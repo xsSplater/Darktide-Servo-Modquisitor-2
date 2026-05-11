@@ -14,30 +14,30 @@ func (t ForcedDarkTheme) Color(name fyne.ThemeColorName, variant fyne.ThemeVaria
 	// ================== ФОНЫ ========================
 	// Основной фон всего приложения (окна, пустые области)
 	case theme.ColorNameBackground:
-		return color.NRGBA{R: 32, G: 32, B: 32, A: 255}
+		return color.NRGBA{R: 32, G: 32, B: 32, A: 225}
 	// Фон выпадающих меню (строки меню, контекстные меню)
 	case theme.ColorNameMenuBackground:
-		return color.NRGBA{R: 42, G: 42, B: 42, A: 255} // чуть светлее основного фона
-	// Фон полей ввода (например, текстовые поля) – у нас прозрачный, чтобы CRT-фон был виден
+		return color.NRGBA{R: 52, G: 55, B: 52, A: 240} // чуть светлее основного фона
+	// Фон полей ввода – прозрачный для видимости CRT-фона
 	case theme.ColorNameInputBackground:
-		return color.Transparent // return color.NRGBA{R: 22, G: 22, B: 22, A: 255}
+		return color.NRGBA{R: 5, G: 6, B: 5, A: 155}
 	// Фон всплывающих окон (диалогов) – как основной фон
 	case theme.ColorNameOverlayBackground:
 		return color.NRGBA{R: 32, G: 32, B: 32, A: 255}
-	// Цвет текста на предупреждающем/ошибочном фоне (используется редко, в основном для обозначения опасных действий)
+	// Цвет текста предупреждений или ошибок
 	case theme.ColorNameForegroundOnWarning:
-		return color.NRGBA{R: 255, G: 32, B: 32, A: 255}
+		return color.NRGBA{R: 192, G: 255, B: 26, A: 255} // салатовый
 
 	// ================== КНОПКИ ======================
 	// Основной цвет обычной кнопки
 	case theme.ColorNameButton:
-		return color.NRGBA{R: 50, G: 50, B: 55, A: 255}
+		return color.NRGBA{R: 55, G: 60, B: 55, A: 240}
 	// Цвет кнопки, на которую навели мышь (hover)
 	case theme.ColorNameHover:
-		return color.NRGBA{R: 70, G: 150, B: 38, A: 255}
-	// Цвет заблокированной (неактивной) кнопки
+		return color.NRGBA{R: 70, G: 120, B: 38, A: 222}
+	// Цвет неактивной кнопки
 	case theme.ColorNameDisabledButton:
-		return color.NRGBA{R: 20, G: 20, B: 20, A: 255}
+		return color.NRGBA{R: 30, G: 33, B: 30, A: 111}
 	// Индикатор фокуса (обводка активного элемента) – обычно едва заметный
 	case theme.ColorNameFocus:
 		return color.NRGBA{R: 80, G: 130, B: 200, A: 128}
@@ -48,10 +48,9 @@ func (t ForcedDarkTheme) Color(name fyne.ThemeColorName, variant fyne.ThemeVaria
 	// Основной цвет текста
 	case theme.ColorNameForeground:
 		return color.NRGBA{R: 220, G: 220, B: 220, A: 255}
-	// Цвет текста неактивных (заблокированных) виджетов (например, disabled‑кнопок)
+	// Цвет текста неактивных виджетов (например, disabled-кнопок)
 	case theme.ColorNameDisabled:
-		return color.NRGBA{R: 190, G: 255, B: 110, A: 255} // салатовый (CRT‑стиль)
-		// return color.NRGBA{R: 100, G: 100, B: 100, A: 255}
+		return color.NRGBA{R: 111, G: 115, B: 111, A: 111} 
 	// Цвет сообщения об ошибке (красный текст)
 	case theme.ColorNameError:
 		return color.NRGBA{R: 220, G: 60, B: 60, A: 255}
@@ -81,7 +80,7 @@ func (t ForcedDarkTheme) Color(name fyne.ThemeColorName, variant fyne.ThemeVaria
 	// ================== РАЗДЕЛИТЕЛИ =================
 	// Цвет разделительных линий (например, widget.NewSeparator())
 	case theme.ColorNameSeparator:
-		return color.NRGBA{R: 5, G: 5, B: 5, A: 255}
+		return color.NRGBA{R: 65, G: 75, B: 55, A: 155}
 
 	// ================== ТЕНИ ========================
 	// Цвет тени окон и всплывающих элементов
@@ -94,7 +93,7 @@ func (t ForcedDarkTheme) Color(name fyne.ThemeColorName, variant fyne.ThemeVaria
 
 	// ================== ИНПУТ =======================
 	case theme.ColorNameInputBorder:
-		return color.NRGBA{R: 190, G: 255, B: 110, A: 255} // салатовый (CRT‑стиль)
+		return color.NRGBA{R: 190, G: 255, B: 110, A: 255} // салатовый (CRT-стиль)
 		// return color.NRGBA{R: 70, G: 70, B: 78, A: 255}
 
 	// Если вдруг запрошен неизвестный цвет – отдаём белый (заглушка)

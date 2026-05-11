@@ -18,8 +18,8 @@ func launchGame(version GameVersion, gameRoot string, skipLauncher bool) error {
 	case VersionSteam:
 		exePath = filepath.Join(gameRoot, "binaries", "Darktide.exe")
 		if !skipLauncher {
-			// Запуск через Steam
-			return exec.Command("cmd", "/c", "start", "steam://rungameid/1361210").Start()
+			// Открываем Steam-ссылку через обработчик протоколов
+			return exec.Command("rundll32", "url.dll,FileProtocolHandler", "steam://rungameid/1361210").Start()
 		}
 		// Прямой запуск: прописываем steam_appid.txt и формируем аргументы
 		steamAppIDPath := filepath.Join(gameRoot, "binaries", "steam_appid.txt")
@@ -35,8 +35,7 @@ func launchGame(version GameVersion, gameRoot string, skipLauncher bool) error {
 	case VersionXbox:
 		exePath = filepath.Join(gameRoot, "content", "binaries", "Darktide.exe")
 		if !skipLauncher {
-			// Для Xbox (PC Game Pass) используется shell:AppsFolder
-			return exec.Command("cmd", "/c", "start", "shell:AppsFolder\\...").Start()
+			return exec.Command("explorer", "shell:AppsFolder\\...").Start()
 		}
 		args = []string{
 			"--bundle-dir", "../bundle",

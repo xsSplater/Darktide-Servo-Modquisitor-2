@@ -7,7 +7,6 @@ import (
 	"image"
 	"image/color"
 	"math"
-	"net/url"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -184,11 +183,12 @@ func (app *App) makeRedCRTGradient(w, h int) *image.NRGBA {
 }
 
 func (app *App) runAllChecks() {
-	if !checks.CheckInstallation(app.mainWindow) {
-		return
-	}
-	app.appendLog("// " + app.messages["log_start"])
-	checks.EnsureModLoadOrder(app.mainWindow)
+	app.appendLog("// " + app.messages["log_start"]) // Запуск диагностики...
+
+	checks.CheckInstallation(app.mainWindow) // Ищем папки base и dmf
+
+	checks.EnsureModLoadOrder(app.mainWindow) // Ищем список модов mod_load_order.txt
+
 	if !checks.CheckObsoleteMods(app.mainWindow) {
 		return
 	}
@@ -226,8 +226,11 @@ func (app *App) runAllChecks() {
 		app.refreshModList()
 		absPath, _ := filepath.Abs(filepath.Join(app.cfg.ModsPath, "mod_load_order.txt"))
 		if _, err := os.Stat(absPath); err == nil {
-			u, _ := url.Parse("file://" + filepath.ToSlash(absPath))
-			app.myApp.OpenURL(u)
+			go func() {
+				if err := openFileWithDefaultApp(absPath); err != nil {
+					app.appendLog(fmt.Sprintf("Failed to open file: %v", err))
+				}
+			}()
 		}
 	})
 }

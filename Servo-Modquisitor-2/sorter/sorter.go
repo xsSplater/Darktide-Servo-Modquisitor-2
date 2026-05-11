@@ -9,34 +9,34 @@ import (
 )
 
 type LoadOrderRule struct {
-	Mod    string
-	Before string
+	Mod		string
+	Before	string
 }
 
 var (
-	folderExists   func(string) bool
-	listModFolders func() []string
-	logFunc        func(string)
-	mandatoryOrder []string
-	loadOrderRules []LoadOrderRule
-	dependencies   []ModDependency
-	sortWarningRu  string
-	sortWarningEn  string
-	logCreateMLOT  string
-	logMLOTCreated string
+	folderExists	func(string) bool
+	listModFolders	func() []string
+	logFunc			func(string)
+	mandatoryOrder	[]string
+	loadOrderRules	[]LoadOrderRule
+	dependencies	[]ModDependency
+	sortWarningRu	string
+	sortWarningEn	string
+	logCreateMLOT	string
+	logMLOTCreated	string
 )
 
 type ModDependency struct {
-	Dependent string
-	Required  string
+	Dependent	string
+	Required	string
 }
 
-func SetFolderExistsFunc(fn func(string) bool) { folderExists = fn }
-func SetListModFoldersFunc(fn func() []string) { listModFolders = fn }
-func SetLogFunc(fn func(string))               { logFunc = fn }
-func SetMandatoryOrder(order []string)         { mandatoryOrder = order }
-func SetDependencies(deps []ModDependency)     { dependencies = deps }
-func SetSortMessages(ru, en string)            { sortWarningRu = ru; sortWarningEn = en }
+func SetFolderExistsFunc(fn func(string) bool)	{ folderExists = fn }
+func SetListModFoldersFunc(fn func() []string)	{ listModFolders = fn }
+func SetLogFunc(fn func(string))				{ logFunc = fn }
+func SetMandatoryOrder(order []string)			{ mandatoryOrder = order }
+func SetDependencies(deps []ModDependency)		{ dependencies = deps }
+func SetSortMessages(ru, en string)					{ sortWarningRu = ru; sortWarningEn = en }
 func SetLogMessages(createMLOT, mlotCreated string) {
 	logCreateMLOT = createMLOT
 	logMLOTCreated = mlotCreated
@@ -255,7 +255,7 @@ func writeHeader(f *os.File, lang string) {
 		fmt.Fprintln(f, "-- ▒▓▓▓▓loaded. The lower the mod, the higher the loading priority.▓▓▓▓▒")
 		fmt.Fprintln(f, "-- ▒▓3. Do not rename the mod folder, because the folder names and▓▓▓▓▓▒")
 		fmt.Fprintln(f, "-- ▒▓▓▓▓entries inside the fs depend on this name.▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒")
-		fmt.Fprintln(f, "-- ▒▓4. DO NOT list the \"BASE\" or \"DMF\" folders or you will▓▓▓▓▓▓▓▓▒")
+		fmt.Fprintln(f, "-- ▒▓4. DO NOT list the \"BASE\" or \"DMF\" folders or you will▓▓▓▓▓▓▓▓▓▓▓▓▒")
 		fmt.Fprintln(f, "-- ▒▓▓▓▓get an error in the game‼▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒")
 		fmt.Fprintln(f, "-- ▒▓5. If any mod got 'lost' during sorting and wasn`t added to the▓▓▓▒")
 		fmt.Fprintln(f, "-- ▒▓▓▓▓list, please let me know on my Discord or on Nexusmods:▓▓▓▓▓▓▓▓▒")

@@ -1,603 +1,867 @@
 {
-  "app_title_long": {
-    "en": "⚙ Servo-Modquisitor ⚙",
-    "ru": "⚙ Серво-Модквизитор ⚙"
-  },
-  "author_format": {
-    "en": "Author: %s\n\nInstalled: %s",
-    "ru": "Автор: %s\n\nУстановлен: %s"
-  },
-  "author_unknown": {
-    "en": "unknown",
-    "ru": "неизвестен"
-  },
-  "broken_found_list": {
-    "en": "Broken (no .mod): %s",
-    "ru": "Сломаны (нет .mod): %s"
-  },
-  "broken_message": {
-    "en": "These mod folders are missing the required .mod file. The game ignores them. Delete?",
-    "ru": "Эти папки модов не содержат обязательного .mod файла. Игра их игнорирует. Удалить?"
-  },
-  "broken_title": {
-    "en": "Broken Mods",
-    "ru": "Сломанные моды"
-  },
-  "btn_abort": {
-    "en": "Abort",
-    "ru": "Отмена"
-  },
-  "btn_create_new": {
-    "en": "Create new",
-    "ru": "Создать новый"
-  },
-  "btn_disable_mods": {
-    "en": "Disable Mods",
-    "ru": "Выключить моды"
-  },
-  "btn_down": {
-    "en": "▼ Down",
-    "ru": "▼ Вниз"
-  },
-  "btn_enable_mods": {
-    "en": "Enable Mods",
-    "ru": "Включить моды"
-  },
-  "btn_export": {
-    "en": "Export",
-    "ru": "Экспорт"
-  },
-  "btn_fix_malformed": {
-    "en": "Fix all",
-    "ru": "Исправить все"
-  },
-  "btn_import": {
-    "en": "Import",
-    "ru": "Импорт"
-  },
-  "btn_install": {
-    "en": "Install Mod",
-    "ru": "Установить мод"
-  },
-  "btn_install_folder": {
-    "en": "Install Folder",
-    "ru": "Установить папку"
-  },
-  "btn_no_patcher": {
-    "en": "Patcher not found",
-    "ru": "Патчер не найден"
-  },
-  "btn_open_nexus_for_mod": {
-    "en": "Open %s Nexus page",
-    "ru": "Открыть страницу %s на Nexus"
-  },
-  "btn_open_steam_guide": {
-    "en": "Open Steam Guide",
-    "ru": "Открыть руководство Steam"
-  },
-  "btn_quit": {
-    "en": "Quit",
-    "ru": "Выход"
-  },
-  "btn_refresh": {
-    "en": "Refresh List",
-    "ru": "Обновить список"
-  },
-  "btn_remove": {
-    "en": "Remove Mod",
-    "ru": "Удалить мод"
-  },
-  "btn_save_order": {
-    "en": "Save Order",
-    "ru": "Сохранить порядок"
-  },
-  "btn_sort_checks": {
-    "en": "Checking and sorting",
-    "ru": "Проверка и сортировка"
-  },
-  "btn_up": {
-    "en": "▲ Up",
-    "ru": "▲ Вверх"
-  },
-  "check_updates": {
-    "en": "Check for Updates",
-    "ru": "Проверить обновления"
-  },
-  "confirm_delete_text": {
-    "en": "Delete '%s' folder?",
-    "ru": "Удалить папку '%s'?"
-  },
-  "confirm_delete_title": {
-    "en": "Confirm",
-    "ru": "Подтверждение"
-  },
-  "delete_broken": {
-    "en": "Delete All Broken",
-    "ru": "Удалить все сломанные"
-  },
-  "delete_dependent": {
-    "en": "Delete %s",
-    "ru": "Удалить %s"
-  },
-  "delete_empty": {
-    "en": "Delete empty",
-    "ru": "Удалить пустые"
-  },
-  "delete_first": {
-    "en": "Delete %s",
-    "ru": "Удалить %s"
-  },
-  "delete_obsolete": {
-    "en": "Delete all obsolete",
-    "ru": "Удалить все устаревшие"
-  },
-  "delete_second": {
-    "en": "Delete %s",
-    "ru": "Удалить %s"
-  },
-  "deleted_empty_folder": {
-    "en": "Deleted empty folder: %s",
-    "ru": "Удалена пустая папка: %s"
-  },
-  "deleted_mod": {
-    "en": "Deleted: %s",
-    "ru": "Удалён: %s"
-  },
-  "dependency_desc": {
-    "en": "'%s' requires '%s'. Install it or delete the dependent mod.",
-    "ru": "'%s' требует '%s'. Установите или удалите зависимый мод."
-  },
-  "dependency_error_list": {
-    "en": "Dependency error: %s requires %s",
-    "ru": "Ошибка зависимостей: %s требует %s"
-  },
-  "dependency_title": {
-    "en": "Missing dependency",
-    "ru": "Отсутствует зависимость"
-  },
-  "desc_broken": {
-    "en": "❌ Missing .mod file.",
-    "ru": "❌ Отсутствует .mod файл."
-  },
-  "desc_conflict": {
-    "en": "⚠ Conflict with other mods!",
-    "ru": "⚠ Конфликтует с другими модами!"
-  },
-  "desc_obsolete": {
-    "en": "🕓 Obsolete mod.",
-    "ru": "🕓 Устаревший мод."
-  },
-  "desc_placeholder": {
-    "en": "Description will appear here.",
-    "ru": "Здесь появится описание."
-  },
-  "dmf_missing": {
-    "en": "DMF folder missing!",
-    "ru": "Папка DMF не найдена!"
-  },
-  "done": {
-    "en": "Sorting complete!",
-    "ru": "Сортировка завершена!"
-  },
-  "empty_folder_message": {
-    "en": "The following folders are empty:",
-    "ru": "Следующие папки пусты:"
-  },
-  "empty_folder_title": {
-    "en": "Empty folders",
-    "ru": "Пустые папки"
-  },
-  "empty_found_list": {
-    "en": "Empty: %s",
-    "ru": "Пустые: %s"
-  },
-  "error_uns_archive": {
-    "en": "Unsupported archive format: %s",
-    "ru": "Неподдерживаемый формат архива: %s"
-  },
-  "error_elevation": {
-    "en": "Direct launch requires administrator privileges. Try launching normally or run the program as admin.",
-    "ru": "Для прямого запуска требуются права администратора. Попробуйте запустить обычно или запустите программу от имени администратора."
-  },
-  "filter_active": {
-    "en": "Active",
-    "ru": "Активные"
-  },
-  "filter_all": {
-    "en": "All",
-    "ru": "Все"
-  },
-  "filter_conflict": {
-    "en": "Conflicts",
-    "ru": "Конфликты"
-  },
-  "filter_inactive": {
-    "en": "Inactive",
-    "ru": "Отключённые"
-  },
-  "filter_label": {
-    "en": "Filter:",
-    "ru": "Фильтр:"
-  },
-  "filter_obsolete": {
-    "en": "Obsolete",
-    "ru": "Устаревшие"
-  },
-  "first_run_completed": {
-    "en": "Initial setup complete.",
-    "ru": "Начальная настройка завершена."
-  },
-  "first_run_question1": {
-    "en": "Are mods currently enabled in the game?",
-    "ru": "Включены ли моды в игре прямо сейчас?"
-  },
-  "first_run_question2": {
-    "en": "Have you used toggle_darktide_mods.bat?",
-    "ru": "Использовали ли вы toggle_darktide_mods.bat?"
-  },
-  "first_run_question2_autopatch": {
-    "en": "Have you used toggle_dt_mod_autopatch.cmd?",
-    "ru": "Использовали ли вы toggle_dt_mod_autopatch.cmd?"
-  },
-  "first_run_question2_none": {
-    "en": "Have you used toggle_darktide_mods.bat? (Make sure DML is installed)",
-    "ru": "Использовали ли вы toggle_darktide_mods.bat? (Убедитесь, что DML установлен)"
-  },
-  "first_run_title": {
-    "en": "First Run Setup",
-    "ru": "Первоначальная настройка"
-  },
-  "fixed_wrapper": {
-    "en": "Fixed: %s → %s",
-    "ru": "Исправлено: %s → %s"
-  },
-  "incompatible_desc": {
-    "en": "'%s' and '%s' are incompatible. %s",
-    "ru": "'%s' и '%s' несовместимы. %s"
-  },
-  "incompatible_found_list": {
-    "en": "Incompatible: %s and %s",
-    "ru": "Несовместимые: %s и %s"
-  },
-  "incompatible_title": {
-    "en": "Incompatible mods",
-    "ru": "Несовместимые моды"
-  },
-  "launch_error": {
-    "en": "Launch error: %v",
-    "ru": "Ошибка запуска: %v"
-  },
-  "log_create_mlot": {
-    "en": "Creating new mod_load_order.txt...",
-    "ru": "Создание нового mod_load_order.txt..."
-  },
-  "log_mlot_created": {
-    "en": "mod_load_order.txt successfully created.",
-    "ru": "Файл mod_load_order.txt успешно создан."
-  },
-  "log_deleted": {
-    "en": "Mod deleted: %s",
-    "ru": "Мод удалён: %s"
-  },
-  "log_done": {
-    "en": "Done.",
-    "ru": "Готово."
-  },
-  "log_drop_installed": {
-    "en": "Mod installed via drop: %s",
-    "ru": "Мод установлен перетаскиванием: %s"
-  },
-  "log_exported": {
-    "en": "Mod list exported.",
-    "ru": "Список экспортирован."
-  },
-  "log_extract_error": {
-    "en": "Extraction error: %v",
-    "ru": "Ошибка распаковки: %v"
-  },
-  "log_error_drop": {
-    "en": "Error getting information about the dragged object: %v",
-    "ru": "Ошибка при получении информации о перетащенном объекте: %v"
-  },
-  "log_mod_db_missing": {
-    "en": "Mod database (mod_database.json) not found. Using empty list.",
-    "ru": "База модов (mod_database.json) не найдена. Использую пустой список."
-  },
-  "launcher_ver_unknown": {
-    "en": "Game version not determined",
-    "ru": "Версия игры не определена"
-  },
-  "launcher_exe_not_found": {
-    "en": "Darktide.exe not found",
-    "ru": "Darktide.exe не найден"
-  },
-  "launcher_root_not_found": {
-    "en": "Could not find game root",
-    "ru": "Не удалось найти корень игры"
-  },
-  "log_imported": {
-    "en": "Mod list imported.",
-    "ru": "Список импортирован."
-  },
-  "log_installed": {
-    "en": "Mod installed: %s",
-    "ru": "Мод установлен: %s"
-  },
-  "log_installed_folder": {
-    "en": "Folder installed: %s",
-    "ru": "Папка установлена: %s"
-  },
-  "log_list_refreshed": {
-    "en": "Mod list refreshed.",
-    "ru": "Список модов обновлён."
-  },
-  "log_mods_disabled": {
-    "en": "Mods disabled",
-    "ru": "Моды выключены"
-  },
-  "log_mods_enabled": {
-    "en": "Mods enabled",
-    "ru": "Моды включены"
-  },
-  "log_no_patcher": {
-    "en": "Error: no patcher found. Install DML or autopatcher.",
-    "ru": "Ошибка: патчер не найден. Установите DML или автопатчер."
-  },
-  "log_order_saved": {
-    "en": "Current mod order saved.",
-    "ru": "Порядок модов сохранён."
-  },
-  "log_order_unchanged": {
-    "en": "Order unchanged.",
-    "ru": "Порядок не изменялся."
-  },
-  "log_start": {
-    "en": "Starting diagnostics...",
-    "ru": "Запуск диагностики..."
-  },
-  "log_start0": {
-    "en": "+++ Servitor X55-P1473-R engaged +++",
-    "ru": "+++ Сервитор X55-P1473-R активирован +++"
-  },
-  "log_succ_malformed_fixed": {
-    "en": "Malformed folders fixed!",
-    "ru": "Неправильные папки исправлены!"
-  },
-  "log_succ_moid_found": {
-    "en": "✅ External mod lists loaded.",
-    "ru": "✅ Внешние списки модов загружены."
-  },
-  "log_toggle_fail": {
-    "en": "Failed to toggle patcher: %v",
-    "ru": "Ошибка переключения патча: %v"
-  },
-  "log_warn_base_missing": {
-    "en": "⚠ 'BASE' folder not found!",
-    "ru": "⚠ Папка «BASE» не найдена!"
-  },
-  "log_warn_moid_not_found": {
-    "en": "⚠ mandatory_obsolete_incompatible_dependencies.json not found.",
-    "ru": "⚠ Файл mandatory_obsolete_incompatible_dependencies.json не найден."
-  },
-  "log_zip_error": {
-    "en": "ZIP error: %v",
-    "ru": "Ошибка ZIP: %v"
-  },
-  "log_zip_only": {
-    "en": "Error: please select a ZIP archive.",
-    "ru": "Ошибка: выберите ZIP-архив."
-  },
-  "malformed_found_list": {
-    "en": "Malformed: %s",
-    "ru": "Неправильная распаковка: %s"
-  },
-  "menu_contact": {
-    "en": "Contacts",
-    "ru": "Контакты"
-  },
-  "menu_date_format": {
-    "en": "📅 Date Format",
-    "ru": "📅 Формат даты"
-  },
-  "menu_date_format_dd_mm_yyyy": {
-    "en": "dd-mm-yyyy",
-    "ru": "дд-мм-гггг"
-  },
-  "menu_date_format_mm_dd_yyyy": {
-    "en": "mm-dd-yyyy",
-    "ru": "мм-дд-гггг"
-  },
-  "menu_date_format_yyyy_mm_dd": {
-    "en": "yyyy-mm-dd",
-    "ru": "гггг-мм-дд"
-  },
-  "menu_discord_dtmoddrs": {
-    "en": "DT Modders Discord",
-    "ru": "DT Modders Discord"
-  },
-  "menu_discord_my": {
-    "en": "My Discord",
-    "ru": "Мой Discord"
-  },
-  "menu_lang_en": {
-    "en": "English",
-    "ru": "English"
-  },
-  "menu_lang_ru": {
-    "en": "Русский",
-    "ru": "Русский"
-  },
-  "menu_language": {
-    "en": "Language",
-    "ru": "Язык"
-  },
-  "menu_launch_game": {
-    "en": "Launch Game",
-    "ru": "Запуск игры"
-  },
-  "menu_launch_nolauncher": {
-    "en": "Skip launcher (with Admin only!)",
-    "ru": "Пропуск лаунчера (только с правами Админа!)"
-  },
-  "menu_launch_normal": {
-    "en": "Normal (with launcher)",
-    "ru": "Обычный (с лаунчером)"
-  },
-  "menu_nexus": {
-    "en": "Nexus Mods",
-    "ru": "Nexus Mods"
-  },
-  "menu_settings": {
-    "en": "Settings",
-    "ru": "Настройки",
-    "zh-hans": "设置"
-  },
-  "menu_theme": {
-    "en": "Theme",
-    "ru": "Тема"
-  },
-  "menu_theme_dark": {
-    "en": "Dark",
-    "ru": "Тёмная"
-  },
-  "menu_theme_light": {
-    "en": "Light",
-    "ru": "Светлая"
-  },
-  "mod_list_title": {
-    "en": "Darktide - mod list",
-    "ru": "Дарктайд - список модов"
-  },
-  "mod_load_order_created": {
-    "en": "mod_load_order.txt created.",
-    "ru": "mod_load_order.txt создан."
-  },
-  "mod_url_label": {
-    "en": "🔗 Open mod page",
-    "ru": "🔗 Открыть страницу мода"
-  },
-  "no_broken_found": {
-    "en": "No broken mods (missing .mod file).",
-    "ru": "Ни одного сломанного мода (без .mod файла)."
-  },
-  "no_empty_found": {
-    "en": "No empty folders.",
-    "ru": "Нет пустых папок."
-  },
-  "no_malformed_found": {
-    "en": "No malformed folders.",
-    "ru": "Нет неправильно распакованных папок."
-  },
-  "no_obsolete_found": {
-    "en": "No obsolete mods.",
-    "ru": "Нет устаревших модов."
-  },
-  "no_incompatible_found": {
-    "en": "No incompatible mods found.",
-    "ru": "Несовместимых модов не найдено."
-  },
-  "no_dependency_issues": {
-    "en": "No missing dependencies.",
-    "ru": "Все зависимости удовлетворены."
-  },
-  "no_updates_found": {
-    "en": "All files are up to date.",
-    "ru": "Все файлы актуальны."
-  },
-  "obsolete_found_list": {
-    "en": "Obsolete: %s",
-    "ru": "Устаревшие: %s"
-  },
-  "obsolete_message": {
-    "en": "The following mods are obsolete:",
-    "ru": "Обнаружены следующие устаревшие моды:"
-  },
-  "obsolete_title": {
-    "en": "Obsolete mods",
-    "ru": "Устаревшие моды"
-  },
-  "open_mods_folder": {
-    "en": "Open mods folder",
-    "ru": "Открыть папку mods"
-  },
-  "open_required_page": {
-    "en": "Open %s page",
-    "ru": "Открыть страницу %s"
-  },
-  "search_placeholder": {
-    "en": "🔍 Search...",
-    "ru": "🔍 Поиск..."
-  },
-  "select_mod": {
-    "en": "Select a mod",
-    "ru": "Выберите мод"
-  },
-  "setting_force_english_mod_names": {
-    "en": "Force English Mod Names",
-    "ru": "Английские названия модов"
-  },
-  "skip": {
-    "en": "Skip",
-    "ru": "Пропустить"
-  },
-  "sort_en_warning": {
-    "en": "⚠ Using english_sort_order.txt",
-    "ru": "⚠ Используется english_sort_order.txt"
-  },
-  "sort_ru_warning": {
-    "en": "⚠ Using russian_sort_order.txt",
-    "ru": "⚠ Используется russian_sort_order.txt"
-  },
-  "status_active": {
-    "en": "active",
-    "ru": "активен"
-  },
-  "status_inactive": {
-    "en": "inactive",
-    "ru": "отключён"
-  },
-  "status_mandatory": {
-    "en": "on top",
-    "ru": "сверху"
-  },
-  "step_install": {
-    "en": "BASE and DMF found.",
-    "ru": "Папки BASE и DMF найдены."
-  },
-  "update_message": {
-    "en": "New versions of the following files are available: %s\nUpdate?",
-    "ru": "Доступны новые версии файлов: %s\nОбновить?"
-  },
-  "update_title": {
-    "en": "Updates Available",
-    "ru": "Доступны обновления"
-  },
-  "update_success": {
-    "en": "Updated: %s",
-    "ru": "Обновлён: %s"
-  },
-  "window_error_dsc_dml_dmf": {
-    "en": "Folder '%s' of mod %s not found!",
-    "ru": "Папка «%s» мода %s не найдена!"
-  },
-  "window_error_dsc_mlfrmd": {
-    "en": "These folders appear incorrectly unpacked:",
-    "ru": "Эти папки выглядят неправильно распакованными:"
-  },
-  "window_error_dsc_mlfrmd2": {
-    "en": "Fix them?",
-    "ru": "Исправить?"
-  },
-  "window_error_dsc_mlo_mis": {
-    "en": "mod_load_order.txt not found. Create new?",
-    "ru": "mod_load_order.txt не найден. Создать новый?"
-  },
-  "window_error_title": {
-    "en": "⚠ ERROR ⚠",
-    "ru": "⚠ ОШИБКА ⚠"
-  },
-  "yes": {
-    "en": "Yes",
-    "ru": "Да"
-  }
+	"app_title_long": {
+		"en": "⚙ WH40k - Servo-Modquisitor ⚙",
+		"ru": "⚙ WH40k - Серво-Модквизитор ⚙"
+	},
+	"author_label": {
+    	"en": "Author: %s",
+    	"ru": "Автор: %s"
+	},
+	"author_unknown": {
+		"en": "unknown",
+		"ru": "неизвестен"
+	},
+	"installed_label": {
+		"en": "Installed: %s",
+		"ru": "Установлен: %s"
+	},
+	"broken_found_list": {
+		"en": "Broken (no .mod): %s",
+		"ru": "Сломаны (нет .mod): %s"
+	},
+	"broken_message": {
+		"en": "These mod folders are missing the required .mod file. The game ignores them. Delete?",
+		"ru": "Эти папки модов по какой-то причине не содержат обязательного .mod файла.\nВозможно, моды были неправильно распакованы.\nВ игре будут показываться ошибки.\n\nУдалить их?"
+	},
+	"broken_title": {
+		"en": "💥 Broken Mods",
+		"ru": "💥 Сломанные моды"
+	},
+
+	"btn_abort": {
+		"en": "🛑 Abort",
+		"ru": "🛑 Отмена"
+	},
+	"btn_create_new": {
+		"en": "🆕 Create new",
+		"ru": "🆕 Создать новый"
+	},
+	"btn_disable_mods": {
+		"en": "🔳 Toggle Darktide Mods",
+		"ru": "🔳 Выключить моды в Darktide"
+	},
+	"btn_enable_mods": {
+		"en": "🔲 Toggle Darktide Mods",
+		"ru": "🔲 Включить моды в Darktide"
+	},
+	"btn_export": {
+		"en": "⤴ Export",
+		"ru": "⤴ Экспорт"
+	},
+	"btn_fix_malformed": {
+		"en": "🔧 Fix all",
+		"ru": "🔧 Исправить все"
+	},
+	"btn_import": {
+		"en": "⤵ Import",
+		"ru": "⤵ Импорт"
+	},
+	"btn_install": {
+		"en": "⏬ Install Mod",
+		"ru": "⏬ Установить мод"
+	},
+	"btn_install_folder": {
+		"en": "📂 Install Folder",
+		"ru": "📂 Установить папку"
+	},
+		"btn_launch_game": {
+		"en": "▶ Launch Game",
+		"ru": "▶ Запуск игры"
+	},
+	"btn_launch_nolauncher_long": {
+		"en": "🚀 Quick Launch",
+		"ru": "🚀 Быстрый запуск"
+	},
+	"btn_no_patcher": {
+		"en": "⚠ Patcher not found",
+		"ru": "⚠ Патчер не найден"
+	},
+	"btn_open_nexus_for_mod": {
+		"en": "📙 Open %s Nexus page",
+		"ru": "📙 Открыть страницу %s на Nexus"
+	},
+	"btn_open_steam_guide": {
+		"en": "📘 Open Steam Guide",
+		"ru": "📘 Открыть руководство Steam"
+	},
+	"btn_quit": {
+		"en": "🚪 Quit",
+		"ru": "🚪 Выход"
+	},
+	"btn_refresh": {
+		"en": "🔄 Refresh List",
+		"ru": "🔄 Обновить список"
+	},
+	"btn_remove": {
+		"en": "🗑 Remove Mod",
+		"ru": "🗑 Удалить мод"
+	},
+	"btn_save_order": {
+		"en": "💾 Save List",
+		"ru": "💾 Сохранить список"
+	},
+	"btn_sort_checks": {
+		"en": "🛠 Checking and sorting",
+		"ru": "🛠 Проверка и сортировка"
+	},
+	"btn_up": {
+		"en": "🔼 Move up",
+		"ru": "🔼 Поднять выше"
+	},
+	"btn_down": {
+		"en": "🔽 Move down",
+		"ru": "🔽 Опустить ниже"
+	},
+	"btn_move_to_top": {
+		"en": "⏫ Move to Top",
+		"ru": "⏫ Поднять наверх"
+	},
+	"btn_move_to_bottom": {
+		"en": "⏬ Move to Bottom",
+		"ru": "⏬ Опустить в конец"
+	},
+	"lbl_move_to": {
+		"en": "Move mod to:",
+		"ru": "Переместить на:"
+	},
+	"btn_select_all": {
+		"en": "Select All",
+		"ru": "Выделить все"
+	},
+	"btn_deselect_all": {
+		"en": "Deselect All",
+		"ru": "Снять выделение"
+	},
+	"btn_enable_selected": {
+		"en": "Enable Selected",
+		"ru": "Включить выделенные"
+	},
+	"btn_disable_selected": {
+		"en": "Disable Selected",
+		"ru": "Отключить выделенные"
+	},
+	"btn_enable_all_mods": {
+		"en": "Enable All Mods",
+		"ru": "Включить все моды"
+	},
+	"btn_disable_all_mods": {
+		"en": "Disable All Mods",
+		"ru": "Выключить все моды"
+	},
+	"btn_manage_mods": {
+		"en": "⚙ Mod Management ⚙",
+		"ru": "⚙ Управление модами ⚙"
+	},
+
+	"check_updates": {
+		"en": "❔ Check for Updates",
+		"ru": "❔ Проверить обновления"
+	},
+	"confirm_delete_text": {
+		"en": "Delete '%s' folder?",
+		"ru": "Удалить папку '%s'?"
+	},
+	"confirm_delete_title": {
+		"en": "Confirm",
+		"ru": "Подтверждение"
+	},
+	"col_checkbox": {
+		"en": "✅",
+		"ru": "✅"
+	},
+	"col_number": {
+		"en": "#",
+		"ru": "#"
+	},
+	"col_name": {
+		"en": "Mod Name",
+		"ru": "Название мода"
+	},
+	"col_date": {
+		"en": "Installed",
+		"ru": "Установлен"
+	},
+	"col_status": {
+		"en": "Status",
+		"ru": "Статус"
+	},
+	"col_note": {
+		"en": "Note",
+		"ru": "Примечание"
+	},
+	"delete_broken": {
+		"en": "Delete All Broken",
+		"ru": "Удалить все сломанные"
+	},
+	"delete_dependent": {
+		"en": "Delete %s",
+		"ru": "Удалить %s"
+	},
+	"delete_empty": {
+		"en": "Delete empty",
+		"ru": "Удалить пустые"
+	},
+	"delete_first": {
+		"en": "Delete %s",
+		"ru": "Удалить %s"
+	},
+	"delete_obsolete": {
+		"en": "Delete all obsolete",
+		"ru": "Удалить все устаревшие"
+	},
+	"delete_second": {
+		"en": "Delete %s",
+		"ru": "Удалить %s"
+	},
+	"deleted_empty_folder": {
+		"en": "Deleted empty folder: %s",
+		"ru": "Удалена пустая папка: %s"
+	},
+	"deleted_mod": {
+		"en": "Deleted: %s",
+		"ru": "Удалён: %s"
+	},
+	"dependency_desc": {
+		"en": "'%s' requires '%s'. Install it or delete the dependent mod.",
+		"ru": "'%s' требует '%s'. Установите или удалите зависимый мод."
+	},
+	"dependency_error_list": {
+		"en": "Dependency error: %s requires %s",
+		"ru": "Ошибка зависимостей: %s требует %s"
+	},
+	"dependency_title": {
+		"en": "Missing dependency",
+		"ru": "Отсутствует зависимость"
+	},
+	"desc_broken": {
+		"en": "missing .mod file",
+		"ru": "нет .mod файла"
+	},
+	"desc_conflict": {
+		"en": "⚔ Conflict",
+		"ru": "⚔ Конфликт"
+	},
+	"desc_obsolete": {
+		"en": "☠ Obsolete",
+		"ru": "☠ Устаревший"
+	},
+	"desc_placeholder": {
+		"en": "[ Description will appear here ]",
+		"ru": "[ Здесь появится описание ]"
+	},
+	"dmf_missing": {
+		"en": "DMF folder missing!",
+		"ru": "Папка DMF не найдена!"
+	},
+	"done": {
+		"en": "✅ Sorting complete!",
+		"ru": "✅ Сортировка завершена!"
+	},
+	"empty_folder_message": {
+		"en": "The following folders are empty:",
+		"ru": "Следующие папки пусты:"
+	},
+	"empty_folder_title": {
+		"en": "📂 Empty folders",
+		"ru": "📂 Пустые папки"
+	},
+	"empty_found_list": {
+		"en": "Empty: %s",
+		"ru": "Пустые: %s"
+	},
+	"error_uns_archive": {
+		"en": "⚠ Unsupported archive format: %s",
+		"ru": "⚠ Неподдерживаемый формат архива: %s"
+	},
+	"error_elevation": {
+		"en": "Direct launch requires administrator privileges!\nTry launching normally or run the program as Admin.",
+		"ru": "Для прямого запуска требуются права Администратора.\nПопробуйте обычный запуск или запустите программу от имени Администратора."
+	},
+	"filter_active": {
+		"en": "✔ Active",
+		"ru": "✔ Активные"
+	},
+	"filter_all": {
+		"en": "All",
+		"ru": "Все"
+	},
+	"filter_conflict": {
+		"en": "💢 Conflicts",
+		"ru": "💢 Конфликты"
+	},
+	"filter_inactive": {
+		"en": "❌ Inactive",
+		"ru": "❌ Отключённые"
+	},
+	"filter_label": {
+		"en": "Filter:",
+		"ru": "Фильтр:"
+	},
+	"filter_obsolete": {
+		"en": "☠ Obsolete",
+		"ru": "☠ Устаревшие"
+	},
+	"first_run_completed": {
+		"en": "✅ Initial setup complete.",
+		"ru": "✅ Начальная настройка завершена."
+	},
+	"first_run_question1": {
+		"en": "Are mods currently enabled in the game?",
+		"ru": "Включены ли моды в игре прямо сейчас?"
+	},
+	"first_run_question2": {
+		"en": "Have you used toggle_darktide_mods.bat?",
+		"ru": "Использовали ли вы toggle_darktide_mods.bat?"
+	},
+	"first_run_question2_autopatch": {
+		"en": "Have you used toggle_dt_mod_autopatch.cmd?",
+		"ru": "Использовали ли вы toggle_dt_mod_autopatch.cmd?"
+	},
+	"first_run_question2_none": {
+		"en": "Have you used toggle_darktide_mods.bat? (Make sure DML is installed)",
+		"ru": "Использовали ли вы toggle_darktide_mods.bat? (Убедитесь, что DML установлен)"
+	},
+	"first_run_title": {
+		"en": "First Run Setup",
+		"ru": "Первоначальная настройка"
+	},
+	"fixed_wrapper": {
+		"en": "Fixed: %s → %s",
+		"ru": "Исправлено: %s → %s"
+	},
+	"incompatible_desc": {
+		"en": "'%s' and '%s' are incompatible. %s",
+		"ru": "'%s' и '%s' несовместимы. %s"
+	},
+	"incompatible_found_list": {
+		"en": "Incompatible: %s and %s",
+		"ru": "Несовместимые: %s и %s"
+	},
+	"incompatible_title": {
+		"en": "Incompatible mods",
+		"ru": "Несовместимые моды"
+	},
+	"launch_error": {
+		"en": "Launch error: %v",
+		"ru": "Ошибка запуска: %v"
+	},
+	"log_create_mlot": {
+		"en": "Creating new mod_load_order.txt...",
+		"ru": "Создание нового mod_load_order.txt..."
+	},
+	"log_mlot_created": {
+		"en": "mod_load_order.txt successfully created.",
+		"ru": "Файл mod_load_order.txt успешно создан."
+	},
+	"log_deleted": {
+		"en": "Mod deleted: %s",
+		"ru": "Мод удалён: %s"
+	},
+	"log_done": {
+		"en": "Done.",
+		"ru": "Готово."
+	},
+	"log_drop_installed": {
+		"en": "Mod installed via drop: %s",
+		"ru": "Мод установлен перетаскиванием: %s"
+	},
+	"log_exported": {
+		"en": "Mod list exported.",
+		"ru": "Список экспортирован."
+	},
+	"log_extract_error": {
+		"en": "Extraction error: %v",
+		"ru": "Ошибка распаковки: %v"
+	},
+	"log_error_drop": {
+		"en": "Error getting information about the dragged object: %v",
+		"ru": "Ошибка при получении информации о перетащенном объекте: %v"
+	},
+	"log_mod_db_missing": {
+		"en": "Mod database (mod_database.json) not found. Using empty list.",
+		"ru": "База модов (mod_database.json) не найдена. Использую пустой список."
+	},
+	"launcher_ver_unknown": {
+		"en": "Game version not determined",
+		"ru": "Версия игры не определена"
+	},
+	"launcher_exe_not_found": {
+		"en": "Darktide.exe not found",
+		"ru": "Darktide.exe не найден"
+	},
+	"launcher_root_not_found": {
+		"en": "Could not find game root",
+		"ru": "Не удалось найти корень игры"
+	},
+	"log_imported": {
+		"en": "Mod list imported.",
+		"ru": "Список импортирован."
+	},
+	"log_installed": {
+		"en": "Mod installed: %s",
+		"ru": "Мод установлен: %s"
+	},
+	"log_installed_folder": {
+		"en": "Folder installed: %s",
+		"ru": "Папка установлена: %s"
+	},
+	"log_list_refreshed": {
+		"en": "Mod list refreshed.",
+		"ru": "Список модов обновлён."
+	},
+	"log_mods_disabled": {
+		"en": "Mods disabled",
+		"ru": "Моды выключены"
+	},
+	"log_mods_enabled": {
+		"en": "Mods enabled",
+		"ru": "Моды включены"
+	},
+	"log_no_patcher": {
+		"en": "Error: no patcher found. Install DML or autopatcher.",
+		"ru": "Ошибка: патчер не найден. Установите DML или автопатчер."
+	},
+	"log_order_saved": {
+		"en": "Current mod order saved.",
+		"ru": "Порядок модов сохранён."
+	},
+	"log_order_unchanged": {
+		"en": "Order unchanged.",
+		"ru": "Порядок не изменялся."
+	},
+	"log_start": {
+		"en": "Starting diagnostics...",
+		"ru": "Запуск диагностики..."
+	},
+	"log_start0": {
+		"en": "+++ Servitor X55-P1473-R engaged +++",
+		"ru": "+++ Сервитор X55-P1473-R активирован +++"
+	},
+	"log_succ_malformed_fixed": {
+		"en": "Malformed folders fixed!",
+		"ru": "Неправильные папки исправлены!"
+	},
+	"log_succ_moid_found": {
+		"en": "✅ External mod lists loaded.",
+		"ru": "✅ Внешние списки модов загружены."
+	},
+	"log_toggle_fail": {
+		"en": "Failed to toggle patcher: %v",
+		"ru": "Ошибка переключения патча: %v"
+	},
+	"log_warn_base_missing": {
+		"en": "⚠ 'BASE' folder not found!",
+		"ru": "⚠ Папка «BASE» не найдена!"
+	},
+	"log_warn_moid_not_found": {
+		"en": "⚠ mandatory_obsolete_incompatible_dependencies.json not found.",
+		"ru": "⚠ Файл mandatory_obsolete_incompatible_dependencies.json не найден."
+	},
+	"log_zip_error": {
+		"en": "⚠ ZIP error: %v",
+		"ru": "⚠ Ошибка ZIP: %v"
+	},
+	"log_zip_only": {
+		"en": "Error: please select a ZIP archive.",
+		"ru": "Ошибка: выберите ZIP-архив."
+	},
+	"malformed_found_list": {
+		"en": "Malformed: %s",
+		"ru": "Неправильная распаковка: %s"
+	},
+	"menu_contact": {
+		"en": "📧 Contacts",
+		"ru": "📧 Контакты"
+	},
+	"menu_date_format": {
+		"en": "📅 Date Format",
+		"ru": "📅 Формат даты"
+	},
+	"menu_date_format_dd_mm_yyyy": {
+		"en": "dd-mm-yyyy",
+		"ru": "дд-мм-гггг"
+	},
+	"menu_date_format_mm_dd_yyyy": {
+		"en": "mm-dd-yyyy",
+		"ru": "мм-дд-гггг"
+	},
+	"menu_date_format_yyyy_mm_dd": {
+		"en": "yyyy-mm-dd",
+		"ru": "гггг-мм-дд"
+	},
+	"menu_discord_dtmoddrs": {
+		"en": "⚒ DT Modders Discord",
+		"ru": "⚒ DT Modders Discord"
+	},
+	"menu_discord_my": {
+		"en": "🔨 My Discord",
+		"ru": "🔨 Мой Discord"
+	},
+	"menu_github": {
+		"en": "🌚 Github",
+		"ru": "🌚 Github"
+	},
+	"menu_lang_en": {
+		"en": "🗨 English",
+		"ru": "🗨 English"
+	},
+	"menu_lang_ru": {
+		"en": "🗨 Русский",
+		"ru": "🗨 Русский"
+	},
+	"menu_language": {
+		"en": "😛 Language",
+		"ru": "😛 Язык"
+	},
+	"menu_nexus": {
+		"en": "📙 Nexus Mods",
+		"ru": "📙 Nexus Mods"
+	},
+	"menu_settings": {
+		"en": "⚙ Settings",
+		"ru": "⚙ Настройки",
+		"zh-hans": "⚙ 设置"
+	},
+	"menu_theme": {
+		"en": "🌓 Theme",
+		"ru": "🌓 Тема"
+	},
+	"menu_theme_dark": {
+		"en": "🌑 Dark",
+		"ru": "🌑 Тёмная"
+	},
+	"menu_theme_light": {
+		"en": "🌕 Light",
+		"ru": "🌕 Светлая"
+	},
+	"menu_updates": {
+		"en": "⏬ Updates",
+		"ru": "⏬ Обновления"
+	},
+	"menu_update_program": {
+		"en": "📟 Update Program",
+		"ru": "📟 Обновить программу"
+	},
+	"menu_update_sort_files": {
+		"en": "🗃 Update Sorting Files",
+		"ru": "🗃 Обновить файлы сортировки"
+	},
+	"menu_periodic_check": {
+		"en": "⏰ Periodic Update Check",
+		"ru": "⏰ Периодическая проверка"
+	},
+	"mods_counter": {
+		"en": "Showing %d of %d (active %d)",
+		"ru": "Показано %d из %d (активно %d)"
+	},
+	"no_obsolete_found": {
+			"en": "No obsolete mods found.",
+			"ru": "Устаревших модов не обнаружено."
+	},
+	"no_malformed_found": {
+			"en": "No malformed mods found.",
+			"ru": "Неправильно распакованных модов не обнаружено."
+	},
+	"no_empty_found": {
+			"en": "No empty mods found.",
+			"ru": "Пустых папок модов не обнаружено."
+	},
+	"no_incompatible_found": {
+			"en": "No incompatible mods found.",
+			"ru": "Несовместимых модов не обнаружено."
+	},
+	"no_dependency_issues": {
+			"en": "No dependency issues found.",
+			"ru": "Проблем с зависимостями не обнаружено."
+	},
+	"no_broken_found": {
+			"en": "No broken mods found.",
+			"ru": "Сломанных модов не обнаружено."
+	},
+	"mod_load_order_created": {
+			"en": "mod_load_order.txt has been created.",
+			"ru": "mod_load_order.txt создан."
+	},
+	"freq_every_start": {
+		"en": "🕐 Every start",
+		"ru": "🕐 При каждом запуске"
+	},
+	"freq_weekly": {
+		"en": "🕒 Weekly",
+		"ru": "🕒 Раз в неделю"
+	},
+	"freq_monthly": {
+		"en": "🕕 Monthly",
+		"ru": "🕕 Раз в месяц"
+	},
+	"freq_yearly": {
+		"en": "🕛 Yearly",
+		"ru": "🕛 Раз в год"
+	},
+	"freq_never": {
+		"en": "❌ Never",
+		"ru": "❌ Никогда"
+	},
+	"sort_files_missing": {
+		"en": "Sorting files not found",
+		"ru": "Не найдены файлы сортировки"
+	},
+	"sort_files_missing_short": {
+		"en": "Sorting files not found. Mods will be sorted alphabetically.",
+		"ru": "Файлы сортировки не найдены. Моды будут отсортированы по алфавиту."
+	},
+	"download_sort_files_question": {
+		"en": "Download sorting files (mod database and rules)?",
+		"ru": "Скачать файлы сортировки (базу модов и правила)?"
+	},
+	"download_failed": {
+		"en": "Download failed: %v",
+		"ru": "Не удалось скачать: %v"
+	},
+	"download_skipped": {
+		"en": "Skipped. Sorting by alphabet.",
+		"ru": "Пропущено. Сортировка по алфавиту."
+	},
+	"download_skip_forever": {
+		"en": "⏭ Skip (Don't ask again)",
+		"ru": "⏭ Пропустить (больше не спрашивать)"
+	},
+	"sort_files_updated": {
+		"en": "Sorting files updated.",
+		"ru": "Файлы сортировки обновлены."
+	},
+	"no_updates_found": {
+		"en": "All files are up to date.",
+		"ru": "Все файлы актуальны."
+	},
+	"obsolete_found_list": {
+		"en": "Obsolete: %s",
+		"ru": "Устаревшие: %s"
+	},
+	"obsolete_message": {
+		"en": "The following mods are obsolete:",
+		"ru": "Обнаружены следующие устаревшие моды:"
+	},
+	"obsolete_title": {
+		"en": "Obsolete mods",
+		"ru": "Устаревшие моды"
+	},
+	"open_mods_folder": {
+		"en": "Open mods folder",
+		"ru": "Открыть папку mods"
+	},
+	"open_required_page": {
+		"en": "Open %s page",
+		"ru": "Открыть страницу %s"
+	},
+	"open_download_page": {
+		"en": "Open download page",
+		"ru": "Открыть страницу загрузки"
+	},
+	"search_placeholder": {
+		"en": "🔍 Search...",
+		"ru": "🔍 Поиск..."
+	},
+	"select_mod": {
+		"en": "Select a mod",
+		"ru": "Выберите мод"
+	},
+	"setting_force_english_mod_names": {
+		"en": "Force English Mod Names",
+		"ru": "Английские названия модов"
+	},
+	"skip": {
+		"en": "⏩ Skip",
+		"ru": "⏩ Пропустить"
+	},
+	"sort_en_warning": {
+		"en": "Using english_sort_order.txt",
+		"ru": "Используется english_sort_order.txt"
+	},
+	"sort_ru_warning": {
+		"en": "Using russian_sort_order.txt",
+		"ru": "Используется russian_sort_order.txt"
+	},
+	"status_active": {
+		"en": "✔ active",
+		"ru": "✔ активен"
+	},
+	"status_inactive": {
+		"en": "❌ inactive",
+		"ru": "❌ отключён"
+	},
+	"status_mandatory": {
+		"en": "⬆ on top",
+		"ru": "⬆ сверху"
+	},
+	"step_install": {
+		"en": "BASE and DMF found.",
+		"ru": "Папки BASE и DMF найдены."
+	},
+	"update_message": {
+		"en": "New versions of the following files are available: %s\nUpdate?",
+		"ru": "Доступны новые версии файлов: %s\nОбновить?"
+	},
+	"update_title": {
+		"en": "Updates Available",
+		"ru": "Доступны обновления"
+	},
+	"update_success": {
+		"en": "Updated: %s",
+		"ru": "Обновлён: %s"
+	},
+	"window_error_dsc_dml_dmf": {
+		"en": "Folder '%s' of mod %s not found!",
+		"ru": "Папка «%s» мода %s не найдена!"
+	},
+	"window_error_dsc_mlfrmd": {
+		"en": "These folders appear incorrectly unpacked:",
+		"ru": "Эти папки выглядят неправильно распакованными:"
+	},
+	"window_error_dsc_mlfrmd2": {
+		"en": "Fix them?",
+		"ru": "Исправить?"
+	},
+	"window_error_dsc_mlo_mis": {
+		"en": "mod_load_order.txt not found. Create new?",
+		"ru": "mod_load_order.txt не найден. Создать новый?"
+	},
+	"window_error_title": {
+		"en": "⚠ ERROR ⚠",
+		"ru": "⚠ ОШИБКА ⚠"
+	},
+	"yes": {
+		"en": "⏬ Download",
+		"ru": "⏬ Скачать"
+	},
+	"program_update_available": {
+		"en": "Program update available: %s",
+		"ru": "Доступно обновление программы: %s"
+	},
+	"no_update_needed": {
+		"en": "No updates available.",
+		"ru": "Нет обновлений."
+	},
+	"icon_launch_normal": {
+		"en": "",
+		"ru": ""
+	},
+	"icon_launch_nolauncher": {
+		"en": "",
+		"ru": ""
+	},
+
+	"btn_save_order_tooltip": {
+		"en": "Save current mod order (Ctrl+S)",
+		"ru": "Сохранить порядок модов (Ctrl+S)"
+	},
+	"btn_refresh_tooltip": {
+		"en": "Reload mod list (F5)",
+		"ru": "Обновить список модов (F5)"
+	},
+	"btn_install_tooltip": {
+		"en": "Install a mod from archive (Ctrl+I)",
+		"ru": "Установить мод из архива (Ctrl+I)"
+	},
+	"btn_remove_tooltip": {
+		"en": "Delete selected mod (Del)",
+		"ru": "Удалить выбранный мод (Del)"
+	},
+	"btn_up_tooltip": {
+		"en": "Move selected mod up (Alt+↑)",
+		"ru": "Поднять выбранный мод выше (Alt+↑)"
+	},
+	"btn_down_tooltip": {
+		"en": "Move selected mod down (Alt+↓)",
+		"ru": "Опустить выбранный мод ниже (Alt+↓)"
+	},
+	"btn_sort_checks_tooltip": {
+		"en": "Run diagnostics and sort mods (Ctrl+Shift+C)",
+		"ru": "Диагностика и сортировка (Ctrl+Shift+C)"
+	},
+	"btn_toggle_tooltip": {
+		"en": "Toggle all mods on/off in game (Ctrl+T)",
+		"ru": "Вкл/выкл все моды в игре (Ctrl+T)"
+	},
+	"btn_launch_game_tooltip": {
+		"en": "Launch Darktide (Ctrl+L)",
+		"ru": "Запустить Darktide (Ctrl+L)"
+	},
+	"btn_launch_nolauncher_long_tooltip": {
+		"en": "Quick launch without launcher (Ctrl+Shift+L)",
+		"ru": "Быстрый запуск без лаунчера (Ctrl+Shift+L)"
+	},
+	"btn_move_to_top_tooltip": {
+		"en": "Move to top (Ctrl+Home)",
+		"ru": "Переместить в начало (Ctrl+Home)"
+	},
+	"btn_move_to_bottom_tooltip": {
+		"en": "Move to bottom (Ctrl+End)",
+		"ru": "Переместить в конец (Ctrl+End)"
+	},
+	"btn_select_all_tooltip": {
+		"en": "Select all mods (Ctrl+A)",
+		"ru": "Выделить все моды (Ctrl+A)"
+	},
+	"btn_deselect_all_tooltip": {
+		"en": "Deselect all (Ctrl+D)",
+		"ru": "Снять выделение (Ctrl+D)"
+	},
+	"btn_enable_selected_tooltip": {
+		"en": "Enable selected mods (Ctrl+E)",
+		"ru": "Включить выделенные (Ctrl+E)"
+	},
+	"btn_disable_selected_tooltip": {
+		"en": "Disable selected mods (Ctrl+Shift+E)",
+		"ru": "Выключить выделенные (Ctrl+Shift+E)"
+	},
+	"btn_enable_all_tooltip": {
+		"en": "Enable all mods",
+		"ru": "Включить все моды"
+	},
+	"btn_disable_all_tooltip": {
+		"en": "Disable all mods",
+		"ru": "Выключить все моды"
+	},
+	"btn_manage_mods_tooltip": {
+		"en": "Show/hide management panel (Ctrl+M)",
+		"ru": "Показать/скрыть панель управления (Ctrl+M)"
+	},
+
+	"mod_url_label": {
+		"en": "Open mod page",
+		"ru": "Открыть страницу мода"
+	},
+	"log_open_steam_guide": {
+		"en": "Opening Steam guide…",
+		"ru": "Открываю руководство Steam…"
+	},
+	"log_open_nexus_page": {
+		"en": "Opening Nexus page…",
+		"ru": "Открываю страницу Nexus…"
+	},
+	"log_open_mods_folder": {
+		"en": "Opening mods folder",
+		"ru": "Открываю папку с модами"
+	},
+
+	"status_system": {
+		"en": "[framework]",
+		"ru": "[фрэймворк]"
+	},
+
+	"setting_show_system_mods": {
+		"en": "Show DMLoader and DMFramework",
+		"ru": "Показывать DMLoader и DMFramework"
+	},
+
+	"unsaved_changes_question": {
+		"en": "Save changes to mod list before exit?",
+		"ru": "Сохранить изменения перед выходом?"
+	},
+
+	"game_already_running": {
+		"en": "Darktide is already running.",
+		"ru": "Darktide уже запущен."
+	}
 }

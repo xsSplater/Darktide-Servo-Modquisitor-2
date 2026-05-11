@@ -1,0 +1,22 @@
+# Скомпилированные бинарники
+*.exe
+*.exe~
+Servo-Modquisitor
+
+# Логи
+app.log
+
+# Сгенерированные ресурсы (syso)
+rsrc_windows_*.syso
+
+# Временные файлы fyne
+fyne_metadata_init.go
+
+# Файлы конфигурации пользователя
+config.json
+
+# Папка с ресурсами go-winres
+winres/
+
+# Папка для fyne-cross (если используется)
+fyne-cross/

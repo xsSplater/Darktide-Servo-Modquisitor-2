@@ -1,17 +1,16 @@
+// menu.go
 package main
 
 import (
 	"Servo-Modquisitor/checks"
 	"Servo-Modquisitor/sorter"
 	"Servo-Modquisitor/themes"
-	"crypto/md5"
-	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"net/url"
 	"os"
-	"path/filepath"
 	"strings"
 	"time"
 
@@ -67,42 +66,50 @@ func (app *App) buildMainMenu() *fyne.MainMenu {
 		app.mainWindow.SetMainMenu(app.buildMainMenu())
 	})
 
-	updateItem := fyne.NewMenuItem(app.messages["check_updates"], func() {
-		go app.checkForUpdates()
-	})
-
 	settingsMenu := fyne.NewMenu(app.messages["menu_settings"],
 		langMenu, themeMenu, dateMenu, forceEnglishItem,
-		fyne.NewMenuItemSeparator(),
-		updateItem,
 	)
 
-	version := detectGameVersion(app.gameRoot)
-	launchItems := []*fyne.MenuItem{}
-	if version == VersionSteam || version == VersionXbox {
-		launchItems = append(launchItems,
-			fyne.NewMenuItem(app.messages["menu_launch_normal"], func() {
-				go func() {
-					err := app.launchGameFunc(version, app.gameRoot, false)
-					if err != nil {
-						app.appendLog(fmt.Sprintf(app.messages["launch_error"], err))
-					}
-				}()
-			}),
-			fyne.NewMenuItem(app.messages["menu_launch_nolauncher"], func() {
-				go func() {
-					err := app.launchGameFunc(version, app.gameRoot, true)
-					if err != nil {
-						app.appendLog(fmt.Sprintf(app.messages["launch_error"], err))
-					}
-				}()
-			}),
-		)
+	// ---- Меню Обновления ----
+	freqNames := map[string]string{
+		"every_start":	app.messages["freq_every_start"],
+		"weekly":		app.messages["freq_weekly"],
+		"monthly":		app.messages["freq_monthly"],
+		"yearly":		app.messages["freq_yearly"],
+		"never":		app.messages["freq_never"],
 	}
-	launchMenu := fyne.NewMenu(app.messages["menu_launch_game"], launchItems...)
+	freqItems := make([]*fyne.MenuItem, 0, len(freqNames))
+	for freq, name := range freqNames {
+		freqCopy := freq
+		freqItems = append(freqItems, fyne.NewMenuItem(name, func() {
+			app.cfg.UpdateCheckFrequency = freqCopy
+			saveConfig(app.cfg)
+			app.appendLog(fmt.Sprintf("Update check frequency set to %s", name))
+		}))
+	}
+	periodicSub := fyne.NewMenuItem(app.messages["menu_periodic_check"], nil)
+	periodicSub.ChildMenu = fyne.NewMenu("", freqItems...)
 
+	updateProgram := fyne.NewMenuItem(app.messages["menu_update_program"], func() {
+		go app.checkForProgramUpdate()
+	})
+	updateSortFiles := fyne.NewMenuItem(app.messages["menu_update_sort_files"], func() {
+		go app.updateSortFiles()
+	})
+
+	updatesMenu := fyne.NewMenu(app.messages["menu_updates"],
+		updateProgram,
+		updateSortFiles,
+		periodicSub,
+	)
+
+	// Контакты
 	contactNexus := fyne.NewMenuItem(app.messages["menu_nexus"], func() {
 		u, _ := url.Parse("https://www.nexusmods.com/warhammer40kdarktide/mods/139")
+		_ = app.myApp.OpenURL(u)
+	})
+	contactGitHub := fyne.NewMenuItem(app.messages["menu_github"], func() {
+		u, _ := url.Parse("https://github.com/xsSplater/Darktide-Servo-Modquisitor-2")
 		_ = app.myApp.OpenURL(u)
 	})
 	contactDiscordMy := fyne.NewMenuItem(app.messages["menu_discord_my"], func() {
@@ -113,12 +120,31 @@ func (app *App) buildMainMenu() *fyne.MainMenu {
 		u, _ := url.Parse("https://discord.com/channels/1048312349867646996/1165372223322869873")
 		_ = app.myApp.OpenURL(u)
 	})
-	contactMenu := fyne.NewMenu(app.messages["menu_contact"], contactNexus, contactDiscord, contactDiscordMy)
+	contactMenu := fyne.NewMenu(app.messages["menu_contact"], contactGitHub, contactNexus, contactDiscord, contactDiscordMy)
 
-	if len(launchItems) > 0 {
-		return fyne.NewMainMenu(settingsMenu, contactMenu, launchMenu)
+	showSystemLabel := app.messages["setting_show_system_mods"]
+	if app.cfg.ShowSystemMods {
+		showSystemLabel = "✅ " + showSystemLabel
 	}
-	return fyne.NewMainMenu(settingsMenu, contactMenu)
+	showSystemItem := fyne.NewMenuItem(showSystemLabel, func() {
+		app.cfg.ShowSystemMods = !app.cfg.ShowSystemMods
+		saveConfig(app.cfg)
+		// Обновить видимость таблицы
+		if app.systemModsTableContainer != nil {
+			if app.cfg.ShowSystemMods {
+				app.systemModsTableContainer.Show()
+			} else {
+				app.systemModsTableContainer.Hide()
+			}
+		}
+		app.mainWindow.SetMainMenu(app.buildMainMenu()) // обновить галочку
+	})
+
+	settingsMenu = fyne.NewMenu(app.messages["menu_settings"],
+		langMenu, themeMenu, dateMenu, forceEnglishItem, showSystemItem,
+	)
+
+	return fyne.NewMainMenu(settingsMenu, updatesMenu, contactMenu)
 }
 
 func (app *App) changeLanguage(lang string) {
@@ -133,51 +159,131 @@ func (app *App) changeLanguage(lang string) {
 	sorter.SetSortMessages(app.messages["sort_ru_warning"], app.messages["sort_en_warning"])
 	sorter.SetLogMessages(app.messages["log_create_mlot"], app.messages["log_mlot_created"])
 
-	app.searchEntry.SetPlaceHolder(app.messages["search_placeholder"])
-	app.filterSelect.Options = []string{
-		app.messages["filter_all"], app.messages["filter_active"], app.messages["filter_inactive"],
-		app.messages["filter_obsolete"], app.messages["filter_conflict"],
+	// проверки на nil для виджетов, которые создаются в buildUI
+	if app.searchEntry != nil {
+		app.searchEntry.SetPlaceHolder(app.messages["search_placeholder"])
 	}
-	app.filterSelect.SetSelected(app.messages["filter_all"])
-	app.updateToggleButtonText(app.btnToggle)
-	app.refreshModList()
+	if app.filterSelect != nil {
+		app.filterSelect.Options = []string{
+			app.messages["filter_all"], app.messages["filter_active"], app.messages["filter_inactive"],
+			app.messages["filter_obsolete"], app.messages["filter_conflict"],
+		}
+		app.filterSelect.SetSelected(app.messages["filter_all"])
+		app.filterSelect.Refresh()
+	}
+	if app.btnToggle != nil {
+		app.updateToggleButtonText(app.btnToggle)
+	}
+	app.refreshModList() // filterModList внутри имеет проверку counterLabel != nil
 
-	app.modListTitle.SetText(app.messages["mod_list_title"])
-	app.filterLabel.SetText(app.messages["filter_label"])
-	app.btnSaveOrder.SetText(app.messages["btn_save_order"])
-	app.btnSortChecks.SetText(app.messages["btn_sort_checks"])
-	app.btnRefresh.SetText(app.messages["btn_refresh"])
-	app.btnInstall.SetText(app.messages["btn_install"])
-	app.btnRemove.SetText(app.messages["btn_remove"])
-	app.btnExport.SetText(app.messages["btn_export"])
-	app.btnImport.SetText(app.messages["btn_import"])
-	app.btnUp.SetText(app.messages["btn_up"])
-	app.btnDown.SetText(app.messages["btn_down"])
+	// текстовые метки
+	if app.filterLabel != nil {
+		app.filterLabel.SetText(app.messages["filter_label"])
+	}
+	// кнопки, которые были в правой панели и теперь в верхней
+	if app.btnSaveOrder != nil {
+		app.btnSaveOrder.SetText(app.messages["btn_save_order"])
+	}
+	if app.btnSortChecks != nil {
+		app.btnSortChecks.SetText(app.messages["btn_sort_checks"])
+	}
+	if app.btnRefresh != nil {
+		app.btnRefresh.SetText(app.messages["btn_refresh"])
+	}
+	if app.btnInstall != nil {
+		app.btnInstall.SetText(app.messages["btn_install"])
+	}
+	if app.btnRemove != nil {
+		app.btnRemove.SetText(app.messages["btn_remove"])
+	}
+	if app.btnUp != nil {
+		app.btnUp.SetText(app.messages["btn_up"])
+	}
+	if app.btnDown != nil {
+		app.btnDown.SetText(app.messages["btn_down"])
+	}
+	// новые кнопки быстрого перемещения
+	if app.moveToTopBtn != nil {
+		app.moveToTopBtn.SetText(app.messages["btn_move_to_top"])
+	}
+	if app.moveToBottomBtn != nil {
+		app.moveToBottomBtn.SetText(app.messages["btn_move_to_bottom"])
+	}
+	if app.moveToEntry != nil {
+		app.moveToEntry.SetPlaceHolder("##") // неизменяемое
+	}
+	if app.moveLabel != nil {
+		app.moveLabel.SetText(app.messages["lbl_move_to"])
+	}
+	// кнопки выделения
+	if app.selectAllBtn != nil {
+		app.selectAllBtn.SetText(app.messages["btn_select_all"])
+	}
+	if app.deselectAllBtn != nil {
+		app.deselectAllBtn.SetText(app.messages["btn_deselect_all"])
+	}
+	if app.enableSelectedBtn != nil {
+		app.enableSelectedBtn.SetText(app.messages["btn_enable_selected"])
+	}
+	if app.disableSelectedBtn != nil {
+		app.disableSelectedBtn.SetText(app.messages["btn_disable_selected"])
+	}
+	// кнопки массового включения/выключения
+	if app.enableAllBtn != nil {
+		app.enableAllBtn.SetText(app.messages["btn_enable_all_mods"])
+	}
+	if app.disableAllBtn != nil {
+		app.disableAllBtn.SetText(app.messages["btn_disable_all_mods"])
+	}
+	// кнопки запуска
+	app.updateLaunchButtonTexts()
+	if app.headerTable != nil {
+		app.headerTable.Refresh()
+	}
+	if app.manageBtn != nil {
+		app.manageBtn.SetText(app.messages["btn_manage_mods"])
+	}
+
+	// Обновляем заголовок консоли
+	if app.logHeaderText != nil {
+		app.logHeaderText.Text = app.messages["log_start0"]
+		app.logHeaderText.Refresh()
+	}
+
+	// Перерегистрируем тултипы и горячие клавиши
+	app.registerShortcuts()
+	app.reapplyTooltips()
 	app.updateDescriptionForMod(app.selectedModName)
 }
 
-const baseRawURL = "https://raw.githubusercontent.com/xsSplater/Servo-Modquisitor/main/mods/"
-
-func (app *App) checkForUpdates() {
-	files := []struct {
-		local  string
-		remote string
-	}{
-		{"mod_database.json", baseRawURL + "mod_database.json"},
-		{"mandatory_obsolete_incompatible_dependencies.json", baseRawURL + "mandatory_obsolete_incompatible_dependencies.json"},
+func (app *App) updateLaunchButtonTexts() {
+	if app.btnLaunchNormal != nil {
+		app.btnLaunchNormal.SetText(app.messages["btn_launch_game"])
 	}
+	if app.btnLaunchNoLauncher != nil {
+		app.btnLaunchNoLauncher.SetText(app.messages["btn_launch_nolauncher_long"])
+	}
+}
 
-	var updates []string
-	for _, f := range files {
-		localPath := filepath.Join(app.cfg.ModsPath, f.local)
-		needUpdate, err := app.needFileUpdate(localPath, f.remote)
-		if err != nil {
-			app.appendLog(fmt.Sprintf("Update check error for %s: %v", f.local, err))
-			continue
-		}
-		if needUpdate {
-			updates = append(updates, f.local)
-		}
+func (app *App) checkForProgramUpdate() {
+	u, _ := url.Parse("https://www.nexusmods.com/warhammer40kdarktide/mods/139")
+	_ = app.myApp.OpenURL(u)
+	app.appendLog(app.messages["open_download_page"])
+}
+
+func (app *App) updateSortFiles() {
+	updates := []string{}
+	if need, newVer, err := app.checkVersion(modDatabaseURL, app.cfg.LastModDatabaseVersion); err != nil {
+		app.appendLog(fmt.Sprintf("Update check error for mod_database: %v", err))
+	} else if need {
+		updates = append(updates, "mod_database.json")
+		app.cfg.LastModDatabaseVersion = newVer
+	}
+	if need, newVer, err := app.checkVersion(modMandatoryURL, app.cfg.LastMandatoryRulesVersion); err != nil {
+		app.appendLog(fmt.Sprintf("Update check error for mandatory file: %v", err))
+	} else if need {
+		updates = append(updates, "mandatory_obsolete_incompatible_dependencies.json")
+		app.cfg.LastMandatoryRulesVersion = newVer
 	}
 
 	if len(updates) == 0 {
@@ -192,78 +298,82 @@ func (app *App) checkForUpdates() {
 		app.messages["skip"],
 	)
 	if choice == 0 {
-		var errFiles []string
-		for _, f := range files {
-			localPath := filepath.Join(app.cfg.ModsPath, f.local)
-			if err := app.downloadFile(f.remote, localPath); err != nil {
-				errMsg := fmt.Sprintf("Failed to update %s: %v", f.local, err)
-				app.appendLog(errMsg)
-				errFiles = append(errFiles, f.local)
-			} else {
-				app.appendLog(fmt.Sprintf(app.messages["update_success"], f.local))
-			}
+		if err := app.downloadSortFiles(); err != nil {
+			app.appendLog(fmt.Sprintf(app.messages["download_failed"], err))
+			dialog.ShowInformation(app.messages["update_title"], fmt.Sprintf(app.messages["download_failed"], err), app.mainWindow)
+		} else {
+			app.appendLog(app.messages["sort_files_updated"])
+			app.loadModDatabase("mod_database.json")
+			checks.SetModDatabase(app.modDatabase)
+			checks.LoadExternalLists("mandatory_obsolete_incompatible_dependencies.json")
+			app.refreshModList()
+			saveConfig(app.cfg)
 		}
-
-		// Уведомление, если были ошибки
-		if len(errFiles) > 0 {
-			dialog.ShowInformation(
-				app.messages["update_title"],
-				"The following files could not be updated:\n"+strings.Join(errFiles, "\n"),
-				app.mainWindow,
-			)
-		}
-
-		// Перезагружаем базы (если файлы не были перезаписаны, останутся старые)
-		app.loadModDatabase("mod_database.json")
-		checks.SetModDatabase(app.modDatabase)
-		checks.LoadExternalLists("mandatory_obsolete_incompatible_dependencies.json")
-		app.refreshModList()
 	}
 }
 
-func (app *App) needFileUpdate(localPath, url string) (bool, error) {
-	localData, err := os.ReadFile(localPath)
-	if err != nil {
-		return true, nil // локального файла нет – нужно «обновить» (скачать)
-	}
+func (app *App) checkVersion(url, localVersion string) (bool, string, error) {
 	client := &http.Client{Timeout: 10 * time.Second}
-	resp, err := client.Get(url)
+	req, _ := http.NewRequest("GET", url, nil)
+	if token := os.Getenv("GITHUB_TOKEN"); token != "" {
+		req.Header.Set("Authorization", "token "+token)
+	}
+	resp, err := client.Do(req)
 	if err != nil {
-		return false, err
+		return false, "", err
 	}
 	defer resp.Body.Close()
-
 	if resp.StatusCode != http.StatusOK {
-		// Сервер вернул не 200 – считаем, что обновления нет, и возвращаем ошибку
-		return false, fmt.Errorf("HTTP %d", resp.StatusCode)
+		return false, "", fmt.Errorf("HTTP %d", resp.StatusCode)
 	}
-
-	remoteData, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return false, err
+	var wrapper struct {
+		Version string `json:"version"`
 	}
-	localHash := md5.Sum(localData)
-	remoteHash := md5.Sum(remoteData)
-	return hex.EncodeToString(localHash[:]) != hex.EncodeToString(remoteHash[:]), nil
+	if err := json.NewDecoder(io.LimitReader(resp.Body, 1024*1024)).Decode(&wrapper); err != nil {
+		return false, "", err
+	}
+	if wrapper.Version != localVersion {
+		return true, wrapper.Version, nil
+	}
+	return false, localVersion, nil
 }
 
-func (app *App) downloadFile(url, dest string) error {
-	client := &http.Client{Timeout: 30 * time.Second}
-	resp, err := client.Get(url)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
+func (app *App) checkForUpdates() {
+	app.cfg.LastUpdateCheck = time.Now().Format(time.RFC3339)
+	saveConfig(app.cfg)
 
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("HTTP %d", resp.StatusCode)
+	updates := []string{}
+	if need, newVer, err := app.checkVersion(modDatabaseURL, app.cfg.LastModDatabaseVersion); err == nil && need {
+		updates = append(updates, "mod_database.json")
+		_ = newVer
 	}
+	if need, newVer, err := app.checkVersion(modMandatoryURL, app.cfg.LastMandatoryRulesVersion); err == nil && need {
+		updates = append(updates, "mandatory_obsolete_incompatible_dependencies.json")
+		_ = newVer
+	}
+	if len(updates) > 0 {
+		app.appendLog(fmt.Sprintf("New sorting file versions available: %s. Use menu to update.", strings.Join(updates, ", ")))
+	}
+}
 
-	out, err := os.Create(dest)
-	if err != nil {
-		return err
-	}
-	defer out.Close()
-	_, err = io.Copy(out, resp.Body)
-	return err
+func (app *App) reapplyTooltips() {
+	app.applyTooltip(app.btnSaveOrder, "btn_save_order_tooltip")
+	app.applyTooltip(app.btnRefresh, "btn_refresh_tooltip")
+	app.applyTooltip(app.btnInstall, "btn_install_tooltip")
+	app.applyTooltip(app.btnRemove, "btn_remove_tooltip")
+	app.applyTooltip(app.btnUp, "btn_up_tooltip")
+	app.applyTooltip(app.btnDown, "btn_down_tooltip")
+	app.applyTooltip(app.btnSortChecks, "btn_sort_checks_tooltip")
+	app.applyTooltip(app.btnToggle, "btn_toggle_tooltip")
+	app.applyTooltip(app.btnLaunchNormal, "btn_launch_game_tooltip")
+	app.applyTooltip(app.btnLaunchNoLauncher, "btn_launch_nolauncher_long_tooltip")
+	app.applyTooltip(app.moveToTopBtn, "btn_move_to_top_tooltip")
+	app.applyTooltip(app.moveToBottomBtn, "btn_move_to_bottom_tooltip")
+	app.applyTooltip(app.selectAllBtn, "btn_select_all_tooltip")
+	app.applyTooltip(app.deselectAllBtn, "btn_deselect_all_tooltip")
+	app.applyTooltip(app.enableSelectedBtn, "btn_enable_selected_tooltip")
+	app.applyTooltip(app.disableSelectedBtn, "btn_disable_selected_tooltip")
+	app.applyTooltip(app.enableAllBtn, "btn_enable_all_tooltip")
+	app.applyTooltip(app.disableAllBtn, "btn_disable_all_tooltip")
+	app.applyTooltip(app.manageBtn, "btn_manage_mods_tooltip")
 }

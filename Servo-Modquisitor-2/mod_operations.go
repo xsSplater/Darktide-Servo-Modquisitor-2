@@ -1,3 +1,4 @@
+// mod_operations.go
 package main
 
 import (
@@ -9,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strconv"
 	"strings"
 
 	"fyne.io/fyne/v2"
@@ -16,36 +18,77 @@ import (
 	"github.com/nwaples/rardecode/v2"
 )
 
+func safeJoin(destDir, name string) (string, error) {
+	name = strings.TrimLeft(name, "/\\")
+	if filepath.VolumeName(name) != "" {
+		return "", fmt.Errorf("absolute path not allowed")
+	}
+	targetPath := filepath.Clean(filepath.Join(destDir, name))
+	rel, err := filepath.Rel(destDir, targetPath)
+	if err != nil || strings.HasPrefix(rel, "..") {
+		return "", fmt.Errorf("path traversal detected")
+	}
+	return targetPath, nil
+}
+
 func (app *App) refreshModList() {
 	mods := checks.GetModsInfo(app.cfg.Language, app.cfg.ForceEnglishModNames)
+
+	// Разделяем системные и обычные
+	var sysMods, regMods []checks.ModInfo
+	for _, m := range mods {
+		if m.IsSystem {
+			m.Active = false
+			sysMods = append(sysMods, m)
+		} else {
+			regMods = append(regMods, m)
+		}
+	}
+	app.systemMods = sysMods
+
+	// Сортируем обычные моды согласно load order
 	entries := checks.ReadLoadOrder()
 	if entries == nil {
-		sort.Slice(mods, func(i, j int) bool { return mods[i].Name < mods[j].Name })
-		for i := range mods {
-			mods[i].Active = false
+		sort.Slice(regMods, func(i, j int) bool { return regMods[i].Name < regMods[j].Name })
+		for i := range regMods {
+			regMods[i].Active = false
 		}
 	} else {
+		activeMap := make(map[string]bool)
+		for _, e := range entries {
+			activeMap[e.Name] = e.Active
+		}
+		for i := range regMods {
+			if act, ok := activeMap[regMods[i].Name]; ok {
+				regMods[i].Active = act
+			} else {
+				regMods[i].Active = false
+			}
+		}
+
 		orderMap := make(map[string]int)
 		for i, e := range entries {
 			orderMap[e.Name] = i
 		}
-		for i := range mods {
-			if _, ok := orderMap[mods[i].Name]; !ok {
-				orderMap[mods[i].Name] = len(orderMap)
+		for i := range regMods {
+			if _, ok := orderMap[regMods[i].Name]; !ok {
+				orderMap[regMods[i].Name] = len(orderMap)
 			}
 		}
-		sort.Slice(mods, func(i, j int) bool {
-			return orderMap[mods[i].Name] < orderMap[mods[j].Name]
+		sort.Slice(regMods, func(i, j int) bool {
+			return orderMap[regMods[i].Name] < orderMap[regMods[j].Name]
 		})
 	}
-	for i := range mods {
-		mods[i].Obsolete = app.containsStr(checks.ObsoleteMods, mods[i].Name)
-		mods[i].Mandatory = checks.IsMandatoryMod(mods[i].Name)
-		mods[i].Incompatible = app.checkIncompatible(mods[i].Name)
+
+	for i := range regMods {
+		regMods[i].Obsolete = app.containsStr(checks.ObsoleteMods, regMods[i].Name)
+		regMods[i].Mandatory = checks.IsMandatoryMod(regMods[i].Name)
+		regMods[i].Incompatible = app.checkIncompatible(regMods[i].Name)
 	}
+
 	if app.selectedModName != "" {
 		exists := false
-		for _, m := range mods {
+		for _, m := range regMods {
 			if m.Name == app.selectedModName {
 				exists = true
 				break
@@ -55,58 +98,18 @@ func (app *App) refreshModList() {
 			app.selectedModName = ""
 		}
 	}
-	app.allMods = mods
+
+	app.allMods = regMods
 	app.orderDirty = false
 	app.filterModList()
+	app.updateSystemModsTable()
 }
 
-func (app *App) filterModList() {
-	if app.filterSelect == nil {
-		app.displayedMods = app.allMods
-		if app.modTable != nil {
-			app.modTable.Length = func() (int, int) { return len(app.displayedMods), config.TableColumnCount }
-			app.modTable.Refresh()
-		}
-		return
-	}
-
-	filter := app.filterSelect.Selected
-	if filter == "" || filter == app.messages["filter_all"] {
-		filter = app.messages["filter_all"]
-	}
-	search := strings.ToLower(app.searchEntry.Text)
-	app.displayedMods = nil
-	for _, mod := range app.allMods {
-		displayName := strings.ToLower(mod.DisplayName)
-		if search != "" && !strings.Contains(strings.ToLower(mod.Name), search) &&
-			!strings.Contains(displayName, search) {
-			continue
-		}
-		switch filter {
-		case app.messages["filter_active"]:
-			if !mod.Active {
-				continue
-			}
-		case app.messages["filter_inactive"]:
-			if mod.Active {
-				continue
-			}
-		case app.messages["filter_obsolete"]:
-			if !mod.Obsolete {
-				continue
-			}
-		case app.messages["filter_conflict"]:
-			if !mod.Incompatible {
-				continue
-			}
-		}
-		app.displayedMods = append(app.displayedMods, mod)
-	}
-	if app.modTable != nil {
-		app.modTable.Length = func() (int, int) { return len(app.displayedMods), config.TableColumnCount }
-		app.modTable.Refresh()
-		app.modTable.ScrollToTop()
-		app.updateUpDownButtons()
+// Обновление таблицы системных модов
+func (app *App) updateSystemModsTable() {
+	if app.systemModsTable != nil {
+		app.systemModsTable.Length = func() (int, int) { return len(app.systemMods), config.TableColumnCount }
+		app.systemModsTable.Refresh()
 	}
 }
 
@@ -131,6 +134,7 @@ func (app *App) toggleModActive(name string, active bool) {
 			break
 		}
 	}
+	app.updateTableBorder()
 	app.filterModList()
 }
 
@@ -154,6 +158,7 @@ func (app *App) moveSelected(delta int) {
 	}
 	app.allMods[idx], app.allMods[newIdx] = app.allMods[newIdx], app.allMods[idx]
 	app.orderDirty = true
+	app.updateTableBorder()
 	app.filterModList()
 }
 
@@ -161,6 +166,12 @@ func (app *App) findModByName(name string) *checks.ModInfo {
 	for i := range app.allMods {
 		if app.allMods[i].Name == name {
 			return &app.allMods[i]
+		}
+	}
+	// также ищем среди системных
+	for i := range app.systemMods {
+		if app.systemMods[i].Name == name {
+			return &app.systemMods[i]
 		}
 	}
 	return nil
@@ -266,8 +277,8 @@ func (app *App) extractZip(path string) error {
 	defer r.Close()
 	destDir := app.cfg.ModsPath
 	for _, f := range r.File {
-		targetPath := filepath.Join(destDir, f.Name)
-		if !strings.HasPrefix(filepath.Clean(targetPath), filepath.Clean(destDir)+string(os.PathSeparator)) {
+		targetPath, err := safeJoin(destDir, f.Name)
+		if err != nil {
 			continue
 		}
 		if f.FileInfo().IsDir() {
@@ -309,8 +320,8 @@ func (app *App) extractRar(path string) error {
 		if err != nil {
 			return err
 		}
-		targetPath := filepath.Join(destDir, header.Name)
-		if !strings.HasPrefix(filepath.Clean(targetPath), filepath.Clean(destDir)+string(os.PathSeparator)) {
+		targetPath, err := safeJoin(destDir, header.Name)
+		if err != nil {
 			continue
 		}
 		if header.IsDir {
@@ -337,8 +348,8 @@ func (app *App) extract7z(path string) error {
 
 	destDir := app.cfg.ModsPath
 	for _, f := range r.File {
-		targetPath := filepath.Join(destDir, f.Name)
-		if !strings.HasPrefix(filepath.Clean(targetPath), filepath.Clean(destDir)+string(os.PathSeparator)) {
+		targetPath, err := safeJoin(destDir, f.Name)
+		if err != nil {
 			continue
 		}
 		if f.FileInfo().IsDir() {
@@ -368,7 +379,10 @@ func (app *App) copyFolder(src, dst string) error {
 			return err
 		}
 		relPath, _ := filepath.Rel(src, path)
-		targetPath := filepath.Join(dst, relPath)
+		targetPath, err := safeJoin(dst, relPath)
+		if err != nil {
+			return err
+		}
 		if info.IsDir() {
 			return os.MkdirAll(targetPath, 0755)
 		}
@@ -388,4 +402,79 @@ func (app *App) syncModsEnabledState() {
 		// оставляем значение из конфига
 	}
 	saveConfig(app.cfg)
+}
+
+// ----- Методы перемещения -----
+
+func (app *App) moveSelectedToTop() {
+	if app.selectedModName == "" {
+		return
+	}
+	idx := app.findModIndexByName(app.selectedModName)
+	if idx < 0 {
+		return
+	}
+	mod := app.allMods[idx]
+	app.allMods = append(app.allMods[:idx], app.allMods[idx+1:]...)
+	app.allMods = append([]checks.ModInfo{mod}, app.allMods...)
+	app.orderDirty = true
+	app.updateTableBorder()
+	app.filterModList()
+}
+
+func (app *App) moveSelectedToBottom() {
+	if app.selectedModName == "" {
+		return
+	}
+	idx := app.findModIndexByName(app.selectedModName)
+	if idx < 0 {
+		return
+	}
+	mod := app.allMods[idx]
+	app.allMods = append(app.allMods[:idx], app.allMods[idx+1:]...)
+	app.allMods = append(app.allMods, mod)
+	app.orderDirty = true
+	app.updateTableBorder()
+	app.filterModList()
+}
+
+func (app *App) moveSelectedToPosition() {
+	if app.selectedModName == "" {
+		return
+	}
+	posStr := app.moveToEntry.Text
+	if posStr == "" {
+		return
+	}
+	newPos, err := strconv.Atoi(posStr)
+	if err != nil || newPos < 1 || newPos > len(app.allMods) {
+		app.appendLog("Invalid position")
+		return
+	}
+	newPos--
+	oldIdx := app.findModIndexByName(app.selectedModName)
+	if oldIdx < 0 {
+		return
+	}
+	if newPos == oldIdx {
+		return
+	}
+	mod := app.allMods[oldIdx]
+	app.allMods = append(app.allMods[:oldIdx], app.allMods[oldIdx+1:]...)
+	if newPos > oldIdx {
+		newPos--
+	}
+	app.allMods = append(app.allMods[:newPos], append([]checks.ModInfo{mod}, app.allMods[newPos:]...)...)
+	app.orderDirty = true
+	app.updateTableBorder()
+	app.filterModList()
+}
+
+func (app *App) findModIndexByName(name string) int {
+	for i, m := range app.allMods {
+		if m.Name == name {
+			return i
+		}
+	}
+	return -1
 }
