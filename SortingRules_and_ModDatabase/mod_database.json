@@ -1,756 +1,756 @@
 {
-  "version": "0.11",
-  "mod_database": [
-    {
-      "folder": "pickup_spawner",
-      "name": {
-        "en": "Pickup Spawner",
-        "ru": "Спавнер поднимаемых предметов"
-      },
-      "description": {
-        "en": "Let's you spawn any pick up items in the Meat Grinder.",
-        "ru": "Pickup Spawner - Позволяет создавать поднимаемые предметы на Стрельбище."
-      },
-      "author": "dalokraff",
-      "url": "https://www.nexusmods.com/warhammer40kdarktide/mods/7",
-      "note": {
-        "en": "Fix in the comments on the Nexus for working with the Solo Play mod.",
-        "ru": "Фикс в комментариях на Нексусе для работы с модом Игра в Соло."
-      }
-    },
-    {
-      "folder": "dmf",
-      "name": {
-        "en": "Darktide Mod Framework",
-        "ru": "Фреймворк модов для Darktide"
-      },
-      "description": {
-        "en": "An open-source, community-run framework of modules that provides enhanced modding capabilities and support.",
-        "ru": "Darktide Mod Framework - Управляемый сообществом фреймворк с открытым исходным кодом, предоставляющий расширенные возможности и поддержку модификаций."
-      },
-      "author": "Darktide Modders",
-      "url": "https://www.nexusmods.com/warhammer40kdarktide/mods/8",
-      "note": {
-        "en": "If you see this description, something went wrong. Please report it to the author!",
-        "ru": "Если вы видите это описание, значит что-то пошло не так. Сообщите автору!"
-      }
-    },
-    {
-      "folder": "crosshair_hud",
-      "name": {
-        "en": "Crosshair HUD",
-        "ru": "Интерфейс возле прицела"
-      },
-      "description": {
-        "en": "Adds customizable indicators near the crosshair.",
-        "ru": "Crosshair HUD - "
-      },
-      "author": "Fracticality",
-      "url": "https://www.nexusmods.com/warhammer40kdarktide/mods/9",
-      "note": { "en": "", "ru": "" }
-    },
-    {
-      "folder": "custom_hud",
-      "name": {
-        "en": "Custom HUD",
-        "ru": "Настраиваемый интерфейс",
-        "zh-hans": "自定义 HUD"
-      },
-      "description": {
-        "en": "Allows the user to move various HUD elements, with optional grid and snapping.",
-        "ru": "Custom HUD - Позволяет перемещать и изменять размер элементов интерфейса."
-      },
-      "author": "Fracticality",
-      "url": "https://www.nexusmods.com/warhammer40kdarktide/mods/10",
-      "note": { "en": "", "ru": "" }
-    },
-    {
-      "folder": "TaskbarFlasher",
-      "name": {
-        "en": "Taskbar Flasher",
-        "ru": "Мерцание на панели задач"
-      },
-      "description": {
-        "en": "Flash the taskbar icon when loading screens end or the AFK warning pops up.",
-        "ru": "Taskbar Flasher - Игра мерцает на панели задач, когда заканчиваются экраны загрузки или появляется предупреждение о бездействии.",
-        "zh-hans": "在加载屏幕结束或弹出挂机警告时闪烁状态栏"
-      },
-      "author": "raindish",
-      "url": "https://www.nexusmods.com/warhammer40kdarktide/mods/11",
-      "note": { "en": "", "ru": "" }
-    },
-    {
-      "folder": "PingMonitor",
-      "name": {
-        "en": "Ping Monitor",
-        "ru": "Индикатор пинга",
-        "zh-hans": "网络延迟显示"
-      },
-      "description": {
-        "en": "Add your ping to the in game tab menu. Color indicates jitter.",
-        "ru": "Ping Monitor - Показывает значение пинга в игре, при нажатии ТАВ.",
-        "zh-hans": "在游戏内的 Tab 菜单显示到服务器的延迟"
-      },
-      "author": "raindish",
-      "url": "https://www.nexusmods.com/warhammer40kdarktide/mods/13",
-      "note": { "en": "", "ru": "" }
-    },
-    {
-      "folder": "NumericUI",
-      "name": {
-        "en": "Numeric UI",
-        "ru": "Числовой интерфейс",
-        "zh-hans": "数显界面",
-        "zh-hant": "數位化介面",
-        "fr": "Numeric UI"
-      },
-      "description": {
-        "en": "Adds way more visual information to the HUD, check the full description down below!",
-        "ru": "Numeric UI - Добавляет цифры в ваш интерфейс.",
-        "zh-hans": "在 HUD 上显示数字",
-        "zh-hant": "在 HUD 上顯示數字",
-        "fr": "Ajoute des données numériques utile à votre ATH"
-      },
-      "author": "raindish",
-      "url": "https://www.nexusmods.com/warhammer40kdarktide/mods/14",
-      "note": { "en": "", "ru": "" }
-    },
-    {
-      "folder": "LogMeIn",
-      "name": {
-        "en": "Log Me In",
-        "ru": "Впусти меня"
-      },
-      "description": {
-        "en": "Automatically hits space for you at the title screen and automatically selects your current character. Includes a hotkey to cancel the character selections.",
-        "ru": "Log Me In - На титульном экране автоматически нажимается пробел, автоматически выбирает текущего персонажа и загружает в Хаб. Включает горячую клавишу для отмены выбора персонажа."
-      },
-      "author": "raindish",
-      "url": "https://www.nexusmods.com/warhammer40kdarktide/mods/15",
-      "note": {
-        "en": "It should be First, because it affects the Title screen.",
-        "ru": "Должен стоять первым, тк влияет на титульный экран."
-      }
-    },
-    {
-      "folder": "Healthbars",
-      "name": {
-        "en": "Healthbars",
-        "ru": "Полоски здоровья",
-        "zh-hans": "敌人血条",
-        "zh-hant": "敵人血條",
-        "fr": "Barres de santé"
-      },
-      "description": {
-        "en": "Show healthbars from the Psykanium in regular game modes, togglable by enemy class.",
-        "ru": "Healthbars - Показывает полоски здоровья из Псайканиума в обычных режимах игры.",
-        "zh-hans": "在常规游戏模式中也显示灵能室的血条",
-        "zh-hant": "在一般遊戲模式中顯示靈能室的血條",
-        "fr": "Affiche les barres de santé du Psykhanium dans les modes de jeu normaux."
-      },
-      "author": "raindish",
-      "url": "https://www.nexusmods.com/warhammer40kdarktide/mods/16",
-      "note": { "en": "", "ru": "" }
-    },
-    {
-      "folder": "DisableScreenEffects",
-      "name": {
-        "en": "Disable Screen Effects",
-        "ru": "Отключение экранных эффектов",
-        "zh-hans": "禁用屏幕特效"
-      },
-      "description": {
-        "en": "Makes all the screen effects toggleable off (defaults to turning everything off).",
-        "ru": "Disable Screen Effects - Позволяет переключать видимость экранных эффектов.",
-        "zh-hans": "允许开关所有屏幕特效"
-      },
-      "author": "raindish",
-      "url": "https://www.nexusmods.com/warhammer40kdarktide/mods/17",
-      "note": { "en": "", "ru": "" }
-    },
-    {
-      "folder": "hub_hotkey_menus",
-      "name": {
-        "en": "Hub Hotkeys",
-        "ru": "Горячие клавиши меню для Хаба",
-        "zh-hans": "大厅菜单快捷键"
-      },
-      "description": {
-        "en": "Hub Hotkey Menus - Hotkeys for main hub's menus.",
-        "ru": "Hub Hotkey Menus - Открывайте различные меню в Хабе с помощью горячих клавиш.",
-        "zh-hans": "通过快捷键打开哀星号上的各种菜单。"
-      },
-      "author": "dalokraff",
-      "url": "https://www.nexusmods.com/warhammer40kdarktide/mods/18",
-      "note": {
-        "en": "Fix in the comments on the Nexus Mods.",
-        "ru": "Фикс в комментариях на Нексусе."
-      }
-    },
-    {
-      "folder": "base",
-      "name": {
-        "en": "Darktide Mod Loader",
-        "ru": "Загрузчик модов для Дарктайд"
-      },
-      "description": {
-        "en": "A basic tool for enabling/disabling mods. Required for all mods and the Darktide Mod Framework.",
-        "ru": "Darktide Mod Loader - Базовый инструмент для включения/отключения модов. Необходим для всех модов и платформы Darktide Mod Framework."
-      },
-      "author": "Darktide Modders",
-      "url": "https://www.nexusmods.com/warhammer40kdarktide/mods/19",
-      "note": {
-        "en": "If you see this description, something went wrong. Please report it to the author!",
-        "ru": "Если вы видите это описание, значит что-то пошло не так. Сообщите автору!"
-      }
-    },
-    {
-      "folder": "ui_extensions",
-      "name": {
-        "en": "UI Extension",
-        "ru": "UI Extension"
-      },
-      "description": {
-        "en": "Provides streamlined functionality to inject UI components into existing game menus.",
-        "ru": "UI Extension - Предоставляет упрощённую функциональность для внедрения компонентов пользовательского интерфейса в существующие игровые меню."
-      },
-      "author": "Grasmann",
-      "url": "https://www.nexusmods.com/warhammer40kdarktide/mods/20",
-      "note": {
-        "en": "It doesn't do anything on its own. And it's not needed for anything yet.",
-        "ru": "Ничего не делает сам по себе. И пока ни для чего не нужен."
-      }
-    },
-    {
-      "folder": "animation_events",
-      "name": {
-        "en": "Animation Events",
-        "ru": "События Анимаций"
-      },
-      "description": {
-        "en": "Provides streamlined functionality to capture when certain animations are played.",
-        "ru": "Animation Events - Предоставляет упрощённую функциональность для фиксации момента воспроизведения определённых анимаций."
-      },
-      "author": "Grasmann",
-      "url": "https://www.nexusmods.com/warhammer40kdarktide/mods/21",
-      "note": {
-        "en": "For now it is only needed for the Scoreboard mod.",
-        "ru": "Нужен пока только для мода Таблица результатов (Scoreboard)."
-      }
-    },
-    {
-      "folder": "scoreboard",
-      "name": {
-        "en": "Scoreboard",
-        "ru": "Таблица результатов",
-        "zh-hans": "记分板",
-        "fr": "Tableau des scores",
-        "de": "Scoreboard"
-      },
-      "description": {
-        "en": "Shows a scoreboard after missions and additional messages for certain actions during gameplay. Saves scoreboards for later review. Loads scoreboard rows defined in other mods.",
-        "ru": "Scoreboard - Добавляет таблицу результатов с различной индивидуальной статистикой в конце миссий.",
-        "zh-hans": "任务结束时添加显示各种统计数据的记分板。",
-        "fr": "Ajoute un tableau des scores avec diverses statistiques individuelles à la fin des missions.",
-        "de": "Zeigt nach Missionsende ein Scoreboard mit individuellen Statistiken."
-      },
-      "author": "Grasmann",
-      "url": "https://www.nexusmods.com/warhammer40kdarktide/mods/22",
-      "note": { "en": "", "ru": "" }
-    },
-    {
-      "folder": "creature_spawner",
-      "name": {
-        "en": "Creature Spawner",
-        "ru": "Спавнер существ",
-        "zh-hans": "生物生成",
-        "zh-hant": "怪物生成器"
-      },
-      "description": {
-        "en": "Allows spawning/despawning creatures in self-hosted lobbies. Also contains enhancements for the Meat Grinder.",
-        "ru": "Creature Spawner - Позволяет создавать на картах в частных играх различных существ, которые поддерживаются этими картами.",
-        "zh-hans": "允许你在自己主办的游戏中生成各种单位。",
-        "zh-hant": "允許你在私人遊戲的地圖中生成各種單位。"
-      },
-      "author": "Darktide Modders",
-      "url": "https://www.nexusmods.com/warhammer40kdarktide/mods/25",
-      "note": { "en": "", "ru": "" }
-    },
-    {
-      "folder": "",
-      "name": {
-        "en": "",
-        "ru": ""
-      },
-      "description": {
-        "en": "",
-        "ru": ""
-      },
-      "author": "",
-      "url": "",
-      "note": {
-        "en": "",
-        "ru": ""
-      }
-    },
-    {
-      "folder": "",
-      "name": {
-        "en": "",
-        "ru": ""
-      },
-      "description": {
-        "en": "",
-        "ru": ""
-      },
-      "author": "",
-      "url": "",
-      "note": {
-        "en": "",
-        "ru": ""
-      }
-    },
-    {
-      "folder": "",
-      "name": {
-        "en": "",
-        "ru": ""
-      },
-      "description": {
-        "en": "",
-        "ru": ""
-      },
-      "author": "",
-      "url": "",
-      "note": {
-        "en": "",
-        "ru": ""
-      }
-    },
-    {
-      "folder": "",
-      "name": {
-        "en": "",
-        "ru": ""
-      },
-      "description": {
-        "en": "",
-        "ru": ""
-      },
-      "author": "",
-      "url": "",
-      "note": {
-        "en": "",
-        "ru": ""
-      }
-    },
-    {
-      "folder": "",
-      "name": {
-        "en": "",
-        "ru": ""
-      },
-      "description": {
-        "en": "",
-        "ru": ""
-      },
-      "author": "",
-      "url": "",
-      "note": {
-        "en": "",
-        "ru": ""
-      }
-    },
-    {
-      "folder": "",
-      "name": {
-        "en": "",
-        "ru": ""
-      },
-      "description": {
-        "en": "",
-        "ru": ""
-      },
-      "author": "",
-      "url": "",
-      "note": {
-        "en": "",
-        "ru": ""
-      }
-    },
-    {
-      "folder": "",
-      "name": {
-        "en": "",
-        "ru": ""
-      },
-      "description": {
-        "en": "",
-        "ru": ""
-      },
-      "author": "",
-      "url": "",
-      "note": {
-        "en": "",
-        "ru": ""
-      }
-    },
-    {
-      "folder": "",
-      "name": {
-        "en": "",
-        "ru": ""
-      },
-      "description": {
-        "en": "",
-        "ru": ""
-      },
-      "author": "",
-      "url": "",
-      "note": {
-        "en": "",
-        "ru": ""
-      }
-    },
-    {
-      "folder": "",
-      "name": {
-        "en": "",
-        "ru": ""
-      },
-      "description": {
-        "en": "",
-        "ru": ""
-      },
-      "author": "",
-      "url": "",
-      "note": {
-        "en": "",
-        "ru": ""
-      }
-    },
-    {
-      "folder": "",
-      "name": {
-        "en": "",
-        "ru": ""
-      },
-      "description": {
-        "en": "",
-        "ru": ""
-      },
-      "author": "",
-      "url": "",
-      "note": {
-        "en": "",
-        "ru": ""
-      }
-    },
-    {
-      "folder": "",
-      "name": {
-        "en": "",
-        "ru": ""
-      },
-      "description": {
-        "en": "",
-        "ru": ""
-      },
-      "author": "",
-      "url": "",
-      "note": {
-        "en": "",
-        "ru": ""
-      }
-    },
-    {
-      "folder": "",
-      "name": {
-        "en": "",
-        "ru": ""
-      },
-      "description": {
-        "en": "",
-        "ru": ""
-      },
-      "author": "",
-      "url": "",
-      "note": {
-        "en": "",
-        "ru": ""
-      }
-    },
-    {
-      "folder": "",
-      "name": {
-        "en": "",
-        "ru": ""
-      },
-      "description": {
-        "en": "",
-        "ru": ""
-      },
-      "author": "",
-      "url": "",
-      "note": {
-        "en": "",
-        "ru": ""
-      }
-    },
-    {
-      "folder": "",
-      "name": {
-        "en": "",
-        "ru": ""
-      },
-      "description": {
-        "en": "",
-        "ru": ""
-      },
-      "author": "",
-      "url": "",
-      "note": {
-        "en": "",
-        "ru": ""
-      }
-    },
-    {
-      "folder": "",
-      "name": {
-        "en": "",
-        "ru": ""
-      },
-      "description": {
-        "en": "",
-        "ru": ""
-      },
-      "author": "",
-      "url": "",
-      "note": {
-        "en": "",
-        "ru": ""
-      }
-    },
-    {
-      "folder": "",
-      "name": {
-        "en": "",
-        "ru": ""
-      },
-      "description": {
-        "en": "",
-        "ru": ""
-      },
-      "author": "",
-      "url": "",
-      "note": {
-        "en": "",
-        "ru": ""
-      }
-    },
-    {
-      "folder": "",
-      "name": {
-        "en": "",
-        "ru": ""
-      },
-      "description": {
-        "en": "",
-        "ru": ""
-      },
-      "author": "",
-      "url": "",
-      "note": {
-        "en": "",
-        "ru": ""
-      }
-    },
-    {
-      "folder": "",
-      "name": {
-        "en": "",
-        "ru": ""
-      },
-      "description": {
-        "en": "",
-        "ru": ""
-      },
-      "author": "",
-      "url": "",
-      "note": {
-        "en": "",
-        "ru": ""
-      }
-    },
-    {
-      "folder": "",
-      "name": {
-        "en": "",
-        "ru": ""
-      },
-      "description": {
-        "en": "",
-        "ru": ""
-      },
-      "author": "",
-      "url": "",
-      "note": {
-        "en": "",
-        "ru": ""
-      }
-    },
-    {
-      "folder": "",
-      "name": {
-        "en": "",
-        "ru": ""
-      },
-      "description": {
-        "en": "",
-        "ru": ""
-      },
-      "author": "",
-      "url": "",
-      "note": {
-        "en": "",
-        "ru": ""
-      }
-    },
-    {
-      "folder": "",
-      "name": {
-        "en": "",
-        "ru": ""
-      },
-      "description": {
-        "en": "",
-        "ru": ""
-      },
-      "author": "",
-      "url": "",
-      "note": {
-        "en": "",
-        "ru": ""
-      }
-    },
-    {
-      "folder": "",
-      "name": {
-        "en": "",
-        "ru": ""
-      },
-      "description": {
-        "en": "",
-        "ru": ""
-      },
-      "author": "",
-      "url": "",
-      "note": {
-        "en": "",
-        "ru": ""
-      }
-    },
-    {
-      "folder": "",
-      "name": {
-        "en": "",
-        "ru": ""
-      },
-      "description": {
-        "en": "",
-        "ru": ""
-      },
-      "author": "",
-      "url": "",
-      "note": {
-        "en": "",
-        "ru": ""
-      }
-    },
-    {
-      "folder": "",
-      "name": {
-        "en": "",
-        "ru": ""
-      },
-      "description": {
-        "en": "",
-        "ru": ""
-      },
-      "author": "",
-      "url": "",
-      "note": {
-        "en": "",
-        "ru": ""
-      }
-    },
-    {
-      "folder": "",
-      "name": {
-        "en": "",
-        "ru": ""
-      },
-      "description": {
-        "en": "",
-        "ru": ""
-      },
-      "author": "",
-      "url": "",
-      "note": {
-        "en": "",
-        "ru": ""
-      }
-    },
-    {
-      "folder": "",
-      "name": {
-        "en": "",
-        "ru": ""
-      },
-      "description": {
-        "en": "",
-        "ru": ""
-      },
-      "author": "",
-      "url": "",
-      "note": {
-        "en": "",
-        "ru": ""
-      }
-    },
-    {
-      "folder": "",
-      "name": {
-        "en": "",
-        "ru": ""
-      },
-      "description": {
-        "en": "",
-        "ru": ""
-      },
-      "author": "",
-      "url": "",
-      "note": {
-        "en": "",
-        "ru": ""
-      }
-    },
-    {
-      "folder": "",
-      "name": {
-        "en": "",
-        "ru": ""
-      },
-      "description": {
-        "en": "",
-        "ru": ""
-      },
-      "author": "",
-      "url": "",
-      "note": {
-        "en": "",
-        "ru": ""
-      }
-    }
-  ]
+	"version": "0.12",
+	"mod_database": [
+	{
+		"folder": "pickup_spawner",
+		"name": {
+			"en": "Pickup Spawner",
+			"ru": "Спавнер поднимаемых предметов"
+		},
+		"description": {
+			"en": "Let's you spawn any pick up items in the Meat Grinder.",
+			"ru": "Pickup Spawner - Позволяет создавать поднимаемые предметы на Стрельбище."
+		},
+		"author": "dalokraff",
+		"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/7",
+		"note": {
+			"en": "Fix in the comments on the Nexus for working with the Solo Play mod.",
+			"ru": "Фикс в комментариях на Нексусе для работы с модом Игра в Соло(Solo Play)."
+		}
+	},
+	{
+		"folder": "dmf",
+		"name": {
+			"en": "Darktide Mod Framework",
+			"ru": "Фреймворк модов (DMF)"
+		},
+		"description": {
+			"en": "An open-source, community-run framework of modules that provides enhanced modding capabilities and support.",
+			"ru": "Darktide Mod Framework - Управляемый сообществом фреймворк с открытым исходным кодом, предоставляющий расширенные возможности и поддержку модификаций."
+		},
+		"author": "Darktide Modders",
+		"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/8",
+		"note": {
+			"en": "Darktide Mod Framework is here for installation time reference.",
+			"ru": "Darktide Mod Framework здесь для справки о времени установки."
+		}
+	},
+	{
+		"folder": "crosshair_hud",
+		"name": {
+			"en": "Crosshair HUD",
+			"ru": "Интерфейс возле прицела"
+		},
+		"description": {
+			"en": "Adds customizable indicators near the crosshair.",
+			"ru": "Crosshair HUD - "
+		},
+		"author": "Fracticality",
+		"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/9",
+		"note": { "en": "", "ru": "" }
+	},
+	{
+		"folder": "custom_hud",
+		"name": {
+			"en": "Custom HUD",
+			"ru": "Настраиваемый интерфейс",
+		"zh-hans": "自定义 HUD"
+		},
+		"description": {
+			"en": "Allows the user to move various HUD elements, with optional grid and snapping.",
+			"ru": "Custom HUD - Позволяет перемещать и изменять размер элементов интерфейса."
+		},
+		"author": "Fracticality",
+		"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/10",
+		"note": { "en": "", "ru": "" }
+	},
+	{
+		"folder": "TaskbarFlasher",
+		"name": {
+			"en": "Taskbar Flasher",
+			"ru": "Мерцание на панели задач"
+		},
+		"description": {
+			"en": "Flash the taskbar icon when loading screens end or the AFK warning pops up.",
+			"ru": "Taskbar Flasher - Игра мерцает на панели задач, когда заканчиваются экраны загрузки или появляется предупреждение о бездействии.",
+		"zh-hans": "在加载屏幕结束或弹出挂机警告时闪烁状态栏"
+		},
+		"author": "raindish",
+		"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/11",
+		"note": { "en": "", "ru": "" }
+	},
+	{
+		"folder": "PingMonitor",
+		"name": {
+			"en": "Ping Monitor",
+			"ru": "Индикатор пинга",
+		"zh-hans": "网络延迟显示"
+		},
+		"description": {
+			"en": "Add your ping to the in game tab menu. Color indicates jitter.",
+			"ru": "Ping Monitor - Показывает значение пинга в игре, при нажатии ТАВ.",
+		"zh-hans": "在游戏内的 Tab 菜单显示到服务器的延迟"
+		},
+		"author": "raindish",
+		"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/13",
+		"note": { "en": "", "ru": "" }
+	},
+	{
+		"folder": "NumericUI",
+		"name": {
+			"en": "Numeric UI",
+			"ru": "Числовой интерфейс",
+		"zh-hans": "数显界面",
+		"zh-hant": "數位化介面",
+		"fr": "Numeric UI"
+		},
+		"description": {
+			"en": "Adds way more visual information to the HUD, check the full description down below!",
+			"ru": "Numeric UI - Добавляет цифры в ваш интерфейс.",
+		"zh-hans": "在 HUD 上显示数字",
+		"zh-hant": "在 HUD 上顯示數字",
+		"fr": "Ajoute des données numériques utile à votre ATH"
+		},
+		"author": "raindish",
+		"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/14",
+		"note": { "en": "", "ru": "" }
+	},
+	{
+		"folder": "LogMeIn",
+		"name": {
+			"en": "Log Me In",
+			"ru": "Впусти меня"
+		},
+		"description": {
+			"en": "Automatically hits space for you at the title screen and automatically selects your current character. Includes a hotkey to cancel the character selections.",
+			"ru": "Log Me In - На титульном экране автоматически нажимается пробел, автоматически выбирает текущего персонажа и загружает в Хаб. Включает горячую клавишу для отмены выбора персонажа."
+		},
+		"author": "raindish",
+		"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/15",
+		"note": {
+			"en": "It should be First, because it affects the Title screen.",
+			"ru": "Должен стоять первым, тк влияет на титульный экран."
+		}
+	},
+	{
+		"folder": "Healthbars",
+		"name": {
+			"en": "Healthbars",
+			"ru": "Полоски здоровья",
+		"zh-hans": "敌人血条",
+		"zh-hant": "敵人血條",
+		"fr": "Barres de santé"
+		},
+		"description": {
+			"en": "Show healthbars from the Psykanium in regular game modes, togglable by enemy class.",
+			"ru": "Healthbars - Показывает полоски здоровья из Псайканиума в обычных режимах игры.",
+		"zh-hans": "在常规游戏模式中也显示灵能室的血条",
+		"zh-hant": "在一般遊戲模式中顯示靈能室的血條",
+		"fr": "Affiche les barres de santé du Psykhanium dans les modes de jeu normaux."
+		},
+		"author": "raindish",
+		"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/16",
+		"note": { "en": "", "ru": "" }
+	},
+	{
+		"folder": "DisableScreenEffects",
+		"name": {
+			"en": "Disable Screen Effects",
+			"ru": "Отключение экранных эффектов",
+		"zh-hans": "禁用屏幕特效"
+		},
+		"description": {
+			"en": "Makes all the screen effects toggleable off (defaults to turning everything off).",
+			"ru": "Disable Screen Effects - Позволяет переключать видимость экранных эффектов.",
+		"zh-hans": "允许开关所有屏幕特效"
+		},
+		"author": "raindish",
+		"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/17",
+		"note": { "en": "", "ru": "" }
+	},
+	{
+		"folder": "hub_hotkey_menus",
+		"name": {
+			"en": "Hub Hotkeys",
+			"ru": "Горячие клавиши меню для Хаба",
+		"zh-hans": "大厅菜单快捷键"
+		},
+		"description": {
+			"en": "Hub Hotkey Menus - Hotkeys for main hub's menus.",
+			"ru": "Hub Hotkey Menus - Открывайте различные меню в Хабе с помощью горячих клавиш.",
+		"zh-hans": "通过快捷键打开哀星号上的各种菜单。"
+		},
+		"author": "dalokraff",
+		"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/18",
+		"note": {
+			"en": "Fix in the comments on the Nexus Mods.",
+			"ru": "Фикс в комментариях на Нексусе."
+		}
+	},
+	{
+		"folder": "base",
+		"name": {
+			"en": "Darktide Mod Loader",
+			"ru": "Загрузчик модов (DML)"
+		},
+		"description": {
+			"en": "A basic tool for enabling/disabling mods. Required for all mods and the Darktide Mod Framework.",
+			"ru": "Darktide Mod Loader - Базовый инструмент для включения/отключения модов. Необходим для всех модов и платформы Darktide Mod Framework."
+		},
+		"author": "Darktide Modders",
+		"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/19",
+		"note": {
+			"en": "Darktide Mod Loader is here for installation time reference only.",
+			"ru": "Darktide Mod Loader здесь только для справки о времени установки."
+		}
+	},
+	{
+		"folder": "ui_extensions",
+		"name": {
+			"en": "UI Extension",
+			"ru": "UI Extension"
+		},
+		"description": {
+			"en": "Provides streamlined functionality to inject UI components into existing game menus.",
+			"ru": "UI Extension - Предоставляет упрощённую функциональность для внедрения компонентов пользовательского интерфейса в существующие игровые меню."
+		},
+		"author": "Grasmann",
+		"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/20",
+		"note": {
+			"en": "It doesn't do anything on its own. And it's not needed for anything yet.",
+			"ru": "Ничего не делает сам по себе. И пока ни для чего не нужен."
+		}
+	},
+	{
+		"folder": "animation_events",
+		"name": {
+			"en": "Animation Events",
+			"ru": "События Анимаций"
+		},
+		"description": {
+			"en": "Provides streamlined functionality to capture when certain animations are played.",
+			"ru": "Animation Events - Предоставляет упрощённую функциональность для фиксации момента воспроизведения определённых анимаций."
+		},
+		"author": "Grasmann",
+		"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/21",
+		"note": {
+			"en": "For now it is only needed for the Scoreboard mod.",
+			"ru": "Нужен пока только для мода Таблица результатов (Scoreboard)."
+		}
+	},
+	{
+		"folder": "scoreboard",
+		"name": {
+			"en": "Scoreboard",
+			"ru": "Таблица результатов",
+		"zh-hans": "记分板",
+		"fr": "Tableau des scores",
+		"de": "Scoreboard"
+		},
+		"description": {
+			"en": "Shows a scoreboard after missions and additional messages for certain actions during gameplay. Saves scoreboards for later review. Loads scoreboard rows defined in other mods.",
+			"ru": "Scoreboard - Добавляет таблицу результатов с различной индивидуальной статистикой в конце миссий.",
+		"zh-hans": "任务结束时添加显示各种统计数据的记分板。",
+		"fr": "Ajoute un tableau des scores avec diverses statistiques individuelles à la fin des missions.",
+		"de": "Zeigt nach Missionsende ein Scoreboard mit individuellen Statistiken."
+		},
+		"author": "Grasmann",
+		"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/22",
+		"note": { "en": "", "ru": "" }
+	},
+	{
+		"folder": "creature_spawner",
+		"name": {
+			"en": "Creature Spawner",
+			"ru": "Спавнер существ",
+		"zh-hans": "生物生成",
+		"zh-hant": "怪物生成器"
+		},
+		"description": {
+			"en": "Allows spawning/despawning creatures in self-hosted lobbies. Also contains enhancements for the Meat Grinder.",
+			"ru": "Creature Spawner - Позволяет создавать на картах в частных играх различных существ, которые поддерживаются этими картами.",
+		"zh-hans": "允许你在自己主办的游戏中生成各种单位。",
+		"zh-hant": "允許你在私人遊戲的地圖中生成各種單位。"
+		},
+		"author": "Darktide Modders",
+		"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/25",
+		"note": { "en": "", "ru": "" }
+	},
+	{
+		"folder": "",
+		"name": {
+			"en": "No Skull",
+			"ru": ""
+		},
+		"description": {
+			"en": "This mod removes the red skull icon that appears when you tag an enemy.",
+			"ru": "No Skull"
+		},
+		"author": "",
+		"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/26",
+		"note": {
+			"en": "",
+			"ru": ""
+		}
+	},
+	{
+		"folder": "",
+		"name": {
+			"en": "",
+			"ru": ""
+		},
+		"description": {
+			"en": "",
+			"ru": ""
+		},
+		"author": "",
+		"url": "",
+		"note": {
+			"en": "",
+			"ru": ""
+		}
+	},
+	{
+		"folder": "",
+		"name": {
+			"en": "",
+			"ru": ""
+		},
+		"description": {
+			"en": "",
+			"ru": ""
+		},
+		"author": "",
+		"url": "",
+		"note": {
+			"en": "",
+			"ru": ""
+		}
+	},
+	{
+		"folder": "",
+		"name": {
+			"en": "",
+			"ru": ""
+		},
+		"description": {
+			"en": "",
+			"ru": ""
+		},
+		"author": "",
+		"url": "",
+		"note": {
+			"en": "",
+			"ru": ""
+		}
+	},
+	{
+		"folder": "",
+		"name": {
+			"en": "",
+			"ru": ""
+		},
+		"description": {
+			"en": "",
+			"ru": ""
+		},
+		"author": "",
+		"url": "",
+		"note": {
+			"en": "",
+			"ru": ""
+		}
+	},
+	{
+		"folder": "",
+		"name": {
+			"en": "",
+			"ru": ""
+		},
+		"description": {
+			"en": "",
+			"ru": ""
+		},
+		"author": "",
+		"url": "",
+		"note": {
+			"en": "",
+			"ru": ""
+		}
+	},
+	{
+		"folder": "",
+		"name": {
+			"en": "",
+			"ru": ""
+		},
+		"description": {
+			"en": "",
+			"ru": ""
+		},
+		"author": "",
+		"url": "",
+		"note": {
+			"en": "",
+			"ru": ""
+		}
+	},
+	{
+		"folder": "",
+		"name": {
+			"en": "",
+			"ru": ""
+		},
+		"description": {
+			"en": "",
+			"ru": ""
+		},
+		"author": "",
+		"url": "",
+		"note": {
+			"en": "",
+			"ru": ""
+		}
+	},
+	{
+		"folder": "",
+		"name": {
+			"en": "",
+			"ru": ""
+		},
+		"description": {
+			"en": "",
+			"ru": ""
+		},
+		"author": "",
+		"url": "",
+		"note": {
+			"en": "",
+			"ru": ""
+		}
+	},
+	{
+		"folder": "",
+		"name": {
+			"en": "",
+			"ru": ""
+		},
+		"description": {
+			"en": "",
+			"ru": ""
+		},
+		"author": "",
+		"url": "",
+		"note": {
+			"en": "",
+			"ru": ""
+		}
+	},
+	{
+		"folder": "",
+		"name": {
+			"en": "",
+			"ru": ""
+		},
+		"description": {
+			"en": "",
+			"ru": ""
+		},
+		"author": "",
+		"url": "",
+		"note": {
+			"en": "",
+			"ru": ""
+		}
+	},
+	{
+		"folder": "",
+		"name": {
+			"en": "",
+			"ru": ""
+		},
+		"description": {
+			"en": "",
+			"ru": ""
+		},
+		"author": "",
+		"url": "",
+		"note": {
+			"en": "",
+			"ru": ""
+		}
+	},
+	{
+		"folder": "",
+		"name": {
+			"en": "",
+			"ru": ""
+		},
+		"description": {
+			"en": "",
+			"ru": ""
+		},
+		"author": "",
+		"url": "",
+		"note": {
+			"en": "",
+			"ru": ""
+		}
+	},
+	{
+		"folder": "",
+		"name": {
+			"en": "",
+			"ru": ""
+		},
+		"description": {
+			"en": "",
+			"ru": ""
+		},
+		"author": "",
+		"url": "",
+		"note": {
+			"en": "",
+			"ru": ""
+		}
+	},
+	{
+		"folder": "",
+		"name": {
+			"en": "",
+			"ru": ""
+		},
+		"description": {
+			"en": "",
+			"ru": ""
+		},
+		"author": "",
+		"url": "",
+		"note": {
+			"en": "",
+			"ru": ""
+		}
+	},
+	{
+		"folder": "",
+		"name": {
+			"en": "",
+			"ru": ""
+		},
+		"description": {
+			"en": "",
+			"ru": ""
+		},
+		"author": "",
+		"url": "",
+		"note": {
+			"en": "",
+			"ru": ""
+		}
+	},
+	{
+		"folder": "",
+		"name": {
+			"en": "",
+			"ru": ""
+		},
+		"description": {
+			"en": "",
+			"ru": ""
+		},
+		"author": "",
+		"url": "",
+		"note": {
+			"en": "",
+			"ru": ""
+		}
+	},
+	{
+		"folder": "",
+		"name": {
+			"en": "",
+			"ru": ""
+		},
+		"description": {
+			"en": "",
+			"ru": ""
+		},
+		"author": "",
+		"url": "",
+		"note": {
+			"en": "",
+			"ru": ""
+		}
+	},
+	{
+		"folder": "",
+		"name": {
+			"en": "",
+			"ru": ""
+		},
+		"description": {
+			"en": "",
+			"ru": ""
+		},
+		"author": "",
+		"url": "",
+		"note": {
+			"en": "",
+			"ru": ""
+		}
+	},
+	{
+		"folder": "",
+		"name": {
+			"en": "",
+			"ru": ""
+		},
+		"description": {
+			"en": "",
+			"ru": ""
+		},
+		"author": "",
+		"url": "",
+		"note": {
+			"en": "",
+			"ru": ""
+		}
+	},
+	{
+		"folder": "",
+		"name": {
+			"en": "",
+			"ru": ""
+		},
+		"description": {
+			"en": "",
+			"ru": ""
+		},
+		"author": "",
+		"url": "",
+		"note": {
+			"en": "",
+			"ru": ""
+		}
+	},
+	{
+		"folder": "",
+		"name": {
+			"en": "",
+			"ru": ""
+		},
+		"description": {
+			"en": "",
+			"ru": ""
+		},
+		"author": "",
+		"url": "",
+		"note": {
+			"en": "",
+			"ru": ""
+		}
+	},
+	{
+		"folder": "",
+		"name": {
+			"en": "",
+			"ru": ""
+		},
+		"description": {
+			"en": "",
+			"ru": ""
+		},
+		"author": "",
+		"url": "",
+		"note": {
+			"en": "",
+			"ru": ""
+		}
+	},
+	{
+		"folder": "",
+		"name": {
+			"en": "",
+			"ru": ""
+		},
+		"description": {
+			"en": "",
+			"ru": ""
+		},
+		"author": "",
+		"url": "",
+		"note": {
+			"en": "",
+			"ru": ""
+		}
+	},
+	{
+		"folder": "",
+		"name": {
+			"en": "",
+			"ru": ""
+		},
+		"description": {
+			"en": "",
+			"ru": ""
+		},
+		"author": "",
+		"url": "",
+		"note": {
+			"en": "",
+			"ru": ""
+		}
+	},
+	{
+		"folder": "",
+		"name": {
+			"en": "",
+			"ru": ""
+		},
+		"description": {
+			"en": "",
+			"ru": ""
+		},
+		"author": "",
+		"url": "",
+		"note": {
+			"en": "",
+			"ru": ""
+		}
+	},
+	{
+		"folder": "",
+		"name": {
+			"en": "",
+			"ru": ""
+		},
+		"description": {
+			"en": "",
+			"ru": ""
+		},
+		"author": "",
+		"url": "",
+		"note": {
+			"en": "",
+			"ru": ""
+		}
+	},
+	{
+		"folder": "",
+		"name": {
+			"en": "",
+			"ru": ""
+		},
+		"description": {
+			"en": "",
+			"ru": ""
+		},
+		"author": "",
+		"url": "",
+		"note": {
+			"en": "",
+			"ru": ""
+		}
+	}
+	]
 }
