@@ -71,9 +71,9 @@ func launchGame(version GameVersion, gameRoot string, skipLauncher bool) error {
 func findWine() (string, error) {
 	// Стандартные пути, где может находиться wine
 	possiblePaths := []string{
-		"wine",                // если wine есть в PATH
-		"/usr/bin/wine",       // стандартный путь
-		"/usr/local/bin/wine", // локальная установка
+		"wine",					// если wine есть в PATH
+		"/usr/bin/wine",		// стандартный путь
+		"/usr/local/bin/wine",	// локальная установка
 	}
 
 	// Проверяем стандартные пути

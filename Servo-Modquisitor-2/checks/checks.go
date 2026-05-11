@@ -13,35 +13,34 @@ import (
 )
 
 var (
-	appendLog        func(string)
-	messages         *map[string]string
-	showChoiceDialog func(fyne.Window, string, string, ...string) int
-	openURL          func(string)
-	modsDir          string
+	appendLog			func(string)
+	messages			*map[string]string
+	showChoiceDialog	func(fyne.Window, string, string, ...string) int
+	openURL				func(string)
+	modsDir				string
 
-	// кэш базы модов (ключ – нижний регистр папки)
-	modDBMap map[string]*ModDBEntry
+	modDBMap			map[string]*ModDBEntry
+	externalVersion		string
 )
 
 func InitGlobals(
-	logger func(string),
-	msg *map[string]string,
-	dialogFunc func(fyne.Window, string, string, ...string) int,
-	urlOpener func(string),
-	modsDirPath string,
+	logger				func(string),
+	msg					*map[string]string,
+	dialogFunc			func(fyne.Window, string, string, ...string) int,
+	urlOpener			func(string),
+	modsDirPath			string,
 ) {
-	appendLog = logger
-	messages = msg
-	showChoiceDialog = dialogFunc
-	openURL = urlOpener
-	modsDir = modsDirPath
+	appendLog			= logger
+	messages			= msg
+	showChoiceDialog	= dialogFunc
+	openURL				= urlOpener
+	modsDir				= modsDirPath
 }
 
 var currentLang string
 
 func SetLanguage(lang string) { currentLang = lang }
 
-// SetModDatabase строит map для быстрого поиска
 func SetModDatabase(entries []ModDBEntry) {
 	modDBMap = make(map[string]*ModDBEntry, len(entries))
 	for i := range entries {
@@ -49,20 +48,15 @@ func SetModDatabase(entries []ModDBEntry) {
 	}
 }
 
-// ---------- Правила порядка загрузки ----------
 type LoadOrderRule struct {
-	Mod    string `json:"mod"`
+	Mod	string `json:"mod"`
 	Before string `json:"before"`
 }
 
 var LoadOrderRules []LoadOrderRule
 
-// ModsDir возвращает путь к папке с модами.
-func ModsDir() string {
-	return modsDir
-}
+func ModsDir() string { return modsDir }
 
-// FolderExists проверяет, существует ли папка с именем name внутри modsDir.
 func FolderExists(name string) bool {
 	info, err := os.Stat(filepath.Join(modsDir, name))
 	if os.IsNotExist(err) {
@@ -71,10 +65,8 @@ func FolderExists(name string) bool {
 	return info != nil && info.IsDir()
 }
 
-// RemoveMod удаляет папку мода.
 func RemoveMod(name string) { os.RemoveAll(filepath.Join(modsDir, name)) }
 
-// ListModFolders возвращает список имён папок в modsDir.
 func ListModFolders() []string {
 	var folders []string
 	entries, err := os.ReadDir(modsDir)
@@ -92,55 +84,87 @@ func ListModFolders() []string {
 	return folders
 }
 
-// ---------- Модели для UI ----------
 type ModInfo struct {
-	Name         string
-	DisplayName  string
-	ModTime      time.Time
-	Active       bool
-	Obsolete     bool
-	Incompatible bool
-	Mandatory    bool
-	Broken       bool
-	Description  string
-	Author       string
-	URL          string
-	Note         string
+	Active			bool
+	Broken			bool
+	Incompatible	bool
+	Mandatory		bool
+	Obsolete		bool
+	Selected		bool
+	IsSystem		bool
+	Author			string
+	Description		string
+	DisplayName		string
+	Name			string
+	Note			string
+	URL				string
+	ModTime			time.Time
 }
 
-// ModDBEntry – запись во внешней базе модов (mod_database.json)
 type ModDBEntry struct {
-	Folder      string            `json:"folder"`
-	Name        map[string]string `json:"name"`
-	Description map[string]string `json:"description"`
-	Author      string            `json:"author"`
-	URL         string            `json:"url"`
-	Note        map[string]string `json:"note"`
+	Author		string				`json:"author"`
+	Description	map[string]string	`json:"description"`
+	Folder		string				`json:"folder"`
+	Name		map[string]string	`json:"name"`
+	Note		map[string]string	`json:"note"`
+	URL			string				`json:"url"`
 }
 
-// GetModsInfo теперь использует modDBMap
+// GetModsInfo – теперь учитывает системные папки, ищет дату в .lua файлах
 func GetModsInfo(lang string, forceEnglish bool) []ModInfo {
 	folders := ListModFolders()
 	var mods []ModInfo
 	for _, name := range folders {
-		if name == "base" || name == "dmf" {
-			continue
-		}
 		fullPath := filepath.Join(modsDir, name)
 		fi, err := os.Stat(fullPath)
 		if err != nil {
 			continue
 		}
-		mod := ModInfo{Name: name, ModTime: fi.ModTime(), Active: true}
-		modFilePath := filepath.Join(fullPath, name+".mod")
-		if modFileInfo, err := os.Stat(modFilePath); os.IsNotExist(err) {
-			mod.Broken = true
-		} else if err == nil {
-			mod.ModTime = modFileInfo.ModTime()
+		mod := ModInfo{Name: name, Active: true}
+
+		switch {
+		case name == "base":
+			mod.IsSystem = true
+			mod.Active = false
+			mod.ModTime = getModTimeFromFile(filepath.Join(fullPath, "mod_manager.lua"))
+		case name == "dmf":
+			mod.IsSystem = true
+			mod.Active = false
+			mod.ModTime = getModTimeFromFile(filepath.Join(fullPath, "scripts", "mods", "dmf", "dmf_loader.lua"))
+		default:
+			// Обычный мод: ищем .lua
+			luaPaths := []string{
+				filepath.Join(fullPath, name+".lua"),
+				filepath.Join(fullPath, "scripts", "mods", name, name+".lua"),
+			}
+			foundLua := false
+			for _, lp := range luaPaths {
+				if t := getModTimeFromFile(lp); !t.IsZero() {
+					mod.ModTime = t
+					foundLua = true
+					break
+				}
+			}
+			if !foundLua {
+				// Fallback на .mod и папку
+				modFilePath := filepath.Join(fullPath, name+".mod")
+				if modFileInfo, err := os.Stat(modFilePath); err == nil {
+					mod.ModTime = modFileInfo.ModTime()
+				} else {
+					mod.ModTime = fi.ModTime()
+				}
+				// Проверка на broken
+				if !fileExists(modFilePath) {
+					mod.Broken = true
+				}
+			} else {
+				// .lua есть – мод не broken (независимо от .mod)
+				mod.Broken = false
+			}
 		}
 
 		// поиск в кэше базы
-		if db, ok := modDBMap[strings.ToLower(name)]; ok {
+		if db, ok := modDBMap[strings.ToLower(name)]; ok && db.Folder != "" {
 			mod.Author = db.Author
 			mod.URL = db.URL
 			mod.Description = pickLocalized(db.Description, lang)
@@ -162,6 +186,15 @@ func GetModsInfo(lang string, forceEnglish bool) []ModInfo {
 		mods = append(mods, mod)
 	}
 	return mods
+}
+
+// getModTimeFromFile возвращает время модификации файла, если он существует, иначе zero time
+func getModTimeFromFile(path string) time.Time {
+	info, err := os.Stat(path)
+	if err != nil {
+		return time.Time{}
+	}
+	return info.ModTime()
 }
 
 func fileExists(path string) bool { _, err := os.Stat(path); return err == nil }
@@ -255,18 +288,19 @@ func UpdateModActive(entries []LoadOrderEntry, modName string, active bool) []Lo
 
 // ---------- Внешние списки ----------
 var (
-	ObsoleteMods      []string
+	ObsoleteMods	  []string
 	IncompatiblePairs []IncompatiblePair
-	Dependencies      []Dependency
-	MandatoryOrder    []string
+	Dependencies	  []Dependency
+	MandatoryOrder	[]string
 )
 
 type ExternalData struct {
-	MandatoryOrder    []string           `json:"mandatory_order"`
-	ObsoleteMods      []string           `json:"obsolete_mods"`
-	IncompatiblePairs []IncompatiblePair `json:"incompatible_pairs"`
-	Dependencies      []Dependency       `json:"dependencies"`
-	LoadOrder         []LoadOrderRule    `json:"load_order"`
+	Version				string				`json:"version"`
+	MandatoryOrder		[]string			`json:"mandatory_order"`
+	ObsoleteMods		[]string			`json:"obsolete_mods"`
+	IncompatiblePairs	[]IncompatiblePair	`json:"incompatible_pairs"`
+	Dependencies		[]Dependency		`json:"dependencies"`
+	LoadOrder			[]LoadOrderRule		`json:"load_order"`
 }
 
 type IncompatiblePair struct{ Mod1, Mod2, Desc string }
@@ -281,6 +315,7 @@ func LoadExternalLists(filename string) error {
 	if err := json.Unmarshal(data, &ext); err != nil {
 		return err
 	}
+	externalVersion = ext.Version
 	ObsoleteMods = ext.ObsoleteMods
 	IncompatiblePairs = ext.IncompatiblePairs
 	Dependencies = ext.Dependencies
@@ -288,6 +323,8 @@ func LoadExternalLists(filename string) error {
 	MandatoryOrder = ext.MandatoryOrder
 	return nil
 }
+
+func GetExternalVersion() string { return externalVersion }
 
 func IsMandatoryMod(name string) bool {
 	for _, m := range MandatoryOrder {
@@ -460,7 +497,6 @@ func fixWrapper(wrapper string) {
 	appendLog(fmt.Sprintf((*messages)["fixed_wrapper"], wrapper, innerName))
 }
 
-// CheckBrokenMods – поиск папок без .mod файла и предложение удалить
 func CheckBrokenMods(window fyne.Window) bool {
 	var broken []string
 	for _, folder := range ListModFolders() {
@@ -490,7 +526,6 @@ func CheckBrokenMods(window fyne.Window) bool {
 	return true
 }
 
-// AutoFixMalformed – тихое исправление всех обёрток (после установки из ZIP)
 func AutoFixMalformed() {
 	for _, folder := range ListModFolders() {
 		if folder == "base" || folder == "dmf" {
@@ -533,7 +568,6 @@ func CheckEmptyFolders(window fyne.Window) bool {
 	return true
 }
 
-// CheckIncompatible – итеративная проверка конфликтов, без рекурсии
 func CheckIncompatible(window fyne.Window) bool {
 	for {
 		var found *IncompatiblePair
@@ -563,13 +597,11 @@ func CheckIncompatible(window fyne.Window) bool {
 			RemoveMod(found.Mod2)
 			appendLog(fmt.Sprintf((*messages)["deleted_mod"], found.Mod2))
 		case 0:
-			// пропустить – прекращаем проверку
 			return true
 		}
 	}
 }
 
-// CheckDependencies – итеративная проверка зависимостей
 func CheckDependencies(window fyne.Window) bool {
 	for {
 		var found *Dependency
@@ -599,12 +631,11 @@ func CheckDependencies(window fyne.Window) bool {
 			RemoveMod(found.Dependent)
 			appendLog(fmt.Sprintf((*messages)["deleted_mod"], found.Dependent))
 		case 0:
-			return true // пропустить
+			return true
 		}
 	}
 }
 
-// pickLocalized выбирает строку для заданного языка с fallback-ом.
 func pickLocalized(tr map[string]string, lang string) string {
 	if tr == nil {
 		return ""

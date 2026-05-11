@@ -1,0 +1,29 @@
+{
+    "FixedFileInfo": {
+        "FileVersion": {
+            "Major": 1,
+            "Minor": 0,
+            "Patch": 0,
+            "Build": 0
+        },
+        "ProductVersion": {
+            "Major": 1,
+            "Minor": 0,
+            "Patch": 0,
+            "Build": 0
+        },
+        "FileType": "01"
+    },
+    "StringFileInfo": {
+        "Comments": "Mod manager for Warhammer 40,000: Darktide",
+        "CompanyName": "xsSplater",
+        "FileDescription": "Servo-Modquisitor - Darktide Mod Manager",
+        "InternalName": "Servo-Modquisitor.exe",
+        "LegalCopyright": "© xsSplater. Open source.",
+        "OriginalFilename": "Servo-Modquisitor.exe",
+        "ProductName": "Servo-Modquisitor"
+    },
+    "VarFileInfo": {
+        "Translation": [0x0409, 1252]
+    }
+}
