@@ -9,7 +9,7 @@ This is a program for sorting Darktide mods.
 - Group mod reordering is available.
 - Disabling the main checkbox disables the mod in the "--Mod" list.
 
-## ModQuizitor scans for mod-related issues:
+## ModQuisitor scans for mod-related issues:
 - **Outdated** mods,
 - **Malformed** folders _(ModName-222-33-4-5-666)_,
 - **Empty** folders,
