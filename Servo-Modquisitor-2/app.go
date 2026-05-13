@@ -41,8 +41,8 @@ type Config struct {
 }
 
 const (
-	modDatabaseURL  = "https://raw.githubusercontent.com/xsSplater/Darktide-Servo-Modquisitor/main/SortingRules_and_ModDatabase/mod_database.json"
-	modMandatoryURL = "https://raw.githubusercontent.com/xsSplater/Darktide-Servo-Modquisitor/main/SortingRules_and_ModDatabase/mandatory_obsolete_incompatible_dependencies.json"
+	modDatabaseURL  = "https://raw.githubusercontent.com/xsSplater/Darktide-Servo-Modquisitor-2/main/SortingRules_and_ModDatabase/mod_database.json"
+	modMandatoryURL = "https://raw.githubusercontent.com/xsSplater/Darktide-Servo-Modquisitor-2/main/SortingRules_and_ModDatabase/mandatory_obsolete_incompatible_dependencies.json"
 )
 
 type App struct {
