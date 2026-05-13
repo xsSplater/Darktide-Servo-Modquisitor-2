@@ -5,6 +5,7 @@ This is a program for sorting Darktide mods.
 ## TODO:
 - [ ] Finish the mod lists _(**~11%** of all mods checked and added)_.
 - [ ] Finish the Light Theme.
+- [ ] Linux support (the program can be compiled already, but I can’t check it yet).
 
 ## ModQuizitor scans for mod-related issues:
 - **Outdated** mods,
