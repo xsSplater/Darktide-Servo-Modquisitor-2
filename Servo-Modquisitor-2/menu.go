@@ -28,11 +28,13 @@ func (app *App) buildMainMenu() *fyne.MainMenu {
 		app.cfg.Theme = "dark"
 		saveConfig(app.cfg)
 		app.myApp.Settings().SetTheme(&themes.ForcedDarkTheme{})
+		app.refreshThemeColors()
 	})
 	themeLight := fyne.NewMenuItem(app.messages["menu_theme_light"], func() {
 		app.cfg.Theme = "light"
 		saveConfig(app.cfg)
 		app.myApp.Settings().SetTheme(&themes.ForcedLightTheme{})
+		app.refreshThemeColors()
 	})
 	themeMenu := fyne.NewMenuItem(app.messages["menu_theme"], nil)
 	themeMenu.ChildMenu = fyne.NewMenu("", themeDark, themeLight)
@@ -84,7 +86,7 @@ func (app *App) buildMainMenu() *fyne.MainMenu {
 		freqItems = append(freqItems, fyne.NewMenuItem(name, func() {
 			app.cfg.UpdateCheckFrequency = freqCopy
 			saveConfig(app.cfg)
-			app.appendLog(fmt.Sprintf("Update check frequency set to %s", name))
+			app.appendLog(fmt.Sprintf(app.messages["log_update_check_frequency_set"], name))
 		}))
 	}
 	periodicSub := fyne.NewMenuItem(app.messages["menu_periodic_check"], nil)
@@ -251,7 +253,8 @@ func (app *App) changeLanguage(lang string) {
 	}
 
 	// Перерегистрируем тултипы и горячие клавиши
-	app.registerShortcuts()
+		// Горячие клавиши отключены из-за нестабильной работы на Windows!
+		// app.registerShortcuts()
 	app.reapplyTooltips()
 	app.updateDescriptionForMod(app.selectedModName)
 }
@@ -274,13 +277,13 @@ func (app *App) checkForProgramUpdate() {
 func (app *App) updateSortFiles() {
 	updates := []string{}
 	if need, newVer, err := app.checkVersion(modDatabaseURL, app.cfg.LastModDatabaseVersion); err != nil {
-		app.appendLog(fmt.Sprintf("Update check error for mod_database: %v", err))
+		app.appendLog(fmt.Sprintf(app.messages["log_update_check_error_db"], err))
 	} else if need {
 		updates = append(updates, "mod_database.json")
 		app.cfg.LastModDatabaseVersion = newVer
 	}
 	if need, newVer, err := app.checkVersion(modMandatoryURL, app.cfg.LastMandatoryRulesVersion); err != nil {
-		app.appendLog(fmt.Sprintf("Update check error for mandatory file: %v", err))
+		app.appendLog(fmt.Sprintf(app.messages["log_update_check_error_mandatory"], err))
 	} else if need {
 		updates = append(updates, "mandatory_obsolete_incompatible_dependencies.json")
 		app.cfg.LastMandatoryRulesVersion = newVer
@@ -352,7 +355,7 @@ func (app *App) checkForUpdates() {
 		_ = newVer
 	}
 	if len(updates) > 0 {
-		app.appendLog(fmt.Sprintf("New sorting file versions available: %s. Use menu to update.", strings.Join(updates, ", ")))
+		app.appendLog(fmt.Sprintf(app.messages["log_new_sorting_files_available"], strings.Join(updates, ", ")))
 	}
 }
 

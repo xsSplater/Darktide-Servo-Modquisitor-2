@@ -53,12 +53,19 @@ var (
 	errGameVersionUnknown  string
 	errDarktideExeNotFound string
 	errGameRootNotFound    string
+	errWineNotFound        string
+	errXboxOnLinux         string
 )
 
 func SetLauncherMessages(verUnknown, exeNotFound, rootNotFound string) {
 	errGameVersionUnknown = verUnknown
 	errDarktideExeNotFound = exeNotFound
 	errGameRootNotFound = rootNotFound
+}
+
+func SetLinuxLauncherMessages(wineNotFound, xboxOnLinux string) {
+	errWineNotFound = wineNotFound
+	errXboxOnLinux = xboxOnLinux
 }
 
 func detectGameVersion(gameRoot string) GameVersion {
@@ -183,11 +190,10 @@ func (app *App) makeRedCRTGradient(w, h int) *image.NRGBA {
 }
 
 func (app *App) runAllChecks() {
-	app.appendLog("// " + app.messages["log_start"]) // Запуск диагностики...
+	app.appendLog("// " + app.messages["log_start"])
 
-	checks.CheckInstallation(app.mainWindow) // Ищем папки base и dmf
-
-	checks.EnsureModLoadOrder(app.mainWindow) // Ищем список модов mod_load_order.txt
+	checks.CheckInstallation(app.mainWindow)
+	checks.EnsureModLoadOrder(app.mainWindow)
 
 	if !checks.CheckObsoleteMods(app.mainWindow) {
 		return
@@ -208,10 +214,8 @@ func (app *App) runAllChecks() {
 		return
 	}
 
-	// Первое обновление списка (после удалений) – должно быть в главном потоке
 	fyne.Do(func() { app.refreshModList() })
 
-	// Собираем активные моды (можно без UI)
 	var activeNames []string
 	for _, mod := range app.allMods {
 		if mod.Active && checks.FolderExists(mod.Name) {
@@ -221,14 +225,13 @@ func (app *App) runAllChecks() {
 	sorter.CreateLoadOrderFromActive(activeNames, app.cfg.Language)
 	app.appendLog(app.messages["done"])
 
-	// Финальное обновление UI и открытие файла – в главном потоке
 	fyne.Do(func() {
 		app.refreshModList()
-		absPath, _ := filepath.Abs(filepath.Join(app.cfg.ModsPath, "mod_load_order.txt"))
+		absPath, _ := filepath.Abs(filepath.Join(app.cfg.ModsPath, FileNameLoadOrder))
 		if _, err := os.Stat(absPath); err == nil {
 			go func() {
 				if err := openFileWithDefaultApp(absPath); err != nil {
-					app.appendLog(fmt.Sprintf("Failed to open file: %v", err))
+					app.appendLog(fmt.Sprintf(app.messages["log_failed_open_file"], err))
 				}
 			}()
 		}

@@ -1,9 +1,7 @@
-// mod_operations.go
 package main
 
 import (
 	"Servo-Modquisitor/checks"
-	"Servo-Modquisitor/config"
 	"archive/zip"
 	"fmt"
 	"io"
@@ -34,7 +32,6 @@ func safeJoin(destDir, name string) (string, error) {
 func (app *App) refreshModList() {
 	mods := checks.GetModsInfo(app.cfg.Language, app.cfg.ForceEnglishModNames)
 
-	// Разделяем системные и обычные
 	var sysMods, regMods []checks.ModInfo
 	for _, m := range mods {
 		if m.IsSystem {
@@ -46,7 +43,6 @@ func (app *App) refreshModList() {
 	}
 	app.systemMods = sysMods
 
-	// Сортируем обычные моды согласно load order
 	entries := checks.ReadLoadOrder()
 	if entries == nil {
 		sort.Slice(regMods, func(i, j int) bool { return regMods[i].Name < regMods[j].Name })
@@ -105,10 +101,9 @@ func (app *App) refreshModList() {
 	app.updateSystemModsTable()
 }
 
-// Обновление таблицы системных модов
 func (app *App) updateSystemModsTable() {
 	if app.systemModsTable != nil {
-		app.systemModsTable.Length = func() (int, int) { return len(app.systemMods), config.TableColumnCount }
+		app.systemModsTable.Length = func() (int, int) { return len(app.systemMods), TableColumnCount }
 		app.systemModsTable.Refresh()
 	}
 }
@@ -138,37 +133,12 @@ func (app *App) toggleModActive(name string, active bool) {
 	app.filterModList()
 }
 
-func (app *App) moveSelected(delta int) {
-	if app.selectedModName == "" {
-		return
-	}
-	idx := -1
-	for i, m := range app.allMods {
-		if m.Name == app.selectedModName {
-			idx = i
-			break
-		}
-	}
-	if idx == -1 {
-		return
-	}
-	newIdx := idx + delta
-	if newIdx < 0 || newIdx >= len(app.allMods) {
-		return
-	}
-	app.allMods[idx], app.allMods[newIdx] = app.allMods[newIdx], app.allMods[idx]
-	app.orderDirty = true
-	app.updateTableBorder()
-	app.filterModList()
-}
-
 func (app *App) findModByName(name string) *checks.ModInfo {
 	for i := range app.allMods {
 		if app.allMods[i].Name == name {
 			return &app.allMods[i]
 		}
 	}
-	// также ищем среди системных
 	for i := range app.systemMods {
 		if app.systemMods[i].Name == name {
 			return &app.systemMods[i]
@@ -399,40 +369,123 @@ func (app *App) syncModsEnabledState() {
 	case PatcherAutoPatch:
 		app.cfg.ModsGloballyEnabled = isModsEnabledAutoPatch()
 	case PatcherLegacy:
-		// оставляем значение из конфига
 	}
 	saveConfig(app.cfg)
 }
 
-// ----- Методы перемещения -----
+func (app *App) selectedMods() []string {
+	var names []string
+	for _, m := range app.allMods {
+		if m.Selected {
+			names = append(names, m.Name)
+		}
+	}
+	return names
+}
 
-func (app *App) moveSelectedToTop() {
+func (app *App) moveSelected(delta int) {
 	if app.selectedModName == "" {
 		return
 	}
-	idx := app.findModIndexByName(app.selectedModName)
-	if idx < 0 {
+	selNames := app.selectedMods()
+	if len(selNames) == 0 {
 		return
 	}
-	mod := app.allMods[idx]
-	app.allMods = append(app.allMods[:idx], app.allMods[idx+1:]...)
-	app.allMods = append([]checks.ModInfo{mod}, app.allMods...)
+
+	if len(selNames) == 1 {
+		idx := app.findModIndexByName(selNames[0])
+		if idx == -1 {
+			return
+		}
+		newIdx := idx + delta
+		if newIdx < 0 || newIdx >= len(app.allMods) {
+			return
+		}
+		app.allMods[idx], app.allMods[newIdx] = app.allMods[newIdx], app.allMods[idx]
+		app.orderDirty = true
+		app.updateTableBorder()
+		app.filterModList()
+		return
+	}
+
+	var selected []checks.ModInfo
+	for _, m := range app.allMods {
+		if m.Selected {
+			selected = append(selected, m)
+		}
+	}
+
+	var others []checks.ModInfo
+	for _, m := range app.allMods {
+		if !m.Selected {
+			others = append(others, m)
+		}
+	}
+
+	originalFirstIdx := -1
+	for i, m := range app.allMods {
+		if m.Selected {
+			originalFirstIdx = i
+			break
+		}
+	}
+	if originalFirstIdx == -1 {
+		return
+	}
+
+	insertIdx := originalFirstIdx + delta
+	if insertIdx < 0 {
+		insertIdx = 0
+	} else if insertIdx > len(others) {
+		insertIdx = len(others)
+	}
+
+	var result []checks.ModInfo
+	result = append(result, others[:insertIdx]...)
+	result = append(result, selected...)
+	result = append(result, others[insertIdx:]...)
+
+	app.allMods = result
+	app.orderDirty = true
+	app.updateTableBorder()
+	app.filterModList()
+}
+
+func (app *App) moveSelectedToTop() {
+	selNames := app.selectedMods()
+	if len(selNames) == 0 {
+		return
+	}
+	var selected []checks.ModInfo
+	var others []checks.ModInfo
+	for _, m := range app.allMods {
+		if m.Selected {
+			selected = append(selected, m)
+		} else {
+			others = append(others, m)
+		}
+	}
+	app.allMods = append(selected, others...)
 	app.orderDirty = true
 	app.updateTableBorder()
 	app.filterModList()
 }
 
 func (app *App) moveSelectedToBottom() {
-	if app.selectedModName == "" {
+	selNames := app.selectedMods()
+	if len(selNames) == 0 {
 		return
 	}
-	idx := app.findModIndexByName(app.selectedModName)
-	if idx < 0 {
-		return
+	var selected []checks.ModInfo
+	var others []checks.ModInfo
+	for _, m := range app.allMods {
+		if m.Selected {
+			selected = append(selected, m)
+		} else {
+			others = append(others, m)
+		}
 	}
-	mod := app.allMods[idx]
-	app.allMods = append(app.allMods[:idx], app.allMods[idx+1:]...)
-	app.allMods = append(app.allMods, mod)
+	app.allMods = append(others, selected...)
 	app.orderDirty = true
 	app.updateTableBorder()
 	app.filterModList()
@@ -442,29 +495,40 @@ func (app *App) moveSelectedToPosition() {
 	if app.selectedModName == "" {
 		return
 	}
+	selNames := app.selectedMods()
+	if len(selNames) == 0 {
+		return
+	}
 	posStr := app.moveToEntry.Text
 	if posStr == "" {
 		return
 	}
-	newPos, err := strconv.Atoi(posStr)
-	if err != nil || newPos < 1 || newPos > len(app.allMods) {
-		app.appendLog("Invalid position")
+	visiblePos, err := strconv.Atoi(posStr)
+	if err != nil || visiblePos < 1 || visiblePos > len(app.allMods) {
+		app.appendLog(app.messages["log_invalid_position"])
 		return
 	}
-	newPos--
-	oldIdx := app.findModIndexByName(app.selectedModName)
-	if oldIdx < 0 {
-		return
+	targetIdx := visiblePos - 1
+
+	var selected []checks.ModInfo
+	var others []checks.ModInfo
+	for _, m := range app.allMods {
+		if m.Selected {
+			selected = append(selected, m)
+		} else {
+			others = append(others, m)
+		}
 	}
-	if newPos == oldIdx {
-		return
+
+	if targetIdx > len(others) {
+		targetIdx = len(others)
 	}
-	mod := app.allMods[oldIdx]
-	app.allMods = append(app.allMods[:oldIdx], app.allMods[oldIdx+1:]...)
-	if newPos > oldIdx {
-		newPos--
-	}
-	app.allMods = append(app.allMods[:newPos], append([]checks.ModInfo{mod}, app.allMods[newPos:]...)...)
+	var result []checks.ModInfo
+	result = append(result, others[:targetIdx]...)
+	result = append(result, selected...)
+	result = append(result, others[targetIdx:]...)
+
+	app.allMods = result
 	app.orderDirty = true
 	app.updateTableBorder()
 	app.filterModList()

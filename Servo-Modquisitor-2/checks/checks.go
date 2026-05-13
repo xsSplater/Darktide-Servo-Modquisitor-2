@@ -12,29 +12,35 @@ import (
 	"fyne.io/fyne/v2"
 )
 
-var (
-	appendLog			func(string)
-	messages			*map[string]string
-	showChoiceDialog	func(fyne.Window, string, string, ...string) int
-	openURL				func(string)
-	modsDir				string
+const (
+	loadOrderFileName = "mod_load_order.txt"
+	steamGuideEnURL   = "https://steamcommunity.com/sharedfiles/filedetails/?id=2953324027"
+	steamGuideRuURL   = "https://steamcommunity.com/sharedfiles/filedetails/?id=2950374474"
+)
 
-	modDBMap			map[string]*ModDBEntry
-	externalVersion		string
+var (
+	appendLog         func(string)
+	messages          *map[string]string
+	showChoiceDialog  func(fyne.Window, string, string, ...string) int
+	openURL           func(string)
+	modsDir           string
+
+	modDBMap        map[string]*ModDBEntry
+	externalVersion string
 )
 
 func InitGlobals(
-	logger				func(string),
-	msg					*map[string]string,
-	dialogFunc			func(fyne.Window, string, string, ...string) int,
-	urlOpener			func(string),
-	modsDirPath			string,
+	logger func(string),
+	msg *map[string]string,
+	dialogFunc func(fyne.Window, string, string, ...string) int,
+	urlOpener func(string),
+	modsDirPath string,
 ) {
-	appendLog			= logger
-	messages			= msg
-	showChoiceDialog	= dialogFunc
-	openURL				= urlOpener
-	modsDir				= modsDirPath
+	appendLog = logger
+	messages = msg
+	showChoiceDialog = dialogFunc
+	openURL = urlOpener
+	modsDir = modsDirPath
 }
 
 var currentLang string
@@ -49,7 +55,7 @@ func SetModDatabase(entries []ModDBEntry) {
 }
 
 type LoadOrderRule struct {
-	Mod	string `json:"mod"`
+	Mod    string `json:"mod"`
 	Before string `json:"before"`
 }
 
@@ -72,7 +78,7 @@ func ListModFolders() []string {
 	entries, err := os.ReadDir(modsDir)
 	if err != nil {
 		if appendLog != nil {
-			appendLog(fmt.Sprintf("Error reading mods directory: %v", err))
+			appendLog(fmt.Sprintf((*messages)["log_error_reading_mods_dir"], err))
 		}
 		return folders
 	}
@@ -85,32 +91,33 @@ func ListModFolders() []string {
 }
 
 type ModInfo struct {
-	Active			bool
-	Broken			bool
-	Incompatible	bool
-	Mandatory		bool
-	Obsolete		bool
-	Selected		bool
-	IsSystem		bool
-	Author			string
-	Description		string
-	DisplayName		string
-	Name			string
-	Note			string
-	URL				string
-	ModTime			time.Time
+	Active       bool
+	Broken       bool
+	Incompatible bool
+	Mandatory    bool
+	Obsolete     bool
+	Selected     bool
+	IsSystem     bool
+	Author       string
+	Description  string
+	DisplayName  string
+	Name         string
+	Note         string
+	URL          string
+	GitHubURL    string
+	ModTime      time.Time
 }
 
 type ModDBEntry struct {
-	Author		string				`json:"author"`
-	Description	map[string]string	`json:"description"`
-	Folder		string				`json:"folder"`
-	Name		map[string]string	`json:"name"`
-	Note		map[string]string	`json:"note"`
-	URL			string				`json:"url"`
+	Author      string            `json:"author"`
+	Description map[string]string `json:"description"`
+	Folder      string            `json:"folder"`
+	Name        map[string]string `json:"name"`
+	Note        map[string]string `json:"note"`
+	URL         string            `json:"url"`
+    GitHubURL   string            `json:"github_url"`
 }
 
-// GetModsInfo – теперь учитывает системные папки, ищет дату в .lua файлах
 func GetModsInfo(lang string, forceEnglish bool) []ModInfo {
 	folders := ListModFolders()
 	var mods []ModInfo
@@ -132,7 +139,6 @@ func GetModsInfo(lang string, forceEnglish bool) []ModInfo {
 			mod.Active = false
 			mod.ModTime = getModTimeFromFile(filepath.Join(fullPath, "scripts", "mods", "dmf", "dmf_loader.lua"))
 		default:
-			// Обычный мод: ищем .lua
 			luaPaths := []string{
 				filepath.Join(fullPath, name+".lua"),
 				filepath.Join(fullPath, "scripts", "mods", name, name+".lua"),
@@ -146,27 +152,24 @@ func GetModsInfo(lang string, forceEnglish bool) []ModInfo {
 				}
 			}
 			if !foundLua {
-				// Fallback на .mod и папку
 				modFilePath := filepath.Join(fullPath, name+".mod")
 				if modFileInfo, err := os.Stat(modFilePath); err == nil {
 					mod.ModTime = modFileInfo.ModTime()
 				} else {
 					mod.ModTime = fi.ModTime()
 				}
-				// Проверка на broken
 				if !fileExists(modFilePath) {
 					mod.Broken = true
 				}
 			} else {
-				// .lua есть – мод не broken (независимо от .mod)
 				mod.Broken = false
 			}
 		}
 
-		// поиск в кэше базы
 		if db, ok := modDBMap[strings.ToLower(name)]; ok && db.Folder != "" {
 			mod.Author = db.Author
 			mod.URL = db.URL
+			mod.GitHubURL = db.GitHubURL
 			mod.Description = pickLocalized(db.Description, lang)
 			mod.Note = pickLocalized(db.Note, lang)
 
@@ -188,7 +191,6 @@ func GetModsInfo(lang string, forceEnglish bool) []ModInfo {
 	return mods
 }
 
-// getModTimeFromFile возвращает время модификации файла, если он существует, иначе zero time
 func getModTimeFromFile(path string) time.Time {
 	info, err := os.Stat(path)
 	if err != nil {
@@ -228,14 +230,13 @@ func tryReadLocalization(modName string) string {
 	return ""
 }
 
-// ---------- Load Order ----------
 type LoadOrderEntry struct {
 	Name   string
 	Active bool
 }
 
 func ReadLoadOrder() []LoadOrderEntry {
-	data, err := os.ReadFile(filepath.Join(modsDir, "mod_load_order.txt"))
+	data, err := os.ReadFile(filepath.Join(modsDir, loadOrderFileName))
 	if err != nil {
 		return nil
 	}
@@ -260,7 +261,7 @@ func ReadLoadOrder() []LoadOrderEntry {
 }
 
 func WriteLoadOrder(entries []LoadOrderEntry) error {
-	f, err := os.Create(filepath.Join(modsDir, "mod_load_order.txt"))
+	f, err := os.Create(filepath.Join(modsDir, loadOrderFileName))
 	if err != nil {
 		return err
 	}
@@ -286,21 +287,20 @@ func UpdateModActive(entries []LoadOrderEntry, modName string, active bool) []Lo
 	return append(entries, LoadOrderEntry{Name: modName, Active: active})
 }
 
-// ---------- Внешние списки ----------
 var (
-	ObsoleteMods	  []string
+	ObsoleteMods     []string
 	IncompatiblePairs []IncompatiblePair
-	Dependencies	  []Dependency
-	MandatoryOrder	[]string
+	Dependencies     []Dependency
+	MandatoryOrder   []string
 )
 
 type ExternalData struct {
-	Version				string				`json:"version"`
-	MandatoryOrder		[]string			`json:"mandatory_order"`
-	ObsoleteMods		[]string			`json:"obsolete_mods"`
-	IncompatiblePairs	[]IncompatiblePair	`json:"incompatible_pairs"`
-	Dependencies		[]Dependency		`json:"dependencies"`
-	LoadOrder			[]LoadOrderRule		`json:"load_order"`
+	Version          string             `json:"version"`
+	MandatoryOrder   []string           `json:"mandatory_order"`
+	ObsoleteMods     []string           `json:"obsolete_mods"`
+	IncompatiblePairs []IncompatiblePair `json:"incompatible_pairs"`
+	Dependencies     []Dependency       `json:"dependencies"`
+	LoadOrder        []LoadOrderRule    `json:"load_order"`
 }
 
 type IncompatiblePair struct{ Mod1, Mod2, Desc string }
@@ -335,7 +335,6 @@ func IsMandatoryMod(name string) bool {
 	return false
 }
 
-// ---------- Проверки ----------
 func CheckInstallation(window fyne.Window) bool {
 	if !FolderExists("base") {
 		appendLog((*messages)["log_warn_base_missing"])
@@ -360,9 +359,9 @@ func askMissing(folder, modAbbr, modName, nexusURL string, window fyne.Window) b
 	switch choice {
 	case 0:
 		appendLog((*messages)["log_open_steam_guide"])
-		guideURL := "https://steamcommunity.com/sharedfiles/filedetails/?id=2953324027"
+		guideURL := steamGuideEnURL
 		if currentLang == "ru" {
-			guideURL = "https://steamcommunity.com/sharedfiles/filedetails/?id=2950374474"
+			guideURL = steamGuideRuURL
 		}
 		openURL(guideURL)
 	case 1:
@@ -378,7 +377,7 @@ func askMissing(folder, modAbbr, modName, nexusURL string, window fyne.Window) b
 }
 
 func EnsureModLoadOrder(window fyne.Window) {
-	path := filepath.Join(modsDir, "mod_load_order.txt")
+	path := filepath.Join(modsDir, loadOrderFileName)
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		appendLog((*messages)["window_error_dsc_mlo_mis"])
 		choice := showChoiceDialog(window, (*messages)["window_error_title"],

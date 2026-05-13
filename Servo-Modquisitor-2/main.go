@@ -2,7 +2,6 @@ package main
 
 import (
 	"Servo-Modquisitor/checks"
-	"Servo-Modquisitor/config"
 	"Servo-Modquisitor/sorter"
 	"embed"
 	"fmt"
@@ -30,32 +29,29 @@ func main() {
 	f, err := os.OpenFile(logPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
 	if err == nil {
 		application.logFile = f
-		application.appendLog("=== Servo-Modquisitor started ===")
+		application.appendLog(application.messages["log_started"])
 	} else {
-		application.appendLog(fmt.Sprintf("Could not open log file: %v", err))
+		application.appendLog(fmt.Sprintf(application.messages["log_could_not_open_log"], err))
 	}
 	application.mainWindow = myApp.NewWindow(application.messages["app_title_long"])
-	config.ApplyWindowSettings(application.mainWindow)
+	ApplyWindowSettings(application.mainWindow)
 	application.mainWindow.SetMaster()
 
 	iconData, _ := embeddedFiles.ReadFile("assets/icon.png")
 	if iconData != nil {
 		icon := fyne.NewStaticResource("icon", iconData)
 		application.mainWindow.SetIcon(icon)
-		// также можно установить глобально: myApp.SetIcon(icon)
 	}
 
 	if cfg.WindowWidth > 0 && cfg.WindowHeight > 0 {
 		application.mainWindow.Resize(fyne.NewSize(float32(cfg.WindowWidth), float32(cfg.WindowHeight)))
 	} else {
-		application.mainWindow.Resize(fyne.NewSize(config.MainWindowWidth, config.MainWindowHeight))
+		application.mainWindow.Resize(fyne.NewSize(MainWindowWidth, MainWindowHeight))
 	}
 
-	// Восстановление максимизации (только Windows)
 	if cfg.WindowMaximized {
 		go func() {
-			// Небольшая задержка, чтобы окно гарантированно создалось
-			time.Sleep(200 * time.Millisecond)
+			time.Sleep(WindowMaximizeDelay)
 			maximizeWindowByTitle(application.mainWindow.Title())
 		}()
 	}
@@ -79,7 +75,7 @@ func main() {
 	sorter.SetSortMessages(application.messages["sort_ru_warning"], application.messages["sort_en_warning"])
 	sorter.SetLogMessages(application.messages["log_create_mlot"], application.messages["log_mlot_created"])
 
-	if err := checks.LoadExternalLists("mandatory_obsolete_incompatible_dependencies.json"); err != nil {
+	if err := checks.LoadExternalLists(FileNameMandatoryRules); err != nil {
 		application.appendLog(application.messages["log_warn_moid_not_found"])
 	} else {
 		application.cfg.LastMandatoryRulesVersion = checks.GetExternalVersion()
@@ -95,12 +91,10 @@ func main() {
 	}
 	sorter.SetLoadOrderRules(sorterRules)
 
-	if err := application.loadModDatabase("mod_database.json"); err != nil {
+	if err := application.loadModDatabase(FileNameModDatabase); err != nil {
 		application.modDatabase = []checks.ModDBEntry{}
 		application.appendLog(application.messages["log_mod_db_missing"])
 		application.cfg.LastModDatabaseVersion = ""
-	} else {
-		// версия уже сохранена в loadModDatabase
 	}
 	checks.SetModDatabase(application.modDatabase)
 
@@ -110,6 +104,10 @@ func main() {
 		application.messages["launcher_ver_unknown"],
 		application.messages["launcher_exe_not_found"],
 		application.messages["launcher_root_not_found"],
+	)
+	SetLinuxLauncherMessages(
+		application.messages["linux_wine_not_found"],
+		application.messages["linux_xbox_not_supported"],
 	)
 	application.launchGameFunc = launchGame
 
@@ -122,20 +120,19 @@ func main() {
 	}
 	application.updateToggleButtonText(application.btnToggle)
 
-	application.mainWindow.SetTitle(application.getTitle())
+	application.mainWindow.SetTitle(application.getTitle() + " v" + AppVersion)
 	application.mainWindow.SetMainMenu(application.buildMainMenu())
 
 	application.mainWindow.SetOnClosed(func() {
 		if application.orderDirty {
 			dialog.ShowConfirm(
 				application.messages["window_error_title"],
-				application.messages["unsaved_changes_question"],  // "<- нужно добавить ключ в messages.json"
+				application.messages["unsaved_changes_question"],
 				func(ok bool) {
 					if ok {
 						application.saveCurrentOrder()
-						application.appendLog("Order saved on exit.")
+						application.appendLog(application.messages["order_saved_on_exit"])
 					}
-					// сохраняем размеры и закрываем
 					size := application.mainWindow.Canvas().Size()
 					application.cfg.WindowWidth = int(size.Width)
 					application.cfg.WindowHeight = int(size.Height)
@@ -145,9 +142,8 @@ func main() {
 				},
 				application.mainWindow,
 			)
-			return // не закрываем окно сразу
+			return
 		}
-		// Если нет изменений – просто закрываем
 		size := application.mainWindow.Canvas().Size()
 		application.cfg.WindowWidth = int(size.Width)
 		application.cfg.WindowHeight = int(size.Height)
@@ -159,10 +155,8 @@ func main() {
 		application.handleDrop(uris)
 	})
 
-	// Предложить скачать файлы сортировки при первом запуске (в фоновой горутине)
 	go application.ensureSortFiles()
 
-	// Периодическая проверка обновлений
 	if application.cfg.UpdateCheckFrequency != "never" && application.shouldCheckUpdates() {
 		go application.checkForUpdates()
 	}

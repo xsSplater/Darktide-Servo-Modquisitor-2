@@ -15,10 +15,10 @@ import (
 	"time"
 
 	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/widget"
-	"fyne.io/fyne/v2/canvas"
 )
 
 type Config struct {
@@ -37,7 +37,7 @@ type Config struct {
 	LastUpdateCheck				string	`json:"last_update_check"`
 	SkipSortFilesPrompt			bool	`json:"skip_sort_files_prompt"`
 	UpdateCheckFrequency		string	`json:"update_check_frequency"`
-	ShowSystemMods				bool	`json:"show_system_mods"` // новая настройка
+	ShowSystemMods				bool	`json:"show_system_mods"`
 }
 
 const (
@@ -46,14 +46,14 @@ const (
 )
 
 type App struct {
-	cfg			*Config
-	mainWindow	fyne.Window
-	myApp		fyne.App
+	cfg							*Config
+	mainWindow					fyne.Window
+	myApp						fyne.App
 
 	// логирование
-	logFile			*os.File
-	logContainer	*fyne.Container
-	consoleScroll	*container.Scroll
+	logFile						*os.File
+	logContainer				*fyne.Container
+	consoleScroll				*container.Scroll
 
 	// модели
 	allMods						[]checks.ModInfo
@@ -65,71 +65,77 @@ type App struct {
 	orderDirty					bool
 
 	// рамка вокруг таблицы
-	tableBorder				*canvas.Rectangle
-	tableBorderContainer	*fyne.Container
-	blinkSaveOrderActive	bool
-	blinkCheckSortActive	bool
+	tableBorder					*canvas.Rectangle
+	tableBorderContainer		*fyne.Container
+	blinkSaveOrderActive		bool
+	blinkCheckSortActive		bool
 
-	// управление видимостью панели управления модами
-	managePanel			*fyne.Container
-	showSelectColumn	bool
-    selectColumnBgRes fyne.Resource   // ресурс фона для столбца выделения
+	// Управление видимостью панели управления модами
+	managePanel					*fyne.Container
+	showSelectColumn			bool
+	selectColumnBgRes fyne.Resource
 
-	moveLabel		*widget.Label
-	statusLabel		*widget.Label
+	moveLabel					*widget.Label
+	statusLabel					*widget.Label
 
-	tooltipStatus		*TooltipStatusManager
-	manageBtn			*CustomButton
-	selectAllBtn		*CustomButton
-	deselectAllBtn		*CustomButton
-	enableSelectedBtn	*CustomButton
-	disableSelectedBtn	*CustomButton
-	enableAllBtn		*CustomButton
-	disableAllBtn		*CustomButton
-	moveToTopBtn		*CustomButton
-	moveToBottomBtn		*CustomButton
-	btnToggle			*CustomButton
-	btnSaveOrder		*CustomButton
-	btnRefresh			*CustomButton
-	btnInstall			*CustomButton
-	btnRemove			*CustomButton
-	btnUp, btnDown		*CustomButton
-	btnLaunchNormal		*CustomButton
-	btnLaunchNoLauncher	*CustomButton
-	btnSortChecks		*CustomButton
-	searchClearBtn		*CustomButton
+	tooltipStatus				*TooltipStatusManager
+	manageBtn					*CustomButton
+	selectAllBtn				*CustomButton
+	deselectAllBtn				*CustomButton
+	enableSelectedBtn			*CustomButton
+	disableSelectedBtn			*CustomButton
+	enableAllBtn				*CustomButton
+	disableAllBtn				*CustomButton
+	moveToTopBtn				*CustomButton
+	moveToBottomBtn				*CustomButton
+	btnToggle					*CustomButton
+	btnSaveOrder				*CustomButton
+	btnRefresh					*CustomButton
+	btnInstall					*CustomButton
+	btnRemove					*CustomButton
+	btnUp, btnDown				*CustomButton
+	btnLaunchNormal				*CustomButton
+	btnLaunchNoLauncher			*CustomButton
+	btnSortChecks				*CustomButton
+	searchClearBtn				*CustomButton
 
-	moveToEntry		*widget.Entry
-	searchEntry		*widget.Entry
+	moveToEntry					*widget.Entry
+	searchEntry					*widget.Entry
 
-	descTitle		*widget.Label
-	descAuthor		*widget.Label
-	descInstalled	*widget.Label
-	descBody		*widget.Label
-	descURL			*widget.Hyperlink
-	filterLabel		*widget.Label
-	counterLabel	*widget.Label
+	descTitle					*widget.Label
+	descAuthor					*widget.Label
+	descInstalled				*widget.Label
+	descBody					*widget.Label
+	descURL						*widget.Hyperlink
+    githubLink					*widget.Hyperlink
+	filterLabel					*widget.Label
+	counterLabel				*widget.Label
 
-	logHeaderText	*canvas.Text
-	logWindow		*widget.RichText
+	logHeaderText				*canvas.Text
+	logWindow					*widget.RichText
 
-	filterSelect	*widget.Select
-	modTable		*widget.Table
-	headerTable		*widget.Table
-	systemModsTable	*widget.Table // таблица системных модов
+	filterSelect				*widget.Select
+	modTable					*widget.Table
+	headerTable					*widget.Table
+	systemModsTable				*widget.Table // таблица системных модов
 
-	lastSelectedRow		int
-	lastSelectedTime	time.Time
+	mainSplit					*container.Split
+	rightSplit					*container.Split
 
-	mainSplit	*container.Split
-	rightSplit	*container.Split
+	messages					map[string]string
+	modDatabase					[]checks.ModDBEntry
 
-	messages	map[string]string
-	modDatabase	[]checks.ModDBEntry
+	// ссылки на динамически окрашиваемые объекты
+	screenBgRect				*canvas.Rectangle
+	headerBoxBgRect				*canvas.Rectangle
+	tipBgRect					*canvas.Rectangle
+	topPanelBgRect				*canvas.Rectangle
+	managePanelBgRect			*canvas.Rectangle
+	descCardBgRect				*canvas.Rectangle
 
-	gameRoot	   string
-	patcherType	PatcherType
-	launchGameFunc func(version GameVersion, gameRoot string, skipLauncher bool) error
+	gameRoot					string
+	patcherType					PatcherType
+	launchGameFunc				func(version GameVersion, gameRoot string, skipLauncher bool) error
 }
 
 func NewApp(cfg *Config, myApp fyne.App) *App {
@@ -233,7 +239,7 @@ func (app *App) formatDate(t time.Time, pattern string) string {
 }
 
 type ModDatabaseFile struct {
-	Version string			`json:"version"`
+	Version string				`json:"version"`
 	Mods	[]checks.ModDBEntry `json:"mod_database"`
 }
 
@@ -266,14 +272,8 @@ func (app *App) downloadSortFiles() error {
 		remote string
 		local  string
 	}{
-		{
-			modDatabaseURL,
-			"mod_database.json",
-		},
-		{
-			modMandatoryURL,
-			"mandatory_obsolete_incompatible_dependencies.json",
-		},
+		{modDatabaseURL, FileNameModDatabase},
+		{modMandatoryURL, FileNameMandatoryRules},
 	}
 	for _, f := range files {
 		dest := filepath.Join(app.cfg.ModsPath, f.local)
@@ -286,10 +286,10 @@ func (app *App) downloadSortFiles() error {
 
 func (app *App) ensureSortFiles() {
 	missing := false
-	if _, err := os.Stat(filepath.Join(app.cfg.ModsPath, "mandatory_obsolete_incompatible_dependencies.json")); os.IsNotExist(err) {
+	if _, err := os.Stat(filepath.Join(app.cfg.ModsPath, FileNameMandatoryRules)); os.IsNotExist(err) {
 		missing = true
 	}
-	if _, err := os.Stat(filepath.Join(app.cfg.ModsPath, "mod_database.json")); os.IsNotExist(err) {
+	if _, err := os.Stat(filepath.Join(app.cfg.ModsPath, FileNameModDatabase)); os.IsNotExist(err) {
 		missing = true
 	}
 	if !missing {
@@ -319,10 +319,10 @@ func (app *App) ensureSortFiles() {
 		} else {
 			app.appendLog(app.messages["sort_files_updated"])
 			// Перезагрузить базы
-			if err := app.loadModDatabase("mod_database.json"); err == nil {
+			if err := app.loadModDatabase(FileNameModDatabase); err == nil {
 				checks.SetModDatabase(app.modDatabase)
 			}
-			if err := checks.LoadExternalLists("mandatory_obsolete_incompatible_dependencies.json"); err == nil {
+			if err := checks.LoadExternalLists(FileNameMandatoryRules); err == nil {
 				app.cfg.LastMandatoryRulesVersion = checks.GetExternalVersion()
 				saveConfig(app.cfg)
 			}
@@ -338,6 +338,9 @@ func (app *App) ensureSortFiles() {
 }
 
 func (app *App) shouldCheckUpdates() bool {
+	if app.cfg.UpdateCheckFrequency == "never" {
+		return false
+	}
 	if app.cfg.UpdateCheckFrequency == "every_start" {
 		return true
 	}

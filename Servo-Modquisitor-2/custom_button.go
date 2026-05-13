@@ -2,6 +2,7 @@
 package main
 
 import (
+	"Servo-Modquisitor/themes"
 	"image/color"
 
 	"fyne.io/fyne/v2"
@@ -65,22 +66,17 @@ func (r *_CustomButtonRenderer) Destroy() {}
 
 func (r *_CustomButtonRenderer) updateColors() {
     btn := r.btn
-    // Получаем текущую тему и её вариант (светлый/тёмный)
     th := fyne.CurrentApp().Settings().Theme()
     variant := fyne.CurrentApp().Settings().ThemeVariant()
 
     // Тень
     if btn.disabled {
-        r.shadow.FillColor = color.NRGBA{R: 0, G: 0, B: 0, A: 40}
+        r.shadow.FillColor = th.Color(themes.ColorButtonShadowDisabled, variant)
     } else {
-        r.shadow.FillColor = color.NRGBA{R: 0, G: 0, B: 0, A: 85}
+        r.shadow.FillColor = th.Color(themes.ColorButtonShadow, variant)
     }
-    r.shadow.CornerRadius = 5
 
-    // Основной фон
-    r.bg.CornerRadius = 5
-    r.bg.StrokeWidth = 0.5
-    r.bg.StrokeColor = color.NRGBA{R: 0, G: 0, B: 0, A: 155}
+    r.bg.StrokeColor = th.Color(themes.ColorButtonStroke, variant)
 
     if btn.disabled {
         r.bg.FillColor = th.Color(theme.ColorNameDisabledButton, variant)
@@ -88,10 +84,10 @@ func (r *_CustomButtonRenderer) updateColors() {
         return
     }
 
-    // Если есть фоновое изображение – делаем bg прозрачным
+    // Если есть фоновое изображение
     if r.bgImage != nil {
         r.bg.FillColor = color.Transparent
-        r.bg.StrokeColor = color.NRGBA{R: 0, G: 0, B: 0, A: 85}
+        r.bg.StrokeColor = th.Color(themes.ColorButtonStrokeImage, variant)
         if btn.Importance == widget.WarningImportance {
             r.text.Color = th.Color(theme.ColorNameForegroundOnWarning, variant)
         } else {
@@ -100,7 +96,7 @@ func (r *_CustomButtonRenderer) updateColors() {
         return
     }
 
-    // Состояния hover/pressed/обычное
+    // Обычные состояния
     switch {
     case btn.pressed && btn.hovered:
         r.bg.FillColor = th.Color(theme.ColorNamePressed, variant)
