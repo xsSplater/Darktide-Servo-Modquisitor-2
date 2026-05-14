@@ -1,5 +1,5 @@
 {
-	"version": "0.35",
+	"version": "0.40",
 
 	"mandatory_order": [
 		"LogMeIn",
@@ -17,64 +17,61 @@
 		{"mod": "ChatBlock",		"before": "guarantee_ability_activation"},
 		{"mod": "ChatBlock",		"before": "guarantee_weapon_swap"},
 		{"mod": "ChatBlock",		"before": "guarantee_special_action"},
-
 		{"mod": "MultiBind",		"before": "guarantee_ability_activation"},
 		{"mod": "MultiBind",		"before": "guarantee_weapon_swap"},
 		{"mod": "MultiBind",		"before": "guarantee_special_action"},
 		{"mod": "MultiBind",		"before": "hybrid_sprint"},
-
 		{"mod": "ToggleAltFire",	"before": "guarantee_special_action"},
 		{"mod": "ToggleAltFire",	"before": "hybrid_sprint"},
-
 		{"mod": "extended_weapon_customization_no_gun",
 									"before": "extended_weapon_customization"},
-
 		{"mod": "extended_weapon_customization",
 									"before": "for_the_drip"},
-
 		{"mod": "extended_weapon_customization",
 									"before": "enhanced_character_selection"},
-
 		{"mod": "GlobalStore",		"before": "FilterTrash"},
-
 		{"mod": "StickySprint",		"before": "ToggleAltFire"}
 	],
 
 	"obsolete_mods": [
 			"ads_crosshair",
-		"AimSensitivity",
+			"AimSensitivity",
 		"ammo_med_markers",
-		"barter_at_once",
+			"AutoBackup",
+			"barter_at_once",
 			"barter_with_hadron",
-		"book_finder",
+			"book_finder",
 			"bugfix_loc_markers",
 			"CharWallets",
 		"chest_markers",
 		"CircumstanceFix",
 		"CombatEvolved",
 		"consistent_flamer_backpacks",
-		"contracts_overlay",
+			"contracts_overlay",
 		"CThruShields",
-		"DarkCache",
+			"CustomResolutions",
+			"DarkCache",
 		"DirectToHadron",
 			"emote_wheel_fix",
-		"EnemyAudioReplacer",
+			"EnemyAudioReplacer",
 		"fancy_bots",
 		"graphics_options",
-		"Height Changer",
+			"Height Changer",
 		"heretical_idol_marker",
-		"IgnorePsykerGrenades",
+			"IgnorePsykerGrenades",
+			"Jukebox",
 		"material_markers",
 			"minimap",
-		"ModificationIconColor",
+			"ModificationIconColor",
 		"MultipleKeybinds",
 			"MuteInBackground",
 		"MutePerilSounds",
+			"NoLetterbox",
 			"NoSkull",
-		"OpenSteamProfile",
-		"PenanceDetails",
+			"OpenSteamProfile",
+			"PenanceDetails",
 		"PlasmaGunLagFix",
-		"PreferAuric",
+			"PreferAuric",
 			"PsykaniumDefaultDifficulty",
 			"PsykaniumInvHotkey",
 		"PsykerCriticalPerilQuiet",
@@ -82,7 +79,8 @@
 			"reroll_until_rarity",
 		"RestoreRagdollInteraction",
 		"RetainSelection",
-		"reveal_blessings",
+			"reveal_blessings",
+			"ScoreboardDamage",
 		"settings_extension",
 			"sorted_mission_grid",
 		"SpaceToContinue",
@@ -142,6 +140,10 @@
 			"mod2": "NoneHUD",
 				"desc": "Custom HUD also can hide UI."},
 
+		{"mod1": "ToggleHUD",
+			"mod2": "NoneHUD",
+				"desc": "Both do the same thing."},
+
 		{"mod1": "DisplayPing",
 			"mod2": "PingMonitor",
 				"desc": "Display Ping includes Ping Monitor functionality."},
@@ -188,17 +190,32 @@
 
 		{"mod1": "teammate_tracker",
 			"mod2": "Do I Know You",
-				"desc": "Teammate Tracker includes functionality of Do I Know You."},
-
-		{"mod1": "ToggleHUD",
-			"mod2": "NoneHUD",
-				"desc": "Both do the same thing."}
+				"desc": "Teammate Tracker includes functionality of Do I Know You."}
 	],
 
 	"dependencies": [
 		{"dependent": "Audio",
 			"required": "DarktideLocalServer",
 				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/211"},
+
+		{"dependent": "Clang",
+			"required": "Audio",
+				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/196"},
+		{"dependent": "EnemyAudioReplacer",
+			"required": "Audio",
+				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/196"},
+		{"dependent": "HeKnew",
+			"required": "Audio",
+				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/196"},
+		{"dependent": "LeeroyJenkins",
+			"required": "Audio",
+				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/196"},
+		{"dependent": "Rock",
+			"required": "Audio",
+				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/196"},
+		{"dependent": "UnlimitedPower",
+			"required": "Audio",
+				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/196"},
 
 		{"dependent": "ScoreboardAmmos",
 			"required": "scoreboard",
@@ -226,6 +243,10 @@
 			"required": "Power_DI",
 				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/281"},
 		{"dependent": "Do I Know You",
+			"required": "true_level",
+				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/156"},
+
+		{"dependent": "teammate_tracker",
 			"required": "true_level",
 				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/156"},
 
