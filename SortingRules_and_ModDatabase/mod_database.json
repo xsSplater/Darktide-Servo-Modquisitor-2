@@ -1,5 +1,5 @@
 {
-	"version": "0.25",
+	"version": "0.35",
 	"mod_database": [
 		{
 			"folder": "pickup_spawner",
@@ -693,14 +693,14 @@
 				"ru": "Загрузочный лор"
 			},
 			"description": {
-				"en": "This mod will overwrite the default loading screen messages to instead include a bunch of helpful tips sourced from the community. The user can select which kind of tips they'd like to see from the mod menu. The tips cover a lot of basic and not so basic things and there are also a couple of more generic lore bits.",
-				"ru": "Loading lore - Этот мод заменяет стандартные сообщения на экране загрузки на набор полезных советов, собранных сообществом. Пользователь может выбрать, какие именно советы он хочет видеть, в меню мода. Советы охватывают множество базовых и не очень базовых вещей, а также несколько более общих моментов из лора игры."
+				"en": "This mod will overwrite the default loading screen messages to instead include a bunch of helpful tips sourced from the community.\nThe user can select which kind of tips they'd like to see from the mod menu.\nThe tips cover a lot of basic and not so basic things and there are also a couple of more generic lore bits.",
+				"ru": "Loading lore - Этот мод заменяет стандартные сообщения на экране загрузки на набор полезных советов, собранных сообществом.\nПользователь может выбрать, какие именно советы он хочет видеть, в меню мода.\nСоветы охватывают множество базовых и не очень базовых вещей, а также несколько более общих моментов из лора игры."
 			},
 			"author": "HoboMechanistic",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/56",
 			"github_url": "https://github.com/ChildOfTheCron/GameModding/tree/main/Darktide/loadinglore",
 			"note": {
-				"en": "A little Outdated! It works, but hasn't been updated for a long time. There are some inaccuracies.",
+				"en": "Outdated! It works, but hasn't been updated. There are some inaccuracies.",
 				"ru": "Немного устарел! Работает, но давно не обновляется. Есть неточности."
 			}
 		},
@@ -776,15 +776,15 @@
 				"ru": "Исправление: метки игроков"
 			},
 			"description": {
-				"en": "OBSOLETE!",
-				"ru": "УСТАРЕЛ!"
+				"en": "OBSOLETE!\nThe functionality for correcting marker colors is already built into the current version of the game.\nExplanation on the Nexus page.",
+				"ru": "УСТАРЕЛ!\nФункционал исправления цвета маркеров уже встроен в текущую версию игры.\nОбъяснение на странице Нексус."
 			},
 			"author": "Redbeardt",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/61",
 			"github_url": "https://github.com/xsSplater/redbeardt-Darktide-Mods/tree/main/bugfix_loc_markers",
 			"note": {
-				"en": "The functionality for correcting marker colors is already built into the current version of the game. Explanation on the Nexus page.",
-				"ru": "Функционал исправления цвета маркеров уже встроен в текущую версию игры. Объяснение на странице Нексус."
+				"en": "",
+				"ru": ""
 			}
 		},
 		{
@@ -1326,161 +1326,150 @@
 			"note": { "en": "", "ru": "" }
 		},
 		{
-			"folder": "",
+			"folder": "ItemSorting",
 			"name": {
-				"en": "",
-				"ru": ""
+				"en": "Item Sorting",
+				"ru": "Сортировка предметов",
+				"zh-hans": "物品排序"
 			},
 			"description": {
-				"en": "",
-				"ru": ""
+				"en": "Add extra item sorting options and allow toggling vanilla sorting methods.",
+				"ru": "Item Sorting - Добавляет дополнительные параметры сортировки предметов и позволяет переключать стандартные методы сортировки.",
+				"zh-hans": "添加额外的物品排序选项，并且允许开关原版的排序方式。"
 			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
+			"author": "deluxghost",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/99",
+			"github_url": "https://github.com/deluxghost/darktide-mods/tree/main/ItemSorting",
+			"note": { "en": "", "ru": "" }
 		},
 		{
-			"folder": "",
+			"folder": "buy_until_rating",
 			"name": {
-				"en": "",
-				"ru": ""
+				"en": "Buy Until Rating",
+				"ru": "Закупка до рейтинга"
 			},
 			"description": {
-				"en": "",
-				"ru": ""
+				"en": "Automatically continue to buy selected weapon at Brunt's Armoury until you receive one with good stats, and items of lower stats will be sold automatically.",
+				"ru": "Buy Until Rating"
 			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
+			"author": "Zombine",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/100",
+			"github_url": "https://github.com/zombine04/darktide-mods/tree/main/buy_until_rating",
+			"note": { "en": "", "ru": "" }
 		},
 		{
-			"folder": "",
+			"folder": "CleanForceBlocking",
 			"name": {
-				"en": "",
-				"ru": ""
+				"en": "Clean Force Blocking",
+				"ru": "Чистый силовой блок",
+				"zh-hans": "移除力场剑格挡特效"
 			},
 			"description": {
-				"en": "",
-				"ru": ""
+				"en": "Remove blocking and pushing effect of force swords.",
+				"ru": "Clean Force Blocking - Удаляет эффекты при блоке и толчках силовыми мечами.",
+				"zh-hans": "移除力场剑的格挡和推动特效。"
 			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
+			"author": "deluxghost",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/104",
+			"github_url": "https://github.com/deluxghost/darktide-mods/tree/main/CleanForceBlocking",
+			"note": { "en": "", "ru": "" }
 		},
 		{
-			"folder": "",
+			"folder": "quickest_play",
 			"name": {
-				"en": "",
-				"ru": ""
+				"en": "Quickest Play",
+				"ru": "Быстрейшая игра",
+				"zh-hans": "快速游戏"
 			},
 			"description": {
-				"en": "",
-				"ru": ""
+				"en": "Make it easier to (re)start quickplay matchmaking.",
+				"ru": "Quickest Play - Добавьте горячую клавишу для запуска Быстрой игры из любого места.",
+				"zh-hans": "添加开始快速游戏的快捷键。",
+				"ja": "クイックプレイを開始するホットキーを追加します。"
 			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
+			"author": "Zombine",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/105",
+			"github_url": "https://github.com/zombine04/darktide-mods/tree/main/quickest_play",
+			"note": { "en": "", "ru": "" }
 		},
 		{
-			"folder": "",
+			"folder": "minimap",
 			"name": {
-				"en": "",
-				"ru": ""
+				"en": "Minimap",
+				"ru": "Миникарта"
 			},
 			"description": {
-				"en": "",
-				"ru": ""
+				"en": "OBSOLETE!",
+				"ru": "УСТАРЕЛ!"
 			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
+			"author": "unifyh",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/108",
+			"github_url": "https://github.com/unifyh/minimap",
+			"note": { "en": "", "ru": "" }
 		},
 		{
-			"folder": "",
+			"folder": "SortBrunt",
 			"name": {
-				"en": "",
-				"ru": ""
+				"en": "Sort Mastery",
+				"ru": "Сортировка для Бранта",
+				"zh-hans": "军备库排序"
 			},
 			"description": {
-				"en": "",
-				"ru": ""
+				"en": "Groups similar weapon types together in Brunt's Armory and Mastery.",
+				"ru": "Sort Mastery - Группирует похожее оружие в Арсенале Бранта.",
+				"zh-hans": "在布伦特的军备库和专精界面中，相似武器类型排列成组。"
 			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
+			"author": "ItsAlxl",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/109",
+			"github_url": "https://github.com/ItsAlxl/DarktideMods/tree/main/SortBrunt",
+			"note": { "en": "", "ru": "" }
 		},
 		{
-			"folder": "",
+			"folder": "DynamicCrosshair",
 			"name": {
-				"en": "",
-				"ru": ""
+				"en": "Dynamic Crosshair",
+				"ru": "Динамический прицел"
 			},
 			"description": {
-				"en": "",
-				"ru": ""
+				"en": "Changes your crosshair's color when aiming over an enemy, ally, or barrel and dynamically adjusts its position in 3rd person.",
+				"ru": "Dynamic Crosshair - Изменяет цвет прицела при наведении на врага, союзника или бочку, а также динамически корректирует его положение в режиме от третьего лица."
 			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
+			"author": "ItsAlxl",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/110",
+			"github_url": "https://github.com/ItsAlxl/darktide-mods/tree/main/DynamicCrosshair",
+			"note": { "en": "", "ru": "" }
 		},
 		{
-			"folder": "",
+			"folder": "Perspectives",
 			"name": {
-				"en": "",
-				"ru": ""
+				"en": "Perspectives Mod",
+				"ru": "Вид от третьего лица"
 			},
 			"description": {
-				"en": "",
-				"ru": ""
+				"en": "Switch between first and third person perspectives.",
+				"ru": "Perspectives Mod - Переключение между первым и третьим лицом.",
+				"zh-hans": "在第一人称和第三人称视角之间切换。"
 			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
+			"author": "ItsAlxl",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/111",
+			"github_url": "https://github.com/ItsAlxl/darktide-mods/tree/main/Perspectives",
+			"note": { "en": "", "ru": "" }
 		},
 		{
-			"folder": "",
+			"folder": "DistinctSideMissionIcons",
 			"name": {
-				"en": "",
-				"ru": ""
+				"en": "Distinct Side Mission Icons",
+				"ru": "Уникальные значки побочных миссий",
+				"zh-hans": "区分次要目标图标"
 			},
 			"description": {
-				"en": "",
-				"ru": ""
+				"en": "Change the side mission icons in the mission terminal to be distinguishable.",
+				"ru": "Distinct Side Mission Icons - Изменяет значки побочных миссий на терминале, чтобы их можно было различить.",
+				"zh-hans": "在任务终端中修改次要目标的图标，以作区分。",
+				"ja": "ミッションターミナルでサイドミッションのアイコンを見分けられるよう変更します。"
 			},
-			"author": "",
-			"url": "",
+			"author": "Zombine",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/112",
 			"github_url": "",
 			"note": {
 				"en": "",

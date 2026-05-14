@@ -1,31 +1,19 @@
 {
-	"version": "0.15",
+	"version": "0.35",
 
 	"mandatory_order": [
 		"LogMeIn",
+		"Reconnect",
 		"psych_ward",
 		"CharacterGrid",
+		"animation_events",
 		"DarktideLocalServer",
 		"Audio",
-		"animation_events",
 		"master_item_community_patch",
 		"visual_loadout_customization_community_patch"
 	],
 
 	"load_order": [
-		{"mod": "LogMeIn",			"before": "*"},
-		{"mod": "CharacterGrid",	"before": "BetterMelk"},
-		{"mod": "Reconnect",		"before": "psych_ward"},
-
-		{"mod": "animation_events",	"before": "scoreboard"},
-		{"mod": "scoreboard",		"before": "ScoreboardAmmos"},
-		{"mod": "scoreboard",		"before": "ScoreboardDamage"},
-		{"mod": "scoreboard",		"before": "scoreboard_enhanced_defense_plugin"},
-		{"mod": "scoreboard",		"before": "ScoreboardExplosive"},
-		{"mod": "scoreboard",		"before": "ScoreboardTagCounter"},
-		{"mod": "scoreboard",		"before": "ovenproof_scoreboard_plugin"},
-		{"mod": "scoreboard",		"before": "scoreboard_vermintide_plugin"},
-
 		{"mod": "ChatBlock",		"before": "guarantee_ability_activation"},
 		{"mod": "ChatBlock",		"before": "guarantee_weapon_swap"},
 		{"mod": "ChatBlock",		"before": "guarantee_special_action"},
@@ -38,41 +26,18 @@
 		{"mod": "ToggleAltFire",	"before": "guarantee_special_action"},
 		{"mod": "ToggleAltFire",	"before": "hybrid_sprint"},
 
-
-		{"mod": "visible_equipment", "before": "visible_equipment_uwu"},
-
 		{"mod": "extended_weapon_customization_no_gun",
 									"before": "extended_weapon_customization"},
-		{"mod": "extended_weapon_customization",
-									"before": "extended_weapon_customization_base_additions"},
-		{"mod": "extended_weapon_customization",
-									"before": "extended_weapon_customization_empty_scopes"},
-		{"mod": "extended_weapon_customization",
-									"before": "extended_weapon_customization_more_dakka"},
-		{"mod": "extended_weapon_customization",
-									"before": "extended_weapon_customization_owo"},
-		{"mod": "extended_weapon_customization",
-									"before": "extended_weapon_customization_syn_edits"},
-		{"mod": "extended_weapon_customization_owo",
-									"before": "extended_weapon_customization_syn_edits"},
 
 		{"mod": "extended_weapon_customization",
 									"before": "for_the_drip"},
-		{"mod": "for_the_drip",		"before": "for_the_drip_extra"},
 
 		{"mod": "extended_weapon_customization",
 									"before": "enhanced_character_selection"},
 
-
 		{"mod": "GlobalStore",		"before": "FilterTrash"},
 
-		{"mod": "servo_friend",		"before": "servo_friend_audio_server_plugin"},
-		{"mod": "servo_friend",		"before": "servo_friend_example_addon"},
-
-		{"mod": "StickySprint",		"before": "ToggleAltFire"},
-
-		{"mod": "Power_DI",			"before": "Do I Know You"},
-		{"mod": "true_level",		"before": "Do I Know You"}
+		{"mod": "StickySprint",		"before": "ToggleAltFire"}
 	],
 
 	"obsolete_mods": [
@@ -100,6 +65,7 @@
 		"heretical_idol_marker",
 		"IgnorePsykerGrenades",
 		"material_markers",
+			"minimap",
 		"ModificationIconColor",
 		"MultipleKeybinds",
 			"MuteInBackground",
@@ -136,7 +102,7 @@
 		"weapon_customization_plugin",
 		"weapon_customization_plugin_xsSythes",
 		"weapon_customization_syn_edits",
-		"which_book",
+			"which_book",
 			"WhichMissions",
 
 		"ENLocalizationFIX",
@@ -179,8 +145,6 @@
 		{"mod1": "DisplayPing",
 			"mod2": "PingMonitor",
 				"desc": "Display Ping includes Ping Monitor functionality."},
-
-
 
 		{"mod1": "KillfeedImprovements",
 			"mod2": "Killfeed Details",
@@ -274,19 +238,26 @@
 
 		{"dependent": "extended_weapon_customization_base_additions",
 			"required": "extended_weapon_customization",
-				"url": "https://backup158.github.io/DarktideWeaponCustomizationOwO/"},
+				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/277"},
+		{"dependent": "extended_weapon_customization_empty_scopes",
+			"required": "extended_weapon_customization",
+				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/277"},
+		{"dependent": "extended_weapon_customization_more_dakka",
+			"required": "extended_weapon_customization",
+				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/277"},
 		{"dependent": "extended_weapon_customization_owo",
 			"required": "extended_weapon_customization",
-				"url": "https://backup158.github.io/DarktideWeaponCustomizationOwO/"},
+				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/277"},
 		{"dependent": "extended_weapon_customization_syn_edits",
 			"required": "extended_weapon_customization",
-				"url": "https://backup158.github.io/DarktideWeaponCustomizationOwO/"},
+				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/277"},
 
-		{"dependent": "for_the_drip",
-			"required": "extended_weapon_customization",
-				"url": "https://backup158.github.io/DarktideWeaponCustomizationOwO/"},
 		{"dependent": "for_the_drip_extra",
 			"required": "for_the_drip",
-				"url": "https://github.com/Adspartan/For_the_Drip/releases"}
+				"url": "https://github.com/Adspartan/For_the_Drip/releases"},
+
+		{"dependent": "visible_equipment_uwu",
+			"required": "visible_equipment",
+				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/852"}
 	]
 }
