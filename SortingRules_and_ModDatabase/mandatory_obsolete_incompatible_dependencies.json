@@ -1,5 +1,5 @@
 {
-	"version": "0.40",
+	"version": "0.42",
 
 	"mandatory_order": [
 		"LogMeIn",
@@ -51,7 +51,6 @@
 		"CThruShields",
 			"CustomResolutions",
 			"DarkCache",
-		"DirectToHadron",
 			"emote_wheel_fix",
 			"EnemyAudioReplacer",
 		"fancy_bots",
@@ -60,12 +59,14 @@
 		"heretical_idol_marker",
 			"IgnorePsykerGrenades",
 			"Jukebox",
+			"LocalizationFixForKOAllinone",
 		"material_markers",
 			"minimap",
 			"ModificationIconColor",
 		"MultipleKeybinds",
 			"MuteInBackground",
 		"MutePerilSounds",
+			"no_chitchat",
 			"NoLetterbox",
 			"NoSkull",
 			"OpenSteamProfile",
