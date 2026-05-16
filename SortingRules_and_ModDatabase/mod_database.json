@@ -1,5 +1,5 @@
 {
-	"version": "0.55",
+	"version": "0.57",
 	"mod_database": [
 		{
 			"folder": "pickup_spawner",
@@ -3013,18 +3013,150 @@
 			}
 		},
 		{
-			"folder": "",
+			"folder": "ItemBorderColor",
 			"name": {
-				"en": "",
-				"ru": ""
+				"en": "Item Border Color",
+				"ru": "Цвет границы предмета",
+				"zh-hans": "物品边框颜色"
 			},
 			"description": {
+				"en": "Change selected item border color.",
+				"ru": "Item Border Color - Вы можете изменить цвет границы выбранного предмета.",
+				"zh-hans": "修改已选物品边框颜色。"
+			},
+			"author": "deluxghost",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/231",
+			"github_url": "https://github.com/deluxghost/darktide-mods/tree/main/ItemBorderColor",
+			"note": {
 				"en": "",
 				"ru": ""
+			}
+		},
+		{
+			"folder": "ShowMeRealWeaponStats",
+			"name": {
+				"en": "Show Me Real Weapon Stats",
+				"ru": "Покажи мне реальные модификаторы",
+				"zh-hans": "给我显示真实的武器数据"
 			},
-			"author": "",
-			"url": "",
+			"description": {
+				"en": "Shows real weapon stats with a maximum value of 80.",
+				"ru": "Show Me Real Weapon Stats - Показывает максимальное значение модификаторов оружия до 80, как оно есть.",
+				"zh-hans": "显示最大值为 80 时的「真实」武器数据。"
+			},
+			"author": "deluxghost",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/235",
+			"github_url": "https://github.com/deluxghost/darktide-mods/tree/main/ShowMeRealWeaponStats",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "MoreGraphicsOptions",
+			"name": {
+				"en": "More Graphics Options",
+				"ru": "Больше настроек графики"
+			},
+			"description": {
+				"en": "More Graphics Options - Performance boost - Detailed graphics options for Light Quality, Volumetric Fog, Global Illumination, some render settings like Mesh Quality and some performance settings. Custom presets (Very Low and Off) for Texture Quality, Light Quality, Volumetric Fog and Global Illumination. Custom commands for some of the settings.",
+				"ru": "More Graphics Options - Performance boost - Подробные графические настройки качества освещения, объёмного тумана, глобального освещения, некоторых параметров рендеринга, таких как качество мешей, и некоторых параметров производительности. Пользовательские предустановки (очень низкое и выключено) для качества текстур, качества освещения, объёмного тумана и глобального освещения. Пользовательские команды для некоторых настроек."
+			},
+			"author": "yakuzadeso",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/236",
 			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "better_buff_management",
+			"name": {
+				"en": "Better Buff Management",
+				"ru": "Улучшенное управление баффами"
+			},
+			"description": {
+				"en": "Create your own custom bars for showing a subset of the buffs in the game.",
+				"ru": "Better Buff Management - Создавайте собственные панели для отображения множества баффов в игре."
+			},
+			"author": "FatNutt",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/239",
+			"github_url": "https://github.com/FatNutt/darktide_mods/tree/main/better_buff_management",
+			"note": {
+				"en": "There are some problems. It doesn't update.",
+				"ru": "Есть некоторые проблемы. Не обновляется."
+			}
+		},
+		{
+			"folder": "ovenproof_scoreboard_plugin",
+			"name": {
+				"en": "Ovenproof's Scoreboard Plugin",
+				"ru": "Таблица результатов - Плагин Овенпруфа"
+			},
+			"description": {
+				"en": "Ovenproof's Scoreboard Plugin - Community Patch - Scoreboard plugin for detailed stats \nThe main mod will no longer be updated, so I'm linking to the community patch page here.\nIf the mod doesn't work, check the community patch page. ",
+				"ru": "Ovenproof's Scoreboard Plugin - Community Patch - Плагин для Таблицы результатов (Scoreboard), предоставляющий подробный обзор статистики.\nОсновной мод больше не будет обновляться, поэтому я здесь указываю страницу патча сообщества.\nЕсли мод не работает проверьте страницу патча сообщества."
+			},
+			"author": "OvenProofMars and community",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/514",
+			"github_url": "https://github.com/Backup158/DarktideOvenproofScoreboardPluginPatch/tree/main/ovenproof_scoreboard_plugin",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "DirectToHadron",
+			"name": {
+				"en": "Direct to Hadron",
+				"ru": "Прямо к Хадрон"
+			},
+			"description": {
+				"en": "Direct to Hadron - Go to the crafting menu from inventory - Provides a hotkey to directly access the crafting menu for the selected item from inventory.",
+				"ru": "Direct to Hadron - Go to the crafting menu from inventory - Предоставляет горячую клавишу для прямого доступа к меню улучшения выбранного предмета из инвентаря."
+			},
+			"author": "Zombine",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/242",
+			"github_url": "https://github.com/zombine04/darktide-mods/tree/main/DirectToHadron",
+			"note": {
+				"en": "This mod has been merged to Go To Mastery.",
+				"ru": "Этот мод был интегрирован в Go To Mastery."
+			}
+		},
+		{
+			"folder": "PerilGauge",
+			"name": {
+				"en": "Peril Gauge",
+				"ru": "Индикатор опасности",
+				"zh-hans": "危机值指示器"
+			},
+			"description": {
+				"en": "Adds a configurable HUD bar for your current peril/heat.",
+				"ru": "Peril Gauge - Добавляет в интерфейс настраиваемую полоску текущего уровня опасности/перегрева.",
+				"zh-hans": "添加一个可配置的 HUD 指示条，用于显示当前危机值/热量。"
+			},
+			"author": "ItsAlxl",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/243",
+			"github_url": "https://github.com/ItsAlxl/DarktideMods/tree/main/PerilGauge",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "mouse_workaround",
+			"name": {
+				"en": "Faulty Mouse Workaround",
+				"ru": "Обход неисправностей мыши"
+			},
+			"description": {
+				"en": "Implements a simple workaround for faulty mouses whose mouse buttons sometimes release for a very short time by releasing the buttons only once they have been released for a configurable time.",
+				"ru": "Faulty Mouse Workaround - Реализует простое решение для неисправных мышей, у которых кнопки иногда отпускаются на очень короткое время, путем отпускания кнопок только после того, как они были отпущены в течение настраиваемого времени."
+			},
+			"author": "Timo Zuccarello",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/245",
+			"github_url": "https://github.com/DeltaTimo/darktide-mouse-workaround",
 			"note": {
 				"en": "",
 				"ru": ""
@@ -3033,231 +3165,107 @@
 		{
 			"folder": "",
 			"name": {
-				"en": "",
-				"ru": ""
+				"en": "Auto Mod Loading and Ordering",
+				"ru": "Автозагрузка и сортировка модов"
 			},
 			"description": {
-				"en": "",
-				"ru": ""
+				"en": "Automatically orders and loads valid mods without requiring mod_load_order.txt or vortex load order management.",
+				"ru": "Auto Mod Loading and Ordering - Автоматически упорядочивает и загружает рабочие моды без необходимости использования файла mod_load_order.txt или управления порядком загрузки в Vortex."
 			},
-			"author": "",
-			"url": "",
+			"author": "Altarion",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/246",
 			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": "НУЖНО ОПРЕДЕЛИТЬСЯ С ПОИСКОМ ЭТОГО МОДА!"
+			}
+		},
+		{
+			"folder": "LocalizationFixForKOAllinone",
+			"name": {
+				"en": "Korean Localization Fix",
+				"ru": "Korean Localization Fix"
+			},
+			"description": {
+				"en": "OBSOLETE!",
+				"ru": "УСТАРЕЛ!"
+			},
+			"author": "Polarmingo",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/247",
+			"github_url": "",
+			"note": {
+				"en": "Improved Korean Localization is a successor mod.",
+				"ru": "Improved Korean - мод-наследник."
+			}
+		},
+		{
+			"folder": "no_dodge_jump",
+			"name": {
+				"en": "Stop accidental jumps",
+				"ru": "Предотвращение случайных прыжков"
+			},
+			"description": {
+				"en": "Prevents you from jumping when you accidentally press the dodge+jump keybind too quickly. Works on keyboard and controller.",
+				"ru": "Stop accidental jumps - Предотвращает прыжок при случайном быстром нажатии комбинации клавиш уклонение+прыжок. Работает как на клавиатуре, так и на контроллере."
+			},
+			"author": "Jaemn",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/249",
+			"github_url": "https://github.com/jayemen/darktide_no_dodge_jump",
 			"note": {
 				"en": "",
 				"ru": ""
 			}
 		},
 		{
-			"folder": "",
+			"folder": "no_chitchat",
 			"name": {
-				"en": "",
-				"ru": ""
+				"en": "No ChitChat",
+				"ru": "Никаких пустых разговоров"
 			},
 			"description": {
-				"en": "",
-				"ru": ""
+				"en": "OBSOLETE!",
+				"ru": "УСТАРЕЛ!"
 			},
-			"author": "",
-			"url": "",
-			"github_url": "",
+			"author": "devidkwhoami",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/250",
+			"github_url": "https://github.com/IDK-WHO-AM-I/darktide_no_chitchat",
+			"note": {
+				"en": "",
+				"ru": "Работает?"
+			}
+		},
+		{
+			"folder": "DifficultyColor",
+			"name": {
+				"en": "Difficulty Color",
+				"ru": "Цвета сложности",
+				"zh-hans": "难度颜色"
+			},
+			"description": {
+				"en": "Customize the color of each difficulty.",
+				"ru": "Difficulty Color - Настройте цвета каждого уровня сложности.",
+				"zh-hans": "自定义每个难度的颜色。"
+			},
+			"author": "deluxghost",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/251",
+			"github_url": "https://github.com/deluxghost/darktide-mods/tree/main/DifficultyColor",
 			"note": {
 				"en": "",
 				"ru": ""
 			}
 		},
 		{
-			"folder": "",
+			"folder": "Decode_Helper",
 			"name": {
-				"en": "",
-				"ru": ""
+				"en": "Decode Helper",
+				"ru": "Помощник-декодер"
 			},
 			"description": {
-				"en": "",
-				"ru": ""
+				"en": "Shows you all the targets for the decode symbols minigame.",
+				"ru": "Decode Helper - Отображает все цели для мини-игры по расшифровке символов."
 			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
+			"author": "Jwako",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/252",
 			"github_url": "",
 			"note": {
 				"en": "",
