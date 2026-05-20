@@ -158,10 +158,12 @@ func (app *App) buildUI() {
 	app.applyTooltip(app.btnUp, "btn_up_tooltip")
 	app.btnDown = NewCustomButton(app.messages["btn_down"], func() { app.moveSelected(1) })
 	app.applyTooltip(app.btnDown, "btn_down_tooltip")
+
 	app.btnSaveOrder = NewCustomButton(app.messages["btn_save_order"], func() {
 		if app.orderDirty {
-			app.saveCurrentOrder()
+			app.saveCurrentOrder()          // 1. записываем текущие галочки в файл
 			app.orderDirty = false
+			app.refreshModList()            // 2. сразу перечитываем файл, обновляем модель
 			app.appendLog(app.messages["log_order_saved"])
 			app.stopBlinkSaveButton()
 			app.updateTableBorder()
@@ -170,6 +172,7 @@ func (app *App) buildUI() {
 		}
 	})
 	app.applyTooltip(app.btnSaveOrder, "btn_save_order_tooltip")
+
 	app.btnRefresh = NewCustomButton(app.messages["btn_refresh"], func() {
 		go func() {
 			if app.orderDirty {
@@ -452,6 +455,8 @@ func (app *App) buildUI() {
 				check.SetChecked(mod.Active)
 				check.OnChanged = func(b bool) {
 					app.toggleModActive(mod.Name, b)
+					// Явно выделяем строку, чтобы скролл не прыгал наверх
+					app.modTable.Select(widget.TableCellID{Row: id.Row, Col: 0})
 				}
 				cont.Add(check)
 			}
@@ -622,6 +627,20 @@ func (app *App) buildUI() {
 	// кнопки правой панели
 	app.btnSortChecks = NewCustomButton(app.messages["btn_sort_checks"], func() { go app.runAllChecks() })
 	app.applyTooltip(app.btnSortChecks, "btn_sort_checks_tooltip")
+
+    if app.amlDetected {
+        // app.btnSaveOrder.Disable()
+        // app.btnSortChecks.Disable()
+        // app.btnSaveOrder.SetText(app.messages["btn_save_order_disabled"])
+        // app.btnSortChecks.SetText(app.messages["btn_sort_checks_disabled"])
+
+        // Заменяем тултипы на предупреждение (applyTooltip переопределит OnMouseIn и OnMouseMoved)
+		app.btnSaveOrder.SetText(app.messages["btn_save_order_aml"])
+		app.btnSortChecks.SetText(app.messages["btn_sort_checks_aml"])
+        app.applyTooltip(app.btnSaveOrder, "aml_save_warning_tooltip")
+        app.applyTooltip(app.btnSortChecks, "aml_sort_warning_tooltip")
+    }
+
 	app.btnInstall = NewCustomButton(app.messages["btn_install"], func() {
 		fd := dialog.NewFileOpen(func(reader fyne.URIReadCloser, err error) {
 			if err == nil && reader != nil {
@@ -731,7 +750,7 @@ func (app *App) buildUI() {
 	app.appendCenteredLog(app.messages["log_start0"])
 	app.filterModList()
 
-	go app.blinkCheckSortIfNeeded()
+	// go app.blinkCheckSortIfNeeded()
 	app.updateTableBorder()
 }
 
@@ -1187,28 +1206,6 @@ func (app *App) stopBlinkSaveButton() {
 	app.blinkSaveOrderActive = false
 }
 
-func (app *App) startBlinkCheckSortButton() {
-	app.startBlink(app.btnSortChecks, &app.blinkCheckSortActive, func() bool {
-		return true
-	})
-}
-
-func (app *App) stopBlinkCheckSortButton() {
-	app.blinkCheckSortActive = false
-}
-
-func (app *App) blinkCheckSortIfNeeded() {
-	for {
-		time.Sleep(BlinkCheckInterval)
-		needBlink := app.orderDirty
-		if !needBlink && app.blinkCheckSortActive {
-			app.stopBlinkCheckSortButton()
-		} else if needBlink && !app.blinkCheckSortActive {
-			app.startBlinkCheckSortButton()
-		}
-	}
-}
-
 func (app *App) updateTableBorder() {
 	if app.tableBorder == nil {
 		return
@@ -1240,4 +1237,39 @@ func (app *App) applyTooltip(btn *CustomButton, tipKey string) {
 	btn.OnMouseOut = func() {
 		app.tooltipStatus.HideAfterDelay()
 	}
+}
+
+// showChoiceDialogAsync - асинхронная версия диалога с красным градиентом.
+func (app *App) showChoiceDialogAsync(parent fyne.Window, title, message string, callback func(int), options ...string) {
+    fyne.Do(func() {
+        var buttons []*CustomButton
+        popUp := widget.NewModalPopUp(nil, parent.Canvas())
+        
+        var btnObjects []fyne.CanvasObject
+        for i, opt := range options {
+            idx := i
+            btn := NewCustomButton(opt, func() {
+                popUp.Hide()
+                if callback != nil {
+                    callback(idx)
+                }
+            })
+            buttons = append(buttons, btn)
+            btnObjects = append(btnObjects, btn)
+        }
+        
+        gradHeader := canvas.NewImageFromImage(app.makeRedCRTGradient(DialogGradientWidth, DialogGradientHeight))
+        gradHeader.FillMode = canvas.ImageFillStretch
+        titleLabel := widget.NewLabelWithStyle(title, fyne.TextAlignCenter, fyne.TextStyle{Bold: true})
+        headerContainer := container.NewStack(gradHeader, container.NewCenter(titleLabel))
+
+        content := container.NewVBox(
+            headerContainer,
+            widget.NewLabel(message),
+            container.NewCenter(container.NewHBox(btnObjects...)),
+        )
+        popUp.Content = content
+        popUp.Resize(fyne.NewSize(DialogMinWidth, DialogMinHeight))
+        popUp.Show()
+    })
 }

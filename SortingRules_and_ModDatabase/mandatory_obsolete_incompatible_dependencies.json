@@ -1,5 +1,5 @@
 {
-	"version": "0.42",
+	"version": "0.44",
 
 	"mandatory_order": [
 		"LogMeIn",
@@ -30,6 +30,7 @@
 		{"mod": "extended_weapon_customization",
 									"before": "enhanced_character_selection"},
 		{"mod": "GlobalStore",		"before": "FilterTrash"},
+		{"mod": "no_chitchat",		"before": "LessAnnoyingPing"},
 		{"mod": "StickySprint",		"before": "ToggleAltFire"}
 	],
 
@@ -195,7 +196,20 @@
 	],
 
 	"dependencies": [
+		{"dependent": "outline_colours",
+			"required": "PlayerOutlines",
+				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/734"},
+		{"dependent": "CareerColourOutlines",
+			"required": "PlayerOutlines",
+				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/734"},
+
 		{"dependent": "Audio",
+			"required": "DarktideLocalServer",
+				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/211"},
+		{"dependent": "Coal",
+			"required": "DarktideLocalServer",
+				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/211"},
+		{"dependent": "ScrubsVermin",
 			"required": "DarktideLocalServer",
 				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/211"},
 
@@ -212,6 +226,9 @@
 			"required": "Audio",
 				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/196"},
 		{"dependent": "Rock",
+			"required": "Audio",
+				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/196"},
+		{"dependent": "SpecialSpawnAnnouncer",
 			"required": "Audio",
 				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/196"},
 		{"dependent": "UnlimitedPower",

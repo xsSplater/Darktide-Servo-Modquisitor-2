@@ -110,6 +110,11 @@ func CreateLoadOrderFromActive(activeMods []string, lang string) {
 	sortedRest := topologicalSort(rest, allDeps)
 	finalOrder = append(finalOrder, sortedRest...)
 
+	// ДИАГНОСТИКА: потери на этапе rest (если что‑то не попало в sortedRest)
+	// if logFunc != nil {
+	// 	logFunc(fmt.Sprintf("--- DEBUG: rest before sort: %d", len(rest)))
+	// }
+
 	file, _ := os.Create("mod_load_order.txt")
 	if file != nil {
 		defer file.Close()
@@ -162,8 +167,8 @@ func topologicalSort(mods []string, deps []ModDependency) []string {
 	indeg := make([]int, len(mods))
 
 	for _, dep := range deps {
-		from, ok1 := index[dep.Dependent]
-		to, ok2 := index[dep.Required]
+		from, ok1 := index[dep.Required]	// Зависимость ставится первой
+		to, ok2 := index[dep.Dependent]		// Зависимые ставятся после
 		if ok1 && ok2 {
 			adj[from] = append(adj[from], to)
 			indeg[to]++
@@ -190,6 +195,22 @@ func topologicalSort(mods []string, deps []ModDependency) []string {
 			}
 		}
 	}
+
+	// ДИАГНОСТИКА: проверяем потери
+	// if logFunc != nil {
+	// 	logFunc(fmt.Sprintf("--- DEBUG: topologicalSort: input=%d, output=%d", len(mods), len(result)))
+	// 	if len(mods) != len(result) {
+	// 		present := make(map[string]bool)
+	// 		for _, m := range result {
+	// 			present[m] = true
+	// 		}
+	// 		for _, m := range mods {
+	// 			if !present[m] {
+	// 				logFunc("  MISSING: " + m)
+	// 			}
+	// 		}
+	// 	}
+	// }
 
 	return result
 }

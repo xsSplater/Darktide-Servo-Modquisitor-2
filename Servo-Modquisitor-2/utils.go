@@ -10,6 +10,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 
 	"fyne.io/fyne/v2"
 )
@@ -190,50 +191,105 @@ func (app *App) makeRedCRTGradient(w, h int) *image.NRGBA {
 }
 
 func (app *App) runAllChecks() {
-	app.appendLog("// " + app.messages["log_start"])
+    app.appendLog("// " + app.messages["log_start"])
 
-	checks.CheckInstallation(app.mainWindow)
-	checks.EnsureModLoadOrder(app.mainWindow)
+    checks.CheckInstallation(app.mainWindow)
 
-	if !checks.CheckObsoleteMods(app.mainWindow) {
-		return
-	}
-	if !checks.CheckMalformed(app.mainWindow) {
-		return
-	}
-	if !checks.CheckEmptyFolders(app.mainWindow) {
-		return
-	}
-	if !checks.CheckIncompatible(app.mainWindow) {
-		return
-	}
-	if !checks.CheckDependencies(app.mainWindow) {
-		return
-	}
-	if !checks.CheckBrokenMods(app.mainWindow) {
-		return
-	}
+    checks.EnsureModLoadOrder(app.mainWindow)
 
-	fyne.Do(func() { app.refreshModList() })
+    if !checks.CheckObsoleteMods(app.mainWindow) {
+        return
+    }
 
-	var activeNames []string
-	for _, mod := range app.allMods {
-		if mod.Active && checks.FolderExists(mod.Name) {
-			activeNames = append(activeNames, mod.Name)
-		}
-	}
-	sorter.CreateLoadOrderFromActive(activeNames, app.cfg.Language)
-	app.appendLog(app.messages["done"])
+    if !checks.CheckMalformed(app.mainWindow) {
+        return
+    }
 
-	fyne.Do(func() {
-		app.refreshModList()
-		absPath, _ := filepath.Abs(filepath.Join(app.cfg.ModsPath, FileNameLoadOrder))
-		if _, err := os.Stat(absPath); err == nil {
-			go func() {
-				if err := openFileWithDefaultApp(absPath); err != nil {
-					app.appendLog(fmt.Sprintf(app.messages["log_failed_open_file"], err))
-				}
-			}()
-		}
-	})
+    if !checks.CheckEmptyFolders(app.mainWindow) {
+        return
+    }
+
+    if !checks.CheckIncompatible(app.mainWindow) {
+        return
+    }
+
+    if !checks.CheckDependencies(app.mainWindow) {
+        return
+    }
+
+    if !checks.CheckBrokenMods(app.mainWindow) {
+        return
+    }
+
+
+    // 1. Перечитываем самый свежий сохранённый файл
+    app.refreshModList()
+    
+    // ДИАГНОСТИКА: выводим в лог все моды и их активность после refresh
+    // app.appendLog("--- DEBUG: after refreshModList ---")
+    // for _, mod := range app.allMods {
+    //     app.appendLog(fmt.Sprintf("  %s: Active=%v", mod.Name, mod.Active))
+    // }
+    // app.appendLog("--- END DEBUG ---")
+
+    // 2. Собираем активные моды для сортировки
+    var activeNames []string
+    notActive := make(map[string]bool)
+    for _, mod := range app.allMods {
+        if mod.Active && checks.FolderExists(mod.Name) {
+            activeNames = append(activeNames, mod.Name)
+        } else if checks.FolderExists(mod.Name) && !mod.IsSystem {
+            notActive[mod.Name] = true
+        }
+    }
+
+    // ДИАГНОСТИКА: выводим собранные активные имена
+    // app.appendLog("--- DEBUG: active mods collected for sorting ---")
+    // for _, name := range activeNames {
+    //     app.appendLog("  " + name)
+    // }
+    // app.appendLog("--- END DEBUG ---")
+
+    // Если активных модов нет - просто завершаем
+    if len(activeNames) == 0 {
+        app.appendLog(app.messages["done"])
+        return
+    }
+
+    sorter.CreateLoadOrderFromActive(activeNames, app.cfg.Language)
+
+    // Дописываем неактивные моды, чтобы сохранить их состояние
+    loadOrderPath := filepath.Join(app.cfg.ModsPath, FileNameLoadOrder)
+    f, err := os.OpenFile(loadOrderPath, os.O_APPEND|os.O_WRONLY, 0644)
+    if err == nil {
+        existing := make(map[string]bool)
+        data, _ := os.ReadFile(loadOrderPath)
+        lines := strings.Split(string(data), "\n")
+        for _, line := range lines {
+            line = strings.TrimSpace(line)
+            if line != "" && !strings.HasPrefix(line, "--") {
+                existing[line] = true
+            }
+        }
+        for name := range notActive {
+            if !existing[name] {
+                fmt.Fprintln(f, "-- "+name)
+            }
+        }
+        f.Close()
+    }
+    app.appendLog(app.messages["done"])
+
+    // Финальное обновление UI и открытие файла
+    fyne.Do(func() {
+        app.refreshModList()
+        absPath, _ := filepath.Abs(filepath.Join(app.cfg.ModsPath, FileNameLoadOrder))
+        if _, err := os.Stat(absPath); err == nil {
+            go func() {
+                if err := openFileWithDefaultApp(absPath); err != nil {
+                    app.appendLog(fmt.Sprintf(app.messages["log_failed_open_file"], err))
+                }
+            }()
+        }
+    })
 }

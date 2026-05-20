@@ -1,4 +1,3 @@
-// app.go
 package main
 
 import (
@@ -38,6 +37,8 @@ type Config struct {
 	SkipSortFilesPrompt			bool	`json:"skip_sort_files_prompt"`
 	UpdateCheckFrequency		string	`json:"update_check_frequency"`
 	ShowSystemMods				bool	`json:"show_system_mods"`
+	// скрывать предупреждение об AML
+    SuppressAMLWarning 			bool	`json:"suppress_aml_warning"`
 }
 
 const (
@@ -68,7 +69,8 @@ type App struct {
 	tableBorder					*canvas.Rectangle
 	tableBorderContainer		*fyne.Container
 	blinkSaveOrderActive		bool
-	blinkCheckSortActive		bool
+	// blinkCheckSortActive		bool
+	amlDetected					bool
 
 	// Управление видимостью панели управления модами
 	managePanel					*fyne.Container
@@ -312,7 +314,7 @@ func (app *App) ensureSortFiles() {
 		app.messages["download_skip_forever"],
 	)
 	switch choice {
-	case 0: // Да – скачать
+	case 0: // Да - скачать
 		if err := app.downloadSortFiles(); err != nil {
 			app.appendLog(fmt.Sprintf(app.messages["download_failed"], err))
 			dialog.ShowInformation(app.messages["sort_files_missing"], fmt.Sprintf(app.messages["download_failed"], err), app.mainWindow)

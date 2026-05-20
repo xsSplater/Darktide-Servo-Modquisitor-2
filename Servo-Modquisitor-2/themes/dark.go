@@ -17,10 +17,10 @@ func (t ForcedDarkTheme) Color(name fyne.ThemeColorName, variant fyne.ThemeVaria
 	// Фон выпадающих меню (строки меню, контекстные меню)
 	case theme.ColorNameMenuBackground:
 										return color.NRGBA{R: 52,  G: 55,  B: 52,  A: 240}
-	// Фон полей ввода – прозрачный для видимости CRT-фона
+	// Фон полей ввода - прозрачный для видимости CRT-фона
 	case theme.ColorNameInputBackground:
 										return color.NRGBA{R: 5,   G: 6,   B: 5,   A: 155}
-	// Фон всплывающих окон (диалогов) – как основной фон
+	// Фон всплывающих окон (диалогов) - как основной фон
 	case theme.ColorNameOverlayBackground:
 										return color.NRGBA{R: 32,  G: 32,  B: 32,  A: 255}
 	// Цвет текста предупреждений или ошибок
@@ -34,7 +34,7 @@ func (t ForcedDarkTheme) Color(name fyne.ThemeColorName, variant fyne.ThemeVaria
 	case theme.ColorNameHover:			return color.NRGBA{R: 70,  G: 120, B: 38,  A: 222}
 	// Цвет неактивной кнопки
 	case theme.ColorNameDisabledButton:	return color.NRGBA{R: 30,  G: 33,  B: 30,  A: 111}
-	// Индикатор фокуса (обводка активного элемента) – обычно едва заметный
+	// Индикатор фокуса (обводка активного элемента) - обычно едва заметный
 	case theme.ColorNameFocus:			return color.NRGBA{R: 80,  G: 130, B: 200, A: 128}
 	case theme.ColorNamePressed:		return color.NRGBA{R: 60,  G: 60,  B: 68,  A: 255}
 
@@ -92,7 +92,7 @@ func (t ForcedDarkTheme) Color(name fyne.ThemeColorName, variant fyne.ThemeVaria
     case ColorTableRowOdd:				return color.NRGBA{R: 34,  G: 34,  B: 38,  A: 5  }
     case ColorTableRowSelected:			return color.NRGBA{R: 60,  G: 160, B: 30,  A: 80 }
     case ColorTableRowConflict:			return color.NRGBA{R: 80,  G: 40,  B: 0,   A: 120}
-    case ColorTableBorderDirty:			return color.NRGBA{R: 200, G: 0,   B: 0,   A: 255}
+    case ColorTableBorderDirty:			return color.NRGBA{R: 200, G: 100, B: 0,   A: 255}
     case ColorTableHeaderBg:			return color.NRGBA{R: 20,  G: 20,  B: 20,  A: 255}
     case ColorSystemTableBg:			return color.NRGBA{R: 20,  G: 20,  B: 20,  A: 150}
 
@@ -115,7 +115,7 @@ func (t ForcedDarkTheme) Color(name fyne.ThemeColorName, variant fyne.ThemeVaria
     case ColorButtonStroke:				return color.NRGBA{R: 0,   G: 0,   B: 0,   A: 155}
     case ColorButtonStrokeImage:		return color.NRGBA{R: 0,   G: 0,   B: 0,   A: 85 }
 
-	// Если вдруг запрошен неизвестный цвет – отдаём белый (заглушка)
+	// Если вдруг запрошен неизвестный цвет - отдаём белый (заглушка)
 	default:							return theme.DefaultTheme().Color(name, variant)
 	}
 }

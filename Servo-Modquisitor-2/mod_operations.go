@@ -95,6 +95,24 @@ func (app *App) refreshModList() {
 		}
 	}
 
+    // Проверяем, не изменилось ли состояние AML
+    wasAML := app.amlDetected
+    app.amlDetected = checks.IsAMLInstalled(app.cfg.ModsPath)
+    if wasAML != app.amlDetected {
+        // Обновляем состояние кнопок
+        if app.amlDetected {
+			app.btnSaveOrder.SetText(app.messages["btn_save_order_aml"])
+			app.btnSortChecks.SetText(app.messages["btn_sort_checks_aml"])
+            app.applyTooltip(app.btnSaveOrder, "aml_save_warning_tooltip")
+            app.applyTooltip(app.btnSortChecks, "aml_sort_warning_tooltip")
+        } else {
+            app.btnSaveOrder.SetText(app.messages["btn_save_order"])
+            app.btnSortChecks.SetText(app.messages["btn_sort_checks"])
+            app.applyTooltip(app.btnSaveOrder, "btn_save_order_tooltip")
+            app.applyTooltip(app.btnSortChecks, "btn_sort_checks_tooltip")
+        }
+    }
+
 	app.allMods = regMods
 	app.orderDirty = false
 	app.filterModList()

@@ -112,8 +112,8 @@ func main() {
 	application.launchGameFunc = launchGame
 
 	application.syncModsEnabledState()
-	application.refreshModList()
 	application.buildUI()
+	application.refreshModList()
 
 	if !cfg.InitialSetupDone {
 		application.performFirstRunSetup()
@@ -161,7 +161,31 @@ func main() {
 		go application.checkForUpdates()
 	}
 
-	go application.blinkCheckSortIfNeeded()
+	// go application.blinkCheckSortIfNeeded()
+
+    // Проверка на AML и предупреждение пользователя (асинхронно)
+    application.amlDetected = checks.IsAMLInstalled(cfg.ModsPath)
+    if application.amlDetected && !cfg.SuppressAMLWarning {
+        application.showChoiceDialogAsync(
+            application.mainWindow,
+            application.messages["aml_detected_title"],
+            application.messages["aml_detected_warning"],
+            func(choice int) {
+                switch choice {
+                case 0:
+                    if u, err := url.Parse("https://www.nexusmods.com/warhammer40kdarktide/mods/19"); err == nil {
+                        application.myApp.OpenURL(u)
+                    }
+                case 2:
+                    cfg.SuppressAMLWarning = true
+                    saveConfig(cfg)
+                }
+            },
+            application.messages["btn_open_dml_page"],
+            application.messages["btn_ok"],
+            application.messages["btn_dont_show_again"],
+        )
+    }
 
 	application.mainWindow.ShowAndRun()
 }

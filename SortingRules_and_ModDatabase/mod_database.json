@@ -1,5 +1,5 @@
 {
-	"version": "0.57",
+	"version": "0.59",
 	"mod_database": [
 		{
 			"folder": "pickup_spawner",
@@ -465,7 +465,7 @@
 			},
 			"description": {
 				"en": "Fixes crosshairs to be actually representative of spread, taking your FOV into account. Fixes crosshairs to take spread ratios into account. Crosshair support for shotshell pellet patterns.",
-				"ru": "Crosshairs Fix - Исправляет прицелы, чтобы точно отражать разброс, учитывающий ваше поле зрения. Исправляет прицелы с учётом коэффициента разброса. Добавлена ​​поддержка прицелами различных типов дроби.",
+				"ru": "Crosshairs Fix - Исправляет прицелы, чтобы точно отражать разброс, учитывающий ваше поле зрения. Исправляет прицелы с учётом коэффициента разброса. Добавлена поддержка прицелами различных типов дроби.",
 				"zh-hans": "修复准星，在考虑 FOV 因素的情况下，使其准确反映武器散布范围。"
 			},
 			"author": "Skwuruhl",
@@ -1179,7 +1179,10 @@
 			"author": "Fracticality",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/89",
 			"github_url": "https://github.com/fracticality/darktide-mods/tree/master/psych_ward",
-			"note": { "en": "", "ru": "" }
+			"note": {
+				"en": "It should be at the beginning to load on time.",
+				"ru": "Должен стоять в начале, чтобы успевать загружаться вовремя."
+			}
 		},
 		{
 			"folder": "fashion_randomizer",
@@ -3007,10 +3010,7 @@
 			"author": "JCaleb",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/230",
 			"github_url": "https://github.com/JCalebBR/BetterFireGrenade",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
+			"note": { "en": "", "ru": "" }
 		},
 		{
 			"folder": "ItemBorderColor",
@@ -3027,10 +3027,7 @@
 			"author": "deluxghost",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/231",
 			"github_url": "https://github.com/deluxghost/darktide-mods/tree/main/ItemBorderColor",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
+			"note": { "en": "", "ru": "" }
 		},
 		{
 			"folder": "ShowMeRealWeaponStats",
@@ -3047,10 +3044,7 @@
 			"author": "deluxghost",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/235",
 			"github_url": "https://github.com/deluxghost/darktide-mods/tree/main/ShowMeRealWeaponStats",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
+			"note": { "en": "", "ru": "" }
 		},
 		{
 			"folder": "MoreGraphicsOptions",
@@ -3065,10 +3059,7 @@
 			"author": "yakuzadeso",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/236",
 			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
+			"note": { "en": "", "ru": "" }
 		},
 		{
 			"folder": "better_buff_management",
@@ -3101,10 +3092,7 @@
 			"author": "OvenProofMars and community",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/514",
 			"github_url": "https://github.com/Backup158/DarktideOvenproofScoreboardPluginPatch/tree/main/ovenproof_scoreboard_plugin",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
+			"note": { "en": "", "ru": "" }
 		},
 		{
 			"folder": "DirectToHadron",
@@ -3139,10 +3127,7 @@
 			"author": "ItsAlxl",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/243",
 			"github_url": "https://github.com/ItsAlxl/DarktideMods/tree/main/PerilGauge",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
+			"note": { "en": "", "ru": "" }
 		},
 		{
 			"folder": "mouse_workaround",
@@ -3157,28 +3142,7 @@
 			"author": "Timo Zuccarello",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/245",
 			"github_url": "https://github.com/DeltaTimo/darktide-mouse-workaround",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "Auto Mod Loading and Ordering",
-				"ru": "Автозагрузка и сортировка модов"
-			},
-			"description": {
-				"en": "Automatically orders and loads valid mods without requiring mod_load_order.txt or vortex load order management.",
-				"ru": "Auto Mod Loading and Ordering - Автоматически упорядочивает и загружает рабочие моды без необходимости использования файла mod_load_order.txt или управления порядком загрузки в Vortex."
-			},
-			"author": "Altarion",
-			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/246",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": "НУЖНО ОПРЕДЕЛИТЬСЯ С ПОИСКОМ ЭТОГО МОДА!"
-			}
+			"note": { "en": "", "ru": "" }
 		},
 		{
 			"folder": "LocalizationFixForKOAllinone",
@@ -3211,10 +3175,7 @@
 			"author": "Jaemn",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/249",
 			"github_url": "https://github.com/jayemen/darktide_no_dodge_jump",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
+			"note": { "en": "", "ru": "" }
 		},
 		{
 			"folder": "no_chitchat",
@@ -3231,7 +3192,7 @@
 			"github_url": "https://github.com/IDK-WHO-AM-I/darktide_no_chitchat",
 			"note": {
 				"en": "",
-				"ru": "Работает?"
+				"ru": ""
 			}
 		},
 		{
@@ -3249,23 +3210,1352 @@
 			"author": "deluxghost",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/251",
 			"github_url": "https://github.com/deluxghost/darktide-mods/tree/main/DifficultyColor",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "Decode_Helper",
+			"name": {
+				"en": "Decode Helper",
+				"ru": "Помощник-декодер",
+				"zh-hans": "鸟卜仪预显示"
+			},
+			"description": {
+				"en": "Shows you all the targets for the decode symbols minigame.",
+				"ru": "Decode Helper - Отображает все цели для мини-игры по расшифровке символов.",
+				"zh-hans": "独一无二的小真寻"
+			},
+			"author": "Jwako",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/252",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "InspectFromSocial",
+			"name": {
+				"en": "Inspect from Social",
+				"ru": "Осмотр игроков в Социальном меню",
+				"zh-hans": "社交界面查看装备"
+			},
+			"description": {
+				"en": "Adds a 'Inspect Operative' button to the social menu. You can now inspect friends and players from previous missions!",
+				"ru": "Inspect from Social - Добавляет кнопку для осмотра оперативника в социальное меню. Теперь вы можете проверять друзей и игроков из предыдущих миссий!",
+				"zh-hans": "在社交菜单添加“检视特工”按钮。",
+				"ja": "ソーシャルメニューに「隊員を調べる」ボタンを追加します。"
+			},
+			"author": "Zombine",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/254",
+			"github_url": "https://github.com/zombine04/darktide-mods/tree/main/InspectFromSocial",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "outline_colours",
+			"name": {
+				"en": "Outline Colours",
+				"ru": "Цвета контуров",
+				"zh-hans": "轮廓颜色"
+			},
+			"description": {
+				"en": "Change the colour of different outlines in the games and set their priority.",
+				"ru": "Outline Colours - Используйте собственные цвета контуров.",
+				"zh-hans": "自定义各种轮廓颜色"
+			},
+			"author": "Adspartan",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/255",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "Clock",
+			"name": {
+				"en": "Clock",
+				"ru": "Часы"
+			},
+			"description": {
+				"en": "Adds a clock to the HUD. Compatible with Custom HUD to place it where you like. Full range of font type, font size, and colour options.",
+				"ru": "Clock - Добавляет часы в интерфейс. Совместимо с модом Custom HUD, позволяющим размещать их в любом удобном для вас месте. Полный набор вариантов шрифтов, размеров и цветов."
+			},
+			"author": "Raindish",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/256",
+			"github_url": "https://github.com/danreeves/darktide-mods/tree/main/Clock",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "SpecialSpawnAnnouncer",
+			"name": {
+				"en": "Special Spawn Announcer",
+				"ru": "Объявление появления специалистов"
+			},
+			"description": {
+				"en": "Plays a unique sound when specialist units spawn.",
+				"ru": "Special Spawn Announcer - При появлении специалистов воспроизводит уникальный звук."
+			},
+			"author": "ShitShotScot",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/257",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "ScoreboardTagCounter",
+			"name": {
+				"en": "Scoreboard Tag Counter",
+				"ru": "Таблица результатов - Счётчик меток"
+			},
+			"description": {
+				"en": "A scoreboard plugin that keeps track of how many enemies players have marked.",
+				"ru": "Scoreboard Tag Counter - Плагин для Таблицы результатов, отслеживающий количество отмеченных игроками врагов."
+			},
+			"author": "ShitShotScot",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/258",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "LessAnnoyingPing",
+			"name": {
+				"en": "Less Annoying Ping",
+				"ru": "Менее раздражающая метка"
+			},
+			"description": {
+				"en": "Replace Annoying Ping/Tag Sound with the less annoying Eye Marker Sound, additional options to reduce spam and griefing from other players (e.g. left-click tagging).",
+				"ru": "Less Annoying Ping - Заменяет раздражающий звук пометки врагов на менее раздражающий звук пометки мест.",
+				"zh-hans": "降低标记声音的时间间隔"
+			},
+			"author": "gpk",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/259",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "ScrubsVermin",
+			"name": {
+				"en": "Scrubs Vermin",
+				"ru": "Клиника Vermin"
+			},
+			"description": {
+				"en": "Bring a bit of Scrubs and Vermintide into your Darktide. Type '/scrubsvermin' to watch that Skaven dance!",
+				"ru": "Scrubs Vermin - Добавьте немного сериала Клиника и игры Vermintide в свой Darktide. Введите '/scrubsvermin', чтобы посмотреть, как танцует скавен!"
+			},
+			"author": "SeventeenDucks",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/261",
+			"github_url": "https://github.com/ronvoluted/darktide-mods/tree/main/ScrubsVermin",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "MergedTalentStats",
+			"name": {
+				"en": "Merged Talent Stats",
+				"ru": "Объединённая статистика талантов",
+				"zh-hans": "合并天赋数据"
+			},
+			"description": {
+				"en": "Merge [Operative Modifier] stats in the talents [Full Build] popup.",
+				"ru": "Merged Talent Stats - Мод объединяет Модификаторы оперативника в окне Полный билд.",
+				"zh-hans": "在「完整构筑」弹窗中合并「特工修正」数据。"
+			},
+			"author": "deluxghost",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/263",
+			"github_url": "https://github.com/deluxghost/darktide-mods/tree/main/MergedTalentStats",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "Coherency_Keeper",
+			"name": {
+				"en": "Coherency Keeper",
+				"ru": "Хранитель сплочённости"
+			},
+			"description": {
+				"en": "Displays a directional marker when a player leaves your coherency.",
+				"ru": "Coherency Keeper - Отображает указатель направления, когда игрок покидает вашу радиус сплочённости."
+			},
+			"author": "Jwako",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/264",
+			"github_url": "",
+			"note": {
+				"en": "Possible fix in the comments on Nexus Mods.",
+				"ru": "Возможный фикс в комментариях на Нексусе."
+			}
+		},
+		{
+			"folder": "StimmsPickupIcon",
+			"name": {
+				"en": "Stimms Pickup Icon",
+				"ru": "Цвет значков стимуляторов",
+				"zh-hans": "兴奋剂拾取图标",
+				"zh-hant": "興奮劑拾取圖示"
+			},
+			"description": {
+				"en": "Set corresponding color for stimms HUD icons.",
+				"ru": "Stimms Pickup Icon - Установливает соответствующие цвета для значков стимуляторов.",
+				"zh-hans": "给兴奋剂图标设置对应的颜色。",
+				"zh-hant": "為興奮劑圖示設定對應的顏色。"
+			},
+			"author": "deluxghost",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/265",
+			"github_url": "https://github.com/deluxghost/darktide-mods/tree/main/StimmsPickupIcon",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "PanicStimm",
+			"name": {
+				"en": "Quick-Inject Stimms",
+				"ru": "Быстрое введение стимов",
+				"zh-hans": "快速注射兴奋剂"
+			},
+			"description": {
+				"en": "Adds a button to switch to your Stimm and instantly inject. Also allows you to dictate what you equip after injection.",
+				"ru": "Quick-Inject Stimms - Добавляет кнопку переключения на стимулятор и мгновенного его введения. Также позволяет выбирать, что вы будете экипировать после инъекции.",
+				"zh-hans": "一键注射兴奋剂。"
+			},
+			"author": "ItsAlxl",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/266",
+			"github_url": "https://github.com/ItsAlxl/DarktideMods/tree/main/PanicStimm",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "RecolorStimms",
+			"name": {
+				"en": "Recolor Stimms",
+				"ru": "Цвет стимуляторов",
+				"zh-hans": "兴奋剂染色"
+			},
+			"description": {
+				"en": "Customize the color of stimms and their cases, and swap the syringe stickers.",
+				"ru": "Recolor Stimms - Настраивайте цвет стимуляторов и самих шприцов, а также замените наклейки на шприцах.",
+				"zh-hans": "自定义兴奋剂颜色。"
+			},
+			"author": "ItsAlxl",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/267",
+			"github_url": "https://github.com/ItsAlxl/DarktideMods/tree/main/RecolorStimms",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "Spidey Sense",
+			"name": {
+				"en": "Spidey Sense",
+				"ru": "Паучье чутьё",
+				"zh-hans": "蜘蛛感应",
+				"zh-hant": "蜘蛛感應"
+			},
+			"description": {
+				"en": "Spidey Sense - Accessibility mod for Hard of Hearing or Deaf - Offers a coloured arc indicator for the direction of sound cues for certain special units.",
+				"ru": "Spidey Sense - Accessibility mod for Hard of Hearing or Deaf - Добавляет цветные дуговые индикаторы, показывающие направление звуковых сигналов для определённых врагов.",
+				"zh-hans": "为某些特殊单位的音效提供彩色的方向圆弧指示器。",
+				"zh-hant": "為某些特殊單位的音效提供彩色的方向弧形指示器。"
+			},
+			"author": "Wobin",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/268",
+			"github_url": "https://github.com/Wobin/SpideySense",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "CorrectMissionVotingInfo",
+			"name": {
+				"en": "Correct Mission Voting Info",
+				"ru": "Исправление информации о миссии",
+				"zh-hans": "正确的任务投票信息"
+			},
+			"description": {
+				"en": "When voting for a mission, shows correct auric info and total rewards.",
+				"ru": "Correct Mission Voting Info - При голосовании за миссию отображается правильная информация о миссии и сумме награды.",
+				"zh-hans": "在任务投票时，显示正确的金级信息和总奖励。"
+			},
+			"author": "deluxghost",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/270",
+			"github_url": "https://github.com/deluxghost/darktide-mods/tree/main/CorrectMissionVotingInfo",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "ShowInsignias",
+			"name": {
+				"en": "Show Insignias",
+				"ru": "Отображение знаков различия",
+				"zh-hans": "显示徽章"
+			},
+			"description": {
+				"en": "Shows player insignias during missions.",
+				"ru": "Show Insignias - Показывает знаки различия игроков во время миссий.",
+				"zh-hans": "在任务中显示玩家的徽章。",
+				"ja": "ミッション中にプレイヤーの徽章を表示します。"
+			},
+			"author": "Zombine",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/271",
+			"github_url": "https://github.com/zombine04/darktide-mods/tree/main/ShowInsignias",
+			"note": {
+				"en": "Possible fix in the comments on Nexus Mods.",
+				"ru": "Возможный фикс в комментариях на Нексусе."
+			}
+		},
+		{
+			"folder": "CareerColourOutlines",
+			"name": {
+				"en": "Team Outline Colours",
+				"ru": "Цвета контуров команды"
+			},
+			"description": {
+				"en": "Set teammate outline colours to match their icon.",
+				"ru": "Team Outline Colours - Настраивайте цвета контуров товарищей по команде в соответствии с цветом их значков."
+			},
+			"author": "Raindish",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/272",
+			"github_url": "https://github.com/danreeves/darktide-mods/tree/main/CareerColourOutlines",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "Coal",
+			"name": {
+				"en": "Coal",
+				"ru": "Уголь"
+			},
+			"description": {
+				"en": "Turn the Ogryn's rock into a lump of coal.",
+				"ru": "Coal - Превратите камень огрина в кусок угля."
+			},
+			"author": "SeventeenDucks",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/273",
+			"github_url": "https://github.com/ronvoluted/darktide-mods/tree/main/Coal",
 			"note": {
 				"en": "",
 				"ru": ""
 			}
 		},
 		{
-			"folder": "Decode_Helper",
+			"folder": "",
 			"name": {
-				"en": "Decode Helper",
-				"ru": "Помощник-декодер"
+				"en": "",
+				"ru": ""
 			},
 			"description": {
-				"en": "Shows you all the targets for the decode symbols minigame.",
-				"ru": "Decode Helper - Отображает все цели для мини-игры по расшифровке символов."
+				"en": "",
+				"ru": ""
 			},
-			"author": "Jwako",
-			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/252",
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
 			"github_url": "",
 			"note": {
 				"en": "",

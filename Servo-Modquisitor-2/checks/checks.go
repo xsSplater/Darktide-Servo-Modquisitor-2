@@ -652,3 +652,15 @@ func pickLocalized(tr map[string]string, lang string) string {
 	}
 	return ""
 }
+
+// IsAMLInstalled проверяет, модифицирован ли mod_manager.lua модом Auto Mod Loading and Ordering
+func IsAMLInstalled(modsDir string) bool {
+    data, err := os.ReadFile(filepath.Join(modsDir, "base", "mod_manager.lua"))
+    if err != nil {
+        return false
+    }
+    content := string(data)
+    // Ключевые фразы, уникальные для AML
+    return strings.Contains(content, "aml_hook_load_order") ||
+           strings.Contains(content, "AML IS MANAGING MOD LIST AND LOAD ORDER")
+}

@@ -1,4 +1,24 @@
 {
+    "aml_detected_title": {
+        "en": "⚠ 'Auto Mod Loading and Ordering' mod detected ⚠",
+        "ru": "⚠ Обнаружен мод «Auto Mod Loading and Ordering» ⚠"
+    },
+    "aml_detected_warning": {
+        "en": "The file 'mod_manager.lua' from Darktide Mod Loader has been modified.\nAll list management functions will be overwritten by AML's auto-sorting.\n\nYou can continue using the program or reinstall DML to remove AML and use this program's sorting features.\n\nYou can still run 'Check and Auto-Sort' to check the mods folder for problematic mods.\n\nWhat would you like to do?",
+        "ru": "Файл «mod_manager.lua» мода Darktide Mod Loader модифицирован.\nВсе функции управления списком будут перезаписаны автосортировкой AML.\n\nВы можете продолжить использование программы или переустановить DML, чтобы избавиться от AML и использовать сортировку этой программы.\n\nВы всё ещё можете выполнить «Проверку и автосортировку», чтобы проверить папку mods на проблемные моды.\n\nЧто будем делать?"
+    },
+    "aml_save_warning_tooltip": {
+        "en": "You can Save the list, but AML will overwrite the order of mods in the game.",
+        "ru": "Вы можете Cохранить список, но AML перезапишет порядок модов в игре."
+    },
+    "aml_sort_warning_tooltip": {
+        "en": "You can run Check and Auto-Sort, but AML will overwrite the order of mods in the game.",
+        "ru": "Вы можете выполнить Проверку и автосортировку, но AML перезапишет порядок модов в игре."
+    },
+    "aml_warning_tooltip": {
+        "en": "AML overrides load order - saving/sorting disabled.",
+        "ru": "AML переопределяет порядок загрузки - сохранение/сортировка отключены."
+    },
     "app_title_long": {
         "en": "⚙ WH40k - Servo-Modquisitor ⚙",
         "ru": "⚙ WH40k - Серво-Модквизитор ⚙"
@@ -62,6 +82,10 @@
     "btn_disable_selected_tooltip": {
         "en": "Disable selected mods",
         "ru": "Выключить выделенные"
+    },
+    "btn_dont_show_again": {
+        "en": "Don't show again",
+        "ru": "Больше не показывать"
     },
     "btn_down": {
         "en": "🔽 Move down",
@@ -147,6 +171,14 @@
         "en": "⚠ Patcher not found",
         "ru": "⚠ Патчер не найден"
     },
+    "btn_ok": {
+        "en": "OK",
+        "ru": "ОК"
+    },
+    "btn_open_dml_page": {
+        "en": "Open DML page",
+        "ru": "Открыть страницу DML"
+    },
     "btn_open_nexus_for_mod": {
         "en": "📙 Open %s Nexus page",
         "ru": "📙 Открыть страницу %s на Nexus"
@@ -187,6 +219,10 @@
         "en": "💾 Save List",
         "ru": "💾 Сохранить список"
     },
+    "btn_save_order_aml": {
+        "en": "💾 Save List (AML active)",
+        "ru": "💾 Сохранить список (AML активен)"
+    },
     "btn_save_order_tooltip": {
         "en": "Save current mod order",
         "ru": "Сохранить порядок модов"
@@ -200,8 +236,12 @@
         "ru": "Выделить все моды"
     },
     "btn_sort_checks": {
-        "en": "🛠 Checking and Autosorting",
+        "en": "🛠 Check and Auto-Sort",
         "ru": "🛠 Проверка и Автосортировка"
+    },
+    "btn_sort_checks_aml": {
+        "en": "🛠 Check and Auto-Sort (AML active)",
+        "ru": "🛠 Проверка и Автосортировка (AML активен)"
     },
     "btn_sort_checks_tooltip": {
         "en": "Run diagnostics and sort mods",

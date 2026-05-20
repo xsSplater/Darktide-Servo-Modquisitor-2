@@ -73,7 +73,7 @@ func (t ForcedLightTheme) Color(name fyne.ThemeColorName, variant fyne.ThemeVari
     case ColorTableRowOdd:      		return color.NRGBA{R: 240, G: 240, B: 245, A: 255}
     case ColorTableRowSelected:			return color.NRGBA{R: 160, G: 210, B: 130, A: 120}
     case ColorTableRowConflict:			return color.NRGBA{R: 255, G: 230, B: 200, A: 180}
-    case ColorTableBorderDirty:			return color.NRGBA{R: 200, G: 0,   B: 0,   A: 255}
+    case ColorTableBorderDirty:			return color.NRGBA{R: 200, G: 100, B: 0,   A: 255}
     case ColorTableHeaderBg:    		return color.NRGBA{R: 227, G: 227, B: 234, A: 255}
     case ColorSystemTableBg:    		return color.NRGBA{R: 235, G: 235, B: 240, A: 200}
 
