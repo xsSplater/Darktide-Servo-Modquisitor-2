@@ -91,31 +91,32 @@ func ListModFolders() []string {
 }
 
 type ModInfo struct {
-	Active       bool
-	Broken       bool
-	Incompatible bool
-	Mandatory    bool
-	Obsolete     bool
-	Selected     bool
-	IsSystem     bool
-	Author       string
-	Description  string
-	DisplayName  string
-	Name         string
-	Note         string
-	URL          string
-	GitHubURL    string
-	ModTime      time.Time
+	Active			bool
+	Broken			bool
+	Incompatible	bool
+	Mandatory		bool
+	Obsolete		bool
+	Selected		bool
+	IsSystem		bool
+    VortexDeployed	bool
+	Author			string
+	Description		string
+	DisplayName		string
+	Name			string
+	Note			string
+	URL				string
+	GitHubURL		string
+	ModTime			time.Time
 }
 
 type ModDBEntry struct {
-	Author      string            `json:"author"`
-	Description map[string]string `json:"description"`
-	Folder      string            `json:"folder"`
-	Name        map[string]string `json:"name"`
-	Note        map[string]string `json:"note"`
-	URL         string            `json:"url"`
-    GitHubURL   string            `json:"github_url"`
+	Author			string            `json:"author"`
+	Description		map[string]string `json:"description"`
+	Folder			string            `json:"folder"`
+	Name			map[string]string `json:"name"`
+	Note			map[string]string `json:"note"`
+	URL				string            `json:"url"`
+    GitHubURL		string            `json:"github_url"`
 }
 
 func GetModsInfo(lang string, forceEnglish bool) []ModInfo {
@@ -128,6 +129,22 @@ func GetModsInfo(lang string, forceEnglish bool) []ModInfo {
 			continue
 		}
 		mod := ModInfo{Name: name, Active: true}
+
+		// Обработка специальных префиксов и суффиксов: отключаем мод и добавляем примечание
+		if messages != nil {
+			if strings.HasPrefix(name, "_") || strings.HasPrefix(name, "__") {
+				mod.Active = false
+				mod.Note = (*messages)["note_disabled_prefix"]
+			} else if strings.HasPrefix(name, "--") {
+				mod.Active = false
+				mod.Note = (*messages)["note_disabled_prefix_double"]
+			} else if strings.Contains(name, " - Copy") || strings.Contains(name, " — копия") {
+				mod.Active = false
+				mod.Note = (*messages)["note_backup_copy"]
+			}
+		}
+
+		mod.VortexDeployed = fileExists(filepath.Join(fullPath, "__folder_managed_by_vortex"))
 
 		switch {
 		case name == "base":
@@ -172,6 +189,9 @@ func GetModsInfo(lang string, forceEnglish bool) []ModInfo {
 			mod.GitHubURL = db.GitHubURL
 			mod.Description = pickLocalized(db.Description, lang)
 			mod.Note = pickLocalized(db.Note, lang)
+			if mod.VortexDeployed {
+				mod.Note = strings.TrimSpace(mod.Note + (*messages)["vortex_managed"])
+			}
 
 			if forceEnglish {
 				if enName := pickLocalized(db.Name, "en"); enName != "" {
@@ -266,7 +286,7 @@ func WriteLoadOrder(entries []LoadOrderEntry) error {
 		return err
 	}
 	defer f.Close()
-	fmt.Fprintln(f, "-- ▒Servo-Modquisitor▒ load order ▒")
+	WriteLoadOrderHeader(f, currentLang)
 	for _, e := range entries {
 		if e.Active {
 			fmt.Fprintln(f, e.Name)
@@ -303,7 +323,12 @@ type ExternalData struct {
 	LoadOrder        []LoadOrderRule    `json:"load_order"`
 }
 
-type IncompatiblePair struct{ Mod1, Mod2, Desc string }
+// type IncompatiblePair struct{ Mod1, Mod2, Desc string }
+type IncompatiblePair struct {
+    Mod1 string            `json:"mod1"`
+    Mod2 string            `json:"mod2"`
+    Desc map[string]string `json:"desc"`
+}
 type Dependency struct{ Dependent, Required, RequiredURL string }
 
 func LoadExternalLists(filename string) error {
@@ -354,7 +379,7 @@ func askMissing(folder, modAbbr, modName, nexusURL string, window fyne.Window) b
 		(*messages)["btn_open_steam_guide"],
 		fmt.Sprintf((*messages)["btn_open_nexus_for_mod"], modAbbr),
 		(*messages)["open_mods_folder"],
-		(*messages)["btn_abort"],
+		(*messages)["btn_cancel"],
 	)
 	switch choice {
 	case 0:
@@ -450,14 +475,18 @@ func CheckMalformed(window fyne.Window) bool {
 }
 
 func isLikelyWrapper(folderName string) bool {
-	fullPath := filepath.Join(modsDir, folderName)
-	if folderName == "base" || folderName == "dmf" {
-		return false
-	}
-	entries, err := os.ReadDir(fullPath)
-	if err != nil {
-		return false
-	}
+    fullPath := filepath.Join(modsDir, folderName)
+    if folderName == "base" || folderName == "dmf" {
+        return false
+    }
+    // Vortex-управляемые папки не считаем ошибочными обёртками
+    if fileExists(filepath.Join(fullPath, "__folder_managed_by_vortex")) {
+        return false
+    }
+    entries, err := os.ReadDir(fullPath)
+    if err != nil {
+        return false
+    }
 	var subdirs []string
 	hasModFile := false
 	for _, e := range entries {
@@ -537,10 +566,13 @@ func AutoFixMalformed() {
 }
 
 func CheckEmptyFolders(window fyne.Window) bool {
-	var empty []string
-	for _, folder := range ListModFolders() {
-		fullPath := filepath.Join(modsDir, folder)
-		entries, err := os.ReadDir(fullPath)
+    var empty []string
+    for _, folder := range ListModFolders() {
+        fullPath := filepath.Join(modsDir, folder)
+        if fileExists(filepath.Join(fullPath, "__folder_managed_by_vortex")) {
+            continue // это не пустая папка, а отключённый мод Vortex
+        }
+        entries, err := os.ReadDir(fullPath)
 		if err != nil {
 			continue
 		}
@@ -581,9 +613,9 @@ func CheckIncompatible(window fyne.Window) bool {
 			appendLog((*messages)["no_incompatible_found"])
 			return true
 		}
-		appendLog(fmt.Sprintf((*messages)["incompatible_found_list"], found.Mod1, found.Mod2))
+		appendLog(fmt.Sprintf((*messages)["incompatible_found_list"], found.Mod1, found.Mod2) + " - " + GetIncompatibleDesc(found.Mod1, found.Mod2))
 		choice := showChoiceDialog(window, (*messages)["incompatible_title"],
-			fmt.Sprintf((*messages)["incompatible_desc"], found.Mod1, found.Mod2, found.Desc),
+			fmt.Sprintf((*messages)["incompatible_desc"], found.Mod1, found.Mod2) + "\n" + GetIncompatibleDesc(found.Mod1, found.Mod2),
 			(*messages)["skip"],
 			fmt.Sprintf((*messages)["delete_first"], found.Mod1),
 			fmt.Sprintf((*messages)["delete_second"], found.Mod2),
@@ -653,6 +685,20 @@ func pickLocalized(tr map[string]string, lang string) string {
 	return ""
 }
 
+// GetIncompatibleDesc возвращает локализованное описание конфликта для пары модов.
+func GetIncompatibleDesc(mod1, mod2 string) string {
+    for _, pair := range IncompatiblePairs {
+        if (pair.Mod1 == mod1 && pair.Mod2 == mod2) || (pair.Mod1 == mod2 && pair.Mod2 == mod1) {
+            desc := pickLocalized(pair.Desc, currentLang)
+            // if appendLog != nil {
+            //     appendLog(fmt.Sprintf("DEBUG: GetIncompatibleDesc found desc='%s'", desc))
+            // }
+            return desc
+        }
+    }
+    return ""
+}
+
 // IsAMLInstalled проверяет, модифицирован ли mod_manager.lua модом Auto Mod Loading and Ordering
 func IsAMLInstalled(modsDir string) bool {
     data, err := os.ReadFile(filepath.Join(modsDir, "base", "mod_manager.lua"))
@@ -663,4 +709,45 @@ func IsAMLInstalled(modsDir string) bool {
     // Ключевые фразы, уникальные для AML
     return strings.Contains(content, "aml_hook_load_order") ||
            strings.Contains(content, "AML IS MANAGING MOD LIST AND LOAD ORDER")
+}
+
+// WriteLoadOrderHeader записывает подробный заголовок в файл порядка загрузки.
+func WriteLoadOrderHeader(f *os.File, lang string) {
+    if lang == "ru" {
+        fmt.Fprintln(f, "-- ▒Servo-Modquisitor▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒")
+        fmt.Fprintln(f, "-- ▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒")
+        fmt.Fprintln(f, "-- ▒▓1. Если вам нужно добавить мод вручную, введите название папки▓▓▓▓▒")
+        fmt.Fprintln(f, "-- ▒▓▓▓▓вашего мода ниже. Каждый новый мод обязательно с новой строки.▓▒")
+        fmt.Fprintln(f, "-- ▒▓2. Расположение в списке определяет порядок загрузки модов.▓▓▓▓▓▓▓▒")
+        fmt.Fprintln(f, "-- ▒▓▓▓▓Чем ниже мод, тем больший приоритет в загрузке у него будет.▓▓▓▒")
+        fmt.Fprintln(f, "-- ▒▓3. Не переименовывайте папку мода, т.к. внутри названия папок и▓▓▓▒")
+        fmt.Fprintln(f, "-- ▒▓▓▓▓записи внутри файлов зависят от этого названия.▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒")
+        fmt.Fprintln(f, "-- ▒▓4. НЕ НУЖНО вносить в список папки «BASE» или «DMF» или вы▓▓▓▓▓▓▓▓▒")
+        fmt.Fprintln(f, "-- ▒▓▓▓▓получите ошибку в игре‼▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒")
+        fmt.Fprintln(f, "-- ▒▓5. Если какой-то мод не попал в список, обязательно сообщите▓▓▓▓▓▓▒")
+        fmt.Fprintln(f, "-- ▒▓▓▓▓мне об этом в моём Дискорде или на Nexusmods:▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒")
+        fmt.Fprintln(f, "-- ▒▓▓▓▓https://discord.gg/BGZagw3xnz ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒")
+        fmt.Fprintln(f, "-- ▒▓▓▓▓https://www.nexusmods.com/warhammer40kdarktide/mods/139 ▓▓▓▓▓▓▓▒")
+        fmt.Fprintln(f, "-- ▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒")
+        fmt.Fprintln(f, "-- ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒xsSplater▒")
+        fmt.Fprintln(f, "")
+    } else {
+        fmt.Fprintln(f, "-- ▒Servo-Modquisitor▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒")
+        fmt.Fprintln(f, "-- ▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒")
+        fmt.Fprintln(f, "-- ▒▓1. If you need to add a mod manually, enter the folder name of▓▓▓▓▒")
+        fmt.Fprintln(f, "-- ▒▓▓▓▓your mod below. Each new mod must be on a new line.▓▓▓▓▓▓▓▓▓▓▓▓▒")
+        fmt.Fprintln(f, "-- ▒▓2. Order in the list determines the order in which mods are▓▓▓▓▓▓▓▒")
+        fmt.Fprintln(f, "-- ▒▓▓▓▓loaded. The lower the mod, the higher the loading priority.▓▓▓▓▒")
+        fmt.Fprintln(f, "-- ▒▓3. Do not rename the mod folder, because the folder names and▓▓▓▓▓▒")
+        fmt.Fprintln(f, "-- ▒▓▓▓▓entries inside the fs depend on this name.▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒")
+        fmt.Fprintln(f, "-- ▒▓4. DO NOT list the \"BASE\" or \"DMF\" folders or you will▓▓▓▓▓▓▓▓▓▓▓▓▒")
+        fmt.Fprintln(f, "-- ▒▓▓▓▓get an error in the game‼▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒")
+        fmt.Fprintln(f, "-- ▒▓5. If any mod got 'lost' during sorting and wasn`t added to the▓▓▓▒")
+        fmt.Fprintln(f, "-- ▒▓▓▓▓list, please let me know on my Discord or on Nexusmods:▓▓▓▓▓▓▓▓▒")
+        fmt.Fprintln(f, "-- ▒▓▓▓▓https://discord.gg/BGZagw3xnz ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒")
+        fmt.Fprintln(f, "-- ▒▓▓▓▓https://www.nexusmods.com/warhammer40kdarktide/mods/139 ▓▓▓▓▓▓▓▒")
+        fmt.Fprintln(f, "-- ▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒")
+        fmt.Fprintln(f, "-- ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒xsSplater▒")
+        fmt.Fprintln(f, "")
+    }
 }

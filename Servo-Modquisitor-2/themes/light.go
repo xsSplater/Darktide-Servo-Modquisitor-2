@@ -67,6 +67,7 @@ func (t ForcedLightTheme) Color(name fyne.ThemeColorName, variant fyne.ThemeVari
     case ColorStatusMandatory:			return color.NRGBA{R: 0,   G: 130, B: 0,   A: 255}
     case ColorStatusActive:   			return color.NRGBA{R: 70,  G: 150, B: 70,  A: 255}
     case ColorStatusInactive: 			return color.NRGBA{R: 140, G: 140, B: 145, A: 255}
+	case ColorStatusVortex:				return color.NRGBA{R: 100, G: 200, B: 255, A: 255}
 
     // Таблица
     case ColorTableRowEven:     		return color.NRGBA{R: 250, G: 250, B: 252, A: 255}

@@ -1,5 +1,5 @@
 {
-	"version": "0.44",
+	"version": "0.55",
 
 	"mandatory_order": [
 		"LogMeIn",
@@ -127,72 +127,150 @@
 	],
 
 	"incompatible_pairs": [
-		{"mod1": "ReorderChars",
+		{
+			"mod1": "ReorderChars",
 			"mod2": "CharacterMenuReorder",
-				"desc": "Character Menu Reorder includes functionality of Reorder Characters."},
-
-		{"mod1": "BetterLoadouts",
+			"desc": {
+				"en": "Character Menu Reorder includes functionality of Reorder Characters.",
+				"ru": "Character Menu Reorder уже включает возможности Reorder Characters."
+			}
+		},
+		{
+			"mod1": "BetterLoadouts",
 			"mod2": "more_characters_and_loadouts",
-				"desc": "Better Loadouts includes functionality of More Characters and Loadouts."},
-
-		{"mod1": "custom_hud",
+			"desc": {
+				"en": "Better Loadouts includes functionality of More Characters and Loadouts.",
+				"ru": "Better Loadouts уже включает возможности More Characters and Loadouts."
+			}
+		},
+		{
+			"mod1": "custom_hud",
 			"mod2": "ToggleHUD",
-				"desc": "Custom HUD also can hide UI."},
-		{"mod1": "custom_hud",
+			"desc": {
+				"en": "Custom HUD also can hide UI.",
+				"ru": "Custom HUD также может скрывать интерфейс."
+			}
+		},
+		{
+			"mod1": "custom_hud",
 			"mod2": "NoneHUD",
-				"desc": "Custom HUD also can hide UI."},
-
-		{"mod1": "ToggleHUD",
+			"desc": {
+				"en": "Custom HUD also can hide UI.",
+				"ru": "Custom HUD также может скрывать интерфейс."
+			}
+		},
+		{
+			"mod1": "ToggleHUD",
 			"mod2": "NoneHUD",
-				"desc": "Both do the same thing."},
-
-		{"mod1": "DisplayPing",
+			"desc": {
+				"en": "Both do the same thing.",
+				"ru": "Оба делают одно и то же."
+			}
+		},
+		{
+			"mod1": "DisplayPing",
 			"mod2": "PingMonitor",
-				"desc": "Display Ping includes Ping Monitor functionality."},
-
-		{"mod1": "KillfeedImprovements",
+			"desc": {
+				"en": "Display Ping includes Ping Monitor functionality.",
+				"ru": "Display Ping включает функциональность Ping Monitor."
+			}
+		},
+		{
+			"mod1": "KillfeedImprovements",
 			"mod2": "Killfeed Details",
-				"desc": "These two conflict."},
-
-		{"mod1": "markers_aio",
+			"desc": {
+				"en": "These two conflict.",
+				"ru": "Эти два конфликтуют."
+			}
+		},
+		{
+			"mod1": "markers_aio",
 			"mod2": "FoundYa",
-				"desc": "Markers Improved AIO includes functionality of Found Ya."},
-		{"mod1": "markers_aio",
+			"desc": {
+				"en": "Markers Improved AIO includes functionality of Found Ya.",
+				"ru": "Markers Improved AIO включает функциональность Found Ya."
+			}
+		},
+		{
+			"mod1": "markers_aio",
 			"mod2": "Ration Pack",
-				"desc": "Markers Improved AIO includes functionality of Ration Pack."},
-		{"mod1": "markers_aio",
+			"desc": {
+				"en": "Markers Improved AIO includes functionality of Ration Pack.",
+				"ru": "Markers Improved AIO включает функциональность Ration Pack."
+			}
+		},
+		{
+			"mod1": "markers_aio",
 			"mod2": "StimmsPickupIcon",
-				"desc": "Markers Improved AIO includes functionality of Stimms Pickup Icon."},
-
-		{"mod1": "NumericUI",
+			"desc": {
+				"en": "Markers Improved AIO includes functionality of Stimms Pickup Icon.",
+				"ru": "Markers Improved AIO включает функциональность Stimms Pickup Icon."
+			}
+		},
+		{
+			"mod1": "NumericUI",
 			"mod2": "RemoveTagSkulls",
-				"desc": "Numeric UI already includes all functionality of Remove Tag Skulls."},
-
-		{"mod1": "ShowEquippedInLobby",
+			"desc": {
+				"en": "Numeric UI already includes all functionality of Remove Tag Skulls.",
+				"ru": "Numeric UI уже включает всю функциональность Remove Tag Skulls."
+			}
+		},
+		{
+			"mod1": "ShowEquippedInLobby",
 			"mod2": "Mission Lobby - Show Ranged Weapons",
-				"desc": "Both show weapons in lobby."},
-
-		{"mod1": "simplecolorselector",
+			"desc": {
+				"en": "Both show weapons in lobby.",
+				"ru": "Оба показывают оружие в лобби."
+			}
+		},
+		{
+			"mod1": "simplecolorselector",
 			"mod2": "ColorSelection",
-				"desc": "Simple Color Selector includes functionality of Color Selection."},
-
-		{"mod1": "Skitarius",
+			"desc": {
+				"en": "Simple Color Selector includes functionality of Color Selection.",
+				"ru": "Simple Color Selector включает функциональность Color Selection."
+			}
+		},
+		{
+			"mod1": "Skitarius",
 			"mod2": "UngaBunga",
-				"desc": "Skitarius already includes Unga Bunga functionality."},
-		{"mod1": "Skitarius",
+			"desc": {
+				"en": "Skitarius already includes Unga Bunga functionality.",
+				"ru": "Skitarius уже включает функциональность Unga Bunga."
+			}
+		},
+		{
+			"mod1": "Skitarius",
 			"mod2": "KeepSwinging",
-				"desc": "Skitarius already includes functionality of Keep Swinging."},
-		{"mod1": "Skitarius",
+			"desc": {
+				"en": "Skitarius already includes functionality of Keep Swinging.",
+				"ru": "Skitarius уже включает функциональность Keep Swinging."
+			}
+		},
+		{
+			"mod1": "Skitarius",
 			"mod2": "FullAuto",
-				"desc": "Skitarius already includes functionality of Full Auto."},
-
-		{"mod1": "SoloPlay",
+			"desc": {
+				"en": "Skitarius already includes functionality of Full Auto.",
+				"ru": "Skitarius уже включает функциональность Full Auto."
+			}
+		},
+		{
+			"mod1": "SoloPlay",
 			"mod2": "prologue",
-				"desc": "SoloPlay already includes Prologue functionality."},
-
-		{"mod1": "teammate_tracker",
+			"desc": {
+				"en": "SoloPlay already includes Prologue functionality.",
+				"ru": "SoloPlay уже включает функциональность Prologue."
+			}
+		},
+		{
+			"mod1": "teammate_tracker",
 			"mod2": "Do I Know You",
-				"desc": "Teammate Tracker includes functionality of Do I Know You."}
+			"desc": {
+				"en": "Teammate Tracker includes functionality of Do I Know You.",
+				"ru": "Teammate Tracker включает функциональность Do I Know You."
+			}
+		}
 	],
 
 	"dependencies": [

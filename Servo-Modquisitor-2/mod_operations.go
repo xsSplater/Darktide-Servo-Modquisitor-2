@@ -80,6 +80,24 @@ func (app *App) refreshModList() {
 		regMods[i].Obsolete = app.containsStr(checks.ObsoleteMods, regMods[i].Name)
 		regMods[i].Mandatory = checks.IsMandatoryMod(regMods[i].Name)
 		regMods[i].Incompatible = app.checkIncompatible(regMods[i].Name)
+
+		// Если мод конфликтует, добавляем информацию в Note
+		if regMods[i].Incompatible {
+			for _, pair := range checks.IncompatiblePairs {
+				if pair.Mod1 == regMods[i].Name || pair.Mod2 == regMods[i].Name {
+					other := pair.Mod1
+					if other == regMods[i].Name {
+						other = pair.Mod2
+					}
+					desc := checks.GetIncompatibleDesc(pair.Mod1, pair.Mod2)
+					// app.appendLog(fmt.Sprintf("DEBUG: adding conflict note for %s", regMods[i].Name))
+					if desc != "" {
+						regMods[i].Note = strings.TrimSpace(regMods[i].Note + app.messages["conflict_with"] + other + ": " + desc)
+					}
+					break
+				}
+			}
+		}
 	}
 
 	if app.selectedModName != "" {

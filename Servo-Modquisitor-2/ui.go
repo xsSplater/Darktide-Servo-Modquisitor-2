@@ -479,11 +479,16 @@ func (app *App) buildUI() {
 			cont.Add(nameLabel)
 		case 4:
 			dateStr := app.formatDate(mod.ModTime, app.cfg.DateFormat)
-			cont.Add(widget.NewLabel(dateStr))
+			dateText := canvas.NewText(dateStr, theme.ForegroundColor())
+			dateText.Alignment = fyne.TextAlignCenter
+			cont.Add(dateText)
 		case 5:
 			var statusStr string
 			var clr color.Color
 			switch {
+			case mod.VortexDeployed:
+				statusStr = app.messages["status_vortex"]
+				clr = th.Color(themes.ColorStatusVortex, variant)
 			case mod.IsSystem:
 				statusStr = app.messages["status_system"]
 				clr = th.Color(themes.ColorStatusSystem, variant)
@@ -496,24 +501,25 @@ func (app *App) buildUI() {
 			case mod.Obsolete:
 				statusStr = app.messages["desc_obsolete"]
 				clr = th.Color(themes.ColorStatusObsolete, variant)
-			case mod.Mandatory:
+			case mod.Mandatory && mod.Active:
 				statusStr = app.messages["status_mandatory"]
 				clr = th.Color(themes.ColorStatusMandatory, variant)
+			case mod.Active:
+				statusStr = app.messages["status_active"]
+				clr = th.Color(themes.ColorStatusActive, variant)
 			default:
-				if mod.Active {
-					statusStr = app.messages["status_active"]
-					clr = th.Color(themes.ColorStatusActive, variant)
-				} else {
-					statusStr = app.messages["status_inactive"]
-					clr = th.Color(themes.ColorStatusInactive, variant)
-				}
+				statusStr = app.messages["status_inactive"]
+				clr = th.Color(themes.ColorStatusInactive, variant)
 			}
 			statusText := canvas.NewText(statusStr, clr)
+			statusText.Alignment = fyne.TextAlignCenter
 			cont.Add(statusText)
 		case 6:
 			noteLabel := widget.NewLabel(mod.Note)
-			noteLabel.Wrapping = fyne.TextWrapWord
-			cont.Add(noteLabel)
+			noteLabel.Wrapping = fyne.TextWrapOff // noteLabel.Wrapping = fyne.TextWrapWord
+			noteScroll := container.NewScroll(noteLabel)
+			noteScroll.SetMinSize(fyne.NewSize(0, 35)) // ограничение высоты для скролла
+			cont.Add(noteScroll)
 		}
 	}
 
@@ -869,11 +875,16 @@ func (app *App) showChoiceDialog(parent fyne.Window, title, message string, opti
 		titleLabel := widget.NewLabelWithStyle(title, fyne.TextAlignCenter, fyne.TextStyle{Bold: true})
 		headerContainer := container.NewStack(gradHeader, container.NewCenter(titleLabel))
 
+		msgLabel := widget.NewLabel(message)
+		msgLabel.Wrapping = fyne.TextWrapWord // Перенос строк для включения скролла
+		msgScroll := container.NewScroll(msgLabel)
+		msgScroll.SetMinSize(fyne.NewSize(666, 250)) // ограничение высоты для скролла
 		content := container.NewVBox(
 			headerContainer,
-			widget.NewLabel(message),
+			msgScroll,
 			container.NewCenter(container.NewHBox(buttons...)),
 		)
+
 		popUp := widget.NewModalPopUp(content, parent.Canvas())
 		popUp.Resize(fyne.NewSize(DialogMinWidth, DialogMinHeight))
 		popUp.Show()
@@ -1263,11 +1274,16 @@ func (app *App) showChoiceDialogAsync(parent fyne.Window, title, message string,
         titleLabel := widget.NewLabelWithStyle(title, fyne.TextAlignCenter, fyne.TextStyle{Bold: true})
         headerContainer := container.NewStack(gradHeader, container.NewCenter(titleLabel))
 
-        content := container.NewVBox(
-            headerContainer,
-            widget.NewLabel(message),
-            container.NewCenter(container.NewHBox(btnObjects...)),
-        )
+		msgLabel := widget.NewLabel(message)
+		msgLabel.Wrapping = fyne.TextWrapWord // Перенос строк для включения скролла
+		msgScroll := container.NewScroll(msgLabel)
+		msgScroll.SetMinSize(fyne.NewSize(666, 250)) // Ограничение высоты для скролла
+		content := container.NewVBox(
+			headerContainer,
+			msgScroll,
+			container.NewCenter(container.NewHBox(btnObjects...)),
+		)
+
         popUp.Content = content
         popUp.Resize(fyne.NewSize(DialogMinWidth, DialogMinHeight))
         popUp.Show()

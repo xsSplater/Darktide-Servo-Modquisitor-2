@@ -24,6 +24,7 @@ var (
 	sortWarningEn	string
 	logCreateMLOT	string
 	logMLOTCreated	string
+	writeHeaderFunc	func(*os.File, string)
 )
 
 type ModDependency struct {
@@ -31,12 +32,13 @@ type ModDependency struct {
 	Required	string
 }
 
+// Функции-сеттеры
 func SetFolderExistsFunc(fn func(string) bool)	{ folderExists = fn }
 func SetListModFoldersFunc(fn func() []string)	{ listModFolders = fn }
 func SetLogFunc(fn func(string))				{ logFunc = fn }
 func SetMandatoryOrder(order []string)			{ mandatoryOrder = order }
 func SetDependencies(deps []ModDependency)		{ dependencies = deps }
-func SetSortMessages(ru, en string)					{ sortWarningRu = ru; sortWarningEn = en }
+func SetSortMessages(ru, en string)				{ sortWarningRu = ru; sortWarningEn = en }
 func SetLogMessages(createMLOT, mlotCreated string) {
 	logCreateMLOT = createMLOT
 	logMLOTCreated = mlotCreated
@@ -44,6 +46,10 @@ func SetLogMessages(createMLOT, mlotCreated string) {
 func SetLoadOrderRules(rules []LoadOrderRule) {
 	loadOrderRules = rules
 }
+func SetHeaderFunc(fn func(*os.File, string)) {
+	writeHeaderFunc = fn
+}
+
 
 // кеш кастомных порядков
 var cachedRussianOrder, cachedEnglishOrder []string
@@ -118,7 +124,9 @@ func CreateLoadOrderFromActive(activeMods []string, lang string) {
 	file, _ := os.Create("mod_load_order.txt")
 	if file != nil {
 		defer file.Close()
-		writeHeader(file, lang)
+		if writeHeaderFunc != nil {
+			writeHeaderFunc(file, lang)
+		}
 		for _, mod := range finalOrder {
 			fmt.Fprintln(file, mod)
 		}
@@ -246,44 +254,4 @@ func (h *MinHeap) Pop() interface{} {
 	x := old[n-1]
 	h.indices = old[0 : n-1]
 	return x
-}
-
-func writeHeader(f *os.File, lang string) {
-	if lang == "ru" {
-		fmt.Fprintln(f, "-- ▒Servo-Modquisitor▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒")
-		fmt.Fprintln(f, "-- ▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒")
-		fmt.Fprintln(f, "-- ▒▓1. Если вам нужно добавить мод вручную, введите название папки▓▓▓▓▒")
-		fmt.Fprintln(f, "-- ▒▓▓▓▓вашего мода ниже. Каждый новый мод обязательно с новой строки.▓▒")
-		fmt.Fprintln(f, "-- ▒▓2. Расположение в списке определяет порядок загрузки модов.▓▓▓▓▓▓▓▒")
-		fmt.Fprintln(f, "-- ▒▓▓▓▓Чем ниже мод, тем больший приоритет в загрузке у него будет.▓▓▓▒")
-		fmt.Fprintln(f, "-- ▒▓3. Не переименовывайте папку мода, т.к. внутри названия папок и▓▓▓▒")
-		fmt.Fprintln(f, "-- ▒▓▓▓▓записи внутри файлов зависят от этого названия.▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒")
-		fmt.Fprintln(f, "-- ▒▓4. НЕ НУЖНО вносить в список папки «BASE» или «DMF» или вы▓▓▓▓▓▓▓▓▒")
-		fmt.Fprintln(f, "-- ▒▓▓▓▓получите ошибку в игре‼▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒")
-		fmt.Fprintln(f, "-- ▒▓5. Если какой-то мод не попал в список, обязательно сообщите▓▓▓▓▓▓▒")
-		fmt.Fprintln(f, "-- ▒▓▓▓▓мне об этом в моём Дискорде или на Nexusmods:▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒")
-		fmt.Fprintln(f, "-- ▒▓▓▓▓https://discord.gg/BGZagw3xnz ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒")
-		fmt.Fprintln(f, "-- ▒▓▓▓▓https://www.nexusmods.com/warhammer40kdarktide/mods/139 ▓▓▓▓▓▓▓▒")
-		fmt.Fprintln(f, "-- ▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒")
-		fmt.Fprintln(f, "-- ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒xsSplater▒")
-		fmt.Fprintln(f, "")
-	} else {
-		fmt.Fprintln(f, "-- ▒Servo-Modquisitor▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒")
-		fmt.Fprintln(f, "-- ▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒")
-		fmt.Fprintln(f, "-- ▒▓1. If you need to add a mod manually, enter the folder name of▓▓▓▓▒")
-		fmt.Fprintln(f, "-- ▒▓▓▓▓your mod below. Each new mod must be on a new line.▓▓▓▓▓▓▓▓▓▓▓▓▒")
-		fmt.Fprintln(f, "-- ▒▓2. Order in the list determines the order in which mods are▓▓▓▓▓▓▓▒")
-		fmt.Fprintln(f, "-- ▒▓▓▓▓loaded. The lower the mod, the higher the loading priority.▓▓▓▓▒")
-		fmt.Fprintln(f, "-- ▒▓3. Do not rename the mod folder, because the folder names and▓▓▓▓▓▒")
-		fmt.Fprintln(f, "-- ▒▓▓▓▓entries inside the fs depend on this name.▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒")
-		fmt.Fprintln(f, "-- ▒▓4. DO NOT list the \"BASE\" or \"DMF\" folders or you will▓▓▓▓▓▓▓▓▓▓▓▓▒")
-		fmt.Fprintln(f, "-- ▒▓▓▓▓get an error in the game‼▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒")
-		fmt.Fprintln(f, "-- ▒▓5. If any mod got 'lost' during sorting and wasn`t added to the▓▓▓▒")
-		fmt.Fprintln(f, "-- ▒▓▓▓▓list, please let me know on my Discord or on Nexusmods:▓▓▓▓▓▓▓▓▒")
-		fmt.Fprintln(f, "-- ▒▓▓▓▓https://discord.gg/BGZagw3xnz ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒")
-		fmt.Fprintln(f, "-- ▒▓▓▓▓https://www.nexusmods.com/warhammer40kdarktide/mods/139 ▓▓▓▓▓▓▓▒")
-		fmt.Fprintln(f, "-- ▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒")
-		fmt.Fprintln(f, "-- ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒xsSplater▒")
-		fmt.Fprintln(f, "")
-	}
 }

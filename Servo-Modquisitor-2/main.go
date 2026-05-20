@@ -73,6 +73,7 @@ func main() {
 	sorter.SetListModFoldersFunc(checks.ListModFolders)
 	sorter.SetLogFunc(func(text string) { application.appendLog(text) })
 	sorter.SetSortMessages(application.messages["sort_ru_warning"], application.messages["sort_en_warning"])
+	sorter.SetHeaderFunc(checks.WriteLoadOrderHeader)
 	sorter.SetLogMessages(application.messages["log_create_mlot"], application.messages["log_mlot_created"])
 
 	if err := checks.LoadExternalLists(FileNameMandatoryRules); err != nil {

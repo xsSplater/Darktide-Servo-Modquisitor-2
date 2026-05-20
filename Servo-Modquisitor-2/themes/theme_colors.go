@@ -11,6 +11,7 @@ const (
     ColorStatusMandatory		= "color-status-mandatory"
     ColorStatusActive			= "color-status-active"
     ColorStatusInactive			= "color-status-inactive"
+    ColorStatusVortex           = "colorStatusVortex"
 
     // Таблица
     ColorTableRowEven			= "color-table-row-even"
