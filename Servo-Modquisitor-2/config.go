@@ -7,7 +7,7 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-const AppVersion = "0.8.0"
+const AppVersion = "0.9.0"
 
 // ────────────────────────── ОКНО ──────────────────────────
 const (
