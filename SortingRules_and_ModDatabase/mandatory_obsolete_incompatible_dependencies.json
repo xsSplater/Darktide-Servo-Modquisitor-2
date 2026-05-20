@@ -1,5 +1,5 @@
 {
-	"version": "0.55",
+	"version": "0.57",
 
 	"mandatory_order": [
 		"LogMeIn",
@@ -14,24 +14,42 @@
 	],
 
 	"load_order": [
-		{"mod": "ChatBlock",		"before": "guarantee_ability_activation"},
-		{"mod": "ChatBlock",		"before": "guarantee_weapon_swap"},
-		{"mod": "ChatBlock",		"before": "guarantee_special_action"},
-		{"mod": "MultiBind",		"before": "guarantee_ability_activation"},
-		{"mod": "MultiBind",		"before": "guarantee_weapon_swap"},
-		{"mod": "MultiBind",		"before": "guarantee_special_action"},
-		{"mod": "MultiBind",		"before": "hybrid_sprint"},
-		{"mod": "ToggleAltFire",	"before": "guarantee_special_action"},
-		{"mod": "ToggleAltFire",	"before": "hybrid_sprint"},
+		{"mod": "ChatBlock",
+			"before": "guarantee_ability_activation"},
+		{"mod": "ChatBlock",
+			"before": "guarantee_weapon_swap"},
+		{"mod": "ChatBlock",
+			"before": "guarantee_special_action"},
+
+		{"mod": "MultiBind",
+			"before": "guarantee_ability_activation"},
+		{"mod": "MultiBind",
+			"before": "guarantee_weapon_swap"},
+		{"mod": "MultiBind",
+			"before": "guarantee_special_action"},
+		{"mod": "MultiBind",
+			"before": "hybrid_sprint"},
+
+		{"mod": "ToggleAltFire",
+			"before": "guarantee_special_action"},
+		{"mod": "ToggleAltFire",
+			"before": "hybrid_sprint"},
+
 		{"mod": "extended_weapon_customization_no_gun",
-									"before": "extended_weapon_customization"},
+			"before": "extended_weapon_customization"},
 		{"mod": "extended_weapon_customization",
-									"before": "for_the_drip"},
+			"before": "for_the_drip"},
 		{"mod": "extended_weapon_customization",
-									"before": "enhanced_character_selection"},
-		{"mod": "GlobalStore",		"before": "FilterTrash"},
-		{"mod": "no_chitchat",		"before": "LessAnnoyingPing"},
-		{"mod": "StickySprint",		"before": "ToggleAltFire"}
+			"before": "enhanced_character_selection"},
+
+		{"mod": "GlobalStore",	
+			"before": "FilterTrash"},
+
+		{"mod": "no_chitchat",
+			"before": "LessAnnoyingPing"},
+
+		{"mod": "StickySprint",
+			"before": "ToggleAltFire"}
 	],
 
 	"obsolete_mods": [
@@ -127,150 +145,108 @@
 	],
 
 	"incompatible_pairs": [
-		{
-			"mod1": "ReorderChars",
+		{"mod1": "ReorderChars",
 			"mod2": "CharacterMenuReorder",
-			"desc": {
-				"en": "Character Menu Reorder includes functionality of Reorder Characters.",
-				"ru": "Character Menu Reorder уже включает возможности Reorder Characters."
-			}
-		},
-		{
-			"mod1": "BetterLoadouts",
+				"desc": {
+					"en": "Character Menu Reorder includes functionality of Reorder Characters.",
+					"ru": "Character Menu Reorder уже включает возможности Reorder Characters."	} },
+
+		{"mod1": "BetterLoadouts",
 			"mod2": "more_characters_and_loadouts",
-			"desc": {
-				"en": "Better Loadouts includes functionality of More Characters and Loadouts.",
-				"ru": "Better Loadouts уже включает возможности More Characters and Loadouts."
-			}
-		},
-		{
-			"mod1": "custom_hud",
+				"desc": {
+					"en": "Better Loadouts includes functionality of More Characters and Loadouts.",
+					"ru": "Better Loadouts уже включает возможности More Characters and Loadouts." } },
+
+		{"mod1": "custom_hud",
 			"mod2": "ToggleHUD",
-			"desc": {
-				"en": "Custom HUD also can hide UI.",
-				"ru": "Custom HUD также может скрывать интерфейс."
-			}
-		},
-		{
-			"mod1": "custom_hud",
+				"desc": {
+					"en": "Custom HUD also can hide UI.",
+					"ru": "Custom HUD также может скрывать интерфейс." } },
+		{"mod1": "custom_hud",
 			"mod2": "NoneHUD",
-			"desc": {
-				"en": "Custom HUD also can hide UI.",
-				"ru": "Custom HUD также может скрывать интерфейс."
-			}
-		},
-		{
-			"mod1": "ToggleHUD",
+				"desc": {
+					"en": "Custom HUD also can hide UI.",
+					"ru": "Custom HUD также может скрывать интерфейс." } },
+
+		{"mod1": "ToggleHUD",
 			"mod2": "NoneHUD",
-			"desc": {
-				"en": "Both do the same thing.",
-				"ru": "Оба делают одно и то же."
-			}
-		},
-		{
-			"mod1": "DisplayPing",
+				"desc": {
+					"en": "Both do the same thing.",
+					"ru": "Оба делают одно и то же." } },
+
+		{"mod1": "DisplayPing",
 			"mod2": "PingMonitor",
-			"desc": {
-				"en": "Display Ping includes Ping Monitor functionality.",
-				"ru": "Display Ping включает функциональность Ping Monitor."
-			}
-		},
-		{
-			"mod1": "KillfeedImprovements",
+				"desc": {
+					"en": "Display Ping includes Ping Monitor functionality.",
+					"ru": "Display Ping включает функциональность Ping Monitor." } },
+
+		{"mod1": "KillfeedImprovements",
 			"mod2": "Killfeed Details",
-			"desc": {
-				"en": "These two conflict.",
-				"ru": "Эти два конфликтуют."
-			}
-		},
-		{
-			"mod1": "markers_aio",
+				"desc": {
+					"en": "These two conflict.",
+					"ru": "Эти два конфликтуют." } },
+
+		{"mod1": "markers_aio",
 			"mod2": "FoundYa",
-			"desc": {
-				"en": "Markers Improved AIO includes functionality of Found Ya.",
-				"ru": "Markers Improved AIO включает функциональность Found Ya."
-			}
-		},
-		{
-			"mod1": "markers_aio",
+				"desc": {
+					"en": "Markers Improved AIO includes functionality of Found Ya.",
+					"ru": "Markers Improved AIO включает функциональность Found Ya." } },
+		{"mod1": "markers_aio",
 			"mod2": "Ration Pack",
-			"desc": {
-				"en": "Markers Improved AIO includes functionality of Ration Pack.",
-				"ru": "Markers Improved AIO включает функциональность Ration Pack."
-			}
-		},
-		{
-			"mod1": "markers_aio",
+				"desc": {
+					"en": "Markers Improved AIO includes functionality of Ration Pack.",
+					"ru": "Markers Improved AIO включает функциональность Ration Pack." } },
+		{"mod1": "markers_aio",
 			"mod2": "StimmsPickupIcon",
-			"desc": {
-				"en": "Markers Improved AIO includes functionality of Stimms Pickup Icon.",
-				"ru": "Markers Improved AIO включает функциональность Stimms Pickup Icon."
-			}
-		},
-		{
-			"mod1": "NumericUI",
+				"desc": {
+					"en": "Markers Improved AIO includes functionality of Stimms Pickup Icon.",
+					"ru": "Markers Improved AIO включает функциональность Stimms Pickup Icon." } },
+
+		{"mod1": "NumericUI",
 			"mod2": "RemoveTagSkulls",
-			"desc": {
-				"en": "Numeric UI already includes all functionality of Remove Tag Skulls.",
-				"ru": "Numeric UI уже включает всю функциональность Remove Tag Skulls."
-			}
-		},
-		{
-			"mod1": "ShowEquippedInLobby",
+				"desc": {
+					"en": "Numeric UI already includes all functionality of Remove Tag Skulls.",
+					"ru": "Numeric UI уже включает всю функциональность Remove Tag Skulls." } },
+
+		{"mod1": "ShowEquippedInLobby",
 			"mod2": "Mission Lobby - Show Ranged Weapons",
-			"desc": {
-				"en": "Both show weapons in lobby.",
-				"ru": "Оба показывают оружие в лобби."
-			}
-		},
-		{
-			"mod1": "simplecolorselector",
+				"desc": {
+					"en": "Both show weapons in lobby.",
+					"ru": "Оба показывают оружие в лобби." } },
+
+		{"mod1": "simplecolorselector",
 			"mod2": "ColorSelection",
-			"desc": {
-				"en": "Simple Color Selector includes functionality of Color Selection.",
-				"ru": "Simple Color Selector включает функциональность Color Selection."
-			}
-		},
-		{
-			"mod1": "Skitarius",
+				"desc": {
+					"en": "Simple Color Selector includes functionality of Color Selection.",
+					"ru": "Simple Color Selector включает функциональность Color Selection." } },
+
+		{"mod1": "Skitarius",
 			"mod2": "UngaBunga",
-			"desc": {
-				"en": "Skitarius already includes Unga Bunga functionality.",
-				"ru": "Skitarius уже включает функциональность Unga Bunga."
-			}
-		},
-		{
-			"mod1": "Skitarius",
+				"desc": {
+					"en": "Skitarius already includes Unga Bunga functionality.",
+					"ru": "Skitarius уже включает функциональность Unga Bunga." } },
+		{"mod1": "Skitarius",
 			"mod2": "KeepSwinging",
-			"desc": {
-				"en": "Skitarius already includes functionality of Keep Swinging.",
-				"ru": "Skitarius уже включает функциональность Keep Swinging."
-			}
-		},
-		{
-			"mod1": "Skitarius",
+				"desc": {
+					"en": "Skitarius already includes functionality of Keep Swinging.",
+					"ru": "Skitarius уже включает функциональность Keep Swinging." } },
+		{"mod1": "Skitarius",
 			"mod2": "FullAuto",
-			"desc": {
-				"en": "Skitarius already includes functionality of Full Auto.",
-				"ru": "Skitarius уже включает функциональность Full Auto."
-			}
-		},
-		{
-			"mod1": "SoloPlay",
+				"desc": {
+					"en": "Skitarius already includes functionality of Full Auto.",
+					"ru": "Skitarius уже включает функциональность Full Auto." } },
+
+		{"mod1": "SoloPlay",
 			"mod2": "prologue",
-			"desc": {
-				"en": "SoloPlay already includes Prologue functionality.",
-				"ru": "SoloPlay уже включает функциональность Prologue."
-			}
-		},
-		{
-			"mod1": "teammate_tracker",
+				"desc": {
+					"en": "SoloPlay already includes Prologue functionality.",
+					"ru": "SoloPlay уже включает функциональность Prologue." } },
+
+		{"mod1": "teammate_tracker",
 			"mod2": "Do I Know You",
-			"desc": {
-				"en": "Teammate Tracker includes functionality of Do I Know You.",
-				"ru": "Teammate Tracker включает функциональность Do I Know You."
-			}
-		}
+				"desc": {
+					"en": "Teammate Tracker includes functionality of Do I Know You.",
+					"ru": "Teammate Tracker включает функциональность Do I Know You." } }
 	],
 
 	"dependencies": [
@@ -353,6 +329,13 @@
 			"required": "servo_friend",
 				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/504"},
 
+		{"dependent": "extended_weapon_customization",
+			"required": "visual_loadout_customization_community_patch",
+				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/853"},
+		{"dependent": "extended_weapon_customization",
+			"required": "master_item_community_patch",
+				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/409"},
+
 		{"dependent": "extended_weapon_customization_base_additions",
 			"required": "extended_weapon_customization",
 				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/277"},
@@ -372,6 +355,10 @@
 		{"dependent": "for_the_drip_extra",
 			"required": "for_the_drip",
 				"url": "https://github.com/Adspartan/For_the_Drip/releases"},
+
+		{"dependent": "visible_equipment",
+			"required": "master_item_community_patch",
+				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/409"},
 
 		{"dependent": "visible_equipment_uwu",
 			"required": "visible_equipment",

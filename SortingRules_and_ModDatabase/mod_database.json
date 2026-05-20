@@ -1,5 +1,5 @@
 {
-	"version": "0.59",
+	"version": "0.62",
 	"mod_database": [
 		{
 			"folder": "pickup_spawner",
@@ -1496,8 +1496,8 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/113",
 			"github_url": "https://github.com/deluxghost/darktide-mods/tree/main/ScoreboardExplosive",
 			"note": {
-				"en": "Scoreboard required.",
-				"ru": "Требуется Scoreboard."
+				"en": "Requred: Scoreboard.",
+				"ru": "Требуется: Scoreboard."
 			}
 		},
 		{
@@ -1690,8 +1690,8 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/126",
 			"github_url": "",
 			"note": {
-				"en": "Hasn't been updated in a while. May cause crashes. Scoreboard required.",
-				"ru": "Давно не обновляется. Может вызывать вылеты.Требуется Scoreboard."
+				"en": "Requred: Scoreboard. Hasn't been updated in a while. May cause crashes.",
+				"ru": "Требуется: Scoreboard. Давно не обновляется. Может вызывать вылеты."
 			}
 		},
 		{
@@ -1923,8 +1923,8 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/144",
 			"github_url": "",
 			"note": {
-				"en": "Scoreboard required.",
-				"ru": "Требуется Scoreboard."
+				"en": "Requred: Scoreboard.",
+				"ru": "Требуется: Scoreboard."
 			}
 		},
 		{
@@ -2509,8 +2509,8 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/187",
 			"github_url": "",
 			"note": {
-				"en": "Scoreboard required.",
-				"ru": "Требуется Scoreboard."
+				"en": "Requred: Scoreboard.",
+				"ru": "Требуется: Scoreboard."
 			}
 		},
 		{
@@ -2607,8 +2607,8 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/196",
 			"github_url": "https://github.com/ronvoluted/darktide-mods/tree/main/Audio",
 			"note": {
-				"en": "Darktide Local Server required.",
-				"ru": "Требуется Darktide Local Server."
+				"en": "Requred: Darktide Local Server.",
+				"ru": "Требуется: Darktide Local Server."
 			}
 		},
 		{
@@ -2821,8 +2821,8 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/217",
 			"github_url": "https://github.com/JCalebBR/UnlimitedPower",
 			"note": {
-				"en": "Fix in the comments on the Nexus Mods. Audio plugin required.",
-				"ru": "Фикс в комментариях на Нексусе. Требуется Audio plugin."
+				"en": "Requred: Audio plugin. Fix in the comments on the Nexus Mods.",
+				"ru": "Требуется: Audio plugin. Фикс в комментариях на Нексусе."
 			}
 		},
 		{
@@ -2839,8 +2839,8 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/218",
 			"github_url": "https://github.com/Wobin/Rock",
 			"note": {
-				"en": "Audio plugin required.",
-				"ru": "Требуется Audio plugin."
+				"en": "Requred: Audio plugin.",
+				"ru": "Требуется: Audio plugin."
 			}
 		},
 		{
@@ -2890,8 +2890,8 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/223",
 			"github_url": "",
 			"note": {
-				"en": "Audio plugin required.",
-				"ru": "Требуется Audio plugin."
+				"en": "Requred: Audio plugin.",
+				"ru": "Требуется: Audio plugin."
 			}
 		},
 		{
@@ -2908,8 +2908,8 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/224",
 			"github_url": "",
 			"note": {
-				"en": "Audio plugin required.",
-				"ru": "Требуется Audio plugin."
+				"en": "Requred: Audio plugin.",
+				"ru": "Требуется: Audio plugin."
 			}
 		},
 		{
@@ -2926,8 +2926,8 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/225",
 			"github_url": "",
 			"note": {
-				"en": "Audio plugin required.",
-				"ru": "Требуется Audio plugin."
+				"en": "Requred: Audio plugin.",
+				"ru": "Требуется: Audio plugin."
 			}
 		},
 		{
@@ -2944,8 +2944,8 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/226",
 			"github_url": "",
 			"note": {
-				"en": "Audio plugin required.",
-				"ru": "Требуется Audio plugin."
+				"en": "Requred: Audio plugin.",
+				"ru": "Требуется: Audio plugin."
 			}
 		},
 		{
@@ -3338,7 +3338,10 @@
 			"author": "SeventeenDucks",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/261",
 			"github_url": "https://github.com/ronvoluted/darktide-mods/tree/main/ScrubsVermin",
-			"note": { "en": "", "ru": "" }
+			"note": {
+				"en": "Requred: Darktide Local Server.",
+				"ru": "Требуется: Darktide Local Server."
+			}
 		},
 		{
 			"folder": "MergedTalentStats",
@@ -3514,440 +3517,399 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/273",
 			"github_url": "https://github.com/ronvoluted/darktide-mods/tree/main/Coal",
 			"note": {
-				"en": "",
-				"ru": ""
+				"en": "Required: Darktide Local Server.",
+				"ru": "Требуется: Darktide Local Server."
 			}
 		},
 		{
-			"folder": "",
+			"folder": "SpecialsTracker",
 			"name": {
-				"en": "",
-				"ru": ""
+				"en": "Specials Tracker",
+				"ru": "Отслеживание специалистов"
 			},
 			"description": {
-				"en": "",
-				"ru": ""
+				"en": "Allows the tracking of specific special/monster units through notifications and/or a permanent HUD element.",
+				"ru": "Specials Tracker - Позволяет отслеживать конкретных специалистов/монстров посредством уведомлений и/или постоянного элемента интерфейса."
 			},
-			"author": "",
-			"url": "",
+			"author": "Lunomica",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/274",
 			"github_url": "",
 			"note": {
-				"en": "",
-				"ru": ""
+				"en": "Fix in the comments on the Nexus Mods.",
+				"ru": "Фикс в комментариях на Нексусе."
 			}
 		},
 		{
-			"folder": "",
+			"folder": "ProfilePictures",
 			"name": {
-				"en": "",
-				"ru": ""
+				"en": "Profile Pictures",
+				"ru": "Картинка профиля"
 			},
 			"description": {
-				"en": "",
-				"ru": ""
+				"en": "Show profile pictures from Steam or Xbox instead of the character portrait.",
+				"ru": "Profile Pictures - Показывает вместо портрета персонажа аватарку из Steam или Xbox."
 			},
-			"author": "",
-			"url": "",
-			"github_url": "",
+			"author": "Raindish",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/275",
+			"github_url": "https://github.com/danreeves/darktide-mods/tree/main/ProfilePictures",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "extended_weapon_customization",
+			"name": {
+				"en": "Extended Weapon Customization",
+				"ru": "Расширенная настройка оружия"
+			},
+			"description": {
+				"en": "Weapon customization, flashlights, sights, scopes, equipment on back. Adds different kinds of qol and immersion things. And a bunch more stuff.",
+				"ru": "Extended Weapon Customization - Настройка оружия, фонарики, прицелы, оптические прицелы, снаряжение на спине. Добавляет различные улучшения и другие штуки для погружения в игру. И много чего ещё."
+			},
+			"author": "Grasmann",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/277",
+			"github_url": "https://github.com/grasmann/darktide-mods/tree/main/extended_weapon_customization",
 			"note": {
-				"en": "",
-				"ru": ""
+				"en": "Required: MasterItems Community Patch and Visual Loadout Customization Community Patch.",
+				"ru": "Требуется: MasterItems Community Patch и Visual Loadout Customization Community Patch."
 			}
 		},
 		{
-			"folder": "",
+			"folder": "weapon_customization_no_scope",
 			"name": {
-				"en": "",
-				"ru": ""
+				"en": "Weapon Customization No Sights Plugin",
+				"ru": "Расширенная настройка оружия - Без прицелов"
 			},
 			"description": {
-				"en": "",
-				"ru": ""
+				"en": "The No Sights Plugin for Weapon Customization.",
+				"ru": "Weapon Customization No Sights Plugin - Плагин «Без прицелов» для мода Расширенная настройка оружия (Extended Weapon Customization)."
 			},
-			"author": "",
-			"url": "",
+			"author": "JasperOfTheDawn",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/278",
 			"github_url": "",
 			"note": {
-				"en": "",
-				"ru": ""
+				"en": "Required: Extended Weapon Customization.",
+				"ru": "Требуется: Extended Weapon Customization."
 			}
 		},
 		{
-			"folder": "",
+			"folder": "show_crit_chance",
 			"name": {
-				"en": "",
-				"ru": ""
+				"en": "Отображение шанса крита",
+				"ru": "Show Crit Chance"
 			},
 			"description": {
-				"en": "",
-				"ru": ""
+				"en": "Display the critical strike chance of active weapon in real time.",
+				"ru": "Show Crit Chance - Отображение вероятности критического попадания активного оружия в режиме реального времени."
 			},
-			"author": "",
-			"url": "",
+			"author": "mrouzon",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/279",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "show_remaining_dodges",
+			"name": {
+				"en": "Show Remaining Dodges",
+				"ru": "Отображение уклонений"
+			},
+			"description": {
+				"en": "Display a stamina-like widget showing number of dodges remaining before dodging becomes ineffective.",
+				"ru": "Show Remaining Dodges - Показывает виджет, похожий на индикатор выносливости, показывающий количество оставшихся уклонений до того, как уклонение станет неэффективным."
+			},
+			"author": "mrouzon",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/280",
 			"github_url": "",
 			"note": {
-				"en": "",
-				"ru": ""
+				"en": "Fix in the comments on the Nexus Mods.",
+				"ru": "Фикс в комментариях на Нексусе."
 			}
 		},
 		{
-			"folder": "",
+			"folder": "Power_DI",
 			"name": {
-				"en": "",
-				"ru": ""
+				"en": "Power DI",
+				"ru": "Power DI"
 			},
 			"description": {
-				"en": "",
-				"ru": ""
+				"en": "Power DI is a framework for collecting, transforming and displaying Darktide statistical data.",
+				"ru": "Power DI — это фреймворк для сбора, преобразования и отображения статистических данных Darktide."
 			},
-			"author": "",
-			"url": "",
+			"author": "OvenProofMars",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/281",
+			"github_url": "https://github.com/OvenProofMars/Power_DI",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "Disconnect",
+			"name": {
+				"en": "Disconnect",
+				"ru": "Отключение"
+			},
+			"description": {
+				"en": "Use /dis command to return to main menu or to hub.",
+				"ru": "Disconnect - Используйте команду /dis, чтобы вернуться в главное меню или в хаб."
+			},
+			"author": "Konoko",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/285",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "LoadoutNames",
+			"name": {
+				"en": "Loadout Names",
+				"ru": "Названия билдов"
+			},
+			"description": {
+				"en": "Adds the ability to name your loadouts.",
+				"ru": "Loadout Names - Добавляет возможность давать названия своим билдам."
+			},
+			"author": "ItsAlxl",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/286",
+			"github_url": "https://github.com/ItsAlxl/darktide-mods/tree/main/LoadoutNames",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "combo_tracker",
+			"name": {
+				"en": "Combo Tracker",
+				"ru": "Отслеживание комбо"
+			},
+			"description": {
+				"en": "Display a widget tracking your melee weapon combo.",
+				"ru": "Combo Tracker - Показывает виджет, отслеживающий ваши комбинации ударов холодным оружием."
+			},
+			"author": "mrouzon",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/287",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "FilterTrash",
+			"name": {
+				"en": "Filter Trash",
+				"ru": "Фильтруй мусор"
+			},
+			"description": {
+				"en": "Get rid of unusable trash in store.",
+				"ru": "Filter Trash - Избавьтесь от бесполезного мусора в магазине."
+			},
+			"author": "seroperson",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/288",
+			"github_url": "https://github.com/seroperson/darktide-mods/tree/master/FilterTrash",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "Stimmfo",
+			"name": {
+				"en": "Stimmfo",
+				"ru": "Стимформация",
+				"zh-hans": "兴奋剂信息"
+			},
+			"description": {
+				"en": "Stimmfo - Stimm Bonus Indicator - Adds a text description to the stimms in game to show what effects it will have.",
+				"ru": "Stimmfo - Stimm Bonus Indicator - Добавляет текстовое описание к стимуляторам в игре, показывающее, какие эффекты они будут оказывать.",
+				"zh-hans": "Stimmfo - 在界面的兴奋剂图标旁边添加详细说明"
+			},
+			"author": "Wobin",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/292",
+			"github_url": "https://github.com/Wobin/Stimmfo",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "LessAnnoyingFX",
+			"name": {
+				"en": "Less Annoying FX",
+				"ru": "Менее раздражающие эффекты"
+			},
+			"description": {
+				"en": "Remove some annoying, potentially harmful strobing/flashing VFX. This may help reduce eye strain, headaches and possibly worse photo-sensitivity issues (it does for me).",
+				"ru": "Less Annoying FX - Вы можете убрать некоторые раздражающие, потенциально вредные стробоскопические/мигающие визуальные эффекты. Это может помочь уменьшить напряжение глаз, головные боли и, возможно, снизить проблемы с фоточувствительностью (мне это помогает)."
+			},
+			"author": "gpk",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/293",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "Hardtide",
+			"name": {
+				"en": "Hardtide",
+				"ru": "Хардтайд"
+			},
+			"description": {
+				"en": "Hardtide (Hardcore) - Hardcore mod for Darktide with (optional) online mode. Loadouts track win streaks until a mission loss or bail, and Hardtide ranks loadouts competing in each class at each difficulty/auric level. Be or see one of the top 4 Auric Damnation players in your favorite class.",
+				"ru": "Hardtide (Hardcore) - Хардкорный мод для Darktide с (опциональным) онлайн-режимом. Снаряжение отслеживает серии побед до поражения в миссии или выхода, а Hardtide ранжирует снаряжение участников, соревнующихся в каждом классе на каждом уровне сложности. Станьте лучшим или увидите одного из 4 лучших игроков на золотой сложности в вашем любимом классе."
+			},
+			"author": "itsbadwin",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/294",
 			"github_url": "",
 			"note": {
-				"en": "",
-				"ru": ""
+				"en": "Hasn't been updated for a long time.",
+				"ru": "Давно не обновляется."
 			}
 		},
 		{
-			"folder": "",
+			"folder": "show_accuracy",
 			"name": {
-				"en": "",
-				"ru": ""
+				"en": "Show Accuracy",
+				"ru": "Отображение точности"
 			},
 			"description": {
-				"en": "",
-				"ru": ""
+				"en": "Shows accuracy and weak spot accuracy on hud when a gun is selected.",
+				"ru": "Show Accuracy - Отображает точность стрельбы и точность попаданий в уязвимые места на экране, когда выбрано оружие."
 			},
-			"author": "",
-			"url": "",
+			"author": "FunkTheMonk",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/297",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "CollectibleFinder",
+			"name": {
+				"en": "Collectible Finder",
+				"ru": "Поисковик коллекционных предметов"
+			},
+			"description": {
+				"en": "Displays a notification when collectibles are nearby.",
+				"ru": "Collectible Finder - Показывает уведомление, когда поблизости находятся коллекционные предметы."
+			},
+			"author": "Zombine",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/298",
+			"github_url": "https://github.com/zombine04/darktide-mods/tree/main/CollectibleFinder",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "claim_all_penances",
+			"name": {
+				"en": "Claim All Penances",
+				"ru": "Забери все награды за раз"
+			},
+			"description": {
+				"en": "Claims commendations on entering Penances. Wintrack claim-all via command/keybind.",
+				"ru": "Claim All Penances - Забирает награды при входе в меню Искуплений. Вы можете забрать награды с помощью команды/сочетания клавиш."
+			},
+			"author": "Adspartan",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/299",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "limit_background_fps",
+			"name": {
+				"en": "Limit Background FPS",
+				"ru": "Ограничение FPS в фоне"
+			},
+			"description": {
+				"en": "Limit the game to run at 15 FPS when it is in the background.",
+				"ru": "Limit Background FPS - Ограничьте частоту кадров игры до 15 в фоновом режиме."
+			},
+			"author": "FunkTheMonk",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/302",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "for_the_drip",
+			"name": {
+				"en": "For the Drip",
+				"ru": "Крутой стиль"
+			},
+			"description": {
+				"en": "Gear customization mod (changes are only visible for you).",
+				"ru": "For the Drip - Мод для настройки снаряжения (изменения видны только вам)."
+			},
+			"author": "Adspartan",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/306",
+			"github_url": "https://github.com/Adspartan/For_the_Drip",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "for_the_drip_extra",
+			"name": {
+				"en": "For the Drip Extra",
+				"ru": "Крутой стиль - Дополнение"
+			},
+			"description": {
+				"en": "Add more attachment options in For the Drip.",
+				"ru": "For the Drip Extra - Добавляет новые варианты одежды для мода For the Drip."
+			},
+			"author": "Adspartan",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/306",
 			"github_url": "",
 			"note": {
-				"en": "",
-				"ru": ""
+				"en": "Required: For the Drip.",
+				"ru": "Требуется: For the Drip."
 			}
 		},
 		{
-			"folder": "",
+			"folder": "ArchivumMesselina",
 			"name": {
-				"en": "",
-				"ru": ""
+				"en": "Archivum Messelina",
+				"ru": "Архивум Месселина",
+				"zh-hans": "梅塞利纳档案馆"
 			},
 			"description": {
-				"en": "",
-				"ru": ""
+				"en": "Archivum Messelina - Penance Filtering and Searching - Adds a filter/search to the penances in the Penance screen. Increase the number of marked favourites.",
+				"ru": "Archivum Messelina - Penance Filtering and Searching - Добавляет фильтр/поиск к искуплениям на экране «Искупления». Увеличивает количество помеченных избранными искуплений.",
+				"zh-hans": "梅塞利纳档案馆 - 允许你筛选/搜索苦修"
 			},
-			"author": "",
-			"url": "",
+			"author": "Wobin",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/307",
+			"github_url": "https://github.com/Wobin/ArchivumMesselina",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "RememberServerLocation",
+			"name": {
+				"en": "Remember Server Location",
+				"ru": "Запомни расположение сервера",
+				"zh-hans": "记住服务器位置",
+				"zh-hant": "記住伺服器位置"
+			},
+			"description": {
+				"en": "Remember matchmaking server location option.",
+				"ru": "Remember Server Location - Запоминает расположение сервера в опциях подбора миссии в опциях.",
+				"zh-hans": "记住匹配服务器位置选项。",
+				"zh-hant": "記住配對伺服器位置選項。"
+			},
+			"author": "deluxghost",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/308",
+			"github_url": "https://github.com/deluxghost/darktide-mods/tree/main/RememberServerLocation",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "blessings_archive",
+			"name": {
+				"en": "Blessings Archive",
+				"ru": "Архив благословений"
+			},
+			"description": {
+				"en": "Adds a custom screen that displays detailed information about blessings, featuring filters by weapon category and tier (rarity).",
+				"ru": "Blessings Archive - Добавляет экран, отображающий подробную информацию о благословениях, с фильтрами по категориям оружия и редкости."
+			},
+			"author": "Klavionik",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/310",
 			"github_url": "",
 			"note": {
-				"en": "",
-				"ru": ""
+				"en": "The latest version is packaged incorrectly. You need to create a 'blessings_archive' folder and place the archive contents there.",
+				"ru": "Последняя версия неправильно упакована. Нужно создать папку «blessings_archive» и в неё положить содержимое архива."
 			}
 		},
 		{
-			"folder": "",
+			"folder": "FenyaTitleZ",
 			"name": {
-				"en": "",
-				"ru": ""
+				"en": "Fenya Titles - RU ONLY",
+				"ru": "Погоняла"
 			},
 			"description": {
-				"en": "",
-				"ru": ""
+				"en": "Fenya Titles - RU ONLY - Just for fun! You've been thrown in jail, so sit down, make yourself a mug of chifir, and get yourself a title.",
+				"ru": "Fenya Titles - RU ONLY - Чисто по приколу! Тебя посадили в тюрячку, так что сядь, завари кружку чифиря и возьми себе погоняло."
 			},
-			"author": "",
-			"url": "",
+			"author": "xsSplater",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/311",
 			"github_url": "",
 			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
+				"en": "Required: What the Localization.",
+				"ru": "Требуется: What the Localization."
 			}
 		},
 		{
