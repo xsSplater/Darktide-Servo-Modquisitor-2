@@ -1558,71 +1558,61 @@ func (app *App) showDMLDownloadDialog(url, filename, apiKey string) {
 
 // handleNXMLink с поддержкой DML (ID=19)
 func (app *App) handleNXMLink(nxmURL string) {
-    u, err := url.Parse(nxmURL)
-    if err != nil {
-        app.appendLog(app.messages["log_invalid_nmx_link"])
-        return
-    }
-    segments := strings.Split(strings.Trim(u.Path, "/"), "/")
-    var modID, fileID string
-    for i := 0; i < len(segments)-1; i++ {
-        if segments[i] == "mods" && i+1 < len(segments) {
-            modID = segments[i+1]
-        }
-        if segments[i] == "files" && i+1 < len(segments) {
-            fileID = segments[i+1]
-        }
-    }
-    if modID == "" || fileID == "" {
-        app.appendLog(app.messages["log_invalid_nmx_link"])
-        return
-    }
-    nxmKey := u.Query().Get("key")
-    if nxmKey == "" {
-        app.appendLog("No key found in nxm link")
-        return
-    }
+	parts := strings.Split(nxmURL, "/")
+	if len(parts) < 5 {
+		app.appendLog(app.messages["log_invalid_nmx_link"])
+		return
+	}
 
-    // DML (modID 19) ставится в корень игры
-    if modID == "19" {
-        go func() {
-            directURL, filename, err := app.fetchDirectDownloadLink(modID, fileID, nxmKey)
-            if err != nil {
-                app.appendLog(fmt.Sprintf(app.messages["failed_get_download_link"], err))
-                return
-            }
-            fyne.Do(func() {
-                app.showDMLDownloadDialog(directURL, filename, nxmKey)
-            })
-        }()
-        return
-    }
+	modID := parts[len(parts)-3]
+	fileID := strings.Split(parts[len(parts)-1], "?")[0]
 
-    // Обычные моды
-    go func() {
-        directURL, filename, err := app.fetchDirectDownloadLink(modID, fileID, nxmKey)
-        if err != nil {
-            app.appendLog(fmt.Sprintf(app.messages["failed_get_download_link"], err))
-            return
-        }
-        mid, _ := strconv.Atoi(modID)
-        fid, _ := strconv.Atoi(fileID)
-        var fileVersion string
-        if mid > 0 && fid > 0 {
-            if fi, err := app.FetchFileInfo(mid, fid, nxmKey); err == nil {
-                fileVersion = fi.Version
-            }
-        }
-        modName := "Mod " + modID
-        if mid > 0 {
-            if info, err := app.FetchNexusModInfo(mid, nxmKey); err == nil {
-                modName = info.Name
-            }
-        }
-        fyne.Do(func() {
-            app.showDownloadDialog(directURL, filename, nxmKey, modName, fileVersion, modID)
-        })
-    }()
+	if app.cfg.NexusAPIKey == "" {
+		app.appendLog(app.messages["nexus_api_key_missing"])
+		return
+	}
+
+	// DML устанавливается в корень игры
+	if modID == "19" {
+		go func() {
+			directURL, filename, err := app.fetchDirectDownloadLink(modID, fileID, app.cfg.NexusAPIKey)
+			if err != nil {
+				app.appendLog(fmt.Sprintf(app.messages["failed_get_download_link"], err))
+				return
+			}
+			fyne.Do(func() {
+				app.showDMLDownloadDialog(directURL, filename, app.cfg.NexusAPIKey)
+			})
+		}()
+		return
+	}
+
+	// Обычные моды, с получением версии файла и сохранением после установки
+	go func() {
+		directURL, filename, err := app.fetchDirectDownloadLink(modID, fileID, app.cfg.NexusAPIKey)
+		if err != nil {
+			app.appendLog(fmt.Sprintf(app.messages["failed_get_download_link"], err))
+			return
+		}
+		mid, _ := strconv.Atoi(modID)
+		fid, _ := strconv.Atoi(fileID)
+		var fileVersion string
+		if mid > 0 && fid > 0 {
+			if fi, err := app.FetchFileInfo(mid, fid, app.cfg.NexusAPIKey); err == nil {
+				fileVersion = fi.Version
+			}
+		}
+		// Получаем имя мода, если возможно
+		modName := "Mod " + modID
+		if mid > 0 {
+			if info, err := app.FetchNexusModInfo(mid, app.cfg.NexusAPIKey); err == nil {
+				modName = info.Name
+			}
+		}
+		fyne.Do(func() {
+			app.showDownloadDialog(directURL, filename, app.cfg.NexusAPIKey, modName, fileVersion, modID)
+		})
+	}()
 }
 
 // showNexusAPIKeyDialog открывает диалог ввода/изменения ключа API Nexus.
