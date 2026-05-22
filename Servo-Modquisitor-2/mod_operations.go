@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/widget"
 	"github.com/bodgit/sevenzip"
 	"github.com/nwaples/rardecode/v2"
 )
@@ -81,7 +82,6 @@ func (app *App) refreshModList() {
 		regMods[i].Mandatory = checks.IsMandatoryMod(regMods[i].Name)
 		regMods[i].Incompatible = app.checkIncompatible(regMods[i].Name)
 
-		// Если мод конфликтует, добавляем информацию в Note
 		if regMods[i].Incompatible {
 			for _, pair := range checks.IncompatiblePairs {
 				if pair.Mod1 == regMods[i].Name || pair.Mod2 == regMods[i].Name {
@@ -90,7 +90,6 @@ func (app *App) refreshModList() {
 						other = pair.Mod2
 					}
 					desc := checks.GetIncompatibleDesc(pair.Mod1, pair.Mod2)
-					// app.appendLog(fmt.Sprintf("DEBUG: adding conflict note for %s", regMods[i].Name))
 					if desc != "" {
 						regMods[i].Note = strings.TrimSpace(regMods[i].Note + app.messages["conflict_with"] + other + ": " + desc)
 					}
@@ -113,23 +112,21 @@ func (app *App) refreshModList() {
 		}
 	}
 
-    // Проверяем, не изменилось ли состояние AML
-    wasAML := app.amlDetected
-    app.amlDetected = checks.IsAMLInstalled(app.cfg.ModsPath)
-    if wasAML != app.amlDetected {
-        // Обновляем состояние кнопок
-        if app.amlDetected {
+	wasAML := app.amlDetected
+	app.amlDetected = checks.IsAMLInstalled(app.cfg.ModsPath)
+	if wasAML != app.amlDetected {
+		if app.amlDetected {
 			app.btnSaveOrder.SetText(app.messages["btn_save_order_aml"])
 			app.btnSortChecks.SetText(app.messages["btn_sort_checks_aml"])
-            app.applyTooltip(app.btnSaveOrder, "aml_save_warning_tooltip")
-            app.applyTooltip(app.btnSortChecks, "aml_sort_warning_tooltip")
-        } else {
-            app.btnSaveOrder.SetText(app.messages["btn_save_order"])
-            app.btnSortChecks.SetText(app.messages["btn_sort_checks"])
-            app.applyTooltip(app.btnSaveOrder, "btn_save_order_tooltip")
-            app.applyTooltip(app.btnSortChecks, "btn_sort_checks_tooltip")
-        }
-    }
+			app.applyTooltip(app.btnSaveOrder, "aml_save_warning_tooltip")
+			app.applyTooltip(app.btnSortChecks, "aml_sort_warning_tooltip")
+		} else {
+			app.btnSaveOrder.SetText(app.messages["btn_save_order"])
+			app.btnSortChecks.SetText(app.messages["btn_sort_checks"])
+			app.applyTooltip(app.btnSaveOrder, "btn_save_order_tooltip")
+			app.applyTooltip(app.btnSortChecks, "btn_sort_checks_tooltip")
+		}
+	}
 
 	app.allMods = regMods
 	app.orderDirty = false
@@ -379,6 +376,118 @@ func (app *App) extract7z(path string) error {
 	return nil
 }
 
+func (app *App) extractArchiveTo(archivePath, destDir string) error {
+	ext := strings.ToLower(filepath.Ext(archivePath))
+	switch ext {
+	case ".zip":
+		return app.extractZipTo(archivePath, destDir)
+	case ".rar":
+		return app.extractRarTo(archivePath, destDir)
+	case ".7z":
+		return app.extract7zTo(archivePath, destDir)
+	default:
+		return fmt.Errorf(app.messages["error_uns_archive"], ext)
+	}
+}
+
+func (app *App) extractZipTo(path, destDir string) error {
+	r, err := zip.OpenReader(path)
+	if err != nil {
+		return err
+	}
+	defer r.Close()
+	for _, f := range r.File {
+		targetPath, err := safeJoin(destDir, f.Name)
+		if err != nil {
+			continue
+		}
+		if f.FileInfo().IsDir() {
+			os.MkdirAll(targetPath, 0755)
+			continue
+		}
+		os.MkdirAll(filepath.Dir(targetPath), 0755)
+		outFile, _ := os.Create(targetPath)
+		rc, _ := f.Open()
+		if rc != nil {
+			io.Copy(outFile, rc)
+			rc.Close()
+		}
+		outFile.Close()
+	}
+	return nil
+}
+
+func (app *App) extractRarTo(path, destDir string) error {
+	f, err := os.Open(path)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	rr, err := rardecode.NewReader(f)
+	if err != nil {
+		return err
+	}
+	for {
+		header, err := rr.Next()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return err
+		}
+		targetPath, err := safeJoin(destDir, header.Name)
+		if err != nil {
+			continue
+		}
+		if header.IsDir {
+			os.MkdirAll(targetPath, 0755)
+			continue
+		}
+		os.MkdirAll(filepath.Dir(targetPath), 0755)
+		outFile, err := os.Create(targetPath)
+		if err != nil {
+			continue
+		}
+		io.Copy(outFile, rr)
+		outFile.Close()
+	}
+	return nil
+}
+
+func (app *App) extract7zTo(path, destDir string) error {
+	r, err := sevenzip.OpenReader(path)
+	if err != nil {
+		return err
+	}
+	defer r.Close()
+
+	for _, f := range r.File {
+		targetPath, err := safeJoin(destDir, f.Name)
+		if err != nil {
+			continue
+		}
+		if f.FileInfo().IsDir() {
+			os.MkdirAll(targetPath, 0755)
+			continue
+		}
+		os.MkdirAll(filepath.Dir(targetPath), 0755)
+		outFile, err := os.Create(targetPath)
+		if err != nil {
+			continue
+		}
+		rc, err := f.Open()
+		if err != nil {
+			outFile.Close()
+			continue
+		}
+		io.Copy(outFile, rc)
+		rc.Close()
+		outFile.Close()
+	}
+	return nil
+}
+
 func (app *App) copyFolder(src, dst string) error {
 	return filepath.Walk(src, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
@@ -577,4 +686,192 @@ func (app *App) findModIndexByName(name string) int {
 		}
 	}
 	return -1
+}
+
+func (app *App) selectModByName(name string) {
+	for i, m := range app.displayedMods {
+		if m.Name == name {
+			app.modTable.Select(widget.TableCellID{Row: i, Col: 0})
+			break
+		}
+	}
+}
+
+// DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG 
+func (app *App) InstallModFromArchive(archivePath string, activate bool) (string, error) {
+// app.appendLog(fmt.Sprintf("Installing from archive %s, activate=%v", archivePath, activate))
+
+	tmpDir, err := os.MkdirTemp("", "servo-mod-")
+	if err != nil {
+app.appendLog(fmt.Sprintf("Failed to create temp dir: %v", err))
+		return "", err
+	}
+	defer os.RemoveAll(tmpDir)
+// app.appendLog(fmt.Sprintf("DEBUG: Temp dir: %s", tmpDir))
+
+	if err := app.extractArchiveTo(archivePath, tmpDir); err != nil {
+app.appendLog(fmt.Sprintf("Extract failed: %v", err))
+		return "", err
+	}
+// app.appendLog("Extraction complete")
+
+	entries, err := os.ReadDir(tmpDir)
+	if err != nil {
+// app.appendLog(fmt.Sprintf("DEBUG: Read temp dir failed: %v", err))
+		return "", err
+	}
+// app.appendLog(fmt.Sprintf("DEBUG: Temp dir contains %d entries", len(entries)))
+// for _, e := range entries {
+// 	app.appendLog(fmt.Sprintf("DEBUG:   %s (dir=%v)", e.Name(), e.IsDir()))
+// }
+
+	for _, e := range entries {
+		if e.IsDir() {
+			modName := e.Name()
+			dest := filepath.Join(app.cfg.ModsPath, modName)
+app.appendLog(fmt.Sprintf("Moving %s -> %s", modName, dest))
+			if err := app.copyFolder(filepath.Join(tmpDir, modName), dest); err != nil {
+app.appendLog(fmt.Sprintf("Copy failed: %v", err))
+				return "", err
+			}
+
+			if !activate {
+				app.refreshModList()
+				for i := range app.allMods {
+					if app.allMods[i].Name == modName {
+						app.allMods[i].Active = false
+						break
+					}
+				}
+				app.filterModList()
+				app.appendLog(fmt.Sprintf(app.messages["log_installed_inactive"], modName))
+				return modName, nil
+			} else {
+				app.refreshModList()
+				app.appendLog(fmt.Sprintf(app.messages["log_installed"], modName))
+				return modName, nil
+			}
+		}
+	}
+	return "", fmt.Errorf("No mod folder found in archive")
+}
+
+// Обновление одного обычного мода
+func (app *App) updateModFromNexus(mod *checks.ModInfo) {
+	if mod.URL == "" || app.cfg.NexusAPIKey == "" {
+		app.appendLog(app.messages["update_skipped_no_url"])
+		return
+	}
+	modID := extractModIDFromURL(mod.URL)
+	if modID == 0 {
+		app.appendLog(fmt.Sprintf(app.messages["cannot_extract_mod_id"], mod.URL))
+		return
+	}
+
+	modIDStr := fmt.Sprintf("%d", modID)
+	fileID, err := getLatestFileID(modID, app.cfg.NexusAPIKey)
+	if err != nil {
+		app.appendLog(fmt.Sprintf(app.messages["failed_get_latest_file_id"], err))
+		return
+	}
+	var fileVersion string
+	if fi, err := app.FetchFileInfo(modID, fileID, app.cfg.NexusAPIKey); err == nil {
+		fileVersion = fi.Version
+	}
+	directURL, filename, err := app.fetchDirectDownloadLink(fmt.Sprintf("%d", modID), fmt.Sprintf("%d", fileID), app.cfg.NexusAPIKey)
+	if err != nil {
+		app.appendLog(fmt.Sprintf(app.messages["failed_get_download_link"], err))
+		return
+	}
+	app.showDownloadDialog(directURL, filename, app.cfg.NexusAPIKey, mod.Name, fileVersion, modIDStr)
+}
+
+// Обновление всех модов (только проверка через лог)
+func (app *App) updateAllModsFromNexus() {
+	if app.cfg.NexusAPIKey == "" {
+		app.appendLog(app.messages["nexus_api_key_missing"])
+		return
+	}
+	go app.checkNexusUpdates()
+}
+
+// Удалить выбранные моды
+func (app *App) removeSelectedMods() {
+    for _, mod := range app.allMods {
+        if mod.Selected && !mod.IsSystem {
+            checks.RemoveMod(mod.Name)
+            app.appendLog(fmt.Sprintf(app.messages["log_deleted"], mod.Name))
+        }
+    }
+    app.refreshModList()
+    app.appendLog(app.messages["log_selected_mods_removed"])
+}
+
+// Удалить все моды
+func (app *App) removeAllMods() {
+    for _, mod := range app.allMods {
+        if !mod.IsSystem {
+            checks.RemoveMod(mod.Name)
+            app.appendLog(fmt.Sprintf(app.messages["log_deleted"], mod.Name))
+        }
+    }
+    app.refreshModList()
+    app.appendLog(app.messages["log_all_mods_removed"])
+}
+
+// Установка DML в корень игры
+func (app *App) installDMLFromArchive(archivePath string) error {
+	if app.gameRoot == "" {
+		return fmt.Errorf("game root not found")
+	}
+	tmpDir, err := os.MkdirTemp("", "dml-update")
+	if err != nil {
+		return err
+	}
+	defer os.RemoveAll(tmpDir)
+	if err := app.extractArchiveTo(archivePath, tmpDir); err != nil {
+		return fmt.Errorf("extract failed: %w", err)
+	}
+	entries, err := os.ReadDir(tmpDir)
+	if err != nil {
+		return err
+	}
+	for _, entry := range entries {
+		srcPath := filepath.Join(tmpDir, entry.Name())
+		if err := copyPath(srcPath, filepath.Join(app.gameRoot, entry.Name())); err != nil {
+			app.appendLog(fmt.Sprintf("Failed to copy %s: %v", entry.Name(), err))
+		}
+	}
+	return nil
+}
+
+// Рекурсивное копирование файлов/папок с заменой
+func copyPath(src, dst string) error {
+	srcInfo, err := os.Stat(src)
+	if err != nil {
+		return err
+	}
+	if srcInfo.IsDir() {
+		return filepath.Walk(src, func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+			relPath, _ := filepath.Rel(src, path)
+			targetPath := filepath.Join(dst, relPath)
+			if info.IsDir() {
+				return os.MkdirAll(targetPath, 0755)
+			}
+			data, err := os.ReadFile(path)
+			if err != nil {
+				return err
+			}
+			return os.WriteFile(targetPath, data, 0644)
+		})
+	}
+	// Одиночный файл
+	data, err := os.ReadFile(src)
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(dst, data, 0644)
 }

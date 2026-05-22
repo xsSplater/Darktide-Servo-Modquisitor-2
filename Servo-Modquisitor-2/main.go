@@ -3,11 +3,14 @@ package main
 import (
 	"Servo-Modquisitor/checks"
 	"Servo-Modquisitor/sorter"
+    "bufio"
 	"embed"
 	"fmt"
+    "net"
 	"net/url"
 	"os"
 	"path/filepath"
+    "strings"
 	"time"
 
 	"fyne.io/fyne/v2"
@@ -19,10 +22,22 @@ import (
 var embeddedFiles embed.FS
 
 func main() {
-	myApp := app.NewWithID("com.xssplater.servo-modquisitor")
+    // Проверяем, не передали ли нам nxm-ссылку при запуске
+    if len(os.Args) > 1 && os.Args[1] == "--nxm" && len(os.Args) > 2 {
+        nxmURL := os.Args[2]
+        // Пытаемся подключиться к уже запущенному экземпляру
+        conn, err := net.Dial("tcp", "localhost:31337")
+        if err == nil {
+            fmt.Fprintln(conn, nxmURL)
+            conn.Close()
+            os.Exit(0)
+        }
+        // Если не удалось - это первый экземпляр, продолжаем обычный запуск
+    }
 
-	cfg := loadConfig()
-	cfg.ModsPath, _ = os.Getwd()
+    myApp := app.NewWithID("com.xssplater.servo-modquisitor")
+    cfg := loadConfig()
+    cfg.ModsPath, _ = os.Getwd()
 
 	application := NewApp(cfg, myApp)
 	logPath := filepath.Join(cfg.ModsPath, "app.log")
@@ -115,6 +130,8 @@ func main() {
 	application.syncModsEnabledState()
 	application.buildUI()
 	application.refreshModList()
+	// Запросить ключ API Nexus, если ещё не введён
+	// application.requestNexusAPIKey()
 
 	if !cfg.InitialSetupDone {
 		application.performFirstRunSetup()
@@ -183,10 +200,36 @@ func main() {
                 }
             },
             application.messages["btn_open_dml_page"],
-            application.messages["btn_ok"],
+            application.messages["btn_yes"],
             application.messages["btn_dont_show_again"],
         )
     }
 
-	application.mainWindow.ShowAndRun()
+    // Регистрируем программу как обработчик nxm:// ссылок
+    if exePath, err := os.Executable(); err == nil {
+        registerNXMProtocol(exePath)
+    }
+
+    // Запускаем слушатель для межпроцессного взаимодействия (nxm-ссылки)
+    listener, err := net.Listen("tcp", "localhost:31337")
+    if err == nil {
+        go func() {
+            for {
+                conn, err := listener.Accept()
+                if err != nil {
+                    continue
+                }
+                // Читаем одну строку - nxm-ссылку
+                link, _ := bufio.NewReader(conn).ReadString('\n')
+                conn.Close()
+                // Передаём в главный поток
+                fyne.Do(func() {
+                    application.handleNXMLink(strings.TrimSpace(link))
+                })
+            }
+        }()
+        defer listener.Close()
+    }
+
+    application.mainWindow.ShowAndRun()
 }

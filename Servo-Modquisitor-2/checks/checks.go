@@ -91,22 +91,27 @@ func ListModFolders() []string {
 }
 
 type ModInfo struct {
-	Active			bool
-	Broken			bool
-	Incompatible	bool
-	Mandatory		bool
-	Obsolete		bool
-	Selected		bool
-	IsSystem		bool
-    VortexDeployed	bool
-	Author			string
-	Description		string
-	DisplayName		string
-	Name			string
-	Note			string
-	URL				string
-	GitHubURL		string
-	ModTime			time.Time
+	Active				bool
+	Broken				bool
+	Incompatible		bool
+	Mandatory			bool
+	Obsolete			bool
+	Selected			bool
+	IsSystem			bool
+    VortexDeployed		bool
+	Author				string
+	Description			string
+	DisplayName			string
+	Name				string
+	Note				string
+	URL					string
+	GitHubURL			string
+	ModTime				time.Time
+    NexusVersion		string
+    NexusSummary		string
+    NexusDownloads		int
+    NexusEndorsements	int
+    NexusPictureURL		string
 }
 
 type ModDBEntry struct {
@@ -176,8 +181,14 @@ func GetModsInfo(lang string, forceEnglish bool) []ModInfo {
 					mod.ModTime = fi.ModTime()
 				}
 				if !fileExists(modFilePath) {
-					mod.Broken = true
-				}
+                    mod.Broken = true
+                } else {
+                    mod.Broken = false
+                }
+                // Если папка отключена префиксом - не считаем её сломанной
+                if strings.HasPrefix(name, "_") || strings.HasPrefix(name, "__") || strings.HasPrefix(name, "--") {
+                    mod.Broken = false
+                }
 			} else {
 				mod.Broken = false
 			}

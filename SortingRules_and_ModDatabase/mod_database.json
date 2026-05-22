@@ -2259,8 +2259,8 @@
 				"ru": "Автосоздание копии настроек"
 			},
 			"description": {
-				"en": "OBSOLETE!",
-				"ru": "УСТАРЕЛ!"
+				"en": "Automatically creates a backup of your settings on launch, exit and weekly.",
+				"ru": "Auto Backup - Автоматически создаёт резервную копию ваших настроек при запуске, выходе из игры и еженедельно."
 			},
 			"author": "SeventeenDucks",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/170",

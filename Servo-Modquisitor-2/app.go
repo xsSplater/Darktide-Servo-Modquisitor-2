@@ -39,6 +39,8 @@ type Config struct {
 	ShowSystemMods				bool	`json:"show_system_mods"`
 	// скрывать предупреждение об AML
     SuppressAMLWarning 			bool	`json:"suppress_aml_warning"`
+	// ключ API Nexus Mods
+	NexusAPIKey					string	`json:"nexus_api_key"`
 }
 
 const (
@@ -75,7 +77,7 @@ type App struct {
 	// Управление видимостью панели управления модами
 	managePanel					*fyne.Container
 	showSelectColumn			bool
-	selectColumnBgRes fyne.Resource
+	selectColumnBgRes			fyne.Resource
 
 	moveLabel					*widget.Label
 	statusLabel					*widget.Label
@@ -88,6 +90,8 @@ type App struct {
 	disableSelectedBtn			*CustomButton
 	enableAllBtn				*CustomButton
 	disableAllBtn				*CustomButton
+	removeAllBtn				*CustomButton
+	removeSelectedBtn			*CustomButton
 	moveToTopBtn				*CustomButton
 	moveToBottomBtn				*CustomButton
 	btnToggle					*CustomButton
@@ -95,11 +99,16 @@ type App struct {
 	btnRefresh					*CustomButton
 	btnInstall					*CustomButton
 	btnRemove					*CustomButton
-	btnUp, btnDown				*CustomButton
+	btnUp						*CustomButton
+	btnDown						*CustomButton
 	btnLaunchNormal				*CustomButton
 	btnLaunchNoLauncher			*CustomButton
 	btnSortChecks				*CustomButton
+	btnUpdateAll				*CustomButton
+	btnUpdateMod				*CustomButton
+	btnCheckUpdates				*CustomButton
 	searchClearBtn				*CustomButton
+	btnNexusTest				*CustomButton
 
 	moveToEntry					*widget.Entry
 	searchEntry					*widget.Entry
@@ -112,6 +121,9 @@ type App struct {
     githubLink					*widget.Hyperlink
 	filterLabel					*widget.Label
 	counterLabel				*widget.Label
+
+	descLocalVersion			*widget.Label
+	descLatestVersion			*widget.Label
 
 	logHeaderText				*canvas.Text
 	logWindow					*widget.RichText
@@ -135,6 +147,9 @@ type App struct {
 	managePanelBgRect			*canvas.Rectangle
 	descCardBgRect				*canvas.Rectangle
 
+    nexusVersionCache   map[string]string // локальная версия
+    nexusLatestVersions map[string]string // последняя версия с сайта
+
 	gameRoot					string
 	patcherType					PatcherType
 	launchGameFunc				func(version GameVersion, gameRoot string, skipLauncher bool) error
@@ -142,12 +157,15 @@ type App struct {
 
 func NewApp(cfg *Config, myApp fyne.App) *App {
 	app := &App{
-		cfg:		cfg,
-		messages:	map[string]string{},
-		myApp:		myApp,
+		cfg:					cfg,
+		messages:				map[string]string{},
+		myApp:					myApp,
+		nexusVersionCache:		make(map[string]string),
+		nexusLatestVersions:	make(map[string]string),
 	}
 	app.selectedModIndex.Store(-1)
 	app.loadLanguage(cfg.Language)
+    app.loadNexusVersionCache()
 
 	if cfg.Theme == "light" {
 		myApp.Settings().SetTheme(&themes.ForcedLightTheme{})
@@ -159,6 +177,29 @@ func NewApp(cfg *Config, myApp fyne.App) *App {
 	app.patcherType = detectPatcherType()
 
 	return app
+}
+
+func (app *App) loadNexusVersionCache() {
+    path := filepath.Join(filepath.Dir(configFilePath()), "nexus_versions.json")
+    data, err := os.ReadFile(path)
+    if err != nil {
+        // Файла нет — оставляем уже созданную пустую карту
+        return
+    }
+    if err := json.Unmarshal(data, &app.nexusVersionCache); err != nil {
+        // Ошибка чтения - тоже оставляем пустую карту
+        return
+    }
+    // Если файл содержал "null", карта станет nil - нужно восстановить
+    if app.nexusVersionCache == nil {
+        app.nexusVersionCache = make(map[string]string)
+    }
+}
+
+func (app *App) saveNexusVersionCache() {
+    path := filepath.Join(filepath.Dir(configFilePath()), "nexus_versions.json")
+    data, _ := json.MarshalIndent(app.nexusVersionCache, "", "  ")
+    os.WriteFile(path, data, 0644)
 }
 
 func configFilePath() string {

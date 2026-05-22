@@ -1,4 +1,8 @@
 {
+    "already_latest": {
+        "en": "%s: already latest (%s)",
+        "ru": "%s: уже последняя версия (%s)"
+    },
     "aml_detected_title": {
         "en": "⚠ 'Auto Mod Loading and Ordering' mod detected ⚠",
         "ru": "⚠ Обнаружен мод «Auto Mod Loading and Ordering» ⚠"
@@ -19,9 +23,13 @@
         "en": "AML overrides load order - saving/sorting disabled.",
         "ru": "AML переопределяет порядок загрузки - сохранение/сортировка отключены."
     },
+    "api_remaining_label": {
+        "en": "API requests: %s/%s",
+        "ru": "API запросов: %s/%s"
+    },
     "app_title_long": {
-        "en": "⚙ WH40k - Servo-Modquisitor ⚙",
-        "ru": "⚙ WH40k - Серво-Модквизитор ⚙"
+        "en": "⚙ Servo-Modquisitor - Darktide Mod Manager ⚙",
+        "ru": "⚙ Servo-Modquisitor - Darktide Mod Manager ⚙"
     },
     "author_label": {
         "en": "Author: %s",
@@ -46,6 +54,14 @@
     "btn_cancel": {
         "en": "🛑 Cancel",
         "ru": "🛑 Отмена"
+    },
+    "btn_check_updates": {
+        "en": "🔄 Check updates",
+        "ru": "🔄 Поиск обновлений"
+    },
+    "btn_check_updates_tooltip": {
+        "en": "Checking for new mod versions on Nexus Mods",
+        "ru": "Проверка новых версии модов на Nexus Mods"
     },
     "btn_create_new": {
         "en": "🆕 Create new",
@@ -163,13 +179,13 @@
         "en": "Move to top",
         "ru": "Переместить в начало"
     },
+    "btn_no": {
+        "en": " ❌ No  ",
+        "ru": " ❌ Нет "
+    },
     "btn_no_patcher": {
         "en": "⚠ Patcher not found",
         "ru": "⚠ Патчер не найден"
-    },
-    "btn_ok": {
-        "en": "OK",
-        "ru": "ОК"
     },
     "btn_open_dml_page": {
         "en": "Open DML page",
@@ -196,8 +212,8 @@
         "ru": "🔄 Обновить без сохранения"
     },
     "btn_refresh_tooltip": {
-        "en": "Reload mod list",
-        "ru": "Обновить список модов"
+        "en": "Updates the mod list. Save your changes or they will be lost!",
+        "ru": "Обновляет список модов. Сохраните изменения иначе они будут потеряны!"
     },
     "btn_remove": {
         "en": "🗑 Remove Mod",
@@ -206,6 +222,26 @@
     "btn_remove_tooltip": {
         "en": "Delete selected mod",
         "ru": "Удалить выбранный мод"
+    },
+    "btn_remove_all_mods": {
+        "en": "🗑 Remove All Mods",
+        "ru": "🗑 Удалить все моды"
+    },
+    "btn_remove_all_tooltip": {
+        "en": "Permanently removes all mods except DML and DMF",
+        "ru": "Безвозвратно удаляет все моды кроме DML и DMF"
+    },
+    "btn_remove_selected": {
+        "en": "🗑 Remove Selected",
+        "ru": "🗑 Удалить выбранные"
+    },
+    "btn_remove_selected_tooltip": {
+        "en": "Delete selected mods permanently",
+        "ru": "Безвозвратно удалить выбранные моды"
+    },
+    "btn_save_api": {
+        "en": "💾 Save your API key to the settings file",
+        "ru": "💾 Сохранить ваш API-ключ в файл настроек"
     },
     "btn_save_and_refresh": {
         "en": "💾 Save and Refresh",
@@ -255,6 +291,22 @@
         "en": "Move selected mod up",
         "ru": "Поднять выбранный мод выше"
     },
+    "btn_update_mod": {
+        "en": "🔄 Update Mod",
+        "ru": "🔄 Обновить мод"
+    },
+    "btn_update_all": {
+        "en": "🔄 Update All Mods",
+        "ru": "🔄 Обновить все моды"
+    },
+    "btn_yes": {
+        "en": " ✔ Yes ",
+        "ru": " ✔ Да  "
+    },
+    "cannot_extract_mod_id": {
+        "en": "Cannot extract mod ID from URL: %s",
+        "ru": "Не удалось извлечь ID мода из ссылки: %s"
+    },
     "col_date": {
         "en": "Installed",
         "ru": "Установлен"
@@ -287,9 +339,25 @@
         "en": "Confirm",
         "ru": "Подтверждение"
     },
+    "confirm_remove_all_title": {
+        "en": "⚠ Remove ALL mods?",
+        "ru": "⚠ Удалить ВСЕ моды?"
+    },
+    "confirm_remove_all_text": {
+        "en": "This will permanently delete all mod folders except DML and DMF.\n\nAre you absolutely sure?",
+        "ru": "Это безвозвратно удалит все папки модов кроме DML и DMF.\n\nВы абсолютно уверены?"
+    },
+    "confirm_remove_selected_title": {
+        "en": "⚠ Delete selected mods?",
+        "ru": "⚠ Удалить выбранные моды?"
+    },
+    "confirm_remove_selected_text": {
+        "en": "This will permanently delete mod folders.\n\nMods selected: %d.\n\nAre you sure?",
+        "ru": "Будут безвозвратно удалены папки модов.\n\nМодов выбрано: %d.\n\nВы уверены?"
+    },
     "conflict_with": {
         "en": " 💢 Conflict with ",
-        "ru": " 💢 Конфликтует с "
+        "ru": " 💢 Конфликт с "
     },
     "delete_broken": {
         "en": "Delete All Broken",
@@ -359,6 +427,10 @@
         "en": "✅ Sorting complete!",
         "ru": "✅ Сортировка завершена!"
     },
+    "download_complete": {
+        "en": "Download complete. Mod installed (inactive).",
+        "ru": "Загрузка завершена. Мод установлен (неактивен)."
+    },
     "download_failed": {
         "en": "Download failed: %v",
         "ru": "Не удалось скачать: %v"
@@ -375,6 +447,14 @@
         "en": "Download sorting files (mod database and rules)?",
         "ru": "Скачать файлы сортировки (базу модов и правила)?"
     },
+    "download_title": {
+        "en": "Downloading mod",
+        "ru": "Загрузка мода"
+    },
+    "downloading": {
+        "en": "Downloading: %s",
+        "ru": "Загрузка: %s"
+    },
     "empty_folder_message": {
         "en": "The following folders are empty:",
         "ru": "Следующие папки пусты:"
@@ -390,6 +470,14 @@
     "error_uns_archive": {
         "en": "⚠ Unsupported archive format: %s",
         "ru": "⚠ Неподдерживаемый формат архива: %s"
+    },
+    "failed_get_latest_file_id": {
+        "en": "Failed to get latest file ID: %v",
+        "ru": "Не удалось получить ID последнего файла: %v"
+    },
+    "failed_get_download_link": {
+        "en": "Failed to get download link: %v",
+        "ru": "Не удалось получить ссылку для скачивания: %v"
     },
     "filter_active": {
         "en": "✔ Active",
@@ -487,6 +575,10 @@
         "en": "Installed: %s",
         "ru": "Установлен: %s"
     },
+    "invalid_nxm_link": {
+        "en": "Invalid nxm link",
+        "ru": "Некорректная nxm-ссылка"
+    },
     "launch_error": {
         "en": "Launch error: %v",
         "ru": "Ошибка запуска: %v"
@@ -515,9 +607,13 @@
         "en": "Xbox/Game Pass version is not supported on Linux. Use Steam version.",
         "ru": "Версия Xbox/Game Pass не поддерживается на Linux. Используйте Steam-версию."
     },
+    "log_all_mods_removed": {
+        "en": "All mods have been removed.",
+        "ru": "Все моды удалены."
+    },
     "log_cannot_delete_system": {
-        "en": "Cannot delete system folder.",
-        "ru": "Невозможно удалить системную папку."
+        "en": "Unable to delete base or dmf folders.",
+        "ru": "Невозможно удалить папки base или dmf."
     },
     "log_could_not_open_log": {
         "en": "Could not open log file: %v",
@@ -529,11 +625,23 @@
     },
     "log_deleted": {
         "en": "Mod deleted: %s",
-        "ru": "Мод удалён: %s"
+        "ru": "Удалён мод: %s"
     },
     "log_drop_installed": {
         "en": "Mod installed via drop: %s",
         "ru": "Мод установлен перетаскиванием: %s"
+    },
+    "log_downloaded_file_not_found": {
+        "en": "Downloaded file not found: %v",
+        "ru": "Загруженный файл не найден: %v"
+    },
+    "log_downloaded_file_size": {
+        "en": "Downloaded file size: %.2f MB",
+        "ru": "Размер загруженного файла: %.2f МБ"
+    },
+    "log_downloading_mod": {
+        "en": "Downloading mod: %s",
+        "ru": "Скачивается мод: %s"
     },
     "log_error_drop": {
         "en": "Error getting information about the dragged object: %v",
@@ -559,9 +667,21 @@
         "en": "Folder installed: %s",
         "ru": "Папка установлена: %s"
     },
+    "log_installed_inactive": {
+        "en": "Mod installed (inactive): %s",
+        "ru": "Мод установлен (неактивен): %s"
+    },
     "log_invalid_position": {
         "en": "Invalid position",
         "ru": "Недопустимая позиция"
+    },
+    "log_invalid_nmx_link": {
+        "en": "Invalid nxm link: wrong format",
+        "ru": "Недействительная nxm-ссылка: неправильный формат"
+    },
+    "log_install_failed": {
+        "en": "Installation failed: %v",
+        "ru": "Установка не удалась: %v"
     },
     "log_list_refreshed": {
         "en": "Mod list refreshed.",
@@ -587,6 +707,14 @@
         "en": "New sorting file versions available: %s. Use menu to update.",
         "ru": "Доступны новые версии файлов сортировки: %s. Используйте меню для обновления."
     },
+    "log_nexus_api_error": {
+        "en": "Nexus API error for %s: %v",
+        "ru": "Ошибка Nexus API для %s: %v"
+    },
+    "log_nexus_version_found": {
+        "en": "Found Nexus version for %s: %s",
+        "ru": "Найдена версия на Nexus для %s: %s"
+    },
     "log_no_patcher": {
         "en": "Error: no patcher found. Install DML or autopatcher.",
         "ru": "Ошибка: патчер не найден. Установите DML или автопатчер."
@@ -610,6 +738,10 @@
     "log_order_unchanged": {
         "en": "Order unchanged.",
         "ru": "Порядок не изменялся."
+    },
+    "log_selected_mods_removed": {
+        "en": "Selected mods have been removed.",
+        "ru": "Выбранные моды удалены."
     },
     "log_start": {
         "en": "Starting diagnostics...",
@@ -635,6 +767,10 @@
         "en": "Failed to toggle patcher: %v",
         "ru": "Ошибка переключения патча: %v"
     },
+    "log_update_available": {
+        "en": "Update available for %s: %s -> %s",
+        "ru": "Доступно обновление для %s: %s -> %s"
+    },
     "log_update_check_error_db": {
         "en": "Update check error for mod_database: %v",
         "ru": "Ошибка проверки обновлений mod_database: %v"
@@ -642,6 +778,10 @@
     "log_update_check_error_mandatory": {
         "en": "Update check error for mandatory file: %v",
         "ru": "Ошибка проверки обновлений обязательного файла: %v"
+    },
+    "log_update_check_failed_for": {
+        "en": "Update check failed for %s: %v",
+        "ru": "Проверка обновления не удалась для %s: %v"
     },
     "log_update_check_frequency_set": {
         "en": "Update check frequency set to %s",
@@ -662,6 +802,10 @@
     "log_zip_only": {
         "en": "Error: please select a ZIP archive.",
         "ru": "Ошибка: выберите ZIP-архив."
+    },
+    "looking_for_latest_file": {
+        "en": "Looking for latest file of mod %d...",
+        "ru": "Поиск последнего файла мода %d..."
     },
     "malformed_found_list": {
         "en": "Malformed: %s",
@@ -715,6 +859,10 @@
         "en": "📙 Nexus Mods",
         "ru": "📙 Nexus Mods"
     },
+    "menu_nexus_api_key": {
+        "en": "🔑 Nexus API Key",
+        "ru": "🔑 Ключ API Nexus"
+    },
     "menu_periodic_check": {
         "en": "⏰ Periodic Update Check",
         "ru": "⏰ Периодическая проверка"
@@ -759,33 +907,89 @@
         "en": "Showing %d of %d (active %d)",
         "ru": "Показано %d из %d (активно %d)"
     },
+    "nexus_api_key_title": {
+        "en": "Nexus Mods API Key",
+        "ru": "Ключ API Nexus Mods"
+    },
+    "nexus_api_key_label": {
+        "en": "Enter your personal premium API key from Nexus Mods:",
+        "ru": "Введите ваш личный премиум API-ключ с Nexus Mods:"
+    },
+    "nexus_api_key_placeholder": {
+        "en": "API key...",
+        "ru": "Ключ API..."
+    },
+    "nexus_api_key_saved": {
+        "en": "Nexus API key saved.",
+        "ru": "Ключ API Nexus сохранён."
+    },
+    "nexus_api_key_missing": {
+        "en": "Nexus API key is not set.",
+        "ru": "Ключ API Nexus не задан."
+    },
+    "nexus_endorsements_label": {
+        "en": "Endorsements: %d",
+        "ru": "Рекомендаций: %d"
+    },
+    "nexus_downloads_label": {
+        "en": "Downloads: %d",
+        "ru": "Загрузок: %d"
+    },
+    "nexus_latest_version_label": {
+        "en": "Latest: %s",
+        "ru": "Последняя: %s"
+    },
+    "nexus_latest_version_unknown": {
+        "en": "Latest: ?",
+        "ru": "Последняя: ?"
+    },
+    "nexus_local_version_label": {
+        "en": "Your version: %s",
+        "ru": "Ваша версия: %s"
+    },
+    "nexus_local_version_unknown": {
+        "en": "Your version: ?",
+        "ru": "Ваша версия: ?"
+    },
+    "nexus_version_label": {
+        "en": "Version: %s",
+        "ru": "Версия: %s"
+    },
+    "nexus_version_unknown": {
+        "en": "Version unknown",
+        "ru": "Версия неизвестна"
+    },
     "no_broken_found": {
-        "en": "No broken mods found.",
-        "ru": "Сломанных модов не обнаружено."
+        "en": "✅ No broken mods found.",
+        "ru": "✅ Сломанных модов не обнаружено."
     },
     "no_dependency_issues": {
-        "en": "No dependency issues found.",
-        "ru": "Проблем с зависимостями не обнаружено."
+        "en": "✅ No dependency issues found.",
+        "ru": "✅ Проблем с зависимостями не обнаружено."
     },
     "no_empty_found": {
-        "en": "No empty mods found.",
-        "ru": "Пустых папок модов не обнаружено."
+        "en": "✅ No empty mods found.",
+        "ru": "✅ Пустых папок модов не обнаружено."
     },
     "no_incompatible_found": {
-        "en": "No incompatible mods found.",
-        "ru": "Несовместимых модов не обнаружено."
+        "en": "✅ No incompatible mods found.",
+        "ru": "✅ Несовместимых модов не обнаружено."
     },
     "no_malformed_found": {
-        "en": "No malformed mods found.",
-        "ru": "Неправильно распакованных модов не обнаружено."
+        "en": "✅ No malformed mods found.",
+        "ru": "✅ Неправильно распакованных модов не обнаружено."
+    },
+    "no_mods_selected": {
+        "en": "❌ No mods selected for removal.",
+        "ru": "❌ Не выбраны моды для удаления."
     },
     "no_obsolete_found": {
-        "en": "No obsolete mods found.",
-        "ru": "Устаревших модов не обнаружено."
+        "en": "✅ No obsolete mods found.",
+        "ru": "✅ Устаревших модов не обнаружено."
     },
     "no_updates_found": {
-        "en": "All files are up to date.",
-        "ru": "Все файлы актуальны."
+        "en": "✅ All files are up to date.",
+        "ru": "✅ Все файлы актуальны."
     },
     "note_disabled_prefix": {
         "en": "❓ Prefix (_) - disabled in the list.",
@@ -800,8 +1004,8 @@
         "ru": "❓ Резервная копия - выключено в списке."
     },
     "obsolete_found_list": {
-        "en": "Obsolete: %s",
-        "ru": "Устаревшие: %s"
+        "en": "⌛ Obsolete: %s",
+        "ru": "⌛ Устаревшие: %s"
     },
     "obsolete_message": {
         "en": "The following mods are obsolete:",
@@ -827,9 +1031,13 @@
         "en": "Order saved on exit.",
         "ru": "Порядок сохранён при выходе."
     },
+    "rate_limit_placeholder": {
+        "en": "API: ? / ?",
+        "ru": "API: ? / ?"
+    },
     "refresh_discard_changes": {
-        "en": "You have unsaved changes. Refreshing will discard them. What would you like to do?",
-        "ru": "У вас есть несохранённые изменения. При обновлении они будут потеряны. Что вы хотите сделать?"
+        "en": "You have unsaved changes.\nRefreshing will discard them.\n\nWhat would you like to do?",
+        "ru": "У вас есть несохранённые изменения.\nПри обновлении они будут потеряны.\n\nЧто вы хотите сделать?"
     },
     "search_placeholder": {
         "en": "🔍 Search...",
@@ -887,6 +1095,10 @@
         "en": "🏗 framework",
         "ru": "🏗 фрэймворк"
     },
+    "status_update_available": {
+        "en": "⬆ Update available",
+        "ru": "⬆ Доступно обновление"
+    },
     "status_vortex": {
         "en": "🌪 vortex",
         "ru": "🌪 vortex"
@@ -903,6 +1115,10 @@
         "en": "New versions of the following files are available: %s\nUpdate?",
         "ru": "Доступны новые версии файлов: %s\nОбновить?"
     },
+    "update_skipped_no_url": {
+        "en": "Update skipped: no Nexus URL or API key",
+        "ru": "Обновление пропущено: нет ссылки на Nexus или ключа API"
+    },
     "update_success": {
         "en": "Updated: %s",
         "ru": "Обновлён: %s"
@@ -910,6 +1126,14 @@
     "update_title": {
         "en": "🔄 Updates Available 🔄",
         "ru": "🔄 Доступны обновления 🔄"
+    },
+    "updates_found_count": {
+        "en": "Updates found: %d",
+        "ru": "Найдено обновлений: %d"
+    },
+    "version_check_failed": {
+        "en": "Failed to check version for %s: %v",
+        "ru": "Ошибка проверки версии для %s: %v"
     },
     "vortex_managed": {
         "en": "🌪 Managed by Vortex.",

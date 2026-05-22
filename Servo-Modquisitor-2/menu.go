@@ -57,9 +57,16 @@ func (app *App) buildMainMenu() *fyne.MainMenu {
 	dateMenu := fyne.NewMenuItem(app.messages["menu_date_format"], nil)
 	dateMenu.ChildMenu = fyne.NewMenu("", dateYYYY, dateMMDD, dateDDMM)
 
+	nexusAPIKeyItem := fyne.NewMenuItem(app.messages["menu_nexus_api_key"], func() {
+		app.showNexusAPIKeyDialog()
+	})
+
+	// Force English Mod Names
 	forceEnglishLabel := app.messages["setting_force_english_mod_names"]
 	if app.cfg.ForceEnglishModNames {
 		forceEnglishLabel = "✅ " + forceEnglishLabel
+	} else {
+		forceEnglishLabel = "❌ " + forceEnglishLabel
 	}
 	forceEnglishItem := fyne.NewMenuItem(forceEnglishLabel, func() {
 		app.cfg.ForceEnglishModNames = !app.cfg.ForceEnglishModNames
@@ -68,17 +75,13 @@ func (app *App) buildMainMenu() *fyne.MainMenu {
 		app.mainWindow.SetMainMenu(app.buildMainMenu())
 	})
 
-	settingsMenu := fyne.NewMenu(app.messages["menu_settings"],
-		langMenu, themeMenu, dateMenu, forceEnglishItem,
-	)
-
 	// ---- Меню Обновления ----
 	freqNames := map[string]string{
-		"every_start":	app.messages["freq_every_start"],
-		"weekly":		app.messages["freq_weekly"],
-		"monthly":		app.messages["freq_monthly"],
-		"yearly":		app.messages["freq_yearly"],
-		"never":		app.messages["freq_never"],
+		"every_start": app.messages["freq_every_start"],
+		"weekly":      app.messages["freq_weekly"],
+		"monthly":     app.messages["freq_monthly"],
+		"yearly":      app.messages["freq_yearly"],
+		"never":       app.messages["freq_never"],
 	}
 	freqItems := make([]*fyne.MenuItem, 0, len(freqNames))
 	for freq, name := range freqNames {
@@ -124,14 +127,16 @@ func (app *App) buildMainMenu() *fyne.MainMenu {
 	})
 	contactMenu := fyne.NewMenu(app.messages["menu_contact"], contactGitHub, contactNexus, contactDiscord, contactDiscordMy)
 
+	// Show DMLoader and DMFramework
 	showSystemLabel := app.messages["setting_show_system_mods"]
 	if app.cfg.ShowSystemMods {
 		showSystemLabel = "✅ " + showSystemLabel
+	} else {
+		showSystemLabel = "❌ " + showSystemLabel
 	}
 	showSystemItem := fyne.NewMenuItem(showSystemLabel, func() {
 		app.cfg.ShowSystemMods = !app.cfg.ShowSystemMods
 		saveConfig(app.cfg)
-		// Обновить видимость таблицы
 		if app.systemModsTableContainer != nil {
 			if app.cfg.ShowSystemMods {
 				app.systemModsTableContainer.Show()
@@ -139,11 +144,11 @@ func (app *App) buildMainMenu() *fyne.MainMenu {
 				app.systemModsTableContainer.Hide()
 			}
 		}
-		app.mainWindow.SetMainMenu(app.buildMainMenu()) // обновить галочку
+		app.mainWindow.SetMainMenu(app.buildMainMenu())
 	})
 
-	settingsMenu = fyne.NewMenu(app.messages["menu_settings"],
-		langMenu, themeMenu, dateMenu, forceEnglishItem, showSystemItem,
+	settingsMenu := fyne.NewMenu(app.messages["menu_settings"],
+		langMenu, themeMenu, dateMenu, nexusAPIKeyItem, forceEnglishItem, showSystemItem,
 	)
 
 	return fyne.NewMainMenu(settingsMenu, updatesMenu, contactMenu)
@@ -161,7 +166,7 @@ func (app *App) changeLanguage(lang string) {
 	sorter.SetSortMessages(app.messages["sort_ru_warning"], app.messages["sort_en_warning"])
 	sorter.SetLogMessages(app.messages["log_create_mlot"], app.messages["log_mlot_created"])
 
-	// проверки на nil для виджетов, которые создаются в buildUI
+	// Проверки на nil для виджетов, которые создаются в buildUI
 	if app.searchEntry != nil {
 		app.searchEntry.SetPlaceHolder(app.messages["search_placeholder"])
 	}
@@ -178,11 +183,11 @@ func (app *App) changeLanguage(lang string) {
 	}
 	app.refreshModList() // filterModList внутри имеет проверку counterLabel != nil
 
-	// текстовые метки
+	// Текстовые метки
 	if app.filterLabel != nil {
 		app.filterLabel.SetText(app.messages["filter_label"])
 	}
-	// кнопки, которые были в правой панели и теперь в верхней
+	// Кнопки, которые были в правой панели и теперь в верхней
 	if app.btnSaveOrder != nil {
 		app.btnSaveOrder.SetText(app.messages["btn_save_order"])
 	}
@@ -204,7 +209,7 @@ func (app *App) changeLanguage(lang string) {
 	if app.btnDown != nil {
 		app.btnDown.SetText(app.messages["btn_down"])
 	}
-	// новые кнопки быстрого перемещения
+	// Новые кнопки быстрого перемещения
 	if app.moveToTopBtn != nil {
 		app.moveToTopBtn.SetText(app.messages["btn_move_to_top"])
 	}
@@ -217,7 +222,7 @@ func (app *App) changeLanguage(lang string) {
 	if app.moveLabel != nil {
 		app.moveLabel.SetText(app.messages["lbl_move_to"])
 	}
-	// кнопки выделения
+	// Кнопки выделения
 	if app.selectAllBtn != nil {
 		app.selectAllBtn.SetText(app.messages["btn_select_all"])
 	}
@@ -230,14 +235,21 @@ func (app *App) changeLanguage(lang string) {
 	if app.disableSelectedBtn != nil {
 		app.disableSelectedBtn.SetText(app.messages["btn_disable_selected"])
 	}
-	// кнопки массового включения/выключения
+	// Кнопки массового включения/выключения
 	if app.enableAllBtn != nil {
 		app.enableAllBtn.SetText(app.messages["btn_enable_all_mods"])
 	}
 	if app.disableAllBtn != nil {
 		app.disableAllBtn.SetText(app.messages["btn_disable_all_mods"])
 	}
-	// кнопки запуска
+	// Кнопки удаления модов
+	if app.removeAllBtn != nil {
+		app.removeAllBtn.SetText(app.messages["btn_remove_all_mods"])
+	}
+	if app.removeSelectedBtn != nil {
+		app.removeSelectedBtn.SetText(app.messages["btn_remove_selected"])
+	}
+	// Кнопки запуска
 	app.updateLaunchButtonTexts()
 	if app.headerTable != nil {
 		app.headerTable.Refresh()
@@ -252,9 +264,9 @@ func (app *App) changeLanguage(lang string) {
 		app.logHeaderText.Refresh()
 	}
 
-	// Перерегистрируем тултипы и горячие клавиши
-		// Горячие клавиши отключены из-за нестабильной работы на Windows!
-		// app.registerShortcuts()
+	app.applyTooltip(app.removeSelectedBtn, "btn_remove_selected_tooltip")
+	app.applyTooltip(app.removeAllBtn, "btn_remove_all_tooltip")
+
 	app.reapplyTooltips()
 	app.updateDescriptionForMod(app.selectedModName)
 }
@@ -379,4 +391,6 @@ func (app *App) reapplyTooltips() {
 	app.applyTooltip(app.enableAllBtn, "btn_enable_all_tooltip")
 	app.applyTooltip(app.disableAllBtn, "btn_disable_all_tooltip")
 	app.applyTooltip(app.manageBtn, "btn_manage_mods_tooltip")
+	app.applyTooltip(app.removeAllBtn, "btn_remove_all_tooltip")
+	app.applyTooltip(app.removeSelectedBtn, "btn_remove_selected_tooltip")
 }
