@@ -258,6 +258,16 @@ func (app *App) changeLanguage(lang string) {
 	if app.manageBtn != nil {
 		app.manageBtn.SetText(app.messages["btn_manage_mods"])
 	}
+	// добавить:
+	if app.btnCheckUpdates != nil {
+		app.btnCheckUpdates.SetText(app.messages["btn_check_updates"])
+	}
+	if app.btnUpdateMod != nil {
+		app.btnUpdateMod.SetText(app.messages["btn_update_mod"])
+	}
+	if app.btnUpdateAll != nil {
+		app.btnUpdateAll.SetText(app.messages["btn_update_all"])
+	}
 
 	// Обновляем заголовок консоли
 	if app.logHeaderText != nil {
@@ -267,6 +277,9 @@ func (app *App) changeLanguage(lang string) {
 
 	app.applyTooltip(app.removeSelectedBtn, "btn_remove_selected_tooltip")
 	app.applyTooltip(app.removeAllBtn, "btn_remove_all_tooltip")
+	app.applyTooltip(app.btnCheckUpdates, "btn_check_updates_tooltip")
+	app.applyTooltip(app.btnUpdateMod, "btn_update_mod_tooltip")
+	app.applyTooltip(app.btnUpdateAll, "btn_update_all_tooltip")
 
 	app.reapplyTooltips()
 	app.updateDescriptionForMod(app.selectedModName)
