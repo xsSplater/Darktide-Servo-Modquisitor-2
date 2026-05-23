@@ -438,3 +438,8 @@ func (app *App) downloadFile(url, dest string) error {
 	}
 	return nil
 }
+
+func (app *App) isModActive(name string) bool {
+    mod := app.findModByName(name)
+    return mod != nil && mod.Active
+}

@@ -13,34 +13,37 @@ import (
 )
 
 const (
-	loadOrderFileName = "mod_load_order.txt"
-	steamGuideEnURL   = "https://steamcommunity.com/sharedfiles/filedetails/?id=2953324027"
-	steamGuideRuURL   = "https://steamcommunity.com/sharedfiles/filedetails/?id=2950374474"
+	loadOrderFileName	= "mod_load_order.txt"
+	steamGuideEnURL		= "https://steamcommunity.com/sharedfiles/filedetails/?id=2953324027"
+	steamGuideRuURL		= "https://steamcommunity.com/sharedfiles/filedetails/?id=2950374474"
 )
 
 var (
-	appendLog         func(string)
-	messages          *map[string]string
-	showChoiceDialog  func(fyne.Window, string, string, ...string) int
-	openURL           func(string)
-	modsDir           string
+	appendLog			func(string)
+	messages			*map[string]string
+	showChoiceDialog	func(fyne.Window, string, string, ...string) int
+	openURL				func(string)
+	modsDir				string
+	isModActiveFunc		func(string) bool
 
-	modDBMap        map[string]*ModDBEntry
-	externalVersion string
+	modDBMap			map[string]*ModDBEntry
+	externalVersion		string
 )
 
 func InitGlobals(
-	logger func(string),
-	msg *map[string]string,
-	dialogFunc func(fyne.Window, string, string, ...string) int,
-	urlOpener func(string),
-	modsDirPath string,
+	logger				func(string),
+	msg					*map[string]string,
+	dialogFunc			func(fyne.Window, string, string, ...string) int,
+	urlOpener			func(string),
+	modsDirPath			string,
+    isActiveFn			func(string) bool,
 ) {
-	appendLog = logger
-	messages = msg
-	showChoiceDialog = dialogFunc
-	openURL = urlOpener
-	modsDir = modsDirPath
+	appendLog 			= logger
+	messages 			= msg
+	showChoiceDialog 	= dialogFunc
+	openURL 			= urlOpener
+	modsDir 			= modsDirPath
+    isModActiveFunc		= isActiveFn
 }
 
 var currentLang string
@@ -645,19 +648,20 @@ func CheckIncompatible(window fyne.Window) bool {
 }
 
 func CheckDependencies(window fyne.Window) bool {
-	for {
-		var found *Dependency
-		for _, dep := range Dependencies {
-			if FolderExists(dep.Dependent) && !FolderExists(dep.Required) {
-				d := dep
-				found = &d
-				break
-			}
-		}
-		if found == nil {
-			appendLog((*messages)["no_dependency_issues"])
-			return true
-		}
+    for {
+        var found *Dependency
+        for _, dep := range Dependencies {
+            // зависимый мод активен, а требуемый неактивен (или отсутствует)
+            if isModActiveFunc != nil && isModActiveFunc(dep.Dependent) && !isModActiveFunc(dep.Required) {
+                d := dep
+                found = &d
+                break
+            }
+        }
+        if found == nil {
+            appendLog((*messages)["no_dependency_issues"])
+            return true
+        }
 		appendLog(fmt.Sprintf((*messages)["dependency_error_list"], found.Dependent, found.Required))
 		choice := showChoiceDialog(window, (*messages)["dependency_title"],
 			fmt.Sprintf((*messages)["dependency_desc"], found.Dependent, found.Required),

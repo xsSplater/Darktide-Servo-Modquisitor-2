@@ -16,7 +16,7 @@ import (
 
 const nexusAPIBase = "https://api.nexusmods.com/v1"
 const (
-    appName    = "Servo-Modquisitor"
+    appName    = "Servo-Modquisitor-2"
     appVersion = AppVersion   // берётся из config.go
 )
 

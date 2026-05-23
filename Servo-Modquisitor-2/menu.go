@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -328,29 +329,57 @@ func (app *App) updateSortFiles() {
 }
 
 func (app *App) checkVersion(url, localVersion string) (bool, string, error) {
-	client := &http.Client{Timeout: 10 * time.Second}
-	req, _ := http.NewRequest("GET", url, nil)
-	if token := os.Getenv("GITHUB_TOKEN"); token != "" {
-		req.Header.Set("Authorization", "token "+token)
-	}
-	resp, err := client.Do(req)
-	if err != nil {
-		return false, "", err
-	}
-	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusOK {
-		return false, "", fmt.Errorf("HTTP %d", resp.StatusCode)
-	}
-	var wrapper struct {
-		Version string `json:"version"`
-	}
-	if err := json.NewDecoder(io.LimitReader(resp.Body, 1024*1024)).Decode(&wrapper); err != nil {
-		return false, "", err
-	}
-	if wrapper.Version != localVersion {
-		return true, wrapper.Version, nil
-	}
-	return false, localVersion, nil
+    client := &http.Client{Timeout: 10 * time.Second}
+    req, _ := http.NewRequest("GET", url, nil)
+    if token := os.Getenv("GITHUB_TOKEN"); token != "" {
+        req.Header.Set("Authorization", "token "+token)
+    }
+    resp, err := client.Do(req)
+    if err != nil {
+        return false, "", err
+    }
+    defer resp.Body.Close()
+    if resp.StatusCode != http.StatusOK {
+        return false, "", fmt.Errorf("HTTP %d", resp.StatusCode)
+    }
+    var wrapper struct {
+        Version string `json:"version"`
+    }
+    if err := json.NewDecoder(io.LimitReader(resp.Body, 1024*1024)).Decode(&wrapper); err != nil {
+        return false, "", err
+    }
+    // Сравниваем версии: обновление нужно только если удалённая версия НОВЕЕ локальной
+    if compareVersions(wrapper.Version, localVersion) > 0 {
+        return true, wrapper.Version, nil
+    }
+    return false, localVersion, nil
+}
+
+func compareVersions(a, b string) int {
+    parse := func(s string) []int {
+        parts := strings.Split(s, ".")
+        nums := make([]int, len(parts))
+        for i, p := range parts {
+            nums[i], _ = strconv.Atoi(p)
+        }
+        return nums
+    }
+    va := parse(a)
+    vb := parse(b)
+    for i := 0; i < len(va) && i < len(vb); i++ {
+        if va[i] < vb[i] {
+            return -1
+        } else if va[i] > vb[i] {
+            return 1
+        }
+    }
+    // если все числа равны, но разная длина (например, "0.63" vs "0.63.0")
+    if len(va) < len(vb) {
+        return -1
+    } else if len(va) > len(vb) {
+        return 1
+    }
+    return 0
 }
 
 func (app *App) checkForUpdates() {

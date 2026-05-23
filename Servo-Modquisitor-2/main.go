@@ -82,6 +82,9 @@ func main() {
 			fyne.Do(func() { u, _ := url.Parse(link); myApp.OpenURL(u) })
 		},
 		cfg.ModsPath,
+		func(modName string) bool {
+			return application.isModActive(modName)
+		},
 	)
 
 	sorter.SetFolderExistsFunc(checks.FolderExists)

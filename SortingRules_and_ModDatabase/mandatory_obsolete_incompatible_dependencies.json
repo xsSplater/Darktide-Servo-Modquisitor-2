@@ -1,5 +1,5 @@
 {
-	"version": "0.57",
+	"version": "0.64",
 
 	"mandatory_order": [
 		"LogMeIn",
@@ -14,31 +14,47 @@
 	],
 
 	"load_order": [
+		{"mod": "crosshairs_old_remap",
+			"before": "crosshair_remap"},
+
 		{"mod": "ChatBlock",
 			"before": "guarantee_ability_activation"},
-		{"mod": "ChatBlock",
-			"before": "guarantee_weapon_swap"},
-		{"mod": "ChatBlock",
-			"before": "guarantee_special_action"},
-
 		{"mod": "MultiBind",
 			"before": "guarantee_ability_activation"},
-		{"mod": "MultiBind",
-			"before": "guarantee_weapon_swap"},
-		{"mod": "MultiBind",
+		{"mod": "Skitarius",
+			"before": "guarantee_ability_activation"},
+
+		{"mod": "ChatBlock",
 			"before": "guarantee_special_action"},
 		{"mod": "MultiBind",
-			"before": "hybrid_sprint"},
-
+			"before": "guarantee_special_action"},
+		{"mod": "Skitarius",
+			"before": "guarantee_special_action"},
 		{"mod": "ToggleAltFire",
 			"before": "guarantee_special_action"},
+		{"mod": "extended_weapon_customization",
+			"before": "guarantee_special_action"},
+
+		{"mod": "ChatBlock",
+			"before": "guarantee_weapon_swap"},
+		{"mod": "MultiBind",
+			"before": "guarantee_weapon_swap"},
+		{"mod": "Skitarius",
+			"before": "guarantee_weapon_swap"},
+
+		{"mod": "ChatBlock",
+			"before": "hybrid_sprint"},
+		{"mod": "MultiBind",
+			"before": "hybrid_sprint"},
 		{"mod": "ToggleAltFire",
 			"before": "hybrid_sprint"},
 
 		{"mod": "extended_weapon_customization_no_gun",
 			"before": "extended_weapon_customization"},
+
 		{"mod": "extended_weapon_customization",
 			"before": "for_the_drip"},
+
 		{"mod": "extended_weapon_customization",
 			"before": "enhanced_character_selection"},
 
@@ -60,12 +76,14 @@
 			"barter_with_hadron",
 			"book_finder",
 			"bugfix_loc_markers",
+			"CaptainShield",
 			"CharWallets",
 		"chest_markers",
 		"CircumstanceFix",
 		"CombatEvolved",
 		"consistent_flamer_backpacks",
 			"contracts_overlay",
+			"crosshairs_old_remap",
 		"CThruShields",
 			"CustomResolutions",
 			"DarkCache",
@@ -76,8 +94,10 @@
 			"Height Changer",
 		"heretical_idol_marker",
 			"IgnorePsykerGrenades",
+			"InventoryInspect",
 			"Jukebox",
 			"LocalizationFixForKOAllinone",
+			"LessAnnoyingFx",
 		"material_markers",
 			"minimap",
 			"ModificationIconColor",
@@ -93,7 +113,7 @@
 			"PreferAuric",
 			"PsykaniumDefaultDifficulty",
 			"PsykaniumInvHotkey",
-		"PsykerCriticalPerilQuiet",
+			"PsykerCriticalPerilQuiet",
 		"RejectInvitesWhileInMission",
 			"reroll_until_rarity",
 		"RestoreRagdollInteraction",
@@ -106,19 +126,20 @@
 			"SpectatorHUD",
 		"stimm_markers",
 			"stuff_searcher",
+			"SuperFlashlight",
 		"TaintedDevices_markers",
 		"tome_markers",
 		"TransparentShield",
 			"TruePeril",
 			"ViewModelTweaker",
-		"weapon_customization",
-		"weapon_customization_chains",
-		"weapon_customization_mt_stuff",
-		"weapon_customization_no_scope",
-		"weapon_customization_owo",
-		"weapon_customization_plugin",
-		"weapon_customization_plugin_xsSythes",
-		"weapon_customization_syn_edits",
+			"weapon_customization",
+			"weapon_customization_chains",
+			"weapon_customization_mt_stuff",
+			"weapon_customization_no_scope",
+			"weapon_customization_owo",
+			"weapon_customization_plugin",
+			"weapon_customization_plugin_xsSythes",
+			"weapon_customization_syn_edits",
 			"which_book",
 			"WhichMissions",
 
@@ -144,6 +165,24 @@
 	],
 
 	"incompatible_pairs": [
+		{"mod1": "ZipIt",
+			"mod2": "no_chitchat",
+				"desc": {
+					"en": "Zip It includes functionality of No ChitChat.",
+					"ru": "Zip It уже включает возможности No ChitChat."	} },
+
+		{"mod1": "hybrid_sprint",
+			"mod2": "StickySprint",
+				"desc": {
+					"en": "Hybrid Sprint includes functionality of Sticky Sprint.",
+					"ru": "Hybrid Sprint уже включает возможности Sticky Sprint."	} },
+
+		{"mod1": "MenuUIHider",
+			"mod2": "InventoryHider",
+				"desc": {
+					"en": "Menu UI Hider includes functionality of Inventory Hider.",
+					"ru": "Menu UI Hider уже включает возможности Inventory Hider."	} },
+
 		{"mod1": "ReorderChars",
 			"mod2": "CharacterMenuReorder",
 				"desc": {
@@ -249,6 +288,14 @@
 	],
 
 	"dependencies": [
+		{"dependent": "crosshairs_old_remap",
+			"required": "crosshairs_fix",
+				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/36"},
+
+		{"dependent": "penances_improved",
+			"required": "Archivum Messelina",
+				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/355"},
+
 		{"dependent": "outline_colours",
 			"required": "PlayerOutlines",
 				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/734"},
@@ -269,13 +316,31 @@
 		{"dependent": "Clang",
 			"required": "Audio",
 				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/196"},
+		{"dependent": "DraculaHost",
+			"required": "Audio",
+				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/196"},
 		{"dependent": "EnemyAudioReplacer",
 			"required": "Audio",
 				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/196"},
 		{"dependent": "HeKnew",
 			"required": "Audio",
 				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/196"},
+		{"dependent": "IMGONNAPUKE",
+			"required": "Audio",
+				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/196"},
 		{"dependent": "LeeroyJenkins",
+			"required": "Audio",
+				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/196"},
+		{"dependent": "LMS-AudioTool",
+			"required": "Audio",
+				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/196"},
+		{"dependent": "OgrynFart",
+			"required": "Audio",
+				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/196"},
+		{"dependent": "pox_hound_audio_replacer",
+			"required": "Audio",
+				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/196"},
+		{"dependent": "PsykerAneurysm",
 			"required": "Audio",
 				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/196"},
 		{"dependent": "Rock",
@@ -361,6 +426,10 @@
 
 		{"dependent": "visible_equipment_uwu",
 			"required": "visible_equipment",
-				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/852"}
+				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/852"},
+
+		{"dependent": "weapon_cosmetics_view_improved",
+			"required": "master_item_community_patch",
+				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/409"}
 	]
 }

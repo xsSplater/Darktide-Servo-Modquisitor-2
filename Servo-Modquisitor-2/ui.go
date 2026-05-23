@@ -289,9 +289,9 @@ func (app *App) buildUI() {
 	}
 
 	moveToGroup := container.NewHBox(app.moveLabel, app.moveToEntry)
-	navigationGroup := container.NewHBox(app.btnUp, app.btnDown, app.moveToTopBtn, app.moveToBottomBtn)
+	navigationGroup := container.NewHBox(app.btnUp, app.btnDown, app.moveToTopBtn, app.moveToBottomBtn, app.removeSelectedBtn, app.removeAllBtn)
 	selectGroup := container.NewHBox(app.selectAllBtn, app.deselectAllBtn, app.enableSelectedBtn, app.disableSelectedBtn)
-	allModsGroup := container.NewHBox(app.enableAllBtn, app.disableAllBtn, app.removeSelectedBtn, app.removeAllBtn)
+	allModsGroup := container.NewHBox(app.enableAllBtn, app.disableAllBtn)
 
 	row1 := container.NewHBox(moveToGroup, navigationGroup)
 	row2 := container.NewHBox(selectGroup, allModsGroup)
@@ -824,9 +824,12 @@ func (app *App) buildUI() {
 		}
 		app.updateModFromNexus(mod)
 	})
+	app.applyTooltip(app.btnUpdateMod, "btn_update_mod_tooltip")
+
 	app.btnUpdateAll = NewCustomButton(app.messages["btn_update_all"], func() {
 		app.updateAllModsFromNexus()
 	})
+	app.applyTooltip(app.btnUpdateAll, "btn_update_all_tooltip")
 
 	app.btnCheckUpdates = NewCustomButton(app.messages["btn_check_updates"], func() {
 		go app.checkNexusUpdates()

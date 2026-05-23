@@ -847,31 +847,38 @@ func (app *App) installDMLFromArchive(archivePath string) error {
 
 // Рекурсивное копирование файлов/папок с заменой
 func copyPath(src, dst string) error {
-	srcInfo, err := os.Stat(src)
-	if err != nil {
-		return err
-	}
-	if srcInfo.IsDir() {
-		return filepath.Walk(src, func(path string, info os.FileInfo, err error) error {
-			if err != nil {
-				return err
-			}
-			relPath, _ := filepath.Rel(src, path)
-			targetPath := filepath.Join(dst, relPath)
-			if info.IsDir() {
-				return os.MkdirAll(targetPath, 0755)
-			}
-			data, err := os.ReadFile(path)
-			if err != nil {
-				return err
-			}
-			return os.WriteFile(targetPath, data, 0644)
-		})
-	}
-	// Одиночный файл
-	data, err := os.ReadFile(src)
-	if err != nil {
-		return err
-	}
-	return os.WriteFile(dst, data, 0644)
+    srcInfo, err := os.Stat(src)
+    if err != nil {
+        return err
+    }
+    if srcInfo.IsDir() {
+        return filepath.Walk(src, func(path string, info os.FileInfo, err error) error {
+            if err != nil {
+                return err
+            }
+            relPath, _ := filepath.Rel(src, path)
+            targetPath := filepath.Join(dst, relPath)
+            if info.IsDir() {
+                return os.MkdirAll(targetPath, 0755)
+            }
+            // Перед записью файла убедимся, что папка существует
+            if err := os.MkdirAll(filepath.Dir(targetPath), 0755); err != nil {
+                return err
+            }
+            data, err := os.ReadFile(path)
+            if err != nil {
+                return err
+            }
+            return os.WriteFile(targetPath, data, 0644)
+        })
+    }
+    // Одиночный файл - создаём папку для него
+    if err := os.MkdirAll(filepath.Dir(dst), 0755); err != nil {
+        return err
+    }
+    data, err := os.ReadFile(src)
+    if err != nil {
+        return err
+    }
+    return os.WriteFile(dst, data, 0644)
 }

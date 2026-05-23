@@ -7,7 +7,7 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-const AppVersion = "0.9.5"
+const AppVersion = "0.9.6"
 
 // ────────────────────────── ОКНО ──────────────────────────
 const (
@@ -88,7 +88,7 @@ const LogTimeFormat = "15:04:05"
 
 // ────────────────────────── ЗАДЕРЖКИ ──────────────────────────
 const (
-	TooltipHideDelay    = 2 * time.Second
+	TooltipHideDelay    = 10 * time.Second
 	WindowMaximizeDelay = 200 * time.Millisecond
 	BlinkOnDuration     = 600 * time.Millisecond
 	BlinkOffDuration    = 1000 * time.Millisecond

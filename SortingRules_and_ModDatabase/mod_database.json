@@ -1,5 +1,5 @@
 {
-	"version": "0.62",
+	"version": "0.64",
 	"mod_database": [
 		{
 			"folder": "pickup_spawner",
@@ -3190,10 +3190,7 @@
 			"author": "devidkwhoami",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/250",
 			"github_url": "https://github.com/IDK-WHO-AM-I/darktide_no_chitchat",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
+			"note": { "en": "", "ru": "" }
 		},
 		{
 			"folder": "DifficultyColor",
@@ -3727,7 +3724,10 @@
 			"author": "gpk",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/293",
 			"github_url": "",
-			"note": { "en": "", "ru": "" }
+			"note": {
+				"en": "Hasn't been updated in a while. May cause crashes.",
+				"ru": "Давно не обновляется. Может вызывать вылеты."
+			}
 		},
 		{
 			"folder": "Hardtide",
@@ -3910,6 +3910,1353 @@
 			"note": {
 				"en": "Required: What the Localization.",
 				"ru": "Требуется: What the Localization."
+			}
+		},
+		{
+			"folder": "modding_tools",
+			"name": {
+				"en": "Modding Tools",
+				"ru": "Инструменты для модификации"
+			},
+			"description": {
+				"en": "This mod is primarily intended for modders.",
+				"ru": "Modding Tools - Этот мод предназначен в первую очередь для моддеров."
+			},
+			"author": "Grasmann",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/312",
+			"github_url": "https://github.com/grasmann/darktide-mods/tree/main/modding_tools",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "InventoryHider",
+			"name": {
+				"en": "Inventory Hider",
+				"ru": "Скрыватель интерфейса инвентаря"
+			},
+			"description": {
+				"en": "Hides all the clutter on your inventory screen at the press of a keybind.",
+				"ru": "Inventory Hider - Скрывает всё лишнее на экране инвентаря одним нажатием клавиши."
+			},
+			"author": "Smiggy",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/313",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "RecolorBossHealthBars",
+			"name": {
+				"en": "Recolor Boss Health Bars",
+				"ru": "Цвет полосок здоровья боссов",
+				"zh-hans": "Boss血条上色",
+				"zh-hant": "重繪Boss血條"
+			},
+			"description": {
+				"en": "Show more than two boss health bars at once, and change the color of boss health bars to differentiate different boss units / weakened monsters.",
+				"ru": "Recolor Boss Health Bars - Показывает одновременно более двух полосок здоровья боссов. Цвет полосок здоровья боссов меняется, чтобы различать разных боссов/ослабленных чудовищ.",
+				"zh-hans": "重新给特定敌人的血条上色，并允许在屏幕上同时显示更多Boss血条",
+				"zh-hant": "重新染色敵人的血條，並允許螢幕上顯示更多的Boss血條"
+			},
+			"author": "Lunomica",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/314",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "LMS-AudioTool",
+			"name": {
+				"en": "Last Man Standing",
+				"ru": "Последний выживший"
+			},
+			"description": {
+				"en": "Last Man Standing Audio Replacement Utility",
+				"ru": "Last Man Standing Audio Replacement Utility - Последний выживший - утилита для замены звука"
+			},
+			"author": "Smiggy",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/315",
+			"github_url": "",
+			"note": {
+				"en": "THIS IS A DEPENDENCY FOR OTHER MODS! IT WILL NOT WORK ON ITS OWN!!!",
+				"ru": "ЭТО ЗАВИСИМОСТЬ ДЛЯ ДРУГИХ МОДОВ! САМОСТОЯТЕЛЬНО РАБОТАТЬ НЕ БУДЕТ!!!"
+			}
+		},
+		{
+			"folder": "show-current-penance-stat",
+			"name": {
+				"en": "Show current penance stats",
+				"ru": "Истинные значения искуплений"
+			},
+			"description": {
+				"en": "Show the current stats for penances that can reset, instead of the highest record.",
+				"ru": "Show current penance stats - Вместо наивысшего результата, показывает текущую статистику для Искуплений, которые должны сбрасываться, если вы их не выполнили."
+			},
+			"author": "PixelHyde",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/316",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "Murmur Hashdt",
+			"name": {
+				"en": "Murmur Hashdt",
+				"ru": "Murmur Hashdt"
+			},
+			"description": {
+				"en": "This Mod allows the convertion of strings to murmur hashes as they are used by the game, and the convertion from a hash to an inverted hash that when hashed again results in the same hash for further use in other mods.",
+				"ru": "Murmur Hashdt - Этот мод позволяет преобразовывать строки в хеши Murmur, используемые игрой, а также преобразовывать хеш в инвертированный хеш, который при повторном хешировании дает тот же хеш для дальнейшего использования в других модах."
+			},
+			"author": "Janoti",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/317",
+			"github_url": "https://github.com/Janoti1/Darktide-Mods/tree/main/Murmur%20Hashdt",
+			"note": {
+				"en": "This is a mod for other modders.",
+				"ru": "Это модификация для других моддеров."
+			}
+		},
+		{
+			"folder": "SuperImpact",
+			"name": {
+				"en": "Super Impact",
+				"ru": "Супер удар"
+			},
+			"description": {
+				"en": "Send heretics flying with this simple mod!",
+				"ru": "Super Impact - С этим простым модом вы сможете отправить еретиков в полёт!"
+			},
+			"author": "Sephirothphoenix",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/319",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "PenancesForTheMission",
+			"name": {
+				"en": "Penances for the Mission",
+				"ru": "Искупления для миссий",
+				"zh-hans": "显示任务苦修"
+			},
+			"description": {
+				"en": "Displays available penances for the selected mission in the Mission Terminal.",
+				"ru": "Penances for the Mission - Показывает доступные Искупления для выбранной миссии в терминале миссии.",
+				"zh-hans": "在任务终端内，显示所选任务的可用苦修。",
+				"ja": "ミッションターミナルにおいて、選択したミッションで獲得可能な苦行を表示します。"
+			},
+			"author": "Zombine",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/320",
+			"github_url": "https://github.com/zombine04/darktide-mods/tree/main/PenancesForTheMission",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "Crosshair Confirmation",
+			"name": {
+				"en": "Crosshair Confirmation",
+				"ru": "Подтверждение на прицеле"
+			},
+			"description": {
+				"en": "Will briefly show a specifically coloured/sized/shaped crosshair on a confirmed kill of a special/elite/monster by you.\n\nIf you had issues with the crosshairs not showing up or showing a placeholder texture, there is now an optional dependency on Darktide Local Server. If you run this mod as well, it will pull the textures from the local server rather than the internet.",
+				"ru": "Crosshair Confirmation - При подтверждённом вами убийстве специалиста/элитного врага/чудовища будет кратко показан прицел определённого цвета/размера/формы.\n\nЕсли у вас были проблемы с отображением прицела или использованием текстуры-заглушки, теперь есть дополнительная зависимость от Darktide Local Server. Если вы запустите его, текстуры будут загружаться с локального сервера, а не из интернета."
+			},
+			"author": "Wobin",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/321",
+			"github_url": "https://github.com/Wobin/CrosshairConfirmation",
+			"note": {
+				"en": "As it relies on the combat feed, this will only work in missions. This will not work in the Psykhanium.",
+				"ru": "Поскольку мод зависит от боевой ленты, он будет работать только в миссиях. В Псайканиуме он работать не будет."
+			}
+		},
+		{
+			"folder": "AlternateGrenadeIcons",
+			"name": {
+				"en": "Alternate Grenade Icons",
+				"ru": "Альтернативные значки гранат"
+			},
+			"description": {
+				"en": "Change the grenade icon for your teammates in your HUD to reflect what blitz they are using - by default:\nthe base grenade icon for blitzes that use grenade pickups,\na lightning bolt for blitzes that don't, but have charges,\nand no icon for blitzes that don't have charges.",
+				"ru": "Alternate Grenade Icons - Меняет значок гранаты для ваших товарищей по команде в интерфейсе, чтобы он соответствовал используемому ими блицу по умолчанию:\nбазовый значок гранаты для блицов, использующих гранаты,\nзначок молнии для блицов, которые их не используют, но имеют заряды,\nи отсутствие значка для блицов без зарядов."
+			},
+			"author": "Lunomica",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/322",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "OgrynFart",
+			"name": {
+				"en": "Ogryn Fart",
+				"ru": "Огринский пердёж"
+			},
+			"description": {
+				"en": "Plays a reverb fart sound when the Ogryn uses his Taunt ability. If an Ogryn other than you uses this ability, you can hear it as well.",
+				"ru": "Ogryn Fart - При использовании способности «провокация» огрином воспроизводится звук, похожий на пердеж, с эффектом эха. Если эту способность использует другой огрин, помимо вас, вы тоже сможете услышать этот звук."
+			},
+			"author": "Dattebayo681",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/323",
+			"github_url": "",
+			"note": {
+				"en": "Requred: Audio plugin.",
+				"ru": "Требуется: Audio plugin."
+			}
+		},
+		{
+			"folder": "PsykerAneurysm",
+			"name": {
+				"en": "Psyker Aneurysm",
+				"ru": "Аневризма псайкера"
+			},
+			"description": {
+				"en": "Plays the brain fart aneurysm sound when the Psyker begins to go into Perils of the Warp at 100% and explodes, seperated into two sections: When the Perils starts and when you blow up.",
+				"ru": "Psyker Aneurysm - Воспроизводит звук «brain fart aneurysm», когда псайкер начинает погружаться в «Опасности варпа» при 100% опасности и взрывается. Разделён на две части: начало действия «Опасностей» и взрыв."
+			},
+			"author": "Dattebayo681",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/324",
+			"github_url": "",
+			"note": {
+				"en": "Requred: Audio plugin.",
+				"ru": "Требуется: Audio plugin."
+			}
+		},
+		{
+			"folder": "MarvCrit",
+			"name": {
+				"en": "Marv Crits",
+				"ru": "Криты Марва"
+			},
+			"description": {
+				"en": "Plays Marv's screams from Home Alone 2 when he was electrocuted whenever the Psyker achieve's a critical hit using the Surge Staff or the Smite blitz power. Inspired by MandaloreGaming's best running skit.",
+				"ru": "Marv Crits - Воспроизводит крики Марва из фильма «Один дома 2», когда его ударило током, всякий раз, когда псайкер наносит критический удар, используя Посох Взрыва или блиц «Сокрушение»."
+			},
+			"author": "Dattebayo681",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/325",
+			"github_url": "",
+			"note": {
+				"en": "Requred: Audio plugin.",
+				"ru": "Требуется: Audio plugin."
+			}
+		},
+		{
+			"folder": "CaptainShield",
+			"name": {
+				"en": "Captain's Shield",
+				"ru": "Щит капитана"
+			},
+			"description": {
+				"en": "Imitates the Renegade Captain's toughness shield, with visual and sound effects!",
+				"ru": "Captain's Shield - Имитирует защитный щит капитана-отступника с визуальными и звуковыми эффектами!"
+			},
+			"author": "Sephirothphoenix",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/326",
+			"github_url": "",
+			"note": {
+				"en": "Hasn't been updated in a while. May cause crashes.",
+				"ru": "Давно не обновляется. Может вызывать вылеты."
+			}
+		},
+		{
+			"folder": "InventoryInspect",
+			"name": {
+				"en": "Inventory Inspect",
+				"ru": "Осмотр инвентаря"
+			},
+			"description": {
+				"en": "Inventory Inspect - LUA errors FIX and Players Widget Restoration - Conveniently inspect your party members from the inventory screen.\nMake sure you have installed the fix if the mod doesn't work.\nThe link on the Nexus page leads to the fix.",
+				"ru": "Inventory Inspect - исправление ошибок LUA и восстановление виджета игроков — Удобный осмотр членов вашей группы прямо с экрана инвентаря.\nУбедитесь, что вы установили фикс, если мод не работает.\nСсылка на страницу Nexus ведёт именно на фикс."
+			},
+			"author": "Illidra and MalkyCZE",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/587",
+			"github_url": "",
+			"note": {
+				"en": "Hasn't been updated in a while. May cause crashes.",
+				"ru": "Давно не обновляется. Может вызывать вылеты."
+			}
+		},
+		{
+			"folder": "ZipIt",
+			"name": {
+				"en": "Zip It",
+				"ru": "Заткнись"
+			},
+			"description": {
+				"en": "Want some peace and quiet? Varlet chatter giving you a headache?\nTurn off dialog so you can enjoy the a m b i e n c e.",
+				"ru": "Zip It - Хотите тишины и покоя? Болтовня доводит вас до головной боли?\nОтключите диалоги, чтобы насладиться атмосферой."
+			},
+			"author": "Sephirothphoenix",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/328",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "PauseVision",
+			"name": {
+				"en": "Pause Vision",
+				"ru": "Видимость при паузе"
+			},
+			"description": {
+				"en": "Makes the pause & options menu more transparent. letting you see the action while you adjust your settings mid-combat!",
+				"ru": "Pause Vision - Делает меню паузы и настроек более прозрачным, позволяя вам видеть происходящее, пока вы что-то настраиваете прямо во время боя!"
+			},
+			"author": "Sephirothphoenix",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/329",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "Mutetants",
+			"name": {
+				"en": "Mutetants",
+				"ru": "Заткни мутантов"
+			},
+			"description": {
+				"en": "Tired of constant yelling from mutants? Are their screams giving you a headache?\nThis mod is for you!",
+				"ru": "Mutetants - Устали от постоянных криков мутантов? Их вопли вызывают у вас головную боль?\nЭтот мод для вас!"
+			},
+			"author": "Sephirothphoenix",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/330",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "guarantee_weapon_swap",
+			"name": {
+				"en": "Guarantee Weapon Swap",
+				"ru": "Гарантированная смена оружия",
+				"zh-hans": "保证武器切换",
+				"zh-hant": "保證武器切換"
+			},
+			"description": {
+				"en": "Guarantee weapon swapping when player try to swap weapon in middle of certain animations.",
+				"ru": "Guarantee Weapon Swap - Гарантированная смена оружия, когда игрок пытается сменить оружие в середине анимации.",
+				"zh-hans": "确保玩家在动画中途能成功切换武器",
+				"zh-hant": "確保玩家在動畫中能夠切換武器"
+			},
+			"author": "KamiUnitY",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/331",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "QuickKick",
+			"name": {
+				"en": "Quick Kick",
+				"ru": "Быстрое исключение игрока"
+			},
+			"description": {
+				"en": "Provides a new UI to quickly initiate a kick vote.",
+				"ru": "Quick Kick - Предоставляет новый пользовательский интерфейс для быстрого инициирования голосования за исключение игрока."
+			},
+			"author": "Zombine",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/332",
+			"github_url": "https://github.com/zombine04/darktide-mods/tree/main/QuickKick",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "PsykerCriticalPerilQuiet",
+			"name": {
+				"en": "Quieter Psyker Critical Peril",
+				"ru": "Quieter Psyker Critical Peril"
+			},
+			"description": {
+				"en": "OBSOLETE!",
+				"ru": "УСТАРЕЛ!"
+			},
+			"author": "OrangeKing64",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/333",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "crosshairs_old_remap",
+			"name": {
+				"en": "Legacy Crosshairs",
+				"ru": "Прицелы наследия"
+			},
+			"description": {
+				"en": "OBSOLETE!",
+				"ru": "УСТАРЕЛ!"
+			},
+			"author": "Skwuruhl",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/334",
+			"github_url": "https://github.com/Skwuruhl/darktide-old-crosshairs",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "DraculaHost",
+			"name": {
+				"en": "Draculahost",
+				"ru": "Дракулахост"
+			},
+			"description": {
+				"en": "Replaces all of the Demonhost's voicelines with over 46 unique Dracula Flow voicelines, with more to be added later. Takes into account how far you are from the Daemonhost and its direction in terms of audio volume and position in your headset.",
+				"ru": "Draculahost - Заменяет все голосовые реплики демонхоста более чем 46 уникальными репликами из Dracula Flow, и в дальнейшем будут добавлены новые. Учитывает расстояние до демонхоста и его направление с точки зрения громкости звука и положения в гарнитуре."
+			},
+			"author": "Dattebayo681",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/335",
+			"github_url": "",
+			"note": {
+				"en": "Requred: Audio plugin.",
+				"ru": "Требуется: Audio plugin."
+			}
+		},
+		{
+			"folder": "guarantee_ability_activation",
+			"name": {
+				"en": "Guarantee Ability Activation",
+				"ru": "Гарантированная активация способности",
+				"zh-hans": "保证技能激活",
+				"zh-hant": "保證技能啟用"
+			},
+			"description": {
+				"en": "Guarantee combat ability activation when player try to activate them in middle of certain animations.",
+				"ru": "Guarantee Ability Activation - Гарантированная активация боевой способности, когда игрок пытается активировать её в середине анимации.",
+				"zh-hans": "确保玩家在动画中途能成功激活主动技能",
+				"zh-hant": "確保玩家在動畫中途能成功啟用主動技能"
+			},
+			"author": "KamiUnitY",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/336",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "MultiBind",
+			"name": {
+				"en": "MultiBind",
+				"ru": "Привязка нескольких клавиш",
+				"zh-hans": "多重绑定",
+				"de": "Mehrfachbindung",
+				"fr": "Multi-Liaison"
+			},
+			"description": {
+				"en": "An extra keybindings page to allow for multiple keybindings for a single action.\nAlso allows unbinding of default keybindings by binding with [DELETE].",
+				"ru": "Multi-Bind - Дополнительная страница назначения горячих клавиш, позволяющая назначать несколько клавиш для одного действия.\nТакже позволяет отменить привязку клавиш по умолчанию, нажатием кнопки [DELETE].",
+				"zh-hans": "一个额外的按键绑定页面，允许单个操作设置多个按键绑定。\n还可以通过按[DELETE]解除默认按键绑定。",
+				"de": "Eine zusätzliche Tastenzuweisungsseite, die mehrere Tastenzuweisungen für eine einzelne Aktion ermöglicht.\nErmöglicht auch das Aufheben von Standard-Tastenzuweisungen durch Binden mit [DELETE].",
+				"fr": "Une page de raccourcis supplémentaires permettant de définir plusieurs raccourcis pour une seule action.\nPermet également de désactiver les raccourcis par défaut en les remplaçant par [DELETE]."
+			},
+			"author": "Sephirothphoenix",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/337",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "BioPage",
+			"name": {
+				"en": "Bio Page",
+				"ru": "Страница биографии",
+				"zh-hans": "个人传记"
+			},
+			"description": {
+				"en": "Adds a Biography page for you and other players.",
+				"ru": "BioPage - Добавляет страницу биографии для вас и других игроков.",
+				"zh-hans": "为您和其他玩家添加一个传记页面，用于说明该玩家选择的出生背景故事"
+			},
+			"author": "ItsAlxl",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/341",
+			"github_url": "https://github.com/ItsAlxl/darktide-mods/tree/main/BioPage",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "hybrid_sprint",
+			"name": {
+				"en": "Hybrid Sprint",
+				"ru": "Гибридный бег",
+				"zh-hans": "混合式疾跑",
+				"zh-hant": "混合式衝刺"
+			},
+			"description": {
+				"en": "Provide better sprinting experience by combining Toggle and Hold sprinting mechanic together. Sprint can be canceled by releasing forward key and pressing weapon action.",
+				"ru": "Hybrid Sprint - Предлагает улучшенное управление бегом, объединяя механики бега «Переключить» и «Удерживать». Бег можно отменить, отпустив клавишу «Вперёд» и нажав любую кнопку действия оружия.",
+				"zh-hans": "结合切换疾跑和长按疾跑机制，提供体验更好的混合式疾跑。松开前进键和按下武器操作可以打断疾跑。",
+				"zh-hant": "透過結合「切換衝刺」與「長按衝刺」機制，提供更佳的衝刺體驗。鬆開前進鍵並按下武器操作即可取消衝刺。"
+			},
+			"author": "KamiUnitY",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/342",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "how_did_I_get_that",
+			"name": {
+				"en": "How Did I Get That?",
+				"ru": "Как я это получил?"
+			},
+			"description": {
+				"en": "See details on how to obtain all cosmetics, including penance rewards, commissary items and Hestia's blessing rewards.",
+				"ru": "How Did I Get That? - Показывает подробности о том, как получить все косметические предметы, включая награды за искупления, предметы из магазина и награды за благословения Гестии.",
+				"ko": "화장품 잠금 해제 세부정보 표시"
+			},
+			"author": "Alfthebigheaded",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/344",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "immersive_evasion",
+			"name": {
+				"en": "Immersive Evasion",
+				"ru": "Иммерсивное уклонение"
+			},
+			"description": {
+				"en": "Makes dodge and slide tilt the camera for immersive evasion experience.",
+				"ru": "Immersive Evasion - При уклонении и скольжении камера наклоняется, обеспечивая захватывающий опыт уклонения."
+			},
+			"author": "KamiUnitY",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/345",
+			"github_url": "",
+			"note": {
+				"en": "Not suitable for players who easily experience motion sickness!",
+				"ru": "Не подходит для игроков, страдающих от укачивания!"
+			}
+		},
+		{
+			"folder": "weapon_cosmetics_view_improved",
+			"name": {
+				"en": "Weapon Cosmetics View Improved",
+				"ru": "Улучшенный осмотр косметических элементов оружия",
+				"zh-hans": "武器装饰品视图改进"
+			},
+			"description": {
+				"en": "See locked skins & trinkets, all commodore's vestures items, data mined items and wishlisting and more, to improve the weapon cosmetics screen.",
+				"ru": "Weapon Cosmetics View Improved - Позволяет просматривать заблокированные косметические элементы оружия, такие как скины и безделушки (включая премиум-предметы), точно так же, как и на экране осмотра косметических вещей персонажа.",
+				"zh-hans": "使你可以像角色装饰品页面一样预览全部的皮肤和饰品。"
+			},
+			"author": "Alfthebigheaded",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/346",
+			"github_url": "",
+			"note": {
+				"en": "Required: MasterItems Community Patch.",
+				"ru": "Требуется: MasterItems Community Patch."
+			}
+		},
+		{
+			"folder": "character_cosmetics_view_improved",
+			"name": {
+				"en": "Character Cosmetics View Improved",
+				"ru": "Улучшенный осмотр косметических предметов",
+				"zh-hans": "角色装饰品视图改进"
+			},
+			"description": {
+				"en": "See all Commodore's Vestures items, data mined items, wishlisting and more, to improve the character cosmetics screen.",
+				"ru": "Character Cosmetics View Improved - Отображает все премиумные-косметические предметы, доступные в магазине «Одеяние от Командора», на экране косметических предметов персонажа.",
+				"zh-hans": "在角色装饰品画面中显示全部可通过「准将的服装」可获取的物品，并提供预览功能；当该物品在商店售卖时，你可以直接跳转到商店页；以及更多功能！"
+			},
+			"author": "Alfthebigheaded",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/347",
+			"github_url": "",
+			"note": {
+				"en": "Required: MasterItems Community Patch.",
+				"ru": "Требуется: MasterItems Community Patch."
+			}
+		},
+		{
+			"folder": "commodores_vestures_improved",
+			"name": {
+				"en": "Commodore's Vestures Improved",
+				"ru": "Улучшенные «Одеяния от Командора»",
+				"zh-hans": "准将的服装改进"
+			},
+			"description": {
+				"en": "Preview bundles, show items directly on any character and more, to improve the commodore's vestures screen.",
+				"ru": "Commodore's Vestures Improved - Добавляет ряд полезных функций в премиум-магазин «Одеяние от Командора». В том числе позволяет вам предварительно просматривать наборы и отображать предметы прямо на ваших персонажах, без необходимости повторно входить в магазин нужным классом.",
+				"zh-hans": "为「准将的服装」提供一系列QOL（生活质量）功能。包含预览同捆包及直接在角色身上展示物品，且无须以正确的职业重新进入商店。"
+			},
+			"author": "Alfthebigheaded",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/348",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "IMGONNAPUKE",
+			"name": {
+				"en": "IMGONNAPUKE",
+				"ru": "Меня сейчас вырвет"
+			},
+			"description": {
+				"en": "This mod adds sound clips that trigger when the beast of nurgle vomits.",
+				"ru": "IMGONNAPUKE - Этот мод добавляет звуковые фрагменты, которые срабатывают, когда чудовище Нургла извергает рвоту."
+			},
+			"author": "tickbox",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/349",
+			"github_url": "",
+			"note": {
+				"en": "Requred: Audio plugin.",
+				"ru": "Требуется: Audio plugin."
+			}
+		},
+		{
+			"folder": "pox_hound_audio_replacer",
+			"name": {
+				"en": "Poxhound Minecraft Sound Replacer",
+				"ru": "Чумные гончие: звуки из Minecraft"
+			},
+			"description": {
+				"en": "Replaces the sounds of the pox hounds with less aggressive Minecraft wolf sounds.",
+				"ru": "Poxhound Minecraft Sound Replacer - Заменяет звуки, издаваемые чумными гончими, на менее агрессивные звуки волков из Minecraft."
+			},
+			"author": "Alfthebigheaded",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/350",
+			"github_url": "",
+			"note": {
+				"en": "Requred: Audio plugin.",
+				"ru": "Требуется: Audio plugin."
+			}
+		},
+		{
+			"folder": "guarantee_special_action",
+			"name": {
+				"en": "Guarantee Special Action",
+				"ru": "Гарантированная активация специального действия",
+				"zh-hans": "保证特殊动作",
+				"zh-hant": "保證特殊動作"
+			},
+			"description": {
+				"en": "Guarantee special action and reload action when the player try to perform them in the middle of certain animations.",
+				"ru": "Guarantee Special Action - Гарантированное выполнение специального действия и перезарядки, когда игрок пытается выполнить их во время определённых анимаций.",
+				"zh-hans": "格挡取消特殊动作",
+				"zh-hant": "格擋取消特殊動作"
+			},
+			"author": "KamiUnitY",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/351",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "ScanHelper",
+			"name": {
+				"en": "Scan Helper",
+				"ru": "Помощник сканирования"
+			},
+			"description": {
+				"en": "Add a conspicuous mark to the object to be scanned.",
+				"ru": "ScanHelper - Добавляет заметную метку на сканируемый объект.",
+				"zh-hans": "给需要扫描的物体加个显眼的标记",
+				"zh-hant": "在待掃描物件上加入醒目的標記"
+			},
+			"author": "yinhaox",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/352",
+			"github_url": "",
+			"note": {
+				"en": "Fix in the comments on the Nexus Mods.",
+				"ru": "Фикс в комментариях на Нексусе."
+			}
+		},
+		{
+			"folder": "ALWAYSBLOODYWEAPONS",
+			"name": {
+				"en": "ALWAYS BLOODY WEAPONS",
+				"ru": "ВСЕГДА КРОВАВОЕ ОРУЖИЕ"
+			},
+			"description": {
+				"en": "Delivers exactly what it says on the tin and bathes your gear in a permanent splash of haemoglobin.",
+				"ru": "ALWAYS BLOODY WEAPONS - Выполняет свою функцию в точности, как и заявлено, и навсегда покрывает ваше оружие слоем гемоглобина."
+			},
+			"author": "SeventeenDucks",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/353",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "penances_improved",
+			"name": {
+				"en": "Penance View Improved",
+				"ru": "Улучшенный вид Искуплений",
+				"zh-hans": "保证特殊动作"
+			},
+			"description": {
+				"en": "'Recently completed' sorting, sub-penance details, view all rewards, inspect insignias and frames and more, to improve the penances screen.",
+				"ru": "Penance View Improved - Улучшает экран Искуплений, добавляя «Недавно выполненные» Искупления, более подробную информацию о каждом Искуплении и других Искуплениях, нужных для их выполнения, а также возможность просматривать награды ваших оперативников и многое другое!",
+				"zh-hans": "增加「最近完成」的苦修页面；更多苦修和子级苦修细节；在你的特工身上预览奖励物品；以及更多功能！"
+			},
+			"author": "Alfthebigheaded",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/355",
+			"github_url": "",
+			"note": {
+				"en": "Required: Archivum Messelina.",
+				"ru": "Требуется: Archivum Messelina."
+			}
+		},
+		{
+			"folder": "SuperFlashlight",
+			"name": {
+				"en": "SuperFlashlight",
+				"ru": "Суперфонарик"
+			},
+			"description": {
+				"en": "OBSOLETE!",
+				"ru": "УСТАРЕЛ!"
+			},
+			"author": "yinhaox",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/356",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "lovesmenot",
+			"name": {
+				"en": "Loves Me Loves Me Not",
+				"ru": "Любит, не любит"
+			},
+			"description": {
+				"en": "Your voice matters. Mark toxic and good players while you play and share your opinion with the community.",
+				"ru": "Loves Me Loves Me Not - Ваш голос важен. Отмечайте токсичных и добросовестных игроков во время игры и делитесь своим мнением с сообществом."
+			},
+			"author": "bajuh",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/357",
+			"github_url": "",
+			"note": {
+				"en": "Hasn't been updated in a while. May cause crashes.",
+				"ru": "Давно не обновляется. Может вызывать вылеты."
+			}
+		},
+		{
+			"folder": "LocalizationFixForZH",
+			"name": {
+				"en": "LocalizationFixForZH_from_XYZ",
+				"ru": "LocalizationFixForZH_from_XYZ"
+			},
+			"description": {
+				"en": "Concise and formatted Chinese translation correction, currently updated for all blessings, all entries, and talent trees.",
+				"ru": "Concise and formatted Chinese translation correction, currently updated for all blessings, all entries, and talent trees."
+			},
+			"author": "_XYZ_",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/359",
+			"github_url": "",
+			"note": {
+				"en": "Hasn't been updated in a while.",
+				"ru": "Давно не обновляется."
+			}
+		},
+		{
+			"folder": "train_timer",
+			"name": {
+				"en": "Rolling Steel Timer Improved",
+				"ru": "Улучшенный таймер поезда"
+			},
+			"description": {
+				"en": "Adds a numerical timer to the 'Rolling Steel' *train* operation mission alongside the normal progress bar.",
+				"ru": "Rolling Steel Timer Improved - Добавляет числовой таймер на миссии *поезда* «Стальной экспресс» наряду с обычной шкалой прогресса."
+			},
+			"author": "Alfthebigheaded",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/360",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "GoToMastery",
+			"name": {
+				"en": "Go To Mastery",
+				"ru": "В Мастерство",
+				"zh-hans": "一键跳转专精"
+			},
+			"description": {
+				"en": "Adds a Mastery button to go to a selected weapon's Mastery menu.",
+				"ru": "Go To Mastery - Добавляет кнопку «Мастерство» для перехода в меню мастерства выбранного оружия.",
+				"zh-hans": "添加专精按钮，用来前往已选武器的专精菜单。"
+			},
+			"author": "ItsAlxl and Zombine",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/361",
+			"github_url": "https://github.com/ItsAlxl/darktide-mods/tree/main/GoToMastery",
+			"note": {
+				"en": "Works. Hasn't been updated in a while. May cause crashes.",
+				"ru": "Работает. Давно не обновляется. Может вызывать вылеты."
+			}
+		},
+		{
+			"folder": "FilterSacrifice",
+			"name": {
+				"en": "Filter Sacrifice",
+				"ru": "Фильтрация жертвуемого оружия",
+				"zh-hans": "牺牲筛选器"
+			},
+			"description": {
+				"en": "Filtering and displays only the same weapon type in the sacrifice menu.",
+				"ru": "Filter Sacrifice - Фильтрация и перемещение одного типа оружия в меню жертвования.",
+				"zh-hans": "在牺牲界面中筛选，仅显示相同类型的武器。",
+				"ja": "捧げ物のメニューで同じ武器タイプのみを表示するようにします。"
+			},
+			"author": "Zombine",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/363",
+			"github_url": "https://github.com/zombine04/darktide-mods/tree/main/FilterSacrifice",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "DefaultToHighestBlessingTier",
+			"name": {
+				"en": "Default To Highest Blessing Tier",
+				"ru": "Благословения высшего уровня по умолчанию",
+				"zh-hans": "默认最高祝福等级"
+			},
+			"description": {
+				"en": "Automatically switch to the highest unlocked blessing tier in Re-Bless page.",
+				"ru": "Default To Highest Blessing Tier - Автоматически переключает на наивысший разблокированный уровень благословения на странице смены благословений.",
+				"zh-hans": "在重新祝福页面，自动切换到已解锁的最高祝福等级。"
+			},
+			"author": "deluxghost",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/364",
+			"github_url": "https://github.com/deluxghost/darktide-mods/tree/main/DefaultToHighestBlessingTier",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "EmpowerUntilLimit",
+			"name": {
+				"en": "Empower Until Limit",
+				"ru": "Усиление до предела",
+				"zh-hans": "强化到顶"
+			},
+			"description": {
+				"en": "Keep empowering the weapon quickly until reaching the limit.",
+				"ru": "Empower Until Limit - Продолжает быстро усиливать оружие, пока оно не достигнет предела.",
+				"zh-hans": "快速强化武器，直到达到限制。",
+				"ja": "限界に達するまで素早く武器を強化し続けます。"
+			},
+			"author": "Zombine",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/365",
+			"github_url": "https://github.com/zombine04/darktide-mods/tree/main/EmpowerUntilLimit",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "WarpUnboundTimer",
+			"name": {
+				"en": "Warp Unbound Timer",
+				"ru": "Таймер Искажения варпа",
+				"zh-hans": "亚空间解放计时器"
+			},
+			"description": {
+				"en": "Show a countdown timer of psyker's Warp Unbound talent.",
+				"ru": "Warp Unbound Timer - Показывает таймер обратного отсчёта таланта псайкера «Искажение варпа».",
+				"zh-hans": "显示灵能者亚空间解放天赋的倒计时。"
+			},
+			"author": "deluxghost",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/366",
+			"github_url": "https://github.com/deluxghost/darktide-mods/tree/main/WarpUnboundTimer",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
 			}
 		},
 		{

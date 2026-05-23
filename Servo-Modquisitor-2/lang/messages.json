@@ -60,8 +60,8 @@
         "ru": "🔄 Поиск обновлений"
     },
     "btn_check_updates_tooltip": {
-        "en": "Checking for new mod versions on Nexus Mods",
-        "ru": "Проверка новых версии модов на Nexus Mods"
+        "en": "Checks for updates for all your mods on Nexus. Mods must be installed through ModQuisitor!",
+        "ru": "Проверяет обновления для всех ваших модов на Nexus. Моды должны быть установлены через МодКвизитор!"
     },
     "btn_create_new": {
         "en": "🆕 Create new",
@@ -72,16 +72,16 @@
         "ru": "Снять выделение"
     },
     "btn_deselect_all_tooltip": {
-        "en": "Deselect all",
-        "ru": "Снять выделение"
+        "en": "Deselects mods to stop managing them.",
+        "ru": "Снимает выделение с модов для прекращения управления ими."
     },
     "btn_disable_all_mods": {
         "en": "Disable All Mods",
         "ru": "Выключить все моды"
     },
     "btn_disable_all_tooltip": {
-        "en": "Disable all mods",
-        "ru": "Выключить все моды"
+        "en": "Disables all mods in the list.",
+        "ru": "Выключает вообще все моды в списке."
     },
     "btn_disable_mods": {
         "en": "🔳 Toggle Darktide Mods",
@@ -92,8 +92,8 @@
         "ru": "Отключить выделенные"
     },
     "btn_disable_selected_tooltip": {
-        "en": "Disable selected mods",
-        "ru": "Выключить выделенные"
+        "en": "Disables the mods selected in the list.",
+        "ru": "Отключает выделенные в списке моды."
     },
     "btn_dont_show_again": {
         "en": "Don't show again",
@@ -104,16 +104,16 @@
         "ru": "🔽 Опустить ниже"
     },
     "btn_down_tooltip": {
-        "en": "Move selected mod down",
-        "ru": "Опустить выбранный мод ниже"
+        "en": "Moves the selected mods down one line.",
+        "ru": "Опускает выбранные моды ниже на одну строку."
     },
     "btn_enable_all_mods": {
         "en": "Enable All Mods",
         "ru": "Включить все моды"
     },
     "btn_enable_all_tooltip": {
-        "en": "Enable all mods",
-        "ru": "Включить все моды"
+        "en": "Enables all mods in the list to work in the game.",
+        "ru": "Включает все моды в списке для работы в игре."
     },
     "btn_enable_mods": {
         "en": "🔲 Toggle Darktide Mods",
@@ -124,8 +124,8 @@
         "ru": "Включить выделенные"
     },
     "btn_enable_selected_tooltip": {
-        "en": "Enable selected mods",
-        "ru": "Включить выделенные"
+        "en": "Enables the mods selected in the list to work in the game.",
+        "ru": "Подключает выделенные в списке моды для работы в игре."
     },
     "btn_fix_malformed": {
         "en": "🔧 Fix all",
@@ -136,48 +136,48 @@
         "ru": "⏬ Установить мод"
     },
     "btn_install_tooltip": {
-        "en": "Install a mod from archive",
-        "ru": "Установить мод из архива"
+        "en": "Opens a window for selecting archives for mod installation. It's best to install mods by dragging and dropping them onto the program window.",
+        "ru": "Открывает окно выбора архивов для установки мода. Лучше устанавливайте моды перетаскиванием на окно программы."
     },
     "btn_launch_game": {
         "en": "▶ Launch Game",
         "ru": "▶ Запуск игры"
     },
     "btn_launch_game_tooltip": {
-        "en": "Launch Darktide",
-        "ru": "Запустить Darktide"
+        "en": "Launches Darktide in the standard way via the launcher.",
+        "ru": "Запускает Darktide стандартным способом через лаунчер."
     },
     "btn_launch_nolauncher_long": {
         "en": "🚀 Quick Launch",
         "ru": "🚀 Быстрый запуск"
     },
     "btn_launch_nolauncher_long_tooltip": {
-        "en": "Quick launch without launcher",
-        "ru": "Быстрый запуск без лаунчера"
+        "en": "Quickly launches Darktide bypassing the launcher with the parameter '--lua-heap-mb-size 2048'.",
+        "ru": "Быстро запускает Darktide минуя лаунчер с параметром «--lua-heap-mb-size 2048»."
     },
     "btn_manage_mods": {
         "en": "⚙ Mod Management ⚙",
         "ru": "⚙ Управление модами ⚙"
     },
     "btn_manage_mods_tooltip": {
-        "en": "Show/hide management panel",
-        "ru": "Показать/скрыть панель управления"
+        "en": "Opens the mod management panel: move, enable, disable, delete mods.",
+        "ru": "Открывает панель управления модами: перемещение, включение, выключение, удаление."
     },
     "btn_move_to_bottom": {
         "en": "⏬ Move to Bottom",
         "ru": "⏬ Опустить в конец"
     },
     "btn_move_to_bottom_tooltip": {
-        "en": "Move to bottom",
-        "ru": "Переместить в конец"
+        "en": "Moves the selected mods to the very bottom of the list.",
+        "ru": "Перемещает выбранные моды в самый конец списка."
     },
     "btn_move_to_top": {
         "en": "⏫ Move to Top",
         "ru": "⏫ Поднять наверх"
     },
     "btn_move_to_top_tooltip": {
-        "en": "Move to top",
-        "ru": "Переместить в начало"
+        "en": "Moves the selected mods to the very top of the list.",
+        "ru": "Перемещает выбранные моды в самое начало списка."
     },
     "btn_no": {
         "en": " ❌ No  ",
@@ -220,24 +220,24 @@
         "ru": "🗑 Удалить мод"
     },
     "btn_remove_tooltip": {
-        "en": "Delete selected mod",
-        "ru": "Удалить выбранный мод"
+        "en": "Removes one mod currently selected in the list.",
+        "ru": "Удаляет один мод выбранный прямо сейчас в списке."
     },
     "btn_remove_all_mods": {
         "en": "🗑 Remove All Mods",
         "ru": "🗑 Удалить все моды"
     },
     "btn_remove_all_tooltip": {
-        "en": "Permanently removes all mods except DML and DMF",
-        "ru": "Безвозвратно удаляет все моды кроме DML и DMF"
+        "en": "Permanently removes all mods (except DML and DMF).",
+        "ru": "Безвозвратно удаляет вообще все моды (кроме DML и DMF)."
     },
     "btn_remove_selected": {
         "en": "🗑 Remove Selected",
         "ru": "🗑 Удалить выбранные"
     },
     "btn_remove_selected_tooltip": {
-        "en": "Delete selected mods permanently",
-        "ru": "Безвозвратно удалить выбранные моды"
+        "en": "Permanently deletes mods marked with managed checkboxes in the list.",
+        "ru": "Безвозвратно удаляет моды, выделенные в списке галочками управления."
     },
     "btn_save_api": {
         "en": "💾 Save your API key to the settings file",
@@ -256,16 +256,16 @@
         "ru": "💾 Сохранить список (AML активен)"
     },
     "btn_save_order_tooltip": {
-        "en": "Save current mod order",
-        "ru": "Сохранить порядок модов"
+        "en": "Saves the current list of mods, including for subsequent auto-sorting.",
+        "ru": "Сохраняет текущий список модов, в т.ч. для последующей автосортировки."
     },
     "btn_select_all": {
         "en": "Select All",
         "ru": "Выделить все"
     },
     "btn_select_all_tooltip": {
-        "en": "Select all mods",
-        "ru": "Выделить все моды"
+        "en": "Selects all mods in the list to manage them.",
+        "ru": "Выделяет все моды в списке для управления ими."
     },
     "btn_sort_checks": {
         "en": "🛠 Check and Auto-Sort",
@@ -276,28 +276,36 @@
         "ru": "🛠 Проверка и Автосортировка (AML активен)"
     },
     "btn_sort_checks_tooltip": {
-        "en": "Run diagnostics and sort mods",
-        "ru": "Диагностика и сортировка"
+        "en": "Runs diagnostics on your mods, troubleshoots and sorts them.",
+        "ru": "Запускает диагностику ваших модов, устраняет неисправности и сортирует."
     },
     "btn_toggle_tooltip": {
-        "en": "Toggle all mods on/off in game",
-        "ru": "Вкл/выкл все моды в игре"
+        "en": "Completely disable/enable mods in the game using 'toggle_darktide_mods.bat' or 'toggle_dt_mod_autopatch.cmd'.",
+        "ru": "Полностью выключает/включает моды в игре с помощью «toggle_darktide_mods.bat» или «toggle_dt_mod_autopatch.cmd»."
     },
     "btn_up": {
         "en": "🔼 Move up",
         "ru": "🔼 Поднять выше"
     },
     "btn_up_tooltip": {
-        "en": "Move selected mod up",
-        "ru": "Поднять выбранный мод выше"
+        "en": "Moves the selected mods up one line.",
+        "ru": "Поднимает выбранные моды выше на одну строку."
     },
     "btn_update_mod": {
         "en": "🔄 Update Mod",
         "ru": "🔄 Обновить мод"
     },
+    "btn_update_mod_tooltip": {
+        "en": "Updates one mod currently selected in the list.",
+        "ru": "Обновляет один мод выбранный прямо сейчас в списке."
+    },
     "btn_update_all": {
         "en": "🔄 Update All Mods",
         "ru": "🔄 Обновить все моды"
+    },
+    "btn_update_all_tooltip": {
+        "en": "Updates all mods in the list if an update for them is available on the Nexus.",
+        "ru": "Обновляет все моды в списке, если на Nexus доступно обновление для них."
     },
     "btn_yes": {
         "en": " ✔ Yes ",
@@ -392,8 +400,8 @@
         "ru": "Удалить %s"
     },
     "dependency_desc": {
-        "en": "'%s' requires '%s'. Install it or delete the dependent mod.",
-        "ru": "'%s' требует '%s'. Установите или удалите зависимый мод."
+        "en": "'%s' requires '%s'.\nInstall it or delete the dependent mod.",
+        "ru": "'%s' требует '%s'.\nУстановите или удалите зависимый мод."
     },
     "dependency_error_list": {
         "en": "Dependency error: %s requires %s",
@@ -556,8 +564,8 @@
         "ru": "Darktide уже запущен."
     },
 	"github_url_label": {
-		"en": "🐱‍👤 GitHub",
-		"ru": "🐱‍👤 Гитхаб"
+		"en": "🔗 Open mod page [GitHub]",
+		"ru": "🔗 Открыть страницу мода [GitHub]"
 	},
     "incompatible_desc": {
         "en": "'%s' and '%s' are incompatible.",
@@ -900,8 +908,8 @@
         "ru": "mod_load_order.txt создан."
     },
     "mod_url_label": {
-        "en": "Open mod page",
-        "ru": "Открыть страницу мода"
+        "en": "🔗 Open mod page [Nexus]",
+        "ru": "🔗 Открыть страницу мода [Nexus]"
     },
     "mods_counter": {
         "en": "Showing %d of %d (active %d)",

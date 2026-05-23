@@ -36,7 +36,7 @@ func (tm *TooltipStatusManager) HideAfterDelay() {
 	if tm.hideTimer != nil {
 		tm.hideTimer.Stop()
 	}
-	tm.hideTimer = time.AfterFunc(2*time.Second, func() {
+	tm.hideTimer = time.AfterFunc(TooltipHideDelay, func() {
 		fyne.Do(func() {
 			tm.mu.Lock()
 			tm.label.SetText("")
