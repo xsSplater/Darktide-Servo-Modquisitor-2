@@ -52,7 +52,7 @@ const (
 // ────────────────────────── ОПИСАНИЕ ──────────────────────────
 const (
 	DescScrollMinWidth  float32 = 200
-	DescScrollMinHeight float32 = 150
+	DescScrollMinHeight float32 = 250
 )
 
 // ────────────────────────── ТАБЛИЦЫ ──────────────────────────

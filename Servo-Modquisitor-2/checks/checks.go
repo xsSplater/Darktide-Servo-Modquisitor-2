@@ -18,6 +18,16 @@ const (
 	steamGuideRuURL		= "https://steamcommunity.com/sharedfiles/filedetails/?id=2950374474"
 )
 
+var modListDividers = []string{
+    "___System",
+    "___Scoreboard",
+    "___HUD",
+    "___GamePlay Utilities",
+    "___GamePlay Improve",
+    "___Game Tools",
+    "___Bug Fix",
+}
+
 var (
 	appendLog			func(string)
 	messages			*map[string]string
@@ -150,6 +160,12 @@ func GetModsInfo(lang string, forceEnglish bool) []ModInfo {
 				mod.Active = false
 				mod.Note = (*messages)["note_backup_copy"]
 			}
+		}
+
+		// Исключение мода Mod List Dividers с разделителями ___System, ___Scoreboard и т.д.
+		if contains(modListDividers, name) {
+			mod.Active = true
+			mod.Note = ""
 		}
 
 		mod.VortexDeployed = fileExists(filepath.Join(fullPath, "__folder_managed_by_vortex"))
@@ -385,6 +401,15 @@ func CheckInstallation(window fyne.Window) bool {
 	}
 	appendLog((*messages)["step_install"])
 	return true
+}
+
+func contains(slice []string, item string) bool {
+    for _, s := range slice {
+        if s == item {
+            return true
+        }
+    }
+    return false
 }
 
 func askMissing(folder, modAbbr, modName, nexusURL string, window fyne.Window) bool {
