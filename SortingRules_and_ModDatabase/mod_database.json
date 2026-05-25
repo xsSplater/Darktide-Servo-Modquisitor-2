@@ -1,5 +1,5 @@
 {
-	"version": "0.75",
+	"version": "0.77",
 	"mod_database": [
 		{
 			"folder": "pickup_spawner",
@@ -57,11 +57,12 @@
 			"name": {
 				"en": "Custom HUD",
 				"ru": "Настраиваемый интерфейс",
-			"zh-hans": "自定义 HUD"
+				"zh-hans": "自定义 HUD"
 			},
 			"description": {
 				"en": "Allows the user to move various HUD elements, with optional grid and snapping.",
-				"ru": "Custom HUD - Позволяет перемещать и изменять размер элементов интерфейса."
+				"ru": "Custom HUD - Позволяет перемещать и изменять размер элементов интерфейса.",
+				"zh-hans": "允许自定义排列和调整 HUD 元素大小。"
 			},
 			"author": "Fracticality",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/10",
@@ -1157,7 +1158,10 @@
 			"author": "ItsAlxl",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/88",
 			"github_url": "https://github.com/ItsAlxl/DarktideMods/tree/main/KeepSwinging",
-			"note": { "en": "", "ru": "" }
+			"note": {
+				"en": "A small conflict: KeepSwinging - FullAuto. Shots and special attacks can be triggered simultaneously.",
+				"ru": "Малый конфликт: KeepSwinging - FullAuto. Могут срабатывать одновременно выстрелы и спецатаки."
+			}
 		},
 		{
 			"folder": "psych_ward",
@@ -2520,8 +2524,8 @@
 				"ru": "2D-инвентарь"
 			},
 			"description": {
-				"en": "It makes your inventory a 2D grid with three items per row, and it does it pretty karking well if you ask me.",
-				"ru": "Inventory 2D - Этот мод превращает ваш инвентарь в двухмерную сетку с тремя предметами в каждом ряду, и, на мой взгляд, делает это довольно неплохо."
+				"en": "Inventory2D - FIX for Bound By Duty Update - It makes your inventory a 2D grid with three items per row, and it does it pretty karking well if you ask me.",
+				"ru": "Inventory2D - FIX for Bound By Duty Update -  Этот мод превращает ваш инвентарь в двухмерную сетку с тремя предметами в каждом ряду, и, на мой взгляд, делает это довольно неплохо."
 			},
 			"author": "Redbeardt and Blakrajder",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/594",
@@ -4797,7 +4801,7 @@
 			"folder": "AutoTag",
 			"name": {
 				"en": "AutoTag",
-				"ru": "Автометка"
+				"ru": "Автопометка"
 			},
 			"description": {
 				"en": "Tired of spamming the 'Tag' button to mark enemies?\nHate putting tag on left click and having it endlessly spam?\nThis mod is for you! No more spam tagging!",
@@ -5286,7 +5290,7 @@
 			"description": {
 				"en": "Tired of the Slabs trying to twerk against you, and blocking your vision? Only the blocking your vision part? Well, this is the mod for you!",
 				"ru": "Get Out Of The Way - Надоели эти огрины, которые пытаются прижаться к вам и загораживают обзор? Если загораживают обзор, тогда этот мод для вас!",
-				"zh-hans": "当玩家靠近时，通过使他们消失来防止他们挡住您的摄像机nn作者：WMA——B站 独一无二小真寻维护中"
+				"zh-hans": "当玩家靠近时，通过使他们消失来防止他们挡住您的摄像机nn作者：WMA"
 			},
 			"author": "WMA",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/416",
@@ -6650,13 +6654,11 @@
 			"folder": "StickyFingers",
 			"name": {
 				"en": "Sticky Fingers",
-				"ru": "Ловкие пальцы",
-				"zh-hans": "长按自动交互"
+				"ru": "Ловкие пальцы"
 			},
 			"description": {
 				"en": "Automatically interacts with things while holding the Interact button.",
-				"ru": "Sticky Fingers - Автоматически взаимодействует с объектами при удержании кнопки взаимодействия.",
-				"zh-hans": "B站 独一无二的小真寻"
+				"ru": "Sticky Fingers - Автоматически взаимодействует с объектами при удержании кнопки взаимодействия."
 			},
 			"author": "Norkkom",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/518",
@@ -6739,183 +6741,869 @@
 			"note": { "en": "", "ru": "" }
 		},
 		{
-			"folder": "",
+			"folder": "ritual_timer",
 			"name": {
-				"en": "",
-				"ru": ""
+				"en": "Boss Timer",
+				"ru": "Таймер босса"
 			},
 			"description": {
-				"en": "",
-				"ru": ""
+				"en": "Adds a timer widget to boss and Hexbound ritual healthbars.",
+				"ru": "Boss Timer - Добавляет виджет таймера к полоскам здоровья босса и ритуала Hexbound."
 			},
-			"author": "",
-			"url": "",
+			"author": "azmidiVRC",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/525",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "LessAnnoyingHUD",
+			"name": {
+				"en": "Less Annoying HUD",
+				"ru": "Менее раздражающий интерфейс"
+			},
+			"description": {
+				"en": "Tiny little mod to let you adjust the 'brightness' of the main HUD colors. Requires restart for some HUD elements to take effect (e.g. toughness bar).",
+				"ru": "Less Annoying HUD - Небольшой мод, позволяющий регулировать «яркость» основных цветов HUD. Для применения некоторых элементов HUD (например, полоски выносливости) требуется перезапуск игры."
+			},
+			"author": "gpk",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/526",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "cryin_sword",
+			"name": {
+				"en": "Cryin Sword",
+				"ru": "Плачущий меч"
+			},
+			"description": {
+				"en": "Plays a sound for zealot skill node 'Duelist'.",
+				"ru": "Cryin Sword - Воспроизводит звук для узла навыка изувера «Дуэлянт»."
+			},
+			"author": "Potato_mandoo",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/528",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "LessAnnoyingDuos",
+			"name": {
+				"en": "Less Annoying Duos",
+				"ru": "Менее раздражающие Дуо"
+			},
+			"description": {
+				"en": "Hide and reduce Bot Hud Elements for disabled and hogtied bots, so you can get the bots killed and be less annoyed by them.",
+				"ru": "Less Annoying Duos - Скройте и уменьшите количество элементов интерфейса, связанного с ботами для отключённых и связанных ботов, чтобы вы могли убить ботов и меньше раздражаться из-за них."
+			},
+			"author": "gpk",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/529",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "audible_successful_dodge",
+			"name": {
+				"en": "Audible Successful Dodge",
+				"ru": "Озвученное успешное уклонение"
+			},
+			"description": {
+				"en": "Change the sounds for successful special and regular dodges from a list of in-game sounds, or custom sound files using Audio Plugin (separate mod available on Nexus).\n\nIf you're using the Creature Spawner mod and have the Sound Muffler option enabled in the Psykhanium, enemy sounds will be muted. This means if you've set either of your Audible Thrust sounds to use Plague Ogryn or Chaos Spawn sounds (from the dropdown options), they will not play in the Psykhanium while Sound Muffler is active. The mod is still working—just disable Sound Muffler to hear those sounds while testing.",
+				"ru": "Audible Successful Dodge - Изменяет звуки успешных специальных и обычных уклонений, выбрав их из списка внутриигровых звуков или используя собственные звуковые файлы с помощью Audio плагина (отдельный мод, доступный на Nexus).\n\nЕсли вы используете мод Creature Spawner и у вас включена опция заглушения звуков (Sound Muffler) в Псайканиуме, звуки врагов будут отключены. Это означает, что если вы установили звуки Чумного Огрина или Порождения Хаоса (из выпадающего списка), они не будут воспроизводиться в Псайканиуме, пока активна опция заглушения звуков. Мод работает — просто отключите заглушение звуков, чтобы слышать эти звуки во время тестов."
+			},
+			"author": "demba",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/530",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "TraumaOutlines",
+			"name": {
+				"en": "Trauma Outlines",
+				"ru": "Выделение взрываемых врагов для Травмы"
+			},
+			"description": {
+				"en": "Highlights enemies within Voidblast radius.",
+				"ru": "Trauma Outlines - Подсвечивает врагов в радиусе действия дополнительной атаки посоха Травмы."
+			},
+			"author": "VxeR",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/536",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "DogWhistle",
+			"name": {
+				"en": "Dog Whistle",
+				"ru": "Собачий свисток"
+			},
+			"description": {
+				"en": "Target filtration for the Arbitrator Cyber-Mastiff, with optional auto-tag.\nCompatible with all classes, with per-class customization and extra features for Arbitrators and Focus Target Veterans.",
+				"ru": "Dog Whistle - Фильтрация целей для кибермастифа-арбитра с возможностью автоматической пометки. Совместимо со всеми классами, с возможностью индивидуальной настройки для каждого класса и дополнительными функциями для арбитров и ветеранов, ориентированных на целевые задачи."
+			},
+			"author": "Norkkom",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/539",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "LoadingFix",
+			"name": {
+				"en": "Loading Fix",
+				"ru": "Фикс загрузки"
+			},
+			"description": {
+				"en": "OBSOLETE!",
+				"ru": "УСТАРЕЛ!"
+			},
+			"author": "gpk",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/541",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "BetterDogTargets",
+			"name": {
+				"en": "Better Dog Targets",
+				"ru": "Лучшие цели собак"
+			},
+			"description": {
+				"en": "Recolor dog target ping outlines.",
+				"ru": "Better Dog Targets - Меняйте цвета контуров целей собак."
+			},
+			"author": "Pfhoenix",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/542",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "AutoSwing",
+			"name": {
+				"en": "AutoSwing",
+				"ru": "Автоудар"
+			},
+			"description": {
+				"en": "Adds a keybind to spam light melee attacks.\nSimpler and less buggy 'successor' of KeepSwinging by ItsAlxl.",
+				"ru": "Auto Swing - Добавляет привязку клавиши для многократного использования лёгких рукопашных атак.\nБолее простой и менее глючный преемник мода «Keep Swinging» от ItsAlxl."
+			},
+			"author": "offlegaz",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/543",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "valkyrie",
+			"name": {
+				"en": "Valkyrie Blitz-Ingress",
+				"ru": "Быстрый выход из Валькирии",
+				"zh-hans": "瓦尔基里闪击入场"
+			},
+			"description": {
+				"en": "Load into in-progress missions faster by silencing briefings.",
+				"ru": "Valkyrie Blitz-Ingress - Запускайте уже запущенные миссии быстрее, заглушая брифинги."
+			},
+			"author": "xxBellatrix",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/544",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "LessAnnoyingArbites",
+			"name": {
+				"en": "Less Annoying Arbites",
+				"ru": "Менее раздражающий арбитрес"
+			},
+			"description": {
+				"en": "LessAnnoyingArbites mod, new features, better attack, tweaks and single keybind, Nuncio tweaks, VFX tweaks, Mine tweaks.",
+				"ru": "Less Annoying Arbites - Новые возможности, улучшенная атака, настройки и единая привязка клавиш, настройки Нунцио, настройки визуальных эффектов, настройки мин."
+			},
+			"author": "gpk",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/545",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+			{
+				"folder": "LessAnnoyingDog",
+				"name": {
+					"en": "Less Annoying Dog",
+					"ru": "Менее раздражающая собака"
+				},
+				"description": {
+					"en": "This is essentially a past version of Less Annoying Arbites.",
+					"ru": "Less Annoying Dog - Это по сути прошлая версия Less Annoying Arbites."
+				},
+				"author": "gpk",
+				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/545",
+				"github_url": "",
+				"note": {
+					"en": "Less Annoying Arbites is a successor mod.",
+					"ru": "Less Annoying Arbites - мод-наследник."
+				}
+			},
+		{
+			"folder": "jeanne-oscour",
+			"name": {
+				"en": "Jeanne au secours",
+				"ru": "Jeanne au secours",
+				"fr": "Jeanne au secours"
+			},
+			"description": {
+				"en": "It’s a mod for french speaker how know an old french politician.\nThis is a mod I made as a joke.\nIt replaces the sound of the player being put down by a dog with Jean-Marie Lepen’s famous “Jeanne au secours” line.",
+				"ru": "Этот мод для франкоговорящих пользователей, знакомых со старым французским политиком.\nЭто модификация, которую я сделал в шутку.\nОна заменяет звук того, как игрока убивает собака, знаменитой фразой Жан-Мари Лепена «Jeanne au secours».",
+				"fr": "C’est un mods que j’ai fais pour la blague.\nil remplace le son du joueur de mise à terre par un chien ou quand il est attraper par un mutant par la fameuse réplique “Jeanne au secours” de Jean-marie Lepen."
+			},
+			"author": "Protoxs",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/547",
 			"github_url": "",
 			"note": {
-				"en": "",
-				"ru": ""
+				"en": "Requred: Audio plugin.",
+				"ru": "Требуется: Audio плагин.",
+				"fr": "Requis : Plugin Audio."
 			}
 		},
 		{
-			"folder": "",
+			"folder": "Disco Aquila",
 			"name": {
-				"en": "",
-				"ru": ""
+				"en": "Disco Aquila",
+				"ru": "Диско Аквила"
 			},
 			"description": {
-				"en": "",
-				"ru": ""
+				"en": "Disco Aquila - Nuncio Aquila Disco Light Modification - If your Nuncia Aquila is too staid and boring for the party animal you are, this mod will bring some light and music to the darkness of Tertium.",
+				"ru": "Disco Aquila - Nuncio Aquila Disco Light Modification - Если ваша Нунцио аквила кажется вам слишком чопорной и скучной для такого любителя вечеринок, как вы, этот мод привнесёт больше света и музыки во мрак Терциума."
 			},
-			"author": "",
-			"url": "",
-			"github_url": "",
+			"author": "Wobin",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/548",
+			"github_url": "https://github.com/Wobin/DiscoAquilla",
 			"note": {
-				"en": "",
-				"ru": ""
+				"en": "Requred: Audio plugin.",
+				"ru": "Требуется: Audio плагин."
 			}
 		},
 		{
-			"folder": "",
+			"folder": "audible_pinpointing_target",
 			"name": {
-				"en": "",
-				"ru": ""
+				"en": "Audible Pinpointing Target",
+				"ru": "Озвученное Определение цели"
 			},
 			"description": {
-				"en": "",
-				"ru": ""
+				"en": "Choose from a list of in-game sounds or a custom sound file (Audio Plugin Mod required) to play on each stack of Pinpointing Target. All stacks are toggleable.\n\nIf you're using the Creature Spawner mod and have the Sound Muffler option enabled in the Psykhanium, enemy sounds will be muted. This means if you've set either of your Audible Thrust sounds to use Plague Ogryn or Chaos Spawn sounds (from the dropdown options), they will not play in the Psykhanium while Sound Muffler is active. The mod is still working—just disable Sound Muffler to hear those sounds while testing.",
+				"ru": "Audible Pinpointing Target - Выберите один из внутриигровых звуков или собственный звуковой файл (требуется Audio плагин) для воспроизведения при получении стаков «Определения цели». Все стаки можно переключать.\n\nЕсли вы используете мод Creature Spawner и у вас включена опция заглушения звуков (Sound Muffler) в Псайканиуме, звуки врагов будут отключены. Это означает, что если вы установили звуки Чумного Огрина или Порождения Хаоса (из выпадающего списка), они не будут воспроизводиться в Псайканиуме, пока активна опция заглушения звуков. Мод работает — просто отключите заглушение звуков, чтобы слышать эти звуки во время тестов."
 			},
-			"author": "",
-			"url": "",
+			"author": "demba",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/551",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "PerfectIndicator",
+			"name": {
+				"en": "Perfect Indicator",
+				"ru": "Индикатор идеального блока"
+			},
+			"description": {
+				"en": "Indicates Perfect Block window, or when an attack was blocked perfectly.",
+				"ru": "Perfect Indicator - Показывает индикатор идеального блока, когда атака была идеально заблокирована."
+			},
+			"author": "Norkkom",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/552",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "Litany",
+			"name": {
+				"en": "Litany of Reckoning",
+				"ru": "Литания расплаты"
+			},
+			"description": {
+				"en": "Reports scores to your chat box privately at end of mission.",
+				"ru": "Litany of Reckoning - Результаты миссии отображаются в личном чате по завершении миссии."
+			},
+			"author": "xxBellatrix",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/553",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "Catechisms",
+			"name": {
+				"en": "Catechisms from the Crucible",
+				"ru": "Катехизисы из Горнила"
+			},
+			"description": {
+				"en": "Replace the loading screen messages with useful game tips. Choose the size and colour of text.e.g. 'Yellow concentration stimms last 15 seconds and cool down your Combat Ability four times as fast as usual.'",
+				"ru": "Catechisms from the Crucible - Заменяет сообщения на экране загрузки полезными игровыми советами. Выберите размер и цвет текста. Например: «Жёлтые стимуляторы концентрации действуют 15 секунд и восстанавливают вашу боевую способность в четыре раза быстрее, чем обычно»."
+			},
+			"author": "xxBellatrix",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/554",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "Ammonia",
+			"name": {
+				"en": "Ammonia",
+				"ru": "Хватит про патроны"
+			},
+			"description": {
+				"en": "For those that want it: Silence mentions of 'ammo' from other players.",
+				"ru": "Ammonia - Для тех, кто хочет заглушить упоминания о нехватке боеприпасов другими игроками."
+			},
+			"author": "xxBellatrix",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/555",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "AutoPing",
+			"name": {
+				"en": "AutoPing",
+				"ru": "Автометка"
+			},
+			"description": {
+				"en": "Allows you to automatically tag any/all enemies in the game; this includes dog commands to automate dog targeting.",
+				"ru": "AutoPing - Позволяет автоматически помечать всех врагов в игре; это включает в себя команды для собак, позволяющие автоматизировать прицеливание."
+			},
+			"author": "crispy cranky, mobmen",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/688",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "barrels",
+			"name": {
+				"en": "Barrels",
+				"ru": "Бочки"
+			},
+			"description": {
+				"en": "Tracks who ignited and detonated barrels, then reports kills, player damage and catapults caused by the blast.",
+				"ru": "Barrels - Отслеживает тех, кто поджёг и взорвал бочки, а затем сообщает об убийствах, нанесённом игрокам уроне и катапультированиях, вызванных взрывом."
+			},
+			"author": "xxBellatrix",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/559",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "TeammateHealthbars",
+			"name": {
+				"en": "Teammate Health Bars",
+				"ru": "Полоски здоровья союзников"
+			},
+			"description": {
+				"en": "Adds health and toughness bars above your teammates' heads, allowing better real-time awareness in intense battles. Fully customizable via mod settings. Includes support for opacity, size, distance, color theming, and auto-refresh.",
+				"ru": "Teammate Health Bars - Добавляет полоски здоровья и выносливости над головами ваших товарищей по команде, обеспечивая лучшую видимость в реальном времени в напряжённых сражениях. Полностью настраивается через параметры мода. Поддерживает прозрачность, размер, расстояние, цветовое оформление и автоматическое обновление."
+			},
+			"author": "crispy cranky",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/560",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "HoldToDogAttack",
+			"name": {
+				"en": "Hold To Dog Attack",
+				"ru": "Держи, чтобы натравить собаку"
+			},
+			"description": {
+				"en": "Hold your target ping button to order your dog to attack.",
+				"ru": "Hold To Dog Attack - Удерживайте кнопку метки, чтобы дать собаке команду атаковать."
+			},
+			"author": "Pfhoenix0",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/561",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "ColorCodedHealthbars",
+			"name": {
+				"en": "Colored Enemy Healthbars REDUX",
+				"ru": "Цветные полоски здоровья врагов"
+			},
+			"description": {
+				"en": "Color Coded Healthbars provides advanced enemy health visualization with intelligent priority systems, customizable colors, and enhanced visual features. No external dependencies required - works as a complete standalone mod.",
+				"ru": "Colored Enemy Healthbars REDUX - Мод обеспечивает улучшенную визуализацию здоровья врагов с помощью интеллектуальной системы приоритетов, настраиваемых цветов и расширенных визуальных функций. Внешние зависимости не требуются — работает как полноценный автономный мод."
+			},
+			"author": "crispy cranky",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/562",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "Remembrancer",
+			"name": {
+				"en": "Remembrancer",
+				"ru": "Метки времени в чате",
+        		"zh-hans": "聊天消息时间戳"
+			},
+			"description": {
+				"en": "Adds customizable timestamps to chat messages.",
+				"ru": "Remembrancer - Добавляет настраиваемые временные метки к сообщениям в чате."
+			},
+			"author": "Norkkom",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/563",
+			"github_url": "https://github.com/CATBIRDS/Remembrancer",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "audible_true_aim",
+			"name": {
+				"en": "Audible True Aim",
+				"ru": "Озвученная Верная цель"
+			},
+			"description": {
+				"en": "Choose from a list of in-game sounds or a custom sound file (Audio Plugin Mod required) to play on each stack of True Aim. All stacks are toggleable.\n\nIf you're using the Creature Spawner mod and have the Sound Muffler option enabled in the Psykhanium, enemy sounds will be muted. This means if you've set either of your Audible Thrust sounds to use Plague Ogryn or Chaos Spawn sounds (from the dropdown options), they will not play in the Psykhanium while Sound Muffler is active. The mod is still working—just disable Sound Muffler to hear those sounds while testing.",
+				"ru": "Audible Pinpointing Target - Выберите один из внутриигровых звуков или собственный звуковой файл (требуется мод Audio плагин) для воспроизведения при каждом уровне эффекта «Верная цель». Все уровни эффекта можно переключать.\n\nЕсли вы используете мод Creature Spawner и у вас включена опция заглушения звуков (Sound Muffler) в Псайканиуме, звуки врагов будут отключены. Это означает, что если вы установили звуки Чумного Огрина или Порождения Хаоса (из выпадающего списка), они не будут воспроизводиться в Псайканиуме, пока активна опция заглушения звуков. Мод работает — просто отключите заглушение звуков, чтобы слышать эти звуки во время тестов."
+			},
+			"author": "demba",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/564",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "teammate_tracker",
+			"name": {
+				"en": "Teammate Tracker",
+				"ru": "Отслеживание союзников"
+			},
+			"description": {
+				"en": "Display the win/loss records of teammates and yourself to support battle assessment and team management.",
+				"ru": "Teammate Tracker - Отображайте статистику побед и поражений ваших товарищей по команде и вашу собственную, чтобы облегчить оценку хода боя и управление командой."
+			},
+			"author": "BoffeeH",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/565",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "LetMePlayHavoc",
+			"name": {
+				"en": "Let Me Play Havoc",
+				"ru": "Дайте мне поиграть в хавок"
+			},
+			"description": {
+				"en": "If a havoc mission can't be started, shows a detailed breakdown of who isn't ready / isn't eligible to start, and why.",
+				"ru": "Let Me Play Havoc - Если нельзя начать миссию в хавок, отображается подробная информация о том, кто не готов/не имеет права начать операцию и почему."
+			},
+			"author": "Lunomica",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/567",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "DodgeSlide",
+			"name": {
+				"en": "Dodge and Slide",
+				"ru": "Уклонение и подкат"
+			},
+			"description": {
+				"en": "Slide and dodge with the same key.",
+				"ru": "Dodge and Slide - Уклонение и подкат выполняются одной и той же клавишей."
+			},
+			"author": "VxeR",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/568",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "Scrivener",
+			"name": {
+				"en": "Scrivener",
+				"ru": "Писарь"
+			},
+			"description": {
+				"en": "Copies your in-game chat to your computer's clipboard (type /scrive) or a file (type /scrive txt).",
+				"ru": "Scrivener - Копирует ваш внутриигровой чат в буфер обмена вашего компьютера (введите /scrive) или в файл (введите /scrive txt)."
+			},
+			"author": "xxBellatrix",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/569",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "MissionGrid",
+			"name": {
+				"en": "Mission Grid",
+				"ru": "Сетка миссий"
+			},
+			"description": {
+				"en": "Organizes the mission board into a grid.",
+				"ru": "Mission Grid - Организует доску заданий в виде сетки."
+			},
+			"author": "ItsAlxl",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/570",
+			"github_url": "https://github.com/ItsAlxl/darktide-mods/tree/main/MissionGrid",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "StoryReplay",
+			"name": {
+				"en": "Story Replay",
+				"ru": "Story Replay"
+			},
+			"description": {
+				"en": "OBSOLETE!",
+				"ru": "УСТАРЕЛ!"
+			},
+			"author": "ItsAlxl",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/571",
+			"github_url": "https://github.com/ItsAlxl/darktide-mods/tree/main/StoryReplay",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "xsSplained",
+			"name": {
+				"en": "xsSplained Game Mechanics",
+				"ru": "Объяснение игровых механик",
+				"zh-hans": "游戏机制详解"
+			},
+			"description": {
+				"en": "This mod explains in a special menu some game mechanics: Strength, Finesse, Rending, Brittleness, etc.",
+				"ru": "xsSplained Game Mechanics - Добавляет страницу с детальным объяснением игровых механик.",
+				"zh-hans": "添加包含全面游戏机制说明的详细页面。"
+			},
+			"author": "xsSplater",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/572",
+			"github_url": "https://github.com/xsSplater/Darktide_xsSplained",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "Uptime",
+			"name": {
+				"en": "Uptime",
+				"ru": "Время действия"
+			},
+			"description": {
+				"en": "This mod measures how long your buffs are active during combat.\nIt's a great tool to see if your talents & blessings are worth it, or if you want to switch up your build.\nPress F8 in the Mourningstar to open Uptime.",
+				"ru": "Uptime - Этот мод измеряет продолжительность действия ваших баффов во время боя.\nЭто отличный инструмент, чтобы понять, стоят ли ваши таланты и благословения того, или вы захотите изменить свой билд.\nНажмите F8 в Моурнингстар, чтобы открыть окно Uptime."
+			},
+			"author": "Grimnir",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/573",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "WhosNotReady",
+			"name": {
+				"en": "Who's Not Ready",
+				"ru": "Кто не готов"
+			},
+			"description": {
+				"en": "During mission votes, displays a notification that shows who hasn't voted yet.",
+				"ru": "Who's Not Ready - Во время голосования по миссиям отображается уведомление, показывающее, кто еще не проголосовал."
+			},
+			"author": "Lunomica",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/576",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "TeamKills",
+			"name": {
+				"en": "Team Kills",
+				"ru": "Командные убийства"
+			},
+			"description": {
+				"en": "A comprehensive mod for real-time team statistics tracking: kills, damage, and killstreaks by enemy categories, featuring a detailed statistics board and boss notifications.",
+				"ru": "Team Kills - Комплексный мод для отслеживания командной статистики в реальном времени: убийства, урон и серии убийств по категориям врагов, с подробной таблицей статистики и уведомлениями о боссах."
+			},
+			"author": "RRMLLNV",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/577",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "BetterLoadouts",
+			"name": {
+				"en": "Better Loadouts",
+				"ru": "Улучшенные билды",
+				"zh-hans": "更佳配装方案"
+			},
+			"description": {
+				"en": "Better Loadouts - Extra Loadout Icons and Slots - Changes the character loadout bar to be vertical instead of horizontal and adds more loadout icons.",
+				"ru": "Better Loadouts - Extra Loadout Icons and Slots - Изменяет панель выбора билдов персонажа с горизонтальной на вертикальную и добавляет больше значков.",
+				"zh-hans": "将角色配装栏改为垂直方向（原为水平方向），并增加更多配装图标。"
+			},
+			"author": "GideonAriphael",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/578",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "Wheeeee",
+			"name": {
+				"en": "Wheeeee",
+				"ru": "Уииииии"
+			},
+			"description": {
+				"en": "Wheeeee - Random cartoon screams when being tossed around - Adds in some randomised cartoon screams to being tossed around by explosions, Goofy's holler being a common one.",
+				"ru": "Wheeeee - Random cartoon screams when being tossed around - "
+			},
+			"author": "Wobin",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/580",
+			"github_url": "https://github.com/Wobin/Wheeeee",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "PlayerDeathfeed",
+			"name": {
+				"en": "Player Deathfeed",
+				"ru": "Лента смертей игроков"
+			},
+			"description": {
+				"en": "Shows player and teammate deaths and downs in killfeed and/or notifications.",
+				"ru": "Player Deathfeed - Показывает смерти и падения игрока и товарищей по команде в ленте убийств и/или уведомлениях."
+			},
+			"author": "MeowBeep",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/581",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "Bubblelicious",
+			"name": {
+				"en": "Bubblelicious",
+				"ru": "Пузырепрелестное"
+			},
+			"description": {
+				"en": "Bubblelicious - Psyker shield health indicator - Adds a HUD indicator showing the psyker shield's remaining uptime and health.",
+				"ru": "Bubblelicious - Psyker shield health indicator - Добавляет индикатор в интерфейс, показывающий оставшееся время работы и уровень здоровья псайкерского щита."
+			},
+			"author": "kara07CD",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/582",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "GlowCooldown",
+			"name": {
+				"en": "Glow Cooldown",
+				"ru": "Светящееся восстановление"
+			},
+			"description": {
+				"en": "This mod gives you control over the ARGB settings for the ability icon's frame, the glowing orbs and icon visibility for every ability state - on cooldown, ready, has charges remaining, out of charges and newly added 'paused' cooldown (ie hive scum abilities while active).",
+				"ru": "Glow Cooldown - Этот мод позволяет вам управлять настройками ARGB для рамки значка способности, светящихся сфер и видимости значка для каждого состояния способности: на перезарядке, в готовности, с оставшимися зарядами, без зарядов и для недавно добавленной «приостановленной» перезарядки (например, способности ульев-отбросов во время активности)."
+			},
+			"author": "tdopz",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/584",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "Hound Zero",
+			"name": {
+				"en": "Hound Zero",
+				"ru": "Гончая Зеро",
+				"zh-hans": "高亮猎犬引爆范围"
+			},
+			"description": {
+				"en": "Hound Zero - Arbites Hound Explosion Range Indicator - Hound Zero adds visual cues to show which enemies will be affected by Remote Detonation.",
+				"ru": "Hound Zero - Arbites Hound Explosion Range Indicator - Добавляет визуальные подсказки, показывающие, на каких врагов повлияет дистанционный подрыв.",
+				"zh-hans": "为赛博獒犬添加视觉提示，显示哪些敌人将受到遥控引爆的影响"
+			},
+			"author": "Wobin",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/589",
+			"github_url": "https://github.com/Wobin/HoundZero",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "MutantTom",
+			"name": {
+				"en": "Mutant Tom",
+				"ru": "Мутант Том"
+			},
+			"description": {
+				"en": "Mutant is screaming using Tom's voice.",
+				"ru": "Mutant Tom - Мутант кричит, используя голос Тома."
+			},
+			"author": "Mr Shamrock",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/590",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "Triage",
+			"name": {
+				"en": "Triage",
+				"ru": "Сортировка пациентов"
+			},
+			"description": {
+				"en": "Triage - Health Stimm Priority Target Indicator - Highlight team mates who have less than one wound due to corruption while you are wielding a health stimm. Helps figure out who needs the stimm the most.",
+				"ru": "Triage - Health Stimm Priority Target Indicator - Подсветите товарищей по команде, у которых осталось меньше одного ранения из-за порчи, пока вы держите в руках стимулятор здоровья. Это поможет определить, кому стимулятор нужен больше всего."
+			},
+			"author": "Wobin",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/591",
+			"github_url": "https://github.com/Wobin/Triage",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "YesTakeCandle",
+			"name": {
+				"en": "Yes Take Candle",
+				"ru": "Да, убери свечки"
+			},
+			"description": {
+				"en": "Yes Take Candle - Hide Clothing Flames - Hides flame-heavy cosmetics in first person to reduce dazzle: hides backpack, hat, and torso/shoulders while keeping arms and weapons visible.",
+				"ru": "Yes Take Candle - Hide Clothing Flames - Скрывает косметику с сильным пламенем от первого лица, чтобы уменьшить ослепление: скрывает рюкзак, шляпу и торс/плечи, оставляя руки и оружие видимыми."
+			},
+			"author": "GideonAriphael",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/592",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "No Yelling",
+			"name": {
+				"en": "No Yelling",
+				"ru": "Не ори!"
+			},
+			"description": {
+				"en": "No Yelling - Lowercase chat and Mourningstar chat self mute - Turns your outgoing chats lowercase.\nStops outgoing chats to the Mourningstar channel.",
+				"ru": "No Yelling - Lowercase chat and Mourningstar chat self mute - Преобразует исходящие сообщения в нижний регистр.\nПрекращает отправку исходящих сообщений в канал Моурнингстар."
+			},
+			"author": "kara07CD",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/593",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "Crystalline Focus",
+			"name": {
+				"en": "Crystalline Focus",
+				"ru": "Кристаллический фокус"
+			},
+			"description": {
+				"en": "Crystalline Focus - Crystalline Will Safety Ring Indicator - Adds a visual indicator that an Elite with low enough health is within range of a deadly Perils of the Warp explosion to take advantage of Crystalline Will's non corruption effect.",
+				"ru": "Crystalline Focus - Crystalline Will Safety Ring Indicator - Добавляет визуальный индикатор того, что элитный противник с достаточно низким уровнем здоровья находится в зоне действия убийственного взрыва от Опасностей Варпа, что позволяет воспользоваться эффектом «Чистая воля»."
+			},
+			"author": "Wobin",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/595",
+			"github_url": "https://github.com/Wobin/CrystallineFocus",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "Metal Gear Plasma",
+			"name": {
+				"en": "Metal Gear Plasma",
+				"ru": "Метал Гир Плазма"
+			},
+			"description": {
+				"en": "Metal Gear Plasma - Plasma Gunner alert sounds - Adds the Metal Gear Solid alert sound every time the Plasma gunners fire their guns.",
+				"ru": "Metal Gear Plasma - Plasma Gunner alert sounds - Добавляет звуковой сигнал из Метал Гир Солид каждый раз, когда стрелки из плазменных пушек открывают огонь."
+			},
+			"author": "Wobin",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/596",
+			"github_url": "https://github.com/Wobin/MetalGearPlasma",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "RecoveryMeters",
+			"name": {
+				"en": "Recovery Meters",
+				"ru": "Индикаторы восстановления"
+			},
+			"description": {
+				"en": "Display recovery meters for stamina and dodges next to their gauges.",
+				"ru": "Recovery Meters - Показывает индикаторы восстановления выносливости и уклонений рядом с соответствующими шкалами."
+			},
+			"author": "bountygiver",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/597",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "voc_outline",
+			"name": {
+				"en": "Voice of Command",
+				"ru": "Командный голос"
+			},
+			"description": {
+				"en": "Voice of Command - Knockdown Marker - Enhances the Only In Death Does Duty End (Voice of Command) talent by highlighting and illuminating knocked-down teammates within the ability's radius.",
+				"ru": "Voice of Command - Knockdown Marker - Улучшает талант «Только смертью заканчивается долг» (Командный голос), подсвечивая сбитых с ног товарищей по команде в радиусе действия способности."
+			},
+			"author": "leer",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/601",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "MoarDots",
+			"name": {
+				"en": "Moar Dots - Boss Bars",
+				"ru": "Больше Dot - Полоски здоровья боссов"
+			},
+			"description": {
+				"en": "MoarDots adds clean vertical world-marker bars above bosses that show health, toughness, the current HP number, and key debuff stacks (bleed/burn/warp/toxin and rending %).",
+				"ru": "Moar Dots - Boss Bars - Добавляет над боссами аккуратные вертикальные индикаторы, показывающие здоровье, выносливость, текущее цифровое значение здоровья и количество наложенных дебаффов (кровотечение/ожог/искажение/токсин и пробивание брони %)."
+			},
+			"author": "GideonAriphael",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/603",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "Psykernautics",
+			"name": {
+				"en": "Psykernautics",
+				"ru": "Псайкернавтика"
+			},
+			"description": {
+				"en": "Psykernautics enhances Psyker gameplay with customizable enemy highlighting. Features auto/manual peril-based circles, per-enemy colors, elite priorities, outside-range zones, transparency, line-of-sight filtering, and ground decals. Fully configurable for tactical awareness and situational control.",
+				"ru": "Psykernautics - Улучшает геймплей за псайкера благодаря настраиваемой подсветке врагов. Включает в себя автоматические/ручные круги опасности, цвета для каждого врага, приоритет на элитных врагах, зоны за пределами досягаемости, прозрачность, фильтрацию по линии обзора и наземные декали. Полностью настраиваемая система для тактической осведомлённости и контроля ситуации."
+			},
+			"author": "GAMEDOGSHIPMENT",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/617",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "UkrainianLocalization",
+			"name": {
+				"en": "Ukrainian Localization",
+				"ru": "Українська локалізація"
+			},
+			"description": {
+				"en": "I recommend installing via LBK Launcher. It's much easier to install - one click of a button and you're done. This mod adds Ukrainian localization for Warhammer 40,000: Darktide.",
+				"ru": "Рукомендую встановлювати через LBK Launcher. Набагато простіше онолювати - одне натиснення кнопки і все готово. Цей мод додає українську локалізацію для Warhammer 40,000: Darktide."
+			},
+			"author": "Sidimaki",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/618",
 			"github_url": "",
 			"note": {
-				"en": "",
-				"ru": ""
+				"en": "Required: What The Localization and UA Font Patch.",
+				"ru": "Потрібно: What The Localization та патч UA Font."
 			}
 		},
 		{
-			"folder": "",
+			"folder": "party_finder_auto_refresh",
 			"name": {
-				"en": "",
-				"ru": ""
+				"en": "Party Finder Auto Refresh",
+				"ru": "Поиск группы - автообновление"
 			},
 			"description": {
-				"en": "",
-				"ru": ""
+				"en": "Adds an auto-refresh feature to the Party Finder, allowing you to customize refresh intervals and toggle it with a hotkey.",
+				"ru": "Party Finder Auto Refresh - Добавляет функцию автоматического обновления в поиска группы, позволяя настраивать интервалы обновления и переключать их с помощью горячей клавиши."
 			},
-			"author": "",
-			"url": "",
+			"author": "leer",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/619",
 			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
+			"note": { "en": "", "ru": "" }
 		},
 		{
-			"folder": "",
+			"folder": "PsykerMacros",
 			"name": {
-				"en": "",
-				"ru": ""
+				"en": "Warp Reflex",
+				"ru": "Варп-рефлекс"
 			},
 			"description": {
-				"en": "",
-				"ru": ""
+				"en": "Staff Charge Macro:\nAutomatically charges your Force Staff to a configurable threshold.\nFires at the perfect charge level.\nOptional auto-quell after shooting.\n\nQuick Quell:\nInstantly quell peril with a single button press.\nAuto-swaps to a quellable weapon.",
+				"ru": "Warp Reflex - Макрос зарядки посоха:\nАвтоматически заряжает ваш силовой посох до настраиваемого порога.\nВыстреливает при идеальном уровне заряда.\nДополнительная функция автоподавления после выстрела.\n\nБыстрое подавление:\nМгновенно подавляет опасность одним нажатием кнопки.\nАвтоматически переключается на оружие, которое можно подавить опасность."
 			},
-			"author": "",
-			"url": "",
+			"author": "crispy cranky",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/620",
 			"github_url": "",
 			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
+				"en": "Required: DMF Mouse Bind Fix.",
+				"ru": "Требуется: DMF Mouse Bind Fix."
 			}
 		},
 		{
