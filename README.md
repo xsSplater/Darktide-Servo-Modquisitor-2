@@ -1,5 +1,6 @@
 # Darktide-Servo-ModQuisitor-2
-This is a program for sorting Darktide mods.
+Darktide Mod Manager
+
 <img src="https://staticdelivery.nexusmods.com/mods/4943/images/139/139-1780151868-2122448607.png">
 
 ## Features:
