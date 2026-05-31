@@ -13,11 +13,11 @@ import (
 )
 
 type _CustomButtonRenderer struct {
-	btn     *CustomButton
-	shadow  *canvas.Rectangle // тень
-	bg      *canvas.Rectangle // основной фон
-	bgImage *canvas.Image     // фоновое изображение (опционально)
-	text    *canvas.Text
+	btn		*CustomButton
+	shadow	*canvas.Rectangle // тень
+	bg		*canvas.Rectangle // основной фон
+	bgImage *canvas.Image	  // фоновое изображение (опционально)
+	text	*canvas.Text
 }
 
 func (r *_CustomButtonRenderer) Layout(size fyne.Size) {
@@ -65,69 +65,69 @@ func (r *_CustomButtonRenderer) Objects() []fyne.CanvasObject {
 func (r *_CustomButtonRenderer) Destroy() {}
 
 func (r *_CustomButtonRenderer) updateColors() {
-    btn := r.btn
-    th := fyne.CurrentApp().Settings().Theme()
-    variant := fyne.CurrentApp().Settings().ThemeVariant()
+	btn := r.btn
+	th := fyne.CurrentApp().Settings().Theme()
+	variant := fyne.CurrentApp().Settings().ThemeVariant()
 
-    // Тень
-    if btn.disabled {
-        r.shadow.FillColor = th.Color(themes.ColorButtonShadowDisabled, variant)
-    } else {
-        r.shadow.FillColor = th.Color(themes.ColorButtonShadow, variant)
-    }
+	// Тень
+	if btn.disabled {
+		r.shadow.FillColor = th.Color(themes.ColorButtonShadowDisabled, variant)
+	} else {
+		r.shadow.FillColor = th.Color(themes.ColorButtonShadow, variant)
+	}
 
-    r.bg.StrokeColor = th.Color(themes.ColorButtonStroke, variant)
+	r.bg.StrokeColor = th.Color(themes.ColorButtonStroke, variant)
 
-    if btn.disabled {
-        r.bg.FillColor = th.Color(theme.ColorNameDisabledButton, variant)
-        r.text.Color = th.Color(theme.ColorNameDisabled, variant)
-        return
-    }
+	if btn.disabled {
+		r.bg.FillColor = th.Color(theme.ColorNameDisabledButton, variant)
+		r.text.Color = th.Color(theme.ColorNameDisabled, variant)
+		return
+	}
 
-    // Если есть фоновое изображение
-    if r.bgImage != nil {
-        r.bg.FillColor = color.Transparent
-        r.bg.StrokeColor = th.Color(themes.ColorButtonStrokeImage, variant)
-        if btn.Importance == widget.WarningImportance {
-            r.text.Color = th.Color(theme.ColorNameForegroundOnWarning, variant)
-        } else {
-            r.text.Color = th.Color(theme.ColorNameForeground, variant)
-        }
-        return
-    }
+	// Если есть фоновое изображение
+	if r.bgImage != nil {
+		r.bg.FillColor = color.Transparent
+		r.bg.StrokeColor = th.Color(themes.ColorButtonStrokeImage, variant)
+		if btn.Importance == widget.WarningImportance {
+			r.text.Color = th.Color(theme.ColorNameForegroundOnWarning, variant)
+		} else {
+			r.text.Color = th.Color(theme.ColorNameForeground, variant)
+		}
+		return
+	}
 
-    // Обычные состояния
-    switch {
-    case btn.pressed && btn.hovered:
-        r.bg.FillColor = th.Color(theme.ColorNamePressed, variant)
-        r.text.Color = th.Color(theme.ColorNameForeground, variant)
-    case btn.hovered:
-        r.bg.FillColor = th.Color(theme.ColorNameHover, variant)
-        r.text.Color = th.Color(theme.ColorNameForeground, variant)
-    default:
-        if btn.Importance == widget.WarningImportance {
-            r.bg.FillColor = th.Color(theme.ColorNamePrimary, variant)
-            r.text.Color = th.Color(theme.ColorNameForegroundOnWarning, variant)
-        } else {
-            r.bg.FillColor = th.Color(theme.ColorNameButton, variant)
-            r.text.Color = th.Color(theme.ColorNameForeground, variant)
-        }
-    }
+	// Обычные состояния
+	switch {
+	case btn.pressed && btn.hovered:
+		r.bg.FillColor = th.Color(theme.ColorNamePressed, variant)
+		r.text.Color = th.Color(theme.ColorNameForeground, variant)
+	case btn.hovered:
+		r.bg.FillColor = th.Color(theme.ColorNameHover, variant)
+		r.text.Color = th.Color(theme.ColorNameForeground, variant)
+	default:
+		if btn.Importance == widget.WarningImportance {
+			r.bg.FillColor = th.Color(theme.ColorNamePrimary, variant)
+			r.text.Color = th.Color(theme.ColorNameForegroundOnWarning, variant)
+		} else {
+			r.bg.FillColor = th.Color(theme.ColorNameButton, variant)
+			r.text.Color = th.Color(theme.ColorNameForeground, variant)
+		}
+	}
 }
 
 type CustomButton struct {
 	widget.BaseWidget
-	text       string
+	text	   string
 	OnTapped   func()
 	Importance widget.Importance
 
-	hovered  bool
-	pressed  bool
-	focused  bool
+	hovered	 bool
+	pressed	 bool
+	focused	 bool
 	disabled bool
 
-	OnMouseIn    func()
-	OnMouseOut   func()
+	OnMouseIn	 func()
+	OnMouseOut	 func()
 	OnMouseMoved func(*desktop.MouseEvent)
 
 	bgImage *canvas.Image // необязательное фоновое изображение
@@ -135,7 +135,7 @@ type CustomButton struct {
 
 func NewCustomButton(label string, tapped func()) *CustomButton {
 	b := &CustomButton{
-		text:     label,
+		text:	  label,
 		OnTapped: tapped,
 	}
 	b.ExtendBaseWidget(b)
@@ -196,11 +196,11 @@ func (b *CustomButton) FocusLost() {
 }
 
 func (b *CustomButton) TypedKey(event *fyne.KeyEvent) {}
-func (b *CustomButton) TypedRune(r rune)              {}
+func (b *CustomButton) TypedRune(r rune)			  {}
 
 func (b *CustomButton) Disabled() bool { return b.disabled }
-func (b *CustomButton) Enable()        { b.disabled = false; b.Refresh() }
-func (b *CustomButton) Disable()       { b.disabled = true; b.Refresh() }
+func (b *CustomButton) Enable()		   { b.disabled = false; b.Refresh() }
+func (b *CustomButton) Disable()	   { b.disabled = true; b.Refresh() }
 
 func (b *CustomButton) CreateRenderer() fyne.WidgetRenderer {
 	shadow := canvas.NewRectangle(color.NRGBA{R: 0, G: 0, B: 0, A: 100})
@@ -214,10 +214,10 @@ func (b *CustomButton) CreateRenderer() fyne.WidgetRenderer {
 	txt.TextStyle.Bold = true
 
 	renderer := &_CustomButtonRenderer{
-		btn:    b,
+		btn:	b,
 		shadow: shadow,
-		bg:     bg,
-		text:   txt,
+		bg:		bg,
+		text:	txt,
 	}
 	// Если у кнопки уже установлено изображение, передаём его в рендерер
 	if b.bgImage != nil {

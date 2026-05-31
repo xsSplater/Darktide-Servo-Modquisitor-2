@@ -1,3 +1,4 @@
+// app.go
 package main
 
 import (
@@ -5,167 +6,175 @@ import (
 	"Servo-Modquisitor/sorter"
 	"Servo-Modquisitor/themes"
 	"encoding/json"
+	"errors"
 	"fmt"
-	"io"
-	"net/http"
+	"net"
 	"os"
 	"path/filepath"
+	"strconv"
 	"sync/atomic"
 	"time"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/widget"
 )
 
 type Config struct {
-	Language					string	`json:"language"`
-	Theme						string	`json:"theme"`
-	ModsGloballyEnabled			bool	`json:"mods_globally_enabled"`
-	InitialSetupDone			bool	`json:"initial_setup_done"`
-	DateFormat					string	`json:"date_format"`
-	ForceEnglishModNames		bool	`json:"force_english_mod_names"`
-	ModsPath					string	`json:"mods_path"`
-	WindowWidth					int		`json:"window_width"`
-	WindowHeight				int		`json:"window_height"`
-	WindowMaximized				bool	`json:"window_maximized"`
-	LastModDatabaseVersion		string	`json:"last_mod_database_version"`
-	LastMandatoryRulesVersion	string	`json:"last_mandatory_rules_version"`
-	LastUpdateCheck				string	`json:"last_update_check"`
-	SkipSortFilesPrompt			bool	`json:"skip_sort_files_prompt"`
-	UpdateCheckFrequency		string	`json:"update_check_frequency"`
-	ShowSystemMods				bool	`json:"show_system_mods"`
+	Language                  string `json:"language"`
+	Theme                     string `json:"theme"`
+	ModsGloballyEnabled       bool   `json:"mods_globally_enabled"`
+	InitialSetupDone          bool   `json:"initial_setup_done"`
+	DateFormat                string `json:"date_format"`
+	ForceEnglishModNames      bool   `json:"force_english_mod_names"`
+	ModsPath                  string `json:"mods_path"`
+	WindowWidth               int    `json:"window_width"`
+	WindowHeight              int    `json:"window_height"`
+	WindowMaximized           bool   `json:"window_maximized"`
+	LastModDatabaseVersion    string `json:"last_mod_database_version"`
+	LastMandatoryRulesVersion string `json:"last_mandatory_rules_version"`
+	LastUpdateCheck           string `json:"last_update_check"`
+	SkipSortFilesPrompt       bool   `json:"skip_sort_files_prompt"`
+	UpdateCheckFrequency      string `json:"update_check_frequency"`
+	ShowSystemMods            bool   `json:"show_system_mods"`
 	// скрывать предупреждение об AML
-    SuppressAMLWarning 			bool	`json:"suppress_aml_warning"`
-	// ключ API Nexus Mods
-	NexusAPIKey					string	`json:"nexus_api_key"`
+	SuppressAMLWarning bool `json:"suppress_aml_warning"`
+
+	// Nexus API
+	NexusAPIKey       string    `json:"nexus_api_key"`
+	OAuthAccessToken  string    `json:"oauth_access_token,omitempty"`
+	OAuthRefreshToken string    `json:"oauth_refresh_token,omitempty"`
+	OAuthExpiry       time.Time `json:"oauth_expiry,omitempty"`
 }
 
-const (
-	modDatabaseURL  = "https://raw.githubusercontent.com/xsSplater/Darktide-Servo-Modquisitor-2/main/SortingRules_and_ModDatabase/mod_database.json"
-	modMandatoryURL = "https://raw.githubusercontent.com/xsSplater/Darktide-Servo-Modquisitor-2/main/SortingRules_and_ModDatabase/mandatory_obsolete_incompatible_dependencies.json"
-)
+type ModVersionInfo struct {
+	Timestamp int64  `json:"timestamp"`
+	Version   string `json:"version"`
+	Folder    string `json:"folder"` // Название папки мода
+}
 
 type App struct {
-	cfg							*Config
-	mainWindow					fyne.Window
-	myApp						fyne.App
+	cfg        *Config
+	mainWindow fyne.Window
+	myApp      fyne.App
 
-	// логирование
-	logFile						*os.File
-	logContainer				*fyne.Container
-	consoleScroll				*container.Scroll
+	// Логирование
+	logFile       *os.File
+	consoleScroll *container.Scroll
 
-	// модели
-	allMods						[]checks.ModInfo
-	displayedMods				[]checks.ModInfo
-	systemMods					[]checks.ModInfo   // base и dmf
-	systemModsTableContainer	*fyne.Container
-	selectedModName				string
-	selectedModIndex			atomic.Int32
-	orderDirty					bool
+	// Модели
+	allMods                  []checks.ModInfo
+	displayedMods            []checks.ModInfo
+	systemMods               []checks.ModInfo // base и dmf
+	systemModsTableContainer *fyne.Container
+	selectedModName          string
+	selectedModIndex         atomic.Int32
+	orderDirty               bool
 
-	// рамка вокруг таблицы
-	tableBorder					*canvas.Rectangle
-	tableBorderContainer		*fyne.Container
-	blinkSaveOrderActive		bool
-	// blinkCheckSortActive		bool
-	amlDetected					bool
+	// Рамка вокруг таблицы
+	tableBorder          *canvas.Rectangle
+	tableBorderContainer *fyne.Container
+	blinkSaveOrderActive bool
+	amlDetected          bool
 
 	// Управление видимостью панели управления модами
-	managePanel					*fyne.Container
-	showSelectColumn			bool
-	selectColumnBgRes			fyne.Resource
+	managePanel       *fyne.Container
+	showSelectColumn  bool
+	selectColumnBgRes fyne.Resource
 
-	moveLabel					*widget.Label
-	statusLabel					*widget.Label
+	moveLabel   *widget.Label
+	statusLabel *widget.Label
 
-	tooltipStatus				*TooltipStatusManager
-	manageBtn					*CustomButton
-	selectAllBtn				*CustomButton
-	deselectAllBtn				*CustomButton
-	enableSelectedBtn			*CustomButton
-	disableSelectedBtn			*CustomButton
-	enableAllBtn				*CustomButton
-	disableAllBtn				*CustomButton
-	removeAllBtn				*CustomButton
-	removeSelectedBtn			*CustomButton
-	moveToTopBtn				*CustomButton
-	moveToBottomBtn				*CustomButton
-	btnToggle					*CustomButton
-	btnSaveOrder				*CustomButton
-	btnRefresh					*CustomButton
-	btnInstall					*CustomButton
-	btnRemove					*CustomButton
-	btnUp						*CustomButton
-	btnDown						*CustomButton
-	btnLaunchNormal				*CustomButton
-	btnLaunchNoLauncher			*CustomButton
-	btnSortChecks				*CustomButton
-	btnUpdateAll				*CustomButton
-	btnUpdateMod				*CustomButton
-	btnCheckUpdates				*CustomButton
-	searchClearBtn				*CustomButton
-	btnNexusTest				*CustomButton
+	tooltipStatus       *TooltipStatusManager
+	manageBtn           *CustomButton
+	selectAllBtn        *CustomButton
+	deselectAllBtn      *CustomButton
+	enableSelectedBtn   *CustomButton
+	disableSelectedBtn  *CustomButton
+	enableAllBtn        *CustomButton
+	disableAllBtn       *CustomButton
+	removeAllBtn        *CustomButton
+	removeSelectedBtn   *CustomButton
+	moveToTopBtn        *CustomButton
+	moveToBottomBtn     *CustomButton
+	btnToggle           *CustomButton
+	btnSaveOrder        *CustomButton
+	btnRefresh          *CustomButton
+	btnInstall          *CustomButton
+	btnRemove           *CustomButton
+	btnUp               *CustomButton
+	btnDown             *CustomButton
+	btnLaunchNormal     *CustomButton
+	btnLaunchNoLauncher *CustomButton
+	btnSortChecks       *CustomButton
+	btnUpdateAll        *CustomButton
+	btnUpdateMod        *CustomButton
+	btnCheckUpdates     *CustomButton
+	searchClearBtn      *CustomButton
 
-	moveToEntry					*widget.Entry
-	searchEntry					*widget.Entry
+	// Nexus API
+	oauthState     string
+	oauthVerifier  string
+	nxmListener    net.Listener // слушатель nxm-ссылок
+	enrichDebounce *time.Timer
+	lastNxmURL     string
+	lastNxmTime    time.Time
 
-	descTitle					*widget.Label
-	descAuthor					*widget.Label
-	descInstalled				*widget.Label
-	descBody					*widget.Label
-	descURL						*widget.Hyperlink
-    githubLink					*widget.Hyperlink
-	filterLabel					*widget.Label
-	counterLabel				*widget.Label
+	moveToEntry *widget.Entry
+	searchEntry *widget.Entry
 
-	descLocalVersion			*widget.Label
-	descLatestVersion			*widget.Label
+	descTitle     *canvas.Text
+	descAuthor    *widget.Label
+	descInstalled *widget.Label
+	descBody      *widget.Label
+	descURL       *widget.Hyperlink
+	githubLink    *widget.Hyperlink
+	filterLabel   *widget.Label
+	counterLabel  *widget.Label
 
-	logHeaderText				*canvas.Text
-	logWindow					*widget.RichText
+	descLocalVersion  *widget.Label
+	descLatestVersion *widget.Label
+	descConflict      *widget.Label // под descStatus
 
-	filterSelect				*widget.Select
-	modTable					*widget.Table
-	headerTable					*widget.Table
-	systemModsTable				*widget.Table // таблица системных модов
+	logHeaderText *canvas.Text
+	logWindow     *widget.RichText
 
-	mainSplit					*container.Split
-	rightSplit					*container.Split
+	filterSelect    *widget.Select
+	modTable        *widget.Table
+	headerTable     *widget.Table
+	systemModsTable *widget.Table // таблица системных модов
 
-	messages					map[string]string
-	modDatabase					[]checks.ModDBEntry
+	messages    map[string]string
+	modDatabase []checks.ModDBEntry
 
 	// ссылки на динамически окрашиваемые объекты
-	screenBgRect				*canvas.Rectangle
-	headerBoxBgRect				*canvas.Rectangle
-	tipBgRect					*canvas.Rectangle
-	topPanelBgRect				*canvas.Rectangle
-	managePanelBgRect			*canvas.Rectangle
-	descCardBgRect				*canvas.Rectangle
+	screenBgRect      *canvas.Rectangle
+	headerBoxBgRect   *canvas.Rectangle
+	tipBgRect         *canvas.Rectangle
+	topPanelBgRect    *canvas.Rectangle
+	managePanelBgRect *canvas.Rectangle
+	descCardBgRect    *canvas.Rectangle
 
-    nexusVersionCache   map[string]string // локальная версия
-    nexusLatestVersions map[string]string // последняя версия с сайта
+	nexusVersionCache   map[string]ModVersionInfo // локальная версия
+	nexusLatestVersions map[string]string         // последняя версия с сайта
 
-	gameRoot					string
-	patcherType					PatcherType
-	launchGameFunc				func(version GameVersion, gameRoot string, skipLauncher bool) error
+	gameRoot       string
+	patcherType    PatcherType
+	launchGameFunc func(version GameVersion, gameRoot string, skipLauncher bool) error
 }
 
 func NewApp(cfg *Config, myApp fyne.App) *App {
 	app := &App{
-		cfg:					cfg,
-		messages:				map[string]string{},
-		myApp:					myApp,
-		nexusVersionCache:		make(map[string]string),
-		nexusLatestVersions:	make(map[string]string),
+		cfg:                 cfg,
+		messages:            map[string]string{},
+		myApp:               myApp,
+		nexusVersionCache:   make(map[string]ModVersionInfo),
+		nexusLatestVersions: make(map[string]string),
 	}
 	app.selectedModIndex.Store(-1)
 	app.loadLanguage(cfg.Language)
-    app.loadNexusVersionCache()
+	app.loadNexusVersionCache()
 
 	if cfg.Theme == "light" {
 		myApp.Settings().SetTheme(&themes.ForcedLightTheme{})
@@ -180,26 +189,43 @@ func NewApp(cfg *Config, myApp fyne.App) *App {
 }
 
 func (app *App) loadNexusVersionCache() {
-    path := filepath.Join(filepath.Dir(configFilePath()), "nexus_versions.json")
-    data, err := os.ReadFile(path)
-    if err != nil {
-        // Файла нет — оставляем уже созданную пустую карту
-        return
-    }
-    if err := json.Unmarshal(data, &app.nexusVersionCache); err != nil {
-        // Ошибка чтения - тоже оставляем пустую карту
-        return
-    }
-    // Если файл содержал "null", карта станет nil - нужно восстановить
-    if app.nexusVersionCache == nil {
-        app.nexusVersionCache = make(map[string]string)
-    }
+	path := filepath.Join(filepath.Dir(configFilePath()), "nexus_versions.json")
+	data, err := os.ReadFile(path)
+	if err != nil {
+		app.nexusVersionCache = make(map[string]ModVersionInfo)
+		return
+	}
+	var raw map[string]ModVersionInfo
+	if err := json.Unmarshal(data, &raw); err != nil {
+		// Пробуем старый формат (map[string]string) для миграции
+		var old map[string]string
+		if err2 := json.Unmarshal(data, &old); err2 == nil {
+			app.nexusVersionCache = make(map[string]ModVersionInfo)
+			for k, v := range old {
+				// Пытаемся извлечь timestamp из строки
+				if ts, err := strconv.ParseInt(v, 10, 64); err == nil {
+					// Это уже timestamp, но версии нет - оставим пустую
+					app.nexusVersionCache[k] = ModVersionInfo{Timestamp: ts, Version: ""}
+				} else {
+					// Это старая строковая версия - timestamp нет
+					app.nexusVersionCache[k] = ModVersionInfo{Timestamp: 0, Version: v}
+				}
+			}
+		} else {
+			app.nexusVersionCache = make(map[string]ModVersionInfo)
+		}
+		return
+	}
+	app.nexusVersionCache = raw
+	if app.nexusVersionCache == nil {
+		app.nexusVersionCache = make(map[string]ModVersionInfo)
+	}
 }
 
 func (app *App) saveNexusVersionCache() {
-    path := filepath.Join(filepath.Dir(configFilePath()), "nexus_versions.json")
-    data, _ := json.MarshalIndent(app.nexusVersionCache, "", "  ")
-    os.WriteFile(path, data, 0644)
+	path := filepath.Join(filepath.Dir(configFilePath()), "nexus_versions.json")
+	data, _ := json.MarshalIndent(app.nexusVersionCache, "", "  ")
+	os.WriteFile(path, data, 0644)
 }
 
 func configFilePath() string {
@@ -233,18 +259,51 @@ func loadConfig() *Config {
 
 func saveConfig(c *Config) {
 	path := configFilePath()
-	data, _ := json.MarshalIndent(c, "", "  ")
+	data, _ := json.MarshalIndent(c, "", "	")
 	os.WriteFile(path, data, 0644)
 }
 
 func (app *App) loadLanguage(lang string) error {
 	data, err := embeddedFiles.ReadFile("lang/messages.json")
 	if err != nil {
-		return err
+		return fmt.Errorf("cannot read messages.json: %w", err)
 	}
+
+	// Валидация JSON
+	if !json.Valid(data) {
+		// Попробуем найти строку с ошибкой
+		var syntaxErr *json.SyntaxError
+		dummy := make(map[string]map[string]string)
+		if err := json.Unmarshal(data, &dummy); err != nil {
+			if errors.As(err, &syntaxErr) {
+				line, col := 1, 1
+				for i := 0; i < int(syntaxErr.Offset) && i < len(data); i++ {
+					if data[i] == '\n' {
+						line++
+						col = 1
+					} else {
+						col++
+					}
+				}
+				start := int(syntaxErr.Offset) - 30
+				if start < 0 {
+					start = 0
+				}
+				end := int(syntaxErr.Offset) + 30
+				if end > len(data) {
+					end = len(data)
+				}
+				snippet := string(data[start:end])
+				return fmt.Errorf("JSON error in messages.json at line %d, col %d: %v\nnear: ...%s...", line, col, syntaxErr, snippet)
+			}
+			return fmt.Errorf("messages.json is not valid JSON: %w", err)
+		}
+		return fmt.Errorf("messages.json is not valid JSON (unknown error)")
+	}
+
 	var raw map[string]map[string]string
 	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
+		return fmt.Errorf("cannot unmarshal messages.json: %w", err)
 	}
 
 	newMessages := make(map[string]string)
@@ -282,18 +341,41 @@ func (app *App) formatDate(t time.Time, pattern string) string {
 }
 
 type ModDatabaseFile struct {
-	Version string				`json:"version"`
-	Mods	[]checks.ModDBEntry `json:"mod_database"`
+	Version string              `json:"version"`
+	Mods    []checks.ModDBEntry `json:"mod_database"`
 }
 
 func (app *App) loadModDatabase(filename string) error {
-	data, err := os.ReadFile(filepath.Join(app.cfg.ModsPath, filename))
+	fullPath := filepath.Join(app.cfg.ModsPath, filename)
+	data, err := os.ReadFile(fullPath)
 	if err != nil {
-		return err
+		return fmt.Errorf("cannot read %s: %w", fullPath, err)
 	}
 	var container ModDatabaseFile
 	if err := json.Unmarshal(data, &container); err != nil {
-		return err
+		if syntaxErr, ok := err.(*json.SyntaxError); ok {
+			offset := int(syntaxErr.Offset)
+			line, col := 1, 1
+			for i := 0; i < offset && i < len(data); i++ {
+				if data[i] == '\n' {
+					line++
+					col = 1
+				} else {
+					col++
+				}
+			}
+			start := offset - 20
+			if start < 0 {
+				start = 0
+			}
+			end := offset + 20
+			if end > len(data) {
+				end = len(data)
+			}
+			snippet := string(data[start:end])
+			return fmt.Errorf("JSON error in %s at line %d, col %d: %v\nnear: ...%s...", fullPath, line, col, syntaxErr, snippet)
+		}
+		return fmt.Errorf("cannot unmarshal %s: %w", fullPath, err)
 	}
 	app.modDatabase = container.Mods
 	app.cfg.LastModDatabaseVersion = container.Version
@@ -309,137 +391,7 @@ func convertDeps(deps []checks.Dependency) []sorter.ModDependency {
 	return out
 }
 
-// ---- Новые методы для обновлений ----
-func (app *App) downloadSortFiles() error {
-	files := []struct {
-		remote string
-		local  string
-	}{
-		{modDatabaseURL, FileNameModDatabase},
-		{modMandatoryURL, FileNameMandatoryRules},
-	}
-	for _, f := range files {
-		dest := filepath.Join(app.cfg.ModsPath, f.local)
-		if err := app.downloadFile(f.remote, dest); err != nil {
-			return fmt.Errorf("%s: %w", f.local, err)
-		}
-	}
-	return nil
-}
-
-func (app *App) ensureSortFiles() {
-	missing := false
-	if _, err := os.Stat(filepath.Join(app.cfg.ModsPath, FileNameMandatoryRules)); os.IsNotExist(err) {
-		missing = true
-	}
-	if _, err := os.Stat(filepath.Join(app.cfg.ModsPath, FileNameModDatabase)); os.IsNotExist(err) {
-		missing = true
-	}
-	if !missing {
-		return
-	}
-
-	app.appendLog(app.messages["sort_files_missing_short"])
-
-	if app.cfg.SkipSortFilesPrompt {
-		app.appendLog(app.messages["download_skip_forever"])
-		return
-	}
-
-	choice := app.showChoiceDialog(
-		app.mainWindow,
-		app.messages["sort_files_missing"],
-		app.messages["download_sort_files_question"],
-		app.messages["yes"],
-		app.messages["skip"],
-		app.messages["download_skip_forever"],
-	)
-	switch choice {
-	case 0: // Да - скачать
-		if err := app.downloadSortFiles(); err != nil {
-			app.appendLog(fmt.Sprintf(app.messages["download_failed"], err))
-			dialog.ShowInformation(app.messages["sort_files_missing"], fmt.Sprintf(app.messages["download_failed"], err), app.mainWindow)
-		} else {
-			app.appendLog(app.messages["sort_files_updated"])
-			// Перезагрузить базы
-			if err := app.loadModDatabase(FileNameModDatabase); err == nil {
-				checks.SetModDatabase(app.modDatabase)
-			}
-			if err := checks.LoadExternalLists(FileNameMandatoryRules); err == nil {
-				app.cfg.LastMandatoryRulesVersion = checks.GetExternalVersion()
-				saveConfig(app.cfg)
-			}
-			app.refreshModList()
-		}
-	case 2: // Пропустить и больше не спрашивать
-		app.cfg.SkipSortFilesPrompt = true
-		saveConfig(app.cfg)
-		fallthrough
-	case 1: // Пропустить
-		app.appendLog(app.messages["download_skipped"])
-	}
-}
-
-func (app *App) shouldCheckUpdates() bool {
-	if app.cfg.UpdateCheckFrequency == "never" {
-		return false
-	}
-	if app.cfg.UpdateCheckFrequency == "every_start" {
-		return true
-	}
-	if app.cfg.LastUpdateCheck == "" {
-		return true
-	}
-	last, err := time.Parse(time.RFC3339, app.cfg.LastUpdateCheck)
-	if err != nil {
-		return true
-	}
-	now := time.Now()
-	switch app.cfg.UpdateCheckFrequency {
-	case "weekly":
-		return now.Sub(last) >= 7*24*time.Hour
-	case "monthly":
-		return now.After(last.AddDate(0, 1, 0))
-	case "yearly":
-		return now.After(last.AddDate(1, 0, 0))
-	}
-	return false
-}
-
-func (app *App) downloadFile(url, dest string) error {
-	client := &http.Client{Timeout: 30 * time.Second}
-	req, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		return fmt.Errorf("create request: %w", err)
-	}
-	if token := os.Getenv("GITHUB_TOKEN"); token != "" {
-		req.Header.Set("Authorization", "token "+token)
-	}
-	resp, err := client.Do(req)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("HTTP %d", resp.StatusCode)
-	}
-
-	out, err := os.Create(dest)
-	if err != nil {
-		return err
-	}
-	defer out.Close()
-
-	if _, err := io.Copy(out, resp.Body); err != nil {
-		out.Close()
-		os.Remove(dest)
-		return fmt.Errorf("copy failed: %w", err)
-	}
-	return nil
-}
-
 func (app *App) isModActive(name string) bool {
-    mod := app.findModByName(name)
-    return mod != nil && mod.Active
+	mod := app.findModByName(name)
+	return mod != nil && mod.Active
 }

@@ -1,5 +1,6 @@
 //go:build windows
 
+// window_state_windows.go
 package main
 
 import (

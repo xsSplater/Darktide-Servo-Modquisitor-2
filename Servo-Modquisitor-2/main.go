@@ -1,16 +1,17 @@
+// main.go
 package main
 
 import (
 	"Servo-Modquisitor/checks"
 	"Servo-Modquisitor/sorter"
-    "bufio"
+	"bufio"
 	"embed"
 	"fmt"
-    "net"
+	"net"
 	"net/url"
 	"os"
 	"path/filepath"
-    "strings"
+	"strings"
 	"time"
 
 	"fyne.io/fyne/v2"
@@ -18,26 +19,28 @@ import (
 	"fyne.io/fyne/v2/dialog"
 )
 
-//go:embed lang/messages.json assets/CRT_BlackBG.jpg assets/Yellow_BG.jpg assets/Yellow_BG_button.jpg assets/Yellow_BG_col.jpg assets/icon.png
+//go:embed lang/messages.json assets/CRT_BlackBG.jpg assets/Yellow_BG.jpg assets/Yellow_BG_button.jpg assets/Yellow_BG_col.jpg assets/icon.png assets/mechanicus.png
 var embeddedFiles embed.FS
 
 func main() {
-    // Проверяем, не передали ли нам nxm-ссылку при запуске
-    if len(os.Args) > 1 && os.Args[1] == "--nxm" && len(os.Args) > 2 {
-        nxmURL := os.Args[2]
-        // Пытаемся подключиться к уже запущенному экземпляру
-        conn, err := net.Dial("tcp", "localhost:31337")
-        if err == nil {
-            fmt.Fprintln(conn, nxmURL)
-            conn.Close()
-            os.Exit(0)
-        }
-        // Если не удалось - это первый экземпляр, продолжаем обычный запуск
-    }
+	// Проверяем, не передали ли нам nxm-ссылку при запуске
+	if len(os.Args) > 1 && os.Args[1] == "--nxm" && len(os.Args) > 2 {
+		nxmURL := os.Args[2]
+		// Пытаемся подключиться к уже запущенному экземпляру
+		conn, err := net.Dial("tcp", "localhost:31337")
+		if err == nil {
+			fmt.Fprintln(conn, nxmURL)
+			conn.Close()
+			os.Exit(0)
+		}
+		// Если не удалось - это первый экземпляр, продолжаем обычный запуск
+	}
 
-    myApp := app.NewWithID("com.xssplater.servo-modquisitor")
-    cfg := loadConfig()
-    cfg.ModsPath, _ = os.Getwd()
+	myApp := app.NewWithID("com.xssplater.servo-modquisitor")
+	cfg := loadConfig()
+	// cfg.ModsPath, _ = os.Getwd()
+	exePath, _ := os.Executable()
+	cfg.ModsPath = filepath.Dir(exePath)
 
 	application := NewApp(cfg, myApp)
 	logPath := filepath.Join(cfg.ModsPath, "app.log")
@@ -92,10 +95,11 @@ func main() {
 	sorter.SetLogFunc(func(text string) { application.appendLog(text) })
 	sorter.SetSortMessages(application.messages["sort_ru_warning"], application.messages["sort_en_warning"])
 	sorter.SetHeaderFunc(checks.WriteLoadOrderHeader)
+	sorter.SetLoadOrderOutputPath(filepath.Join(cfg.ModsPath, FileNameLoadOrder))
 	sorter.SetLogMessages(application.messages["log_create_mlot"], application.messages["log_mlot_created"])
 
 	if err := checks.LoadExternalLists(FileNameMandatoryRules); err != nil {
-		application.appendLog(application.messages["log_warn_moid_not_found"])
+		application.appendLog(application.messages["log_warn_moid_not_found"] + ": " + err.Error())
 	} else {
 		application.cfg.LastMandatoryRulesVersion = checks.GetExternalVersion()
 		saveConfig(application.cfg)
@@ -106,13 +110,16 @@ func main() {
 
 	var sorterRules []sorter.LoadOrderRule
 	for _, r := range checks.LoadOrderRules {
-		sorterRules = append(sorterRules, sorter.LoadOrderRule{Mod: r.Mod, Before: r.Before})
+		sorterRules = append(sorterRules, sorter.LoadOrderRule{
+			Before: r.Before,
+			After:  r.After,
+		})
 	}
 	sorter.SetLoadOrderRules(sorterRules)
 
 	if err := application.loadModDatabase(FileNameModDatabase); err != nil {
 		application.modDatabase = []checks.ModDBEntry{}
-		application.appendLog(application.messages["log_mod_db_missing"])
+		application.appendLog(application.messages["log_mod_db_missing"] + ": " + err.Error())
 		application.cfg.LastModDatabaseVersion = ""
 	}
 	checks.SetModDatabase(application.modDatabase)
@@ -133,8 +140,6 @@ func main() {
 	application.syncModsEnabledState()
 	application.buildUI()
 	application.refreshModList()
-	// Запросить ключ API Nexus, если ещё не введён
-	// application.requestNexusAPIKey()
 
 	if !cfg.InitialSetupDone {
 		application.performFirstRunSetup()
@@ -184,55 +189,58 @@ func main() {
 
 	// go application.blinkCheckSortIfNeeded()
 
-    // Проверка на AML и предупреждение пользователя (асинхронно)
-    application.amlDetected = checks.IsAMLInstalled(cfg.ModsPath)
-    if application.amlDetected && !cfg.SuppressAMLWarning {
-        application.showChoiceDialogAsync(
-            application.mainWindow,
-            application.messages["aml_detected_title"],
-            application.messages["aml_detected_warning"],
-            func(choice int) {
-                switch choice {
-                case 0:
-                    if u, err := url.Parse("https://www.nexusmods.com/warhammer40kdarktide/mods/19"); err == nil {
-                        application.myApp.OpenURL(u)
-                    }
-                case 2:
-                    cfg.SuppressAMLWarning = true
-                    saveConfig(cfg)
-                }
-            },
-            application.messages["btn_open_dml_page"],
-            application.messages["btn_yes"],
-            application.messages["btn_dont_show_again"],
-        )
-    }
+	// Проверка на AML и предупреждение пользователя (асинхронно)
+	application.amlDetected = checks.IsAMLInstalled(cfg.ModsPath)
+	if application.amlDetected && !cfg.SuppressAMLWarning {
+		application.showChoiceDialogAsync(
+			application.mainWindow,
+			application.messages["aml_detected_title"],
+			application.messages["aml_detected_warning"],
+			func(choice int) {
+				switch choice {
+				case 0:
+					if u, err := url.Parse("https://www.nexusmods.com/warhammer40kdarktide/mods/19"); err == nil {
+						application.myApp.OpenURL(u)
+					}
+				case 2:
+					cfg.SuppressAMLWarning = true
+					saveConfig(cfg)
+				}
+			},
+			application.messages["btn_open_dml_page"],
+			application.messages["btn_yes"],
+			application.messages["btn_dont_show_again"],
+		)
+	}
 
-    // Регистрируем программу как обработчик nxm:// ссылок
-    if exePath, err := os.Executable(); err == nil {
-        registerNXMProtocol(exePath)
-    }
+	// Регистрируем программу как обработчик nxm:// ссылок
+	if exePath, err := os.Executable(); err == nil {
+		registerNXMProtocol(exePath)
+	}
 
-    // Запускаем слушатель для межпроцессного взаимодействия (nxm-ссылки)
-    listener, err := net.Listen("tcp", "localhost:31337")
-    if err == nil {
-        go func() {
-            for {
-                conn, err := listener.Accept()
-                if err != nil {
-                    continue
-                }
-                // Читаем одну строку - nxm-ссылку
-                link, _ := bufio.NewReader(conn).ReadString('\n')
-                conn.Close()
-                // Передаём в главный поток
-                fyne.Do(func() {
-                    application.handleNXMLink(strings.TrimSpace(link))
-                })
-            }
-        }()
-        defer listener.Close()
-    }
-
-    application.mainWindow.ShowAndRun()
+	// Запускаем слушатель для межпроцессного взаимодействия (nxm-ссылки)
+	application.nxmListener, err = net.Listen("tcp", "localhost:31337")
+	if err == nil {
+		go func() {
+			for {
+				if application.nxmListener == nil {
+					return // слушатель был остановлен, горутина больше не нужна
+				}
+				conn, err := application.nxmListener.Accept()
+				if err != nil {
+					// слушатель закрыт - выходим
+					return
+				}
+				// Читаем одну строку - nxm-ссылку
+				link, _ := bufio.NewReader(conn).ReadString('\n')
+				conn.Close()
+				// Передаём в главный поток
+				fyne.Do(func() {
+					application.handleNXMLink(strings.TrimSpace(link))
+				})
+			}
+		}()
+		defer application.nxmListener.Close()
+	}
+	application.mainWindow.ShowAndRun()
 }

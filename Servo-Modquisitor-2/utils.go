@@ -1,3 +1,4 @@
+// utils.go
 package main
 
 import (
@@ -80,7 +81,8 @@ func detectGameVersion(gameRoot string) GameVersion {
 }
 
 func getGameRoot() string {
-	dir, _ := os.Getwd()
+	exePath, _ := os.Executable()
+	dir := filepath.Dir(exePath) // папка, где лежит exe (mods)
 	for {
 		if detectGameVersion(dir) != VersionUnknown {
 			return dir
@@ -94,6 +96,7 @@ func getGameRoot() string {
 	return ""
 }
 
+// Патчеры toggle_darktide_mods.bat и toggle_dt_mod_autopatch.cmd
 func detectPatcherType() PatcherType {
 	gameRoot := getGameRoot()
 	if gameRoot == "" {
@@ -108,25 +111,38 @@ func detectPatcherType() PatcherType {
 	if _, err := os.Stat(filepath.Join(gameRoot, "tools", "dtkit-patch")); err == nil {
 		return PatcherLegacy
 	}
+	if _, err := os.Stat(filepath.Join(gameRoot, "toggle_darktide_mods.bat")); err == nil {
+		return PatcherLegacy // старый патчер
+	}
 	return PatcherNone
 }
 
 func isModsEnabledAutoPatch() bool {
-	_, err := os.Stat("DISABLE_AUTOPATCHER")
+	gameRoot := getGameRoot()
+	if gameRoot == "" {
+		return false
+	}
+	_, err := os.Stat(filepath.Join(gameRoot, "DISABLE_AUTOPATCHER"))
 	return os.IsNotExist(err)
 }
 
 func toggleModsAutoPatch() error {
+	gameRoot := getGameRoot()
+	if gameRoot == "" {
+		return fmt.Errorf("game root not found")
+	}
 	if isModsEnabledAutoPatch() {
-		f, _ := os.Create("DISABLE_AUTOPATCHER")
+		f, _ := os.Create(filepath.Join(gameRoot, "DISABLE_AUTOPATCHER"))
 		if f != nil {
 			f.Close()
 		}
-		if _, err := os.Stat("../bundle/bundle_database.data.bak"); err == nil {
-			os.Rename("../bundle/bundle_database.data.bak", "../bundle/bundle_database.data")
+		bak := filepath.Join(gameRoot, "bundle", "bundle_database.data.bak")
+		original := filepath.Join(gameRoot, "bundle", "bundle_database.data")
+		if _, err := os.Stat(bak); err == nil {
+			os.Rename(bak, original)
 		}
 	} else {
-		os.Remove("DISABLE_AUTOPATCHER")
+		os.Remove(filepath.Join(gameRoot, "DISABLE_AUTOPATCHER"))
 	}
 	return nil
 }
@@ -136,7 +152,17 @@ func toggleModsLegacy() error {
 	if gameRoot == "" {
 		return fmt.Errorf("%s", errGameRootNotFound)
 	}
-	cmd := exec.Command(filepath.Join(gameRoot, "tools", "dtkit-patch"), "--toggle", "bundle")
+	bat := filepath.Join(gameRoot, "toggle_darktide_mods.bat")
+	if _, err := os.Stat(bat); err != nil {
+		// если bat нет, пробуем dtkit-patch
+		dtkit := filepath.Join(gameRoot, "tools", "dtkit-patch")
+		if _, err := os.Stat(dtkit); err == nil {
+			cmd := exec.Command(dtkit, "--toggle", "bundle")
+			return cmd.Run()
+		}
+		return fmt.Errorf("no supported patcher found")
+	}
+	cmd := exec.Command(bat)
 	return cmd.Run()
 }
 
@@ -191,105 +217,90 @@ func (app *App) makeRedCRTGradient(w, h int) *image.NRGBA {
 }
 
 func (app *App) runAllChecks() {
-    app.appendLog("// " + app.messages["log_start"])
+	app.appendLog("// " + app.messages["log_start"])
 
-    checks.CheckInstallation(app.mainWindow)
+	checks.CheckInstallation(app.mainWindow)
 
-    checks.EnsureModLoadOrder(app.mainWindow)
+	checks.EnsureModLoadOrder(app.mainWindow)
 
-    if !checks.CheckObsoleteMods(app.mainWindow) {
-        return
-    }
+	if !checks.CheckObsoleteMods(app.mainWindow) {
+		return
+	}
 
-    if !checks.CheckMalformed(app.mainWindow) {
-        return
-    }
+	if !checks.CheckMalformed(app.mainWindow) {
+		return
+	}
 
-    if !checks.CheckEmptyFolders(app.mainWindow) {
-        return
-    }
+	if !checks.CheckEmptyFolders(app.mainWindow) {
+		return
+	}
 
-    if !checks.CheckIncompatible(app.mainWindow) {
-        return
-    }
+	if !checks.CheckIncompatible(app.mainWindow) {
+		return
+	}
 
-    if !checks.CheckDependencies(app.mainWindow) {
-        return
-    }
+	if !checks.CheckDependencies(app.mainWindow) {
+		return
+	}
 
-    if !checks.CheckBrokenMods(app.mainWindow) {
-        return
-    }
+	if !checks.CheckBrokenMods(app.mainWindow) {
+		return
+	}
 
+	// 1. Перечитываем самый свежий сохранённый файл
+	app.refreshModList()
 
-    // 1. Перечитываем самый свежий сохранённый файл
-    app.refreshModList()
-    
-    // ДИАГНОСТИКА: выводим в лог все моды и их активность после refresh
-    // app.appendLog("--- DEBUG: after refreshModList ---")
-    // for _, mod := range app.allMods {
-    //     app.appendLog(fmt.Sprintf("  %s: Active=%v", mod.Name, mod.Active))
-    // }
-    // app.appendLog("--- END DEBUG ---")
+	// 2. Собираем активные моды для сортировки
+	var activeNames []string
+	notActive := make(map[string]bool)
+	for _, mod := range app.allMods {
+		if mod.Active && checks.FolderExists(mod.Name) {
+			activeNames = append(activeNames, mod.Name)
+		} else if checks.FolderExists(mod.Name) && !mod.IsSystem {
+			notActive[mod.Name] = true
+		}
+	}
 
-    // 2. Собираем активные моды для сортировки
-    var activeNames []string
-    notActive := make(map[string]bool)
-    for _, mod := range app.allMods {
-        if mod.Active && checks.FolderExists(mod.Name) {
-            activeNames = append(activeNames, mod.Name)
-        } else if checks.FolderExists(mod.Name) && !mod.IsSystem {
-            notActive[mod.Name] = true
-        }
-    }
+	// Если активных модов нет - просто завершаем
+	if len(activeNames) == 0 {
+		app.appendLog(app.messages["done"])
+		return
+	}
 
-    // ДИАГНОСТИКА: выводим собранные активные имена
-    // app.appendLog("--- DEBUG: active mods collected for sorting ---")
-    // for _, name := range activeNames {
-    //     app.appendLog("  " + name)
-    // }
-    // app.appendLog("--- END DEBUG ---")
+	sorter.CreateLoadOrderFromActive(activeNames, app.cfg.Language)
 
-    // Если активных модов нет - просто завершаем
-    if len(activeNames) == 0 {
-        app.appendLog(app.messages["done"])
-        return
-    }
+	// Дописываем неактивные моды, чтобы сохранить их состояние
+	loadOrderPath := filepath.Join(app.cfg.ModsPath, FileNameLoadOrder)
+	f, err := os.OpenFile(loadOrderPath, os.O_APPEND|os.O_WRONLY, 0644)
+	if err == nil {
+		existing := make(map[string]bool)
+		data, _ := os.ReadFile(loadOrderPath)
+		lines := strings.Split(string(data), "\n")
+		for _, line := range lines {
+			line = strings.TrimSpace(line)
+			if line != "" && !strings.HasPrefix(line, "--") {
+				existing[line] = true
+			}
+		}
+		for name := range notActive {
+			if !existing[name] {
+				fmt.Fprintln(f, "-- "+name)
+			}
+		}
+		f.Close()
+	}
+	app.appendLog(app.messages["done"])
 
-    sorter.CreateLoadOrderFromActive(activeNames, app.cfg.Language)
-
-    // Дописываем неактивные моды, чтобы сохранить их состояние
-    loadOrderPath := filepath.Join(app.cfg.ModsPath, FileNameLoadOrder)
-    f, err := os.OpenFile(loadOrderPath, os.O_APPEND|os.O_WRONLY, 0644)
-    if err == nil {
-        existing := make(map[string]bool)
-        data, _ := os.ReadFile(loadOrderPath)
-        lines := strings.Split(string(data), "\n")
-        for _, line := range lines {
-            line = strings.TrimSpace(line)
-            if line != "" && !strings.HasPrefix(line, "--") {
-                existing[line] = true
-            }
-        }
-        for name := range notActive {
-            if !existing[name] {
-                fmt.Fprintln(f, "-- "+name)
-            }
-        }
-        f.Close()
-    }
-    app.appendLog(app.messages["done"])
-
-    // Финальное обновление UI и открытие файла
-    fyne.Do(func() {
-        app.refreshModList()
-        absPath, _ := filepath.Abs(filepath.Join(app.cfg.ModsPath, FileNameLoadOrder))
-        if _, err := os.Stat(absPath); err == nil {
-            go func() {
-                if err := openFileWithDefaultApp(absPath); err != nil {
-                    app.appendLog(fmt.Sprintf(app.messages["log_failed_open_file"], err))
-                }
-            }()
-        }
-    })
+	// Финальное обновление UI и открытие файла
+	fyne.Do(func() {
+		app.refreshModList()
+		absPath, _ := filepath.Abs(filepath.Join(app.cfg.ModsPath, FileNameLoadOrder))
+		if _, err := os.Stat(absPath); err == nil {
+			go func() {
+				if err := openFileWithDefaultApp(absPath); err != nil {
+					app.appendLog(fmt.Sprintf(app.messages["log_failed_open_file"], err))
+				}
+			}()
+		}
+	})
 }

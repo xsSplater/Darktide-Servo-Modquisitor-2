@@ -1,5 +1,6 @@
 //go:build windows
 
+// open_file_windows.go
 package main
 
 import "os/exec"

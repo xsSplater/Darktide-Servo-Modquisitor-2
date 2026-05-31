@@ -1,3 +1,4 @@
+// mod_operations.go
 package main
 
 import (
@@ -12,6 +13,8 @@ import (
 	"strings"
 
 	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/widget"
 	"github.com/bodgit/sevenzip"
 	"github.com/nwaples/rardecode/v2"
@@ -31,6 +34,23 @@ func safeJoin(destDir, name string) (string, error) {
 }
 
 func (app *App) refreshModList() {
+	// --- Фикс для существующей кривой папки hub_hotkey_menus-main ---
+	wrongFolder := filepath.Join(app.cfg.ModsPath, "hub_hotkey_menus-main")
+	correctFolder := filepath.Join(app.cfg.ModsPath, "hub_hotkey_menus")
+	if info, err := os.Stat(wrongFolder); err == nil && info.IsDir() {
+		if _, err := os.Stat(correctFolder); os.IsNotExist(err) {
+			if err := os.Rename(wrongFolder, correctFolder); err == nil {
+				app.appendLog("Auto-renamed existing folder: hub_hotkey_menus-main -> hub_hotkey_menus")
+			} else {
+				app.appendLog(fmt.Sprintf("Failed to rename hub_hotkey_menus-main: %v", err))
+			}
+		} else {
+			// Обе папки есть – удаляем неправильную
+			os.RemoveAll(wrongFolder)
+			app.appendLog("Removed duplicate hub_hotkey_menus-main")
+		}
+	}
+	// --- конец фикса ---
 	mods := checks.GetModsInfo(app.cfg.Language, app.cfg.ForceEnglishModNames)
 
 	var sysMods, regMods []checks.ModInfo
@@ -82,6 +102,7 @@ func (app *App) refreshModList() {
 		regMods[i].Mandatory = checks.IsMandatoryMod(regMods[i].Name)
 		regMods[i].Incompatible = app.checkIncompatible(regMods[i].Name)
 
+		// Описание несовместимости в таблице в Примечании
 		if regMods[i].Incompatible {
 			for _, pair := range checks.IncompatiblePairs {
 				if pair.Mod1 == regMods[i].Name || pair.Mod2 == regMods[i].Name {
@@ -89,10 +110,8 @@ func (app *App) refreshModList() {
 					if other == regMods[i].Name {
 						other = pair.Mod2
 					}
-					desc := checks.GetIncompatibleDesc(pair.Mod1, pair.Mod2)
-					if desc != "" {
-						regMods[i].Note = strings.TrimSpace(regMods[i].Note + app.messages["conflict_with"] + other + ": " + desc)
-					}
+					// Только короткая запись в Note
+					regMods[i].Note = strings.TrimSpace(regMods[i].Note + app.messages["conflict_with"] + other)
 					break
 				}
 			}
@@ -201,7 +220,7 @@ func (app *App) toggleGlobalMods() {
 			if !app.cfg.ModsGloballyEnabled {
 				state = app.messages["log_mods_disabled"]
 			}
-			app.appendLog(state + " (автопатчер)")
+			app.appendLog(state + app.messages["log_autopatcher"])
 		}
 	case PatcherLegacy:
 		err := toggleModsLegacy()
@@ -213,7 +232,7 @@ func (app *App) toggleGlobalMods() {
 			if !app.cfg.ModsGloballyEnabled {
 				state = app.messages["log_mods_disabled"]
 			}
-			app.appendLog(state + " (старый патчер)")
+			app.appendLog(state + app.messages["log_autopatcher_old"])
 		}
 	default:
 		app.appendLog(app.messages["log_no_patcher"])
@@ -243,12 +262,20 @@ func (app *App) handleDrop(uris []fyne.URI) {
 		} else {
 			ext := strings.ToLower(filepath.Ext(path))
 			if ext == ".zip" || ext == ".rar" || ext == ".7z" {
-				err := app.extractArchive(path)
+				installedName, version, err := app.InstallModFromArchive(path, true, "")
 				if err != nil {
 					app.appendLog(fmt.Sprintf(app.messages["log_extract_error"], err))
 				} else {
 					checks.AutoFixMalformed()
 					app.refreshModList()
+					// Попробуем найти modID по имени папки или извлечь из имени архива
+					modID, _, _ := extractVersionAndModIDFromFilename(path)
+					if modID != 0 && version != "" {
+						app.cacheModVersion(fmt.Sprintf("%d", modID), installedName, version, 0)
+					} else if version != "" {
+						// Не знаем modID, не сохраняем в кэш (или сохраняем с ключом = folderName?)
+						// Можно сохранить с ключом = installedName, но потом не будет связи с API
+					}
 					app.appendLog(fmt.Sprintf(app.messages["log_installed"], filepath.Base(path)))
 				}
 			} else {
@@ -697,42 +724,88 @@ func (app *App) selectModByName(name string) {
 	}
 }
 
-// DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG 
-func (app *App) InstallModFromArchive(archivePath string, activate bool) (string, error) {
-// app.appendLog(fmt.Sprintf("Installing from archive %s, activate=%v", archivePath, activate))
-
+func (app *App) InstallModFromArchive(archivePath string, activate bool, knownVersion string) (string, string, error) {
 	tmpDir, err := os.MkdirTemp("", "servo-mod-")
 	if err != nil {
-app.appendLog(fmt.Sprintf("Failed to create temp dir: %v", err))
-		return "", err
+		app.appendLog(fmt.Sprintf("Failed to create temp dir: %v", err))
+		return "", "", err
 	}
 	defer os.RemoveAll(tmpDir)
-// app.appendLog(fmt.Sprintf("DEBUG: Temp dir: %s", tmpDir))
 
 	if err := app.extractArchiveTo(archivePath, tmpDir); err != nil {
-app.appendLog(fmt.Sprintf("Extract failed: %v", err))
-		return "", err
+		app.appendLog(fmt.Sprintf("Extract failed: %v", err))
+		return "", "", err
 	}
-// app.appendLog("Extraction complete")
 
 	entries, err := os.ReadDir(tmpDir)
 	if err != nil {
-// app.appendLog(fmt.Sprintf("DEBUG: Read temp dir failed: %v", err))
-		return "", err
+		return "", "", err
 	}
-// app.appendLog(fmt.Sprintf("DEBUG: Temp dir contains %d entries", len(entries)))
-// for _, e := range entries {
-// 	app.appendLog(fmt.Sprintf("DEBUG:   %s (dir=%v)", e.Name(), e.IsDir()))
-// }
+
+	// ========= СПЕЦИАЛЬНЫЙ ФИКС ДЛЯ МОДА pulsing_barrels =========
+	// Если в корне временной папки есть файл pulsing_barrels.mod, значит мод распакован без отдельной папки.
+	// Создаём папку pulsing_barrels и перемещаем туда всё содержимое.
+	hasModFile := false
+	for _, e := range entries {
+		if e.Name() == "pulsing_barrels.mod" {
+			hasModFile = true
+			break
+		}
+	}
+	if hasModFile {
+		modFolderName := "pulsing_barrels"
+		newModPath := filepath.Join(tmpDir, modFolderName)
+		if err := os.MkdirAll(newModPath, 0755); err == nil {
+			// Перемещаем все файлы и папки из tmpDir в новую подпапку
+			for _, e := range entries {
+				src := filepath.Join(tmpDir, e.Name())
+				dst := filepath.Join(newModPath, e.Name())
+				_ = os.Rename(src, dst)
+			}
+			// Обновляем список entries - теперь там должна быть одна папка
+			entries, err = os.ReadDir(tmpDir)
+			if err != nil {
+				return "", "", err
+			}
+			app.appendLog("Fixed missing root folder for pulsing_barrels")
+		}
+	}
+	// ========= КОНЕЦ ФИКСА =========
 
 	for _, e := range entries {
 		if e.IsDir() {
 			modName := e.Name()
+			// ========= Фикс кривой папки hub_hotkey_menus-main =========
+			if modName == "hub_hotkey_menus-main" {
+				newName := "hub_hotkey_menus"
+				oldPath := filepath.Join(tmpDir, modName)
+				newPath := filepath.Join(tmpDir, newName)
+				if err := os.Rename(oldPath, newPath); err == nil {
+					app.appendLog(fmt.Sprintf("Auto-renamed temp folder: %s -> %s", modName, newName))
+					modName = newName
+				} else {
+					app.appendLog(fmt.Sprintf("Failed to rename %s: %v", modName, err))
+				}
+			}
+			// ========= КОНЕЦ ФИКСА =========
 			dest := filepath.Join(app.cfg.ModsPath, modName)
-app.appendLog(fmt.Sprintf("Moving %s -> %s", modName, dest))
+			app.appendLog(fmt.Sprintf("Moving %s -> %s", modName, dest))
 			if err := app.copyFolder(filepath.Join(tmpDir, modName), dest); err != nil {
-app.appendLog(fmt.Sprintf("Copy failed: %v", err))
-				return "", err
+				app.appendLog(fmt.Sprintf("Copy failed: %v", err))
+				return "", "", err
+			}
+
+			// Определяем версию мода
+			version := knownVersion
+			if version == "" {
+				// Пытаемся извлечь из имени архива
+				_, extractedVersion, ok := extractVersionAndModIDFromFilename(archivePath)
+				if ok && extractedVersion != "" {
+					version = extractedVersion
+				} else {
+					// Спрашиваем у пользователя
+					version = app.promptUserForVersion(modName)
+				}
 			}
 
 			if !activate {
@@ -745,20 +818,23 @@ app.appendLog(fmt.Sprintf("Copy failed: %v", err))
 				}
 				app.filterModList()
 				app.appendLog(fmt.Sprintf(app.messages["log_installed_inactive"], modName))
-				return modName, nil
+				return modName, version, nil
 			} else {
 				app.refreshModList()
 				app.appendLog(fmt.Sprintf(app.messages["log_installed"], modName))
-				return modName, nil
+				return modName, version, nil
 			}
 		}
 	}
-	return "", fmt.Errorf("No mod folder found in archive")
+	return "", "", fmt.Errorf("no mod folder found in archive")
 }
 
-// Обновление одного обычного мода
+// Обновление одного мода. Только для Premium-пользователей!
 func (app *App) updateModFromNexus(mod *checks.ModInfo) {
-	if mod.URL == "" || app.cfg.NexusAPIKey == "" {
+	// app.appendLog("DEBUG: getAuthToken = " + app.getAuthToken())
+	// app.appendLog("DEBUG: mod.URL = " + mod.URL)
+
+	if mod.URL == "" || app.getAuthToken() == "" {
 		app.appendLog(app.messages["update_skipped_no_url"])
 		return
 	}
@@ -769,54 +845,105 @@ func (app *App) updateModFromNexus(mod *checks.ModInfo) {
 	}
 
 	modIDStr := fmt.Sprintf("%d", modID)
-	fileID, err := getLatestFileID(modID, app.cfg.NexusAPIKey)
+	fileInfo, err := app.getLatestFileInfo(modID)
 	if err != nil {
 		app.appendLog(fmt.Sprintf(app.messages["failed_get_latest_file_id"], err))
 		return
 	}
-	var fileVersion string
-	if fi, err := app.FetchFileInfo(modID, fileID, app.cfg.NexusAPIKey); err == nil {
-		fileVersion = fi.Version
-	}
-	directURL, filename, err := app.fetchDirectDownloadLink(fmt.Sprintf("%d", modID), fmt.Sprintf("%d", fileID), app.cfg.NexusAPIKey)
+
+	directURL, filename, err := app.getPremiumDownloadURL(modIDStr, fmt.Sprintf("%d", fileInfo.ID))
 	if err != nil {
 		app.appendLog(fmt.Sprintf(app.messages["failed_get_download_link"], err))
 		return
 	}
-	app.showDownloadDialog(directURL, filename, app.cfg.NexusAPIKey, mod.Name, fileVersion, modIDStr)
+	app.showDownloadDialog(directURL, filename, mod.Name, fileInfo, modIDStr)
 }
 
-// Обновление всех модов (только проверка через лог)
+// Обновление всех модов (только те, у которых есть обновление). Только для Premium-пользователей!
 func (app *App) updateAllModsFromNexus() {
-	if app.cfg.NexusAPIKey == "" {
+	if app.getAuthToken() == "" {
 		app.appendLog(app.messages["nexus_api_key_missing"])
 		return
 	}
-	go app.checkNexusUpdates()
+
+	// Сначала собираем список модов, для которых действительно есть обновление
+	var modsToUpdate []*checks.ModInfo
+	for i := range app.allMods {
+		mod := &app.allMods[i]
+		if mod.URL == "" || mod.IsSystem {
+			continue
+		}
+		modID := extractModIDFromURL(mod.URL)
+		if modID == 0 {
+			continue
+		}
+		// Получаем актуальную информацию о последнем файле
+		fileInfo, err := app.getLatestFileInfo(modID)
+		if err != nil {
+			app.appendLog(fmt.Sprintf("Failed to check %s: %v", mod.Name, err))
+			continue
+		}
+		modIDStr := fmt.Sprintf("%d", modID)
+		var saved ModVersionInfo
+		if info, exists := app.nexusVersionCache[modIDStr]; exists {
+			saved = info
+		}
+		if saved.Timestamp == 0 || fileInfo.UploadedTimestamp > saved.Timestamp {
+			modsToUpdate = append(modsToUpdate, mod)
+		}
+	}
+
+	if len(modsToUpdate) == 0 {
+		app.appendLog(app.messages["no_updates_found"])
+		return
+	}
+
+	// Диалог подтверждения
+	choice := app.showChoiceDialog(
+		app.mainWindow,
+		app.messages["update_title"],
+		fmt.Sprintf("Найдено обновлений: %d. Обновить все?", len(modsToUpdate)),
+		app.messages["yes"],
+		app.messages["btn_cancel"],
+	)
+	if choice != 0 {
+		return
+	}
+
+	// Обновляем
+	updatedCount := 0
+	for _, mod := range modsToUpdate {
+		app.appendLog(fmt.Sprintf(app.messages["updating_mod"], mod.Name))
+		app.updateModFromNexus(mod) // эта функция уже содержит проверку "already_latest"
+		updatedCount++
+	}
+	app.appendLog(fmt.Sprintf(app.messages["update_all_finished"], updatedCount))
 }
 
 // Удалить выбранные моды
 func (app *App) removeSelectedMods() {
-    for _, mod := range app.allMods {
-        if mod.Selected && !mod.IsSystem {
-            checks.RemoveMod(mod.Name)
-            app.appendLog(fmt.Sprintf(app.messages["log_deleted"], mod.Name))
-        }
-    }
-    app.refreshModList()
-    app.appendLog(app.messages["log_selected_mods_removed"])
+	for _, mod := range app.allMods {
+		if mod.Selected && !mod.IsSystem {
+			checks.RemoveMod(mod.Name)
+			app.appendLog(fmt.Sprintf(app.messages["log_deleted"], mod.Name))
+		}
+	}
+	app.refreshModList()
+	app.appendLog(app.messages["log_selected_mods_removed"])
+	app.updateTableBorder()
 }
 
 // Удалить все моды
 func (app *App) removeAllMods() {
-    for _, mod := range app.allMods {
-        if !mod.IsSystem {
-            checks.RemoveMod(mod.Name)
-            app.appendLog(fmt.Sprintf(app.messages["log_deleted"], mod.Name))
-        }
-    }
-    app.refreshModList()
-    app.appendLog(app.messages["log_all_mods_removed"])
+	for _, mod := range app.allMods {
+		if !mod.IsSystem {
+			checks.RemoveMod(mod.Name)
+			app.appendLog(fmt.Sprintf(app.messages["log_deleted"], mod.Name))
+		}
+	}
+	app.refreshModList()
+	app.appendLog(app.messages["log_all_mods_removed"])
+	app.updateTableBorder()
 }
 
 // Установка DML в корень игры
@@ -847,38 +974,156 @@ func (app *App) installDMLFromArchive(archivePath string) error {
 
 // Рекурсивное копирование файлов/папок с заменой
 func copyPath(src, dst string) error {
-    srcInfo, err := os.Stat(src)
-    if err != nil {
-        return err
-    }
-    if srcInfo.IsDir() {
-        return filepath.Walk(src, func(path string, info os.FileInfo, err error) error {
-            if err != nil {
-                return err
-            }
-            relPath, _ := filepath.Rel(src, path)
-            targetPath := filepath.Join(dst, relPath)
-            if info.IsDir() {
-                return os.MkdirAll(targetPath, 0755)
-            }
-            // Перед записью файла убедимся, что папка существует
-            if err := os.MkdirAll(filepath.Dir(targetPath), 0755); err != nil {
-                return err
-            }
-            data, err := os.ReadFile(path)
-            if err != nil {
-                return err
-            }
-            return os.WriteFile(targetPath, data, 0644)
-        })
-    }
-    // Одиночный файл - создаём папку для него
-    if err := os.MkdirAll(filepath.Dir(dst), 0755); err != nil {
-        return err
-    }
-    data, err := os.ReadFile(src)
-    if err != nil {
-        return err
-    }
-    return os.WriteFile(dst, data, 0644)
+	srcInfo, err := os.Stat(src)
+	if err != nil {
+		return err
+	}
+	if srcInfo.IsDir() {
+		return filepath.Walk(src, func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+			relPath, _ := filepath.Rel(src, path)
+			targetPath := filepath.Join(dst, relPath)
+			if info.IsDir() {
+				return os.MkdirAll(targetPath, 0755)
+			}
+			// Перед записью файла убедимся, что папка существует
+			if err := os.MkdirAll(filepath.Dir(targetPath), 0755); err != nil {
+				return err
+			}
+			data, err := os.ReadFile(path)
+			if err != nil {
+				return err
+			}
+			return os.WriteFile(targetPath, data, 0644)
+		})
+	}
+	// Одиночный файл - создаём папку для него
+	if err := os.MkdirAll(filepath.Dir(dst), 0755); err != nil {
+		return err
+	}
+	data, err := os.ReadFile(src)
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(dst, data, 0644)
+}
+
+func (app *App) updateAutopatcher() {
+	if app.getAuthToken() == "" {
+		app.appendLog(app.messages["nexus_api_key_missing"])
+		return
+	}
+	const autopatchModID = 709
+	app.appendLog(fmt.Sprintf(app.messages["looking_for_latest_file"], autopatchModID))
+	fileInfo, err := app.getLatestFileInfo(autopatchModID)
+	if err != nil {
+		app.appendLog(fmt.Sprintf(app.messages["failed_get_latest_file_id"], err))
+		return
+	}
+
+	modIDStr := fmt.Sprintf("%d", autopatchModID)
+	var saved ModVersionInfo
+	if info, exists := app.nexusVersionCache[modIDStr]; exists {
+		saved = info
+	}
+	if saved.Timestamp != 0 && fileInfo.UploadedTimestamp <= saved.Timestamp {
+		app.appendLog(fmt.Sprintf(app.messages["already_latest"], "Autopatcher", fileInfo.Version))
+		return
+	}
+
+	directURL, filename, err := app.getPremiumDownloadURL(modIDStr, fmt.Sprintf("%d", fileInfo.ID))
+	if err != nil {
+		app.appendLog(fmt.Sprintf(app.messages["failed_get_download_link"], err))
+		return
+	}
+	fyne.Do(func() {
+		app.showAutopatcherDownloadDialog(directURL, filename, fileInfo)
+	})
+}
+
+func (app *App) installAutopatcherFromArchive(archivePath string) error {
+	// Автопатчер устанавливается в корень игры, а не в mods
+	return app.installDMLFromArchive(archivePath) // у него такая же структура установки
+}
+
+// extractVersionAndModIDFromFilename пытается извлечь версию и ID мода из имени файла
+// Формат: "ИмяМода-MODID-Версия-Время.zip" или "ИмяМода-Версия-MODID-Время.zip"
+func extractVersionAndModIDFromFilename(filename string) (modID int, version string, ok bool) {
+	name := filepath.Base(filename)
+	// Удаляем расширение
+	ext := filepath.Ext(name)
+	if ext != "" {
+		name = name[:len(name)-len(ext)]
+	}
+	parts := strings.Split(name, "-")
+	if len(parts) < 4 {
+		return 0, "", false
+	}
+	// Ищем часть, похожую на число (modID) – обычно 2-3 цифры
+	for i, part := range parts {
+		if id, err := strconv.Atoi(part); err == nil && id > 0 && id < 10000 {
+			modID = id
+			// Версия – обычно следующая часть или предыдущая?
+			// Пробуем разные варианты
+			if i+1 < len(parts) && strings.Contains(parts[i+1], ".") {
+				version = parts[i+1]
+				return modID, version, true
+			}
+			if i-1 >= 0 && strings.Contains(parts[i-1], ".") {
+				version = parts[i-1]
+				return modID, version, true
+			}
+		}
+	}
+	// Если не нашли modID, но есть часть с точкой – считаем её версией
+	for _, part := range parts {
+		if strings.Contains(part, ".") && len(part) > 1 && !strings.Contains(part, " ") {
+			version = part
+			return 0, version, true
+		}
+	}
+	return 0, "", false
+}
+
+// promptUserForVersion показывает диалог ввода версии и возвращает введённую строку
+func (app *App) promptUserForVersion(modName string) string {
+	resultChan := make(chan string, 1)
+	fyne.Do(func() {
+		entry := widget.NewEntry()
+		entry.SetPlaceHolder("например, 1.0.0 или 26.04.12")
+		var dlg dialog.Dialog
+		content := container.NewVBox(
+			widget.NewLabel(fmt.Sprintf("Не удалось определить версию мода '%s'.\nВведите версию вручную:", modName)),
+			entry,
+			container.NewHBox(
+				widget.NewButton("Сохранить", func() {
+					resultChan <- entry.Text
+					dlg.Hide()
+				}),
+				widget.NewButton("Отмена", func() {
+					resultChan <- ""
+					dlg.Hide()
+				}),
+			),
+		)
+		dlg = dialog.NewCustom("Версия мода", "", content, app.mainWindow)
+		dlg.Resize(fyne.NewSize(400, 200))
+		dlg.Show()
+	})
+	return <-resultChan
+}
+
+// cacheModVersion сохраняет версию мода в кэш (без timestamp, если неизвестен)
+func (app *App) cacheModVersion(modID string, folderName string, version string, timestamp int64) {
+	if version == "" {
+		return
+	}
+	app.nexusVersionCache[modID] = ModVersionInfo{
+		Timestamp: timestamp,
+		Version:   version,
+		Folder:    folderName,
+	}
+	app.saveNexusVersionCache()
 }

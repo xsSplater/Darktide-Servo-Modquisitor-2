@@ -39,6 +39,10 @@
         "en": "unknown",
         "ru": "неизвестен"
     },
+    "autopatcher_updated": {
+        "en": "Autopatcher updated successfully.",
+        "ru": "Автопатчер успешно обновлён."
+    },
     "broken_found_list": {
         "en": "Broken (no .mod): %s",
         "ru": "Сломаны (нет .mod): %s"
@@ -67,6 +71,10 @@
         "en": "🆕 Create new",
         "ru": "🆕 Создать новый"
     },
+    "btn_delete_api_key": {
+        "en": "🗑 Delete API Key",
+        "ru": "🗑 Удалить ключ API"
+    },
     "btn_deselect_all": {
         "en": "Deselect All",
         "ru": "Снять выделение"
@@ -85,7 +93,7 @@
     },
     "btn_disable_mods": {
         "en": "🔳 Toggle Darktide Mods",
-        "ru": "🔳 Выключить моды в Darktide"
+        "ru": "🔳 Отключить моды"
     },
     "btn_disable_selected": {
         "en": "Disable Selected",
@@ -136,8 +144,8 @@
         "ru": "⏬ Установить мод"
     },
     "btn_install_tooltip": {
-        "en": "Opens a window for selecting archives for mod installation. It's best to install mods by dragging and dropping them onto the program window.",
-        "ru": "Открывает окно выбора архивов для установки мода. Лучше устанавливайте моды перетаскиванием на окно программы."
+        "en": "You can install mods by opening the selection window with this button or by dragging the archive onto this window.",
+        "ru": "Вы можете установить моды открыв окно выбора этой кнопкой или перетаскиванием архива на это окно."
     },
     "btn_launch_game": {
         "en": "▶ Launch Game",
@@ -186,6 +194,10 @@
     "btn_no_patcher": {
         "en": "⚠ Patcher not found",
         "ru": "⚠ Патчер не найден"
+    },
+    "btn_ok": {
+        "en": "OK",
+        "ru": "ОК"
     },
     "btn_open_dml_page": {
         "en": "Open DML page",
@@ -269,7 +281,7 @@
     },
     "btn_sort_checks": {
         "en": "🛠 Check and Auto-Sort",
-        "ru": "🛠 Проверка и Автосортировка"
+        "ru": "🛠 Проверка и Сортировка"
     },
     "btn_sort_checks_aml": {
         "en": "🛠 Check and Auto-Sort (AML active)",
@@ -291,25 +303,37 @@
         "en": "Moves the selected mods up one line.",
         "ru": "Поднимает выбранные моды выше на одну строку."
     },
+    "btn_update_all": {
+        "en": "🔄 Update All Mods",
+        "ru": "🔄 Обновить все моды"
+    },
+    "btn_update_all_premium_only": {
+        "en": "Updates all mods in the list. Requires a Premium!",
+        "ru": "Обновляет все моды в списке. Требуется премиум!"
+    },
+    "btn_update_all_tooltip": {
+        "en": "Updates all mods in the list.",
+        "ru": "Обновляет все моды в списке."
+    },
     "btn_update_mod": {
         "en": "🔄 Update Mod",
         "ru": "🔄 Обновить мод"
+    },
+    "btn_update_mod_premium_only": {
+        "en": "Updates one mod currently selected in the list. Requires a Premium!",
+        "ru": "Обновляет один мод выбранный прямо сейчас в списке. Требуется премиум!"
     },
     "btn_update_mod_tooltip": {
         "en": "Updates one mod currently selected in the list.",
         "ru": "Обновляет один мод выбранный прямо сейчас в списке."
     },
-    "btn_update_all": {
-        "en": "🔄 Update All Mods",
-        "ru": "🔄 Обновить все моды"
-    },
-    "btn_update_all_tooltip": {
-        "en": "Updates all mods in the list if an update for them is available on the Nexus.",
-        "ru": "Обновляет все моды в списке, если на Nexus доступно обновление для них."
-    },
     "btn_yes": {
         "en": " ✔ Yes ",
         "ru": " ✔ Да  "
+    },
+    "checking_github_update": {
+        "en": "Checking for program updates on GitHub...",
+        "ru": "Проверка обновлений программы на GitHub..."
     },
     "cannot_extract_mod_id": {
         "en": "Cannot extract mod ID from URL: %s",
@@ -364,8 +388,8 @@
         "ru": "Будут безвозвратно удалены папки модов.\n\nМодов выбрано: %d.\n\nВы уверены?"
     },
     "conflict_with": {
-        "en": " 💢 Conflict with ",
-        "ru": " 💢 Конфликт с "
+        "en": "Conflict with ",
+        "ru": "Конфликт с "
     },
     "delete_broken": {
         "en": "Delete All Broken",
@@ -416,8 +440,8 @@
         "ru": "нет .mod файла"
     },
     "desc_conflict": {
-        "en": "⚔ Conflict",
-        "ru": "⚔ Конфликт"
+        "en": "⚔ conflict",
+        "ru": "⚔ конфликт"
     },
     "desc_obsolete": {
         "en": "☠ Obsolete",
@@ -431,9 +455,21 @@
         "en": "DMF folder missing!",
         "ru": "Папка DMF не найдена!"
     },
+    "dml_install_failed": {
+        "en": "DML installation failed: %v",
+        "ru": "Ошибка установки DML: %v"
+    },
+    "dml_updated": {
+        "en": "Darktide Mod Loader updated successfully.",
+        "ru": "Darktide Mod Loader успешно обновлён."
+    },
     "done": {
         "en": "✅ Sorting complete!",
         "ru": "✅ Сортировка завершена!"
+    },
+    "download_api_response": {
+        "en": "Download API response: %s",
+        "ru": "Ответ API загрузки: %s"
     },
     "download_complete": {
         "en": "Download complete. Mod installed (inactive).",
@@ -442,6 +478,14 @@
     "download_failed": {
         "en": "Download failed: %v",
         "ru": "Не удалось скачать: %v"
+    },
+    "download_free_method": {
+        "en": "Using FREE download method.",
+        "ru": "Используется БЕСПЛАТНЫЙ метод загрузки."
+    },
+    "download_premium_method": {
+        "en": "Using PREMIUM download method.",
+        "ru": "Используется ПРЕМИУМ метод загрузки."
     },
     "download_skipped": {
         "en": "Skipped. Sorting by alphabet.",
@@ -462,6 +506,10 @@
     "downloading": {
         "en": "Downloading: %s",
         "ru": "Загрузка: %s"
+    },
+    "downloading_dml": {
+        "en": "Downloading DML: %s",
+        "ru": "Загрузка DML: %s"
     },
     "empty_folder_message": {
         "en": "The following folders are empty:",
@@ -496,8 +544,8 @@
         "ru": "Все"
     },
     "filter_conflict": {
-        "en": "💢 Conflicts",
-        "ru": "💢 Конфликты"
+        "en": "⚔ Conflicts",
+        "ru": "⚔ Конфликты"
     },
     "filter_inactive": {
         "en": "❌ Inactive",
@@ -559,9 +607,33 @@
         "en": "🕛 Yearly",
         "ru": "🕛 Раз в год"
     },
+    "github_already_latest": {
+        "en": "✅ Program is up-to-date.",
+        "ru": "✅ Программа уже обновлена до последней версии."
+    },
     "game_already_running": {
-        "en": "Darktide is already running.",
-        "ru": "Darktide уже запущен."
+        "en": "🛑 Darktide is already running.",
+        "ru": "🛑 Darktide уже запущен."
+    },
+    "github_api_error": {
+        "en": "GitHub API error: %v",
+        "ru": "Ошибка API GitHub: %v"
+    },
+    "github_api_error_status": {
+        "en": "GitHub API returned status %d",
+        "ru": "API GitHub вернул статус %d"
+    },
+    "github_update_available": {
+        "en": "New version available! Current: %s, latest: %s",
+        "ru": "Доступна новая версия! Текущая: %s, последняя: %s"
+    },
+    "github_update_message": {
+        "en": "A new release %s is available on GitHub. Open the release page?",
+        "ru": "Доступен новый релиз %s на GitHub. Открыть страницу релиза?"
+    },
+    "github_update_title": {
+        "en": "⬆ Program Update Available",
+        "ru": "⬆ Доступно обновление программы"
     },
 	"github_url_label": {
 		"en": "🔗 Open mod page [GitHub]",
@@ -579,9 +651,21 @@
         "en": "💫 Incompatible mods 💫",
         "ru": "💫 Несовместимые моды 💫"
     },
+    "install_failed": {
+        "en": "Installation failed: %v",
+        "ru": "Ошибка установки: %v"
+    },
     "installed_label": {
         "en": "Installed: %s",
         "ru": "Установлен: %s"
+    },
+    "installing_autopatcher": {
+        "en": "Installing Autopatcher...",
+        "ru": "Установка автопатчера..."
+    },
+    "installing_dml": {
+        "en": "Installing Darktide Mod Loader...",
+        "ru": "Установка Darktide Mod Loader..."
     },
     "invalid_nxm_link": {
         "en": "Invalid nxm link",
@@ -614,6 +698,14 @@
     "linux_xbox_not_supported": {
         "en": "Xbox/Game Pass version is not supported on Linux. Use Steam version.",
         "ru": "Версия Xbox/Game Pass не поддерживается на Linux. Используйте Steam-версию."
+    },
+    "log_autopatcher": {
+        "en": " (Autopatcher)",
+        "ru": " (автопатчер)"
+    },
+    "log_autopatcher_old": {
+        "en": " (BAT patcher)",
+        "ru": " (старый патчер)"
     },
     "log_all_mods_removed": {
         "en": "All mods have been removed.",
@@ -820,8 +912,8 @@
         "ru": "Неправильная распаковка: %s"
     },
     "menu_contact": {
-        "en": "📧 Contacts",
-        "ru": "📧 Контакты"
+        "en": "[ 📧 Contacts ]",
+        "ru": "[ 📧 Контакты ]"
     },
     "menu_date_format": {
         "en": "📅 Date Format",
@@ -848,8 +940,8 @@
         "ru": "🔨 Мой Discord"
     },
     "menu_github": {
-        "en": "🌚 Github",
-        "ru": "🌚 Github"
+        "en": "🌚 Program repository [Github]",
+        "ru": "🌚 Репозиторий программы [Github]"
     },
     "menu_lang_en": {
         "en": "🗨 English",
@@ -864,20 +956,32 @@
         "ru": "😛 Язык"
     },
     "menu_nexus": {
-        "en": "📙 Nexus Mods",
-        "ru": "📙 Nexus Mods"
+        "en": "[ 🔗 Login to Nexus ]",
+        "ru": "[ 🔗 Вход на Nexus ]"
+    },
+    "menu_nexus_mod_page": {
+        "en": "🔗 Mod Page [Nexus]",
+        "ru": "🔗 Страница мода [Nexus]"
+    },
+    "menu_nexus_login": {
+        "en": "👤 Login with Nexus (OAuth)",
+        "ru": "👤 Войти через Nexus (OAuth)"
+    },
+    "menu_nexus_logout": {
+        "en": "🚪 Log out of Nexus",
+        "ru": "🚪 Выйти из аккаунта Nexus"
     },
     "menu_nexus_api_key": {
-        "en": "🔑 Nexus API Key",
-        "ru": "🔑 Ключ API Nexus"
+        "en": "🔑 Login with Nexus API Key",
+        "ru": "🔑 Вход с помощью API-ключа Nexus"
     },
     "menu_periodic_check": {
         "en": "⏰ Periodic Update Check",
         "ru": "⏰ Периодическая проверка"
     },
     "menu_settings": {
-        "en": "⚙ Settings",
-        "ru": "⚙ Настройки"
+        "en": "[ ⚙ Settings ]",
+        "ru": "[ ⚙ Настройки ]"
     },
     "menu_theme": {
         "en": "🌓 Theme",
@@ -892,20 +996,24 @@
         "ru": "🌕 Светлая"
     },
     "menu_update_program": {
-        "en": "📟 Update Program",
-        "ru": "📟 Обновить программу"
+        "en": "⏬ Update Program [Nexus]",
+        "ru": "⏬ Обновить программу [Nexus]"
+    },
+    "menu_update_program_github": {
+        "en": "⏬ Update Program [Github]",
+        "ru": "⏬ Обновить программу [Github]"
     },
     "menu_update_sort_files": {
-        "en": "🗃 Update Sorting Files",
-        "ru": "🗃 Обновить файлы сортировки"
+        "en": "⏬ Update Sorting Files [Github]",
+        "ru": "⏬ Обновить файлы сортировки [Github]"
     },
     "menu_updates": {
-        "en": "⏬ Updates",
-        "ru": "⏬ Обновления"
+        "en": "[ ⏬ Updates ]",
+        "ru": "[ ⏬ Обновления ]"
     },
     "mod_load_order_created": {
-        "en": "mod_load_order.txt has been created.",
-        "ru": "mod_load_order.txt создан."
+        "en": "✅ mod_load_order.txt has been created.",
+        "ru": "✅ mod_load_order.txt создан."
     },
     "mod_url_label": {
         "en": "🔗 Open mod page [Nexus]",
@@ -915,13 +1023,21 @@
         "en": "Showing %d of %d (active %d)",
         "ru": "Показано %d из %d (активно %d)"
     },
-    "nexus_api_key_title": {
-        "en": "Nexus Mods API Key",
-        "ru": "Ключ API Nexus Mods"
+    "nxm_already_processing": {
+        "en": "This download link was already processed recently. Skipping duplicate.",
+        "ru": "Эта ссылка уже обрабатывалась недавно. Пропускаю повтор."
+    },
+    "nexus_api_key_deleted": {
+        "en": "Nexus API key deleted.",
+        "ru": "Ключ API Nexus удалён."
     },
     "nexus_api_key_label": {
         "en": "Enter your personal premium API key from Nexus Mods:",
         "ru": "Введите ваш личный премиум API-ключ с Nexus Mods:"
+    },
+    "nexus_api_key_missing": {
+        "en": "Nexus API key is not set.",
+        "ru": "Ключ API Nexus не задан."
     },
     "nexus_api_key_placeholder": {
         "en": "API key...",
@@ -931,9 +1047,9 @@
         "en": "Nexus API key saved.",
         "ru": "Ключ API Nexus сохранён."
     },
-    "nexus_api_key_missing": {
-        "en": "Nexus API key is not set.",
-        "ru": "Ключ API Nexus не задан."
+    "nexus_api_key_title": {
+        "en": "Nexus Mods API Key",
+        "ru": "Ключ API Nexus Mods"
     },
     "nexus_endorsements_label": {
         "en": "Endorsements: %d",
@@ -942,6 +1058,10 @@
     "nexus_downloads_label": {
         "en": "Downloads: %d",
         "ru": "Загрузок: %d"
+    },
+    "nexus_free_status": {
+        "en": "Nexus account status: Free",
+        "ru": "Статус Nexus-аккаунта: Бесплатный"
     },
     "nexus_latest_version_label": {
         "en": "Latest: %s",
@@ -958,6 +1078,10 @@
     "nexus_local_version_unknown": {
         "en": "Your version: ?",
         "ru": "Ваша версия: ?"
+    },
+    "nexus_premium_status": {
+        "en": "Nexus account status: Premium",
+        "ru": "Статус Nexus-аккаунта: Премиум"
     },
     "nexus_version_label": {
         "en": "Version: %s",
@@ -991,6 +1115,10 @@
         "en": "❌ No mods selected for removal.",
         "ru": "❌ Не выбраны моды для удаления."
     },
+    "no_mods_to_update": {
+        "en": "No mods with Nexus URL found.",
+        "ru": "Не найдено модов с Nexus-ссылкой."
+    },
     "no_obsolete_found": {
         "en": "✅ No obsolete mods found.",
         "ru": "✅ Устаревших модов не обнаружено."
@@ -1010,6 +1138,42 @@
     "note_backup_copy": {
         "en": "❓ Backup copy - disabled in the list.",
         "ru": "❓ Резервная копия - выключено в списке."
+    },
+    "oauth_login_success": {
+        "en": "Successfully logged in with Nexus Mods.",
+        "ru": "Успешный вход через Nexus Mods."
+    },
+    "oauth_failed_verifier": {
+        "en": "Failed to generate code verifier: %s",
+        "ru": "Ошибка генерации code verifier: %s"
+    },
+    "oauth_failed_parse_url": {
+        "en": "Failed to parse auth URL: %s",
+        "ru": "Ошибка парсинга URL авторизации: %s"
+    },
+    "oauth_failed_open_browser": {
+        "en": "Failed to open browser: %s",
+        "ru": "Ошибка открытия браузера: %s"
+    },
+    "oauth_failed_callback_server": {
+        "en": "Failed to start callback server: %s",
+        "ru": "Ошибка запуска сервера обратного вызова: %s"
+    },
+    "oauth_exchange_failed": {
+        "en": "Token exchange failed: %s",
+        "ru": "Ошибка обмена токена: %s"
+    },
+    "oauth_logout_success": {
+        "en": "Logged out from Nexus Mods.",
+        "ru": "Выход из Nexus Mods выполнен."
+    },
+    "oauth_success_title": {
+        "en": "✅ Login Successful",
+        "ru": "✅ Вход выполнен"
+    },
+    "oauth_success_message": {
+        "en": "You have successfully logged in to your Nexus Mods account.",
+        "ru": "Вы успешно вошли в аккаунт Nexus Mods."
     },
     "obsolete_found_list": {
         "en": "⌛ Obsolete: %s",
@@ -1039,6 +1203,10 @@
         "en": "Order saved on exit.",
         "ru": "Порядок сохранён при выходе."
     },
+    "premium_download_response": {
+        "en": "Premium download response: %s",
+        "ru": "Ответ премиум-загрузки: %s"
+    },
     "rate_limit_placeholder": {
         "en": "API: ? / ?",
         "ru": "API: ? / ?"
@@ -1062,6 +1230,10 @@
     "skip": {
         "en": "⏩ Skip",
         "ru": "⏩ Пропустить"
+    },
+    "skip_all": {
+        "en": "⏭ Skip All",
+        "ru": "⏭ Пропустить все"
     },
     "setting_force_english_mod_names": {
         "en": "Force English Mod Names",
@@ -1119,9 +1291,17 @@
         "en": "Save changes to mod list before exit?",
         "ru": "Сохранить изменения перед выходом?"
     },
+    "update_all_finished": {
+        "en": "All updates completed (%d mods).",
+        "ru": "Все обновления завершены (%d модов)."
+    },
     "update_message": {
         "en": "New versions of the following files are available: %s\nUpdate?",
         "ru": "Доступны новые версии файлов: %s\nОбновить?"
+    },
+    "update_no_url": {
+        "en": "Selected mod does not have a Nexus URL.",
+        "ru": "У выбранного мода нет ссылки на Nexus."
     },
     "update_skipped_no_url": {
         "en": "Update skipped: no Nexus URL or API key",
@@ -1138,6 +1318,10 @@
     "updates_found_count": {
         "en": "Updates found: %d",
         "ru": "Найдено обновлений: %d"
+    },
+    "updating_mod": {
+        "en": "Updating: %s",
+        "ru": "Обновление: %s"
     },
     "version_check_failed": {
         "en": "Failed to check version for %s: %v",
@@ -1174,5 +1358,9 @@
     "yes": {
         "en": "⏬ Download",
         "ru": "⏬ Скачать"
+    },
+    "yes_open_github": {
+        "en": "Open GitHub",
+        "ru": "Открыть GitHub"
     }
 }

@@ -1,3 +1,4 @@
+// tooltip_status_manager.go
 package main
 
 import (
@@ -9,8 +10,8 @@ import (
 )
 
 type TooltipStatusManager struct {
-	label     *widget.Label
-	mu        sync.Mutex
+	label	  *widget.Label
+	mu		  sync.Mutex
 	hideTimer *time.Timer
 }
 

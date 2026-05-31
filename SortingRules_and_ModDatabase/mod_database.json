@@ -1,5 +1,5 @@
 {
-	"version": "0.77",
+	"version": "0.86",
 	"mod_database": [
 		{
 			"folder": "pickup_spawner",
@@ -33,8 +33,8 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/8",
 			"github_url": "https://github.com/Darktide-Mod-Framework/Darktide-Mod-Framework",
 			"note": {
-				"en": "Darktide Mod Framework is here for installation time reference.",
-				"ru": "Darktide Mod Framework здесь для справки о времени установки."
+				"en": "",
+				"ru": ""
 			}
 		},
 		{
@@ -213,8 +213,8 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/19",
 			"github_url": "https://github.com/Darktide-Mod-Framework/Darktide-Mod-Loader",
 			"note": {
-				"en": "Darktide Mod Loader is here for installation time reference only.",
-				"ru": "Darktide Mod Loader здесь только для справки о времени установки."
+				"en": "",
+				"ru": ""
 			}
 		},
 		{
@@ -452,10 +452,7 @@
 			"author": "Aussiemon",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/35",
 			"github_url": "https://github.com/Aussiemon/Darktide-Mods/tree/master/prologue",
-			"note": {
-				"en": "Solo Play - can launch the prologue.",
-				"ru": "Solo Play - может запускать пролог."
-			}
+			"note": { "en": "", "ru": "" }
 		},
 		{
 			"folder": "crosshairs_fix",
@@ -652,7 +649,7 @@
 			},
 			"description": {
 				"en": "Nothing New - Clear New Item notifications - Will clean up all 'new item' notification dots on the UI and can suppress the 'New Penance' top right notification in the Mourningstar.",
-				"ru": "Nothing New - Clear New Item notifications - Удаляет все  уведомления о «новом предмете» в пользовательском интерфейсе и сможет скрыть уведомление «новое искупление» в правом верхнем углу в Моунингстар.",
+				"ru": "Nothing New - Clear New Item notifications - Удаляет все  уведомления о «новом предмете» в пользовательском интерфейсе и сможет скрыть уведомление «новое искупление» в правом верхнем углу в Моурнингстар.",
 				"zh-hans": "清除所有“新物品”黄点"
 			},
 			"author": "Wobin",
@@ -949,7 +946,7 @@
 			},
 			"description": {
 				"en": "Hey you! Yea you! Are you stuck on the Mourningstar waiting for your friends? Or maybe you're waiting for a new shop rotation? Are you bored and running around aimlessly? Now you can run around aimlessly with purpose!",
-				"ru": "Egg Hunt - Эй ты! Да, ты! Застрял на Моунингстар в ожидании друзей? Или, может, ждешь смены ассортимента в магазине? Тебе скучно и ты бесцельно бегаешь? Теперь ты можешь продолжать бегать, но с определённой целью!"
+				"ru": "Egg Hunt - Эй ты! Да, ты! Застрял на Моурнингстар в ожидании друзей? Или, может, ждешь смены ассортимента в магазине? Тебе скучно и ты бесцельно бегаешь? Теперь ты можешь продолжать бегать, но с определённой целью!"
 			},
 			"author": "HoboMechanistic",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/73",
@@ -1228,9 +1225,8 @@
 				"zh-hans": "酷炫机器人"
 			},
 			"description": {
-				"en": "Replaces bot prisoner garb with pre-defined or randomized Veteran cosmetics.",
-				"ru": "Fancy Bots - Заменяет тюремную одежду ботов на заранее определённые или случайные косметические предметы.",
-				"zh-hans": "给机器人装备合适或随机的装饰品。仅客户端可见。"
+				"en": "OBSOLETE!",
+				"ru": "УСТАРЕЛ!"
 			},
 			"author": "Aussiemon",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/92",
@@ -1403,21 +1399,6 @@
 			"author": "Zombine",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/105",
 			"github_url": "https://github.com/zombine04/darktide-mods/tree/main/quickest_play",
-			"note": { "en": "", "ru": "" }
-		},
-		{
-			"folder": "minimap",
-			"name": {
-				"en": "Minimap",
-				"ru": "Миникарта"
-			},
-			"description": {
-				"en": "OBSOLETE!",
-				"ru": "УСТАРЕЛ!"
-			},
-			"author": "unifyh",
-			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/108",
-			"github_url": "https://github.com/unifyh/minimap",
 			"note": { "en": "", "ru": "" }
 		},
 		{
@@ -2524,15 +2505,15 @@
 				"ru": "2D-инвентарь"
 			},
 			"description": {
-				"en": "Inventory2D - FIX for Bound By Duty Update - It makes your inventory a 2D grid with three items per row, and it does it pretty karking well if you ask me.",
-				"ru": "Inventory2D - FIX for Bound By Duty Update -  Этот мод превращает ваш инвентарь в двухмерную сетку с тремя предметами в каждом ряду, и, на мой взгляд, делает это довольно неплохо."
+				"en": "Inventory2D - It makes your inventory a 2D grid with three items per row, and it does it pretty karking well if you ask me.",
+				"ru": "Inventory2D - Этот мод превращает ваш инвентарь в двухмерную сетку с тремя предметами в каждом ряду, и, на мой взгляд, делает это довольно неплохо."
 			},
-			"author": "Redbeardt and Blakrajder",
-			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/594",
-			"github_url": "",
+			"author": "Redbeardt",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/188",
+			"github_url": "https://www.nexusmods.com/warhammer40kdarktide/mods/594",
 			"note": {
-				"en": "The mod hasn't been updated in a while. Find the fix at the Nexus link.",
-				"ru": "Мод давно не обновляется. Фикс ищите по ссылке на Нексус."
+				"en": "The mod hasn't been updated. Look for Blakrajder's fix on Nexus (The GitHub link on the right is a link to the fix).",
+				"ru": "Мод давно не обновляется. Фикс от Blakrajder ищите на Нексус (ссылка Гитхаб справа - это ссылка на фикс)."
 			}
 		},
 		{
@@ -2667,8 +2648,8 @@
 				"ru": "Эволюция боя"
 			},
 			"description": {
-				"en": "Reworks Darktide's combat to behave more like Vermintide 2, whilst preserving what Darktide brings to the table.",
-				"ru": "Combat Evolved - Перерабатывает боевую систему в Darktide, чтобы она больше походила на Vermintide 2, при этом сохранены все преимущества Darktide."
+				"en": "OBSOLETE!",
+				"ru": "УСТАРЕЛ!"
 			},
 			"author": "Lance Pertot",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/200",
@@ -3791,10 +3772,13 @@
 				"en": "Claims commendations on entering Penances. Wintrack claim-all via command/keybind.",
 				"ru": "Claim All Penances - Забирает награды при входе в меню Искуплений. Вы можете забрать награды с помощью команды/сочетания клавиш."
 			},
-			"author": "Adspartan",
-			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/299",
+			"author": "Adspartan and Prowo",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/676",
 			"github_url": "",
-			"note": { "en": "", "ru": "" }
+			"note": {
+				"en": "The mod hasn't been updated in a while. Look for Prowo's fix on the Nexus (the Nexus link on the right is the link to the fix).",
+				"ru": "Мод давно не обновляется. Фикс от Prowo ищите на Нексус (ссылка Нексус справа - это ссылка на фикс)."
+			}
 		},
 		{
 			"folder": "limit_background_fps",
@@ -4533,8 +4517,8 @@
 				"zh-hans": "给需要扫描的物体加个显眼的标记",
 				"zh-hant": "在待掃描物件上加入醒目的標記"
 			},
-			"author": "yinhaox",
-			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/352",
+			"author": "yinhaox and Saigofu",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/657",
 			"github_url": "",
 			"note": {
 				"en": "Fix in the comments on the Nexus Mods.",
@@ -4912,11 +4896,11 @@
 			"folder": "Mourningstar_dialogue_improved",
 			"name": {
 				"en": "Mourningstar Dialogue Improved",
-				"ru": "Улучшение диалогов в Моунингстар"
+				"ru": "Улучшение диалогов в Моурнингстар"
 			},
 			"description": {
 				"en": "Allows hearing radio chatter within menus, completely disable chatter and some other tweaks to improve the dialogue within the Mourningstar Hub (And now in missions too).",
-				"ru": "Mourningstar Dialogue Improved - Позволяет слышать радиопереговоры в меню, полностью отключает разговоры и вносит некоторые другие изменения для улучшения диалогов в хабе Моунингстар (а теперь и в миссиях)."
+				"ru": "Mourningstar Dialogue Improved - Позволяет слышать радиопереговоры в меню, полностью отключает разговоры и вносит некоторые другие изменения для улучшения диалогов в хабе Моурнингстар (а теперь и в миссиях)."
 			},
 			"author": "Alfthebigheaded",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/382",
@@ -6397,7 +6381,7 @@
 			},
 			"author": "Ferrasick",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/496",
-			"github_url": "https://github.com/AlexFerras/darktide-mods",
+			"github_url": "https://github.com/AlexFerras/darktide-mods/tree/main/helbore_passive_charge",
 			"note": { "en": "", "ru": "" }
 		},
 		{
@@ -7607,6 +7591,1217 @@
 			}
 		},
 		{
+			"folder": "DamageNumbers",
+			"name": {
+				"en": "Damage Numbers",
+				"ru": "Цифры урона"
+			},
+			"description": {
+				"en": "See the impact of your attacks in real time! This mod displays floating damage numbers above enemies when you hit them, making it easy to track your performance and compare weapon effectiveness.\n\nYou can toggle damage numbers on or off at any time using a customizable hotkey in the mod options.",
+				"ru": "Damage Numbers - Показывает эффект от ваших атак в реальном времени! Этот мод отображает всплывающие цифры урона над врагами при попадании, что позволяет легко отслеживать вашу эффективность и сравнивать оружие.\n\nВы можете включить или выключить отображение цифр урона в любой момент с помощью настраиваемой горячей клавиши в опциях мода."
+			},
+			"author": "tickbox",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/621",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "auto_rations",
+			"name": {
+				"en": "Auto Rations - Recover or Destroy",
+				"ru": "Smaller Talent Tree Arbites class"
+			},
+			"description": {
+				"en": "Automatically interacts with rations. Depending on your selected option, the mod will either recover the rations or destroy them when you aim at them.",
+				"ru": "Auto Rations - Recover or Destroy - Автоматически взаимодействует с пайками. В зависимости от выбранного вами варианта, мод, при наведении на них прицела, либо вернёт пайки, либо уничтожит их."
+			},
+			"author": "leer",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/625",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "emperors_lantern",
+			"name": {
+				"en": "Emperor's Lantern",
+				"ru": "Светоч Императора"
+			},
+			"description": {
+				"en": "Adds a dynamic light source near the player during dark missions to improve visibility or simply for aesthetics.",
+				"ru": "Emperor's Lantern - Добавляет динамический источник света рядом с игроком во время тёмных миссий для улучшения видимости или просто для эстетических целей."
+			},
+			"author": "leer",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/626",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "CircumstanceFix",
+			"name": {
+				"en": "Circumstance Fix",
+				"ru": "Circumstance Fix"
+			},
+			"description": {
+				"en": "OBSOLETE!",
+				"ru": "УСТАРЕЛ!"
+			},
+			"author": "SashimiChefCat",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/627",
+			"github_url": "https://github.com/sashimichefcat/CircumstanceFix",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "ViewModelTweaker",
+			"name": {
+				"en": "ViewModel Tweaker",
+				"ru": "ViewModel Tweaker"
+			},
+			"description": {
+				"en": "OBSOLETE!",
+				"ru": "УСТАРЕЛ!"
+			},
+			"author": "Norkkom",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/628",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "HitCounter",
+			"name": {
+				"en": "Hit Counter",
+				"ru": "Счётчик ударов"
+			},
+			"description": {
+				"en": "A challenge run tool to track all instances of received damage, for yourself and your team.",
+				"ru": "Hit Counter - Инструмент для отслеживания всех случаев получения урона, как для вас лично, так и для вашей команды."
+			},
+			"author": "Norkkom",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/629",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "ua_font_patch",
+			"name": {
+				"en": "UA Font Patch",
+				"ru": "Патч шрифта - украинский"
+			},
+			"description": {
+				"en": "Enables Cyrillic fonts in the English version of Warhammer 40,000: Darktide, allowing Ukrainian localization to display properly without transliteration.",
+				"ru": "UA Font Patch - Додає підтримку кирилиці в англійській версії Warhammer 40,000: Darktide, дозволяючи українській локалізації відоб."
+			},
+			"author": "Sidimaki",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/630",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "ColorSelection",
+			"name": {
+				"en": "Color Selection",
+				"ru": "Выбор цвета"
+			},
+			"description": {
+				"en": "Color Selection (AKA Player Slot Color Picker) - Allows you to edit each player slot color. The top player color slot is you!\nThis mod should affect all mods that use player slot color and all parts of the UI that use player slot colors.",
+				"ru": "Color Selection (AKA Player Slot Color Picker) - Позволяет редактировать цвет каждого слота игрока. Верхний слот цвета игрока — это вы!\nЭтот мод должен повлиять на все моды, использующие цвет слотов игроков, и на все части пользовательского интерфейса, использующие цвет слотов игроков."
+			},
+			"author": "SashimiChefCat and IndicaBunny",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/631",
+			"github_url": "https://github.com/sashimichefcat/ColorSelection",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "Let Me See My Scanner",
+			"name": {
+				"en": "Let me see my scanner (Auspex)",
+				"ru": "Покажи мне мой сканер (ауспекс)."
+			},
+			"description": {
+				"en": "Hides hud elements when scanning or using the Auspex.",
+				"ru": "Let me see my scanner (Auspex) - Скрывает элементы интерфейса при сканировании или использовании ауспекса."
+			},
+			"author": "SashimiChefCat and IndicaBunny",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/632",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "minimap",
+			"name": {
+				"en": "MiniMap (Fixed and Improved)",
+				"ru": "Миникарта (исправлена и улучшена)"
+			},
+			"description": {
+				"en": "MiniMap (Fixed and Improved) - Adds a circular minimap to your HUD showing teammates, enemies, objectives, and more.",
+				"ru": "MiniMap (Fixed and Improved) - Добавляет на интерфейс круговую мини-карту, отображающую товарищей по команде, врагов, цели и многое другое."
+			},
+			"author": "unifyh and Indicabunny",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/633",
+			"github_url": "https://github.com/unifyh/minimap",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "Sniper",
+			"name": {
+				"en": "Sniper fix",
+				"ru": "Исправление снайпера"
+			},
+			"description": {
+				"en": "Plays the sniper sound when the game plays the sniper sound. My shitty attempt at 'fixing' the sniper's audio cue volume.",
+				"ru": "Sniper fix - Звук выстрела снайперской винтовки воспроизводится, когда игра воспроизводит звук выстрела снайперской винтовки. Моя жалкая попытка 'исправить' выстрелы снайпера."
+			},
+			"author": "Harridas",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/634",
+			"github_url": "",
+			"note": {
+				"en": "Required: Audio plugin.",
+				"ru": "Требуется: Audio плагин."
+			}
+		},
+		{
+			"folder": "better_downed_indicators",
+			"name": {
+				"en": "Player State Indicators",
+				"ru": "Индикаторы состояния игрока"
+			},
+			"description": {
+				"en": "Player State Indicators (aka Better Downed Icons) - Makes it more clear what made you or your teammates got downed by, instead of a generic exclamation point. Adds Auspex/luggable detection on players and allows you to customize the colors of all player status icons. Also tracks interactions!",
+				"ru": "Player State Indicators (aka Better Downed Icons) - Делает более понятной причину выведения из строя вас или ваших товарищей по команде, вместо обычного восклицательного знака. Добавляет обнаружение ауспекса/переносимых предметов для игроков и позволяет настраивать цвета всех значков статусов игроков. Также отслеживает взаимодействия!"
+			},
+			"author": "IndicaBunny",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/635",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "ping_duration_changer",
+			"name": {
+				"en": "Ping duration changer",
+				"ru": "Изменение длительности метки"
+			},
+			"description": {
+				"en": "Allows you to customize how long pings remain visible on the map. Each ping group has its own settings.",
+				"ru": "Ping duration changer - Позволяет настраивать время отображения меток на карте. Для каждой группы сигналов действуют свои собственные настройки."
+			},
+			"author": "IndicaBunny",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/636",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "veil_shield",
+			"name": {
+				"en": "Veil Shield",
+				"ru": "Полупрозрачный щит"
+			},
+			"description": {
+				"en": "Automatically hides or adjusts the transparency of your melee shields during block actions, with separate options and opacity control for Slab and Suppression Shields.",
+				"ru": "Veil Shield - Автоматически скрывает или регулирует прозрачность ваших щитов ближнего боя во время блокирования, с отдельными параметрами и регулировкой прозрачности для щита-плиты и щита подавления."
+			},
+			"author": "leer",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/637",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "mauler_attack_indicator",
+			"name": {
+				"en": "Mauler Attack Indicator",
+				"ru": "Индикатор атаки палача"
+			},
+			"description": {
+				"en": "A visual enhancement mod for Warhammer 40,000: Darktide that displays clear attack indicators for Mauler enemies. This mod helps players identify when Maulers are about to perform their cleave attacks, providing visual cues through colored decals on the ground.",
+				"ru": "Mauler Attack Indicator - Визуальное улучшение для Warhammer 40,000: Darktide, отображающее чёткие индикаторы атаки врагов палачей. Этот мод помогает игрокам определить, когда палач собирается нанести свой рубящий удар сверху, предоставляя визуальные подсказки в виде цветных декалей на земле."
+			},
+			"author": "Icetiger540",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/638",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "crusher_attack_indicator",
+			"name": {
+				"en": "Crusher Attack Indicator",
+				"ru": "Индикатор атаки дробителя"
+			},
+			"description": {
+				"en": "A visual enhancement mod for Warhammer 40,000: Darktide that displays clear attack indicators for Crusher enemies. This mod helps players identify when Crushers are about to perform their cleave attacks, providing crucial visual cues through colored decals on the ground.",
+				"ru": "Crusher Attack Indicator - Визуальное улучшение для Warhammer 40,000: Darktide, отображающее чёткие индикаторы атак врагов-дробителей. Этот мод помогает игрокам определить, когда дробитель собирается нанести свой пробивающий удар сверху, предоставляя визуальные подсказки в виде цветных декалей на земле."
+			},
+			"author": "Icetiger540",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/639",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "shorten_usernames",
+			"name": {
+				"en": "Shorten Usernames",
+				"ru": "Сокращённые имена игроков"
+			},
+			"description": {
+				"en": "Shortens usernames in all Menus and HUD elements with names. Fully customizable!",
+				"ru": "Shorten Usernames - Сокращает имена игроков во всех меню и элементах интерфейса. Полностью настраиваемый!"
+			},
+			"author": "IndicaBunny",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/641",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "RunTimer",
+			"name": {
+				"en": "Run Timer",
+				"ru": "Таймер забега"
+			},
+			"description": {
+				"en": "During a mission it shows a run timer and can show the character's speed.",
+				"ru": "Run Timer - Во время миссии отображается время выполнения задания, а также может показываться скорость персонажа."
+			},
+			"author": "RRMLLNV",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/643",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "Killfeed Details",
+			"name": {
+				"en": "Killfeed Details",
+				"ru": "Детальная лента убийств"
+			},
+			"description": {
+				"en": "Provides kill icons in the killfeed to show how enemies died.",
+				"ru": "Killfeed Details - Добавляет значки убийств в ленту убийств, показывающие, как погибли враги."
+			},
+			"author": "Norkkom",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/644",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "simplecolorselector",
+			"name": {
+				"en": "Simple Color Selection",
+				"ru": "Простой выбор цвета"
+			},
+			"description": {
+				"en": "Simple Color Selection (AKA Player Slot Color Picker) - A version of my other mod that lets you pick slot colors but with no menu, no coloring outside missions and no custom ids.",
+				"ru": "Simple Color Selection (AKA Player Slot Color Picker) - Версия другого мода, которая позволяет выбирать цвета слотов, но без меню, без возможности раскрашивания вне миссий и без пользовательских идентификаторов."
+			},
+			"author": "IndicaBunny",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/645",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "QuickDeploy",
+			"name": {
+				"en": "Quick Deploy",
+				"ru": "Быстрое развертывание"
+			},
+			"description": {
+				"en": "A mod for quick deployment of ammo and health crate with a single keypress. Skips the equipping step - just press and done!",
+				"ru": "Quick Deploy - Мод для быстрой установки ящиков с боеприпасами и аптечек одним нажатием клавиши. Пропускает этап экипировки — просто нажмите и готово!"
+			},
+			"author": "RRMLLNV",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/646",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "ShowOwnItemCount",
+			"name": {
+				"en": "Show Own Item Count",
+				"ru": "Число предметов"
+			},
+			"description": {
+				"en": "Display the count of owned weapons in Armoury, counting weapons by the maximum potential.",
+				"ru": "Show Own Item Count - Показывает количество имеющегося в оружейной комнате оружия, считая оружие по максимальному потенциалу."
+			},
+			"author": "FungusOVO",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/647",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "enginseers_workbench",
+			"name": {
+				"en": "Enginseer's Workbench",
+				"ru": "Верстак технопровидца"
+			},
+			"description": {
+				"en": "This mod allows for the customization and fine-tuning of weapon stats, attack patterns, and other, similar parameters. It is highly technical, but also quite flexible, allowing users to create their own custom weapon marks to test behavior, play around in solo missions, and so on. This mod has no effect in regular multiplayer missions.",
+				"ru": "Enginseer's Workbench - Этот мод позволяет настраивать и точно регулировать характеристики оружия, схемы атак и другие подобные параметры. Он довольно сложный в использовании, но при этом достаточно гибкий. Он позволяет пользователям создавать собственные пользовательские модели оружия для тестирования поведения, экспериментов в одиночных миссиях и так далее. Этот мод не оказывает влияния на обычные многопользовательские миссии."
+			},
+			"author": "Agayek",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/648",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "CharacterGrid",
+			"name": {
+				"en": "Character Grid",
+				"ru": "Сетка персонажей",
+				"zh-hans": "角色选择重新排序"
+			},
+			"description": {
+				"en": "Changes the default scroll-able character selection panel to a grid format that you don't need to scroll for up to 9 characters!",
+				"ru": "Character Grid - Заменяет стандартную прокручиваемую панель выбора символов на сетку, в которой не нужно прокручивать до 9 персонажа!",
+				"zh-hans": "优化角色选择界面"
+			},
+			"author": "defallt",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/649",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "loot_dopamine",
+			"name": {
+				"en": "Loot Dopamine",
+				"ru": "Добыча дофамина"
+			},
+			"description": {
+				"en": "Adds customizable text pop-ups for picking up materials.",
+				"ru": "Добавляет настраиваемые текстовые всплывающие сообщения о подборе материалов."
+			},
+			"author": "IndicaBunny",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/652",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "StimmCountdown",
+			"name": {
+				"en": "Stimm Countdown",
+				"ru": "Обратный отсчёт стима"
+			},
+			"description": {
+				"en": "Shows stimm duration and cooldown timer for Hive Scum.",
+				"ru": "Stimm Countdown - Показывает длительность действия стимулятора и таймер его перезарядки для отребья улья."
+			},
+			"author": "RRMLLNV",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/653",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "BrokerStimTimer",
+			"name": {
+				"en": "Broker Stim Timer",
+				"ru": "Таймер стимулятора брокера"
+			},
+			"description": {
+				"en": "BrokerStimTimer (aka Hive Scum Stim Timer) - A timer for the Hive scum/broker stim ability that can be positioned anywhere on screen.",
+				"ru": "BrokerStimTimer (aka Hive Scum Stim Timer) - Таймер для способности стимулятора отребья улья/брокера, который можно разместить в любом месте экрана."
+			},
+			"author": "IndicaBunny",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/654",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "BrokerAutoStim",
+			"name": {
+				"en": "Broker AutoStim",
+				"ru": "Автостим брокера"
+			},
+			"description": {
+				"en": "Automatically injects broker/hive scum stim after being in combat for a customizable duration. Takes in account Chemical Dependency!",
+				"ru": "Broker AutoStim - Автоматически вводит стимулятор брокера/отребья улья после нахождения в бою в течение настраиваемого времени. Учитывает Химическую зависимость!"
+			},
+			"author": "IndicaBunny",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/655",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "FriendlyFireNotify",
+			"name": {
+				"en": "Friendly Fire Notify",
+				"ru": "Уведомление о дружественном огне"
+			},
+			"description": {
+				"en": "Shows friendly-fire alerts both ways: teammates hitting you (name, source like barrel/fire/poxbursters, per-player and team totals) and when you hit them.",
+				"ru": "Friendly Fire Notify - Показывает оповещения о дружественном огне в обоих направлениях: когда в вас попадают товарищи по команде (имя, источник попадания, например, бочка/огонь/взрывун, общее количество попаданий на игрока и команду) и когда вы в них попадаете."
+			},
+			"author": "RRMLLNV",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/658",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "PlayerProgression",
+			"name": {
+				"en": "Player Progression",
+				"ru": "Прогрессия игрока"
+			},
+			"description": {
+				"en": "Displays global player statistics: kills by faction and enemy type, mission progress, records, and other key metrics. Features full controller support.",
+				"ru": "Player Progression - Показывает глобальную статистику игрока: количество убийств по фракциям и типам врагов, прогресс выполнения миссий, рекорды и другие ключевые показатели. Полная поддержка контроль над контроллером."
+			},
+			"author": "RRMLLNV",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/659",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "CombatStats",
+			"name": {
+				"en": "Combat Stats",
+				"ru": "Боевая статистика"
+			},
+			"description": {
+				"en": "Comprehensive combat analytics tracking damage breakdowns, kills, buff uptime, and more. Essential for theory-crafting and build optimization.",
+				"ru": "Combat Stats - Комплексная аналитика боя, отслеживающая детализацию урона, убийства, время действия баффов и многое другое. Незаменима для теоретического анализа и оптимизации билдов."
+			},
+			"author": "deathbeam",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/661",
+			"github_url": "https://github.com/deathbeam/darktide-mods/tree/main/CombatStats",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "ImprovedPenanceTracking",
+			"name": {
+				"en": "Improved Penance Tracking",
+				"ru": "Улучшение отслеживания искуплений"
+			},
+			"description": {
+				"en": "Increases max penances tracking limit up to 20 + hides other classes penances in TAB overlay.",
+				"ru": "Improved Penance Tracking - Увеличивает максимальное количество отслеживаемых искуплений до 20 + скрывает искупления других классов в оверлее TAB."
+			},
+			"author": "seroperson",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/662",
+			"github_url": "https://github.com/seroperson/darktide-mods/tree/master/ImprovedPenanceTracking",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "A La Mode",
+			"name": {
+				"en": "A La Mode",
+				"ru": "Модный"
+			},
+			"description": {
+				"en": "A La Mode (Weapon Mode Indicator) - Highlights the icon of certain weapons in the bottom right weapon bar with a different colour to indicate the current mode (customisable).",
+				"ru": "A La Mode (Weapon Mode Indicator) - Подсвечивает значок определённого оружия в нижней правой панели выбора оружия другим цветом, указывая на текущий режим (настраивается)."
+			},
+			"author": "Wobin",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/663",
+			"github_url": "https://github.com/Wobin/ALaMode",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "whats_in_the_box",
+			"name": {
+				"en": "What's in the box",
+				"ru": "Что в ящике"
+			},
+			"description": {
+				"en": "Displays the active stimm effects from the Stimm Supply.",
+				"ru": "What's in the box - Показывает активные эффекты стимуляции от «Запаса стимуляторов»."
+			},
+			"author": "leer",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/664",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "MiniAudioAddon",
+			"name": {
+				"en": "Mini Audio Addon",
+				"ru": "Миниаудио аддон"
+			},
+			"description": {
+				"en": "This mod integrates a custom miniaudio_dt command-line helper with Darktide's Local Server. The game sends JSON commands to the CLI wrapper, which forwards them to a miniaudio-based backend that manages multiple 3D/spatial audio tracks in real time. This allows scripts and gameplay logic to trigger, position, and control spatialized sounds.",
+				"ru": "Mini Audio Addon - Этот мод интегрирует пользовательскую утилиту командной строки miniaudio_dt с локальным сервером Darktide. Игра отправляет команды в формате JSON в оболочку CLI, которая перенаправляет их на бэкэнд на основе miniaudio, управляющий несколькими трёхмерными/пространственными звуковыми дорожками в реальном времени. Это позволяет скриптам и игровой логике запускать, позиционировать и управлять пространственными звуками."
+			},
+			"author": "LAUR3HTE",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/665",
+			"github_url": "",
+			"note": {
+				"en": "Requred: Darktide Local Server.",
+				"ru": "Требуется: Darktide Local Server."
+			}
+		},
+		{
+			"folder": "PlasmaGunLagFix",
+			"name": {
+				"en": "Plasma Gun Lag Fix",
+				"ru": "Plasma Gun Lag Fix"
+			},
+			"description": {
+				"en": "OBSOLETE!",
+				"ru": "УСТАРЕЛ!"
+			},
+			"author": "Paimon",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/666",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "hitbox_debug_draw",
+			"name": {
+				"en": "Hitbox Debug Draw",
+				"ru": "Отрисовка хитбоксов отладки"
+			},
+			"description": {
+				"en": "Draw debug lines for most enemy attacks. Meat Grinder only.",
+				"ru": "Hitbox Debug Draw - Отображайте отладочные линии для большинства вражеских атак. Только для мясорубки."
+			},
+			"author": "Ferrasick",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/667",
+			"github_url": "https://github.com/AlexFerras/darktide-mods/tree/main/hitbox_debug_draw",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "StimmSupplyRings",
+			"name": {
+				"en": "Stimm Supply Rings",
+				"ru": "Кольца стим-ящиков"
+			},
+			"description": {
+				"en": "Visualizes Stimm Supply buffs with color-coded rings. Red = Strength, Blue = Attack Speed, Yellow = Cooldown, Purple = Toughness.",
+				"ru": "Stimm Supply Rings - Визуализирует баффы от использования «Запаса стимуляторов» с помощью цветных колец. Красный = Сила, Синий = Скорость атаки, Жёлтый = Время перезарядки, Фиолетовый = Выносливость."
+			},
+			"author": "bozo",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/668",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "ElevatorMusic",
+			"name": {
+				"en": "Elevator Music",
+				"ru": "Музыка для лифта"
+			},
+			"description": {
+				"en": "Elevator Music and Disco lights Mod.",
+				"ru": "Elevator Music - Мод для лифта: музыка и дискосвет."
+			},
+			"author": "LAUR3HTE",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/669",
+			"github_url": "",
+			"note": {
+				"en": "Required: Mini Audio Addon.",
+				"ru": "Требуется: Миниаудио аддон."
+			}
+		},
+		{
+			"folder": "MourningstarCommandWheel",
+			"name": {
+				"en": "Mourningstar Command Wheel",
+				"ru": "Командное колесо для Моурнингстар"
+			},
+			"description": {
+				"en": "A convenient radial menu system for quick access to all hub menus and features. Includes hotkey and gamepad controller support.",
+				"ru": "Mourningstar Command Wheel - Удобная радиальная система меню для быстрого доступа ко всем меню и функциям центра управления. Поддерживает горячие клавиши и геймпад."
+			},
+			"author": "RRMLLNV",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/670",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "MuteImpacts",
+			"name": {
+				"en": "Silence Obnoxious Sounds (SOS)",
+				"ru": "Заглушение неприятных звуков"
+			},
+			"description": {
+				"en": "Silence Obnoxious Sounds (SOS) - Mute Impact SFX - Remove Sounds from Psyker Primary Fire and Plinking from No or Reduced Damage from Carapace Armor - Silence Left Click - Silence Pox Gas Coughs or Coughing - Remove sounds from Psyker Primary Fire explosions and the plinking from doing no or reduced Damage against Carapace or Flak Armor.",
+				"ru": "Silence Obnoxious Sounds (SOS) - Mute Impact SFX - Remove Sounds from Psyker Primary Fire and Plinking from No or Reduced Damage from Carapace Armor - Silence Left Click - Silence Pox Gas Coughs or Coughing - Удаляет звуки от попаданий основной атакой посохов псайкера, а также дребезжание, возникающее при нанесении урона по панцирной или противоосколочной броне, или при его снижении."
+			},
+			"author": "Backup158",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/671",
+			"github_url": "https://github.com/Backup158/MuteImpacts",
+			"note": {
+				"en": "Required: Audio plugin.",
+				"ru": "Требуется: Audio плагин."
+			}
+		},
+		{
+			"folder": "CompassBar",
+			"name": {
+				"en": "Compass Bar",
+				"ru": "Полоска компаса"
+			},
+			"description": {
+				"en": "A compass bar HUD element that displays cardinal and intermediate directions (N, S, E, W, NE, SE, SW, NW) with degree markings. The compass rotates dynamically based on player camera direction, helping with orientation and navigation during missions.",
+				"ru": "Compass Bar - Элемент интерфейса в виде компаса, отображающий основные и промежуточные направления (север, юг, восток, запад, северо-восток, юго-восток, юго-запад, северо-запад) с градусными отметками. Компас динамически вращается в зависимости от направления камеры игрока и помогает с ориентированием и навигацией во время миссий."
+			},
+			"author": "RRMLLNV",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/672",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "ability_timer",
+			"name": {
+				"en": "Combat Ability timers",
+				"ru": "Таймеры боевых способностей"
+			},
+			"description": {
+				"en": "Adds a moveable customizable timer to all classes combat abilities.",
+				"ru": "Combat Ability timers - Добавляет перемещаемый настраиваемый таймер ко всем боевым способностям классов."
+			},
+			"author": "IndicaBunny",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/673",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "CurioEvaluator",
+			"name": {
+				"en": "Curio Evaluator",
+				"ru": "Оценщик редкостей"
+			},
+			"description": {
+				"en": "OBSOLETE!",
+				"ru": "УСТАРЕЛ!"
+			},
+			"author": "Wisher",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/675",
+			"github_url": "",
+			"note": {
+				"en": "Hasn't been updated in a while. It may cause crashes.",
+				"ru": "Давно не обновляется. Возможно может вызывать вылеты."
+			}
+		},
+		{
+			"folder": "ticking_barrels",
+			"name": {
+				"en": "Ticking Barrels",
+				"ru": "Тикающие бочки"
+			},
+			"description": {
+				"en": "Displays countdown timers and icons above explosive and fire barrels when they are ignited.",
+				"ru": "Claim All Penance Fix - Показывает таймеры обратного отсчёта и значки над взрывчатыми и огненными бочками, когда они загораются."
+			},
+			"author": "leer",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/677",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "vfx_swapper",
+			"name": {
+				"en": "VFX Swapper",
+				"ru": "Замена визуальных эффектов"
+			},
+			"description": {
+				"en": "Replaces certain effects that obscures vision and/or hurts performance. Has varying options for each effect, some are simply lesser versions of the same, others complete replacement. Removes Blight Spreads, Rampaging Enemies and Rotten Armor specific death explosion visuals as well.",
+				"ru": "VFX Swapper - Заменяет некоторые эффекты, которые ухудшают обзор и/или снижают производительность. Для каждого эффекта доступны различные варианты, некоторые из них являются просто упрощёнными версиями, другие — полной заменой. Также удаляет визуальные эффекты, характерные для эффектов «Распространение порчи», «Неистовые враги» и «Гнилая броня» при смерти."
+			},
+			"author": "tdopz and leerH",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/678",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "zServo_Lexmechanicus",
+			"name": {
+				"en": "Servo-Lexmechanicus",
+				"ru": "Серво-Лексмеханикус",
+				"fr": "Servo-Lexmechanicus",
+				"zh-hans": "伺服律法机械",
+				"zh-hant": "伺服律法機械",
+				"de": "Servo-Lexmechanicus",
+				"it": "Servo-Lexmechanicus",
+				"ja": "サーヴォ・レクスメカニクス",
+				"ko": "서보 렉스메카니쿠스",
+				"pl": "Servo-Lexmechanicus",
+				"pt-br": "Servo-Lexmechanicus",
+				"es": "Servo-Lexmechanicus"
+			},
+			"description": {
+				"en": "A Lexmechanicus servo-unit for categorizing and cataloging mods. Blessed by the Omnissiah.",
+				"ru": "Servo-Lexmechanicus - Сервитор Лексмеханикус: категоризация и каталогизация модов. Во имя Омниссии.",
+				"fr": "Une unité servo Lexmechanicus pour catégoriser et cataloguer les mods. Béni par l'Omnissiah.",
+				"zh-hans": "用于分类和编目模组的律法机械伺服单元。受万机之神祝福。",
+				"zh-hant": "用於分類和編目模組的律法機械伺服單元。受萬機之神祝福。",
+				"de": "Eine Lexmechanicus-Servo-Einheit zur Kategorisierung und Katalogisierung von Mods. Vom Omnissiah gesegnet.",
+				"it": "Un'unità servo Lexmechanicus per categorizzare e catalogare mod. Benedetto dall'Omnissiah.",
+				"ja": "MODを分類・カタログ化するレクスメカニクス・サーヴォユニット。オムニサイアの祝福を受けて。",
+				"ko": "MOD를 분류하고 목록화하는 렉스메카니쿠스 서보 유닛. 오미니시아의 축복을 받았습니다.",
+				"pl": "Jednostka servo Lexmechanicus do kategoryzacji i katalogowania modów. Błogosławiona przez Omnissiah.",
+				"pt-br": "Uma unidade servo Lexmechanicus para categorizar e catalogar mods. Abençoado pelo Omnissiah.",
+				"es": "Una unidad servo Lexmechanicus para categorizar y catalogar mods. Bendecido por el Omnissiah."
+			},
+			"author": "xsSplater",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/680",
+			"github_url": "https://github.com/xsSplater/Darktide-Servo-Lexmechanicus",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "claim_all_master",
+			"name": {
+				"en": "Claim All Masteries",
+				"ru": "Получите всем навыками"
+			},
+			"description": {
+				"en": "Allows you to spend all available blessing points for the weapon trait shop in the weapon mastery view.\n\nSet a keybind or automatically spend all available blessing points when entering a weapon mastery trait upgrade selection.",
+				"ru": "Claim All Masteries - Позволяет потратить все доступные очки благословения на магазин характеристик оружия в окне мастерства владения оружием.\n\nНазначьте клавишу для переключения режимов или автоматически тратьте все доступные очки благословения при выборе улучшения навыка владения оружием."
+			},
+			"author": "Prowo",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/681",
+			"github_url": "https://www.nexusmods.com/warhammer40kdarktide/mods/681",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "SimpleBuffFilter",
+			"name": {
+				"en": "Simple Buff Filter",
+				"ru": "Простой фильтр баффов"
+			},
+			"description": {
+				"en": "Simple Buff Filter - Buff Bar Management - Learns buffs and readable names as you play. Lets you hide unimportant buffs and change bar size and opacity for multiple bars.",
+				"ru": "Simple Buff Filter - Buff Bar Management - В процессе игры запоминает названия баффов и делает их названия понятными. Позволяет скрывать неважные баффы, изменять размер и прозрачность нескольких панелей."
+			},
+			"author": "GideonAriphael",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/682",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "TalentUI",
+			"name": {
+				"en": "Talent UI",
+				"ru": "Интерфейс талантов игроков"
+			},
+			"description": {
+				"en": "Shows ability icons with cooldown timers for teammates and local player in the team HUD. Displays teammate weapon icons with ammunition count.",
+				"ru": "Talent UI - Показывает значки способностей с таймерами перезарядки для товарищей по команде и игрока в командном интерфейсе. Отображает значки оружия товарищей по команде с указанием количества патронов."
+			},
+			"author": "RRMLLNV",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/683",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "machine_gods_beacon",
+			"name": {
+				"en": "Machine God's Beacon",
+				"ru": "Маяк Бога-Машины"
+			},
+			"description": {
+				"en": "Enables custom control of map-based light sources and environmental shading effects. Configurable light selection, flicker behaviors, and environment blocking for special mission types.",
+				"ru": "Machine God's Beacon - Позволяет настраивать источники света на карте и эффекты затенения окружающей среды. Настраиваемый выбор источников света, режим мерцания и блокировка окружающей среды для специальных типов миссий."
+			},
+			"author": "bsod",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/684",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "MenuUIHider",
+			"name": {
+				"en": "Menu UI Hider",
+				"ru": "Скрыватель интерфейса меню",
+				"zh-hans": "隐藏所有界面"
+			},
+			"description": {
+				"en": "Hides all menu interface elements with a button press.\n\nDon't forget to assign a button!",
+				"ru": "Menu UI Hider - Скрывает все элементы интерфейса в меню по нажатию кнопки.\n\nНе забудьте назначить кнопку!",
+				"zh-hans": "提供快捷键，用于隐藏菜单界面的所有元素。"
+			},
+			"author": "xsSplater",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/685",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "SlowMode",
+			"name": {
+				"en": "Slow Mode",
+				"ru": "Режим замедления"
+			},
+			"description": {
+				"en": "Adds a client-side “bullet time” control that lets the player slow down gameplay speed for practice and testing. Intended for offline play or local gameplay in Psykanium.",
+				"ru": "Slow Mode - Добавляет на стороне клиента элемент управления «замедлением времени», позволяющий игроку замедлять скорость игрового процесса для тренировки и тестирования. Предназначен для игры в офлайн-режиме или локальной игры в Psykanium."
+			},
+			"author": "LAUR3HTE",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/686",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "RitualZones",
+			"name": {
+				"en": "Ritual Zones",
+				"ru": "Ритуальные зоны"
+			},
+			"description": {
+				"en": "Ritual Zones - Pathfinding Utilities - Mod to show an icon when the hex ritual spawns and a timer for the ritual completion. Plus additional game pathing, progress, and trigger debug visualizers.",
+				"ru": "Ritual Zones - Pathfinding Utilities - Мод, показывает иконку при появлении ритуала проклятия и таймер его завершения. Также добавлены визуализаторы для отслеживания игрового пути, прогресса и запуска отладочных процессов."
+			},
+			"author": "LAUR3HTE",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/687",
+			"github_url": "https://github.com/Craven73/dt_level_debug",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "GlobalStore",
+			"name": {
+				"en": "Global Store",
+				"ru": "Глобальный магазин",
+				"zh-hans": "全局商店"
+			},
+			"description": {
+				"en": "Store view with offers from all your characters.",
+				"ru": "Global Store - Просмотр магазина с возможностью покупки предметов для всех ваших персонажей.",
+				"zh-hans": "在单个全局商店中浏览所有角色的物品，并显示肖像。"
+			},
+			"author": "seroperson",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/692",
+			"github_url": "https://github.com/seroperson/darktide-mods/tree/master/GlobalStore",
+			"note": {
+				"en": "GlobalStore must be loaded BEFORE FilterTrash.",
+				"ru": "GlobalStore необходимо загружать ДО FilterTrash."
+			}
+		},
+		{
+			"folder": "CopyChatMessage",
+			"name": {
+				"en": "Copy Chat Message",
+				"ru": "Скопировать сообщение чата"
+			},
+			"description": {
+				"en": "A mod for quickly copying recent chat messages to the clipboard via a hotkey.",
+				"ru": "Copy Chat Message - Мод для быстрого копирования последних сообщений чата в буфер обмена с помощью горячей клавиши."
+			},
+			"author": "RRMLLNV",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/693",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "GuiTweaker",
+			"name": {
+				"en": "GUI Tweaker",
+				"ru": "Настройка графического интерфейса"
+			},
+			"description": {
+				"en": "HUD Tweaker, but for Mourningstar menus: edit ViewElement widget styles.",
+				"ru": "GUI Tweaker - HUD Tweaker, но для меню в Моурнингстар: редактируйте стили виджета ViewElement."
+			},
+			"author": "GideonAriphael",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/694",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "mission_progress",
+			"name": {
+				"en": "Mission Progress",
+				"ru": "Прогресс миссии"
+			},
+			"description": {
+				"en": "Adds a customizable progress bar showing mission completion, medicae stations with charge counts, respawn beacons, grimoires, and scriptures. Shows distance to extraction and progress percentage. Includes 15 theme presets (Imperium, Mechanicus, Chaos, etc.) plus full customization options.",
+				"ru": "Mission Progress - Добавляет настраиваемую полосу прогресса, отображающую прогресс миссии, аптечки с количеством зарядов, маяки возрождения, гримуары и писания. Отображает расстояние до точки эвакуации и процент выполнения. Включает 15 предустановленных тем (империум, механикус, хаос и т.д.) плюс полные возможности настройки."
+			},
+			"author": "iekgaa",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/695",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "WeaponSecondaryOverride",
+			"name": {
+				"en": "Weapon Secondary Override",
+				"ru": "Переопределение вспомогательного оружия"
+			},
+			"description": {
+				"en": "Weapon Secondary Override (Separate Block and ADS) - Allows you to use separate keybinds for melee block and ADS.",
+				"ru": "Weapon Secondary Override (Separate Block and ADS) - Позволяет использовать отдельные сочетания клавиш для блокирования в ближнем бою и прицеливания."
+			},
+			"author": "ninjabladeJr",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/696",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "pulsing_barrels",
+			"name": {
+				"en": "Pulsing Barrels",
+				"ru": "Пульсирующие бочки"
+			},
+			"description": {
+				"en": "The barrel pulses to indicate how close it is to exploding, with timer count down it intensifies its pulsing heavily.",
+				"ru": "Pulsing Barrels - Бочки пульсируют, указывая на приближение взрыва; по мере уменьшения времени таймера пульсация усиливается."
+			},
+			"author": "Paimon",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/697",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "TapToggle_HoldSprint",
+			"name": {
+				"en": "Tap 2 Toggle And Or Hold",
+				"ru": "2 нажатия переключает и/или удерживает"
+			},
+			"description": {
+				"en": "For Sprint.\nThese allows you to set your Sprint/Crouch setting as Hold, then Double-Tap your bind to toggle it on.\nThis lets you mindlessly sprint when you want, while still letting you keep the precision and intentionality of Holding to Sprint.\nYou can set sprint so it's always on out of combat or auto off in.",
+				"ru": "Tap 2 Toggle And Or Hold - Один файл для бега и один для приседания.\nВы можете установить режим бега/приседания как «удерживание», а затем дважды нажмите на назначенную кнопку, чтобы включить его.\nЭто позволяет вам бегать бездумно, когда захотите, сохраняя при этом точность и целенаправленность бега как при удержании кнопки.\nВы можете настроить бег так, чтобы он всегда был включён вне боя или автоматически отключался во время боя."
+			},
+			"author": "ninjabladeJr",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/699",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "CrouchToggle",
+			"name": {
+				"en": "Tap 2 Toggle And Or Hold",
+				"ru": "2 нажатия переключает и/или удерживает"
+			},
+			"description": {
+				"en": "For Crouch.\nThese allows you to set your Sprint/Crouch setting as Hold, then Double-Tap your bind to toggle it on.\nThis lets you mindlessly sprint when you want, while still letting you keep the precision and intentionality of Holding to Sprint.\nYou can set sprint so it's always on out of combat or auto off in.",
+				"ru": "Tap 2 Toggle And Or Hold - Один файл для бега и один для приседания.\nВы можете установить режим бега/приседания как «удерживание», а затем дважды нажмите на назначенную кнопку, чтобы включить его.\nЭто позволяет вам бегать бездумно, когда захотите, сохраняя при этом точность и целенаправленность бега как при удержании кнопки.\nВы можете настроить бег так, чтобы он всегда был включён вне боя или автоматически отключался во время боя."
+			},
+			"author": "ninjabladeJr",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/699",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "Latency_Compensation",
+			"name": {
+				"en": "Latency Compensation",
+				"ru": "Компенсация задержки"
+			},
+			"description": {
+				"en": "Latency Compensation (Fix Lag Ping) - Latency compensation is a mod that will predict enemy movements and animations client side (mutant, pox hound, trapper, pox buster) and provide a visual indicator to help with dodge/ push timing based on your current ping (latency) to the server.",
+				"ru": "Latency Compensation (Fix Lag Ping) - Мод, который прогнозирует движения и анимацию врагов на стороне клиента (мутант, чумная гончая, сеточник, чумной взрывник) и предоставляет визуальный индикатор, помогающий правильно рассчитать время уклонения/отталкивания в зависимости от вашего текущего пинга (задержки) до сервера."
+			},
+			"author": "Quantum",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/702",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "psyker_shield_disable_spin",
+			"name": {
+				"en": "Psyker Shield Disable Spin",
+				"ru": "Отключение вращения щита псайкера"
+			},
+			"description": {
+				"en": "This mod disables LMB rotating your psyker's wall-shield while placing it, to avoid accidentally doing this.",
+				"ru": "Psyker Shield Disable Spin - Этот мод отключает вращение щита псайкера левой кнопкой мыши во время его установки, чтобы избежать случайного поворота."
+			},
+			"author": "kraggrim",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/704",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "CustomUIColors",
+			"name": {
+				"en": "Custom UI Colors",
+				"ru": "Настраиваемые цвета интерфейса"
+			},
+			"description": {
+				"en": "Customize colors and transparency of UI elements in different menus.",
+				"ru": "Custom UI Colors - Настройка цветов и прозрачности элементов интерфейса в различных меню."
+			},
+			"author": "xsSplater",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/705",
+			"github_url": "https://github.com/xsSplater/Darktide_CustomUIColors",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "CleaveStats",
+			"name": {
+				"en": "Cleave Stats",
+				"ru": "Статистика пробивания врагов"
+			},
+			"description": {
+				"en": "Designed to show detailed statistics relating to your attack's Cleave.\nThis is both for Melee and Ranged.",
+				"ru": "Cleave Stats - Мод предназначен для отображения подробной статистики, касающейся пробивания враго вашми атаками: сколько врагов было поражено за удар/выстрел.\nЭто относится как к атакам ближнего, так и дальнего боя."
+			},
+			"author": "ninjabladeJr",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/706",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "TalentPreview",
+			"name": {
+				"en": "Talent Preview",
+				"ru": "Предосмотр талантов"
+			},
+			"description": {
+				"en": "Adds a simple talent preview to the lobby, showing each player’s selected talents as icons above their loadout slot. Hover over an icon to see the full tooltip and details. Customize icon size, number of icons per row, and the preview position in the mod settings.",
+				"ru": "Talent Preview - Добавляет в лобби простой предварительный просмотр талантов, отображая выбранные таланты каждого игрока в виде значков над слотом снаряжения. Наведите курсор на значок, чтобы увидеть полную всплывающую подсказку и подробности. Размер значка, количество значков в ряду и положение предварительного просмотра можно настроить в параметрах мода."
+			},
+			"author": "LAUR3HTE",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/707",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
 			"folder": "",
 			"name": {
 				"en": "",
@@ -7799,6 +8994,582 @@
 			"author": "",
 			"url": "",
 			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "autopatch",
+			"name": {
+				"en": "Darktide Mod Autopatcher",
+				"ru": "Автопатчер Darktide"
+			},
+			"description": {
+				"en": "Darktide engine plugin (DLL) that patches Darktide to load mods every time the game starts. Replaces manually running toggle_darktide_mods after updates.",
+				"ru": "Darktide Mod Autopatcher - Плагин движка Darktide (DLL), который патчит Darktide, чтобы моды загружались каждый раз при запуске игры. Заменяет ручной запуск toggle_darktide_mods.bat после обновлений."
+			},
+			"author": "Darktide Modders",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/709",
+			"github_url": "https://github.com/manshanko/dt-mod-autopatch/",
 			"note": {
 				"en": "",
 				"ru": ""

@@ -1,3 +1,4 @@
+// ui_build.go
 package main
 
 import (
@@ -6,9 +7,7 @@ import (
 	"fmt"
 	"image/color"
 	"net/url"
-	"os"
 	"path/filepath"
-	"strconv"
 	"strings"
 	"time"
 
@@ -16,7 +15,6 @@ import (
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
-	"fyne.io/fyne/v2/driver/desktop"
 	"fyne.io/fyne/v2/storage"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
@@ -130,38 +128,28 @@ func (app *App) buildUI() {
 	statusContainer := container.NewStack(app.tipBgRect, app.statusLabel)
 
 	// Кнопки быстрого перемещения
-		// Переместить моды наверх
 	app.moveToTopBtn = NewCustomButton(app.messages["btn_move_to_top"], func() { app.moveSelectedToTop() })
 	app.applyTooltip(app.moveToTopBtn, "btn_move_to_top_tooltip")
-		// Переместить моды вниз
 	app.moveToBottomBtn = NewCustomButton(app.messages["btn_move_to_bottom"], func() { app.moveSelectedToBottom() })
 	app.applyTooltip(app.moveToBottomBtn, "btn_move_to_bottom_tooltip")
-		// Переместить моды на строку номер...
 	app.moveToEntry = widget.NewEntry()
-	app.moveToEntry.SetPlaceHolder(app.messages["col_number"] + app.messages["col_number"])
+	app.moveToEntry.SetPlaceHolder(app.messages["col_number"])
 	app.moveToEntry.OnSubmitted = func(text string) { app.moveSelectedToPosition() }
 	app.moveLabel = widget.NewLabel(app.messages["lbl_move_to"])
 
 	// Кнопки выделения и массовых операций
-		// Выбрать все моды
 	app.selectAllBtn = NewCustomButton(app.messages["btn_select_all"], func() { app.selectAllMods(true) })
 	app.applyTooltip(app.selectAllBtn, "btn_select_all_tooltip")
-		// Снять выделение со всех модов
 	app.deselectAllBtn = NewCustomButton(app.messages["btn_deselect_all"], func() { app.selectAllMods(false) })
 	app.applyTooltip(app.deselectAllBtn, "btn_deselect_all_tooltip")
-		// Включить выбранные моды
 	app.enableSelectedBtn = NewCustomButton(app.messages["btn_enable_selected"], func() { app.setSelectedActive(true) })
 	app.applyTooltip(app.enableSelectedBtn, "btn_enable_selected_tooltip")
-		// Отключить выбранные моды
 	app.disableSelectedBtn = NewCustomButton(app.messages["btn_disable_selected"], func() { app.setSelectedActive(false) })
 	app.applyTooltip(app.disableSelectedBtn, "btn_disable_selected_tooltip")
-		// Включить все моды
 	app.enableAllBtn = NewCustomButton(app.messages["btn_enable_all_mods"], func() { app.setAllModsActive(true) })
 	app.applyTooltip(app.enableAllBtn, "btn_enable_all_tooltip")
-		// Выключить все моды
 	app.disableAllBtn = NewCustomButton(app.messages["btn_disable_all_mods"], func() { app.setAllModsActive(false) })
 	app.applyTooltip(app.disableAllBtn, "btn_disable_all_tooltip")
-		// Удалить все моды
 	app.removeAllBtn = NewCustomButton(app.messages["btn_remove_all_mods"], func() {
 		app.showConfirmDialog(
 			app.messages["confirm_remove_all_title"],
@@ -176,7 +164,6 @@ func (app *App) buildUI() {
 		)
 	})
 	app.applyTooltip(app.removeAllBtn, "btn_remove_all_tooltip")
-		// Удалить выбранные моды
 	app.removeSelectedBtn = NewCustomButton(app.messages["btn_remove_selected"], func() {
 		sel := app.selectedMods()
 		if len(sel) == 0 {
@@ -200,10 +187,8 @@ func (app *App) buildUI() {
 	// Основные кнопки
 	app.btnUp = NewCustomButton(app.messages["btn_up"], func() { app.moveSelected(-1) })
 	app.applyTooltip(app.btnUp, "btn_up_tooltip")
-
 	app.btnDown = NewCustomButton(app.messages["btn_down"], func() { app.moveSelected(1) })
 	app.applyTooltip(app.btnDown, "btn_down_tooltip")
-
 	app.btnSaveOrder = NewCustomButton(app.messages["btn_save_order"], func() {
 		if app.orderDirty {
 			app.saveCurrentOrder()
@@ -217,7 +202,6 @@ func (app *App) buildUI() {
 		}
 	})
 	app.applyTooltip(app.btnSaveOrder, "btn_save_order_tooltip")
-
 	app.btnRefresh = NewCustomButton(app.messages["btn_refresh"], func() {
 		go func() {
 			if app.orderDirty {
@@ -240,6 +224,9 @@ func (app *App) buildUI() {
 						app.appendLog(app.messages["log_list_refreshed"])
 					case 1:
 					case 2:
+						app.orderDirty = false
+						app.stopBlinkSaveButton()
+						app.updateTableBorder()
 						app.refreshModList()
 						app.appendLog(app.messages["log_list_refreshed"])
 					}
@@ -253,7 +240,6 @@ func (app *App) buildUI() {
 		}()
 	})
 	app.applyTooltip(app.btnRefresh, "btn_refresh_tooltip")
-
 	app.btnToggle = NewCustomButton(app.messages["btn_disable_mods"], func() { app.toggleGlobalMods() })
 	app.applyTooltip(app.btnToggle, "btn_toggle_tooltip")
 	app.updateToggleButtonText(app.btnToggle)
@@ -283,7 +269,6 @@ func (app *App) buildUI() {
 		img.Translucency = 0.8
 		app.manageBtn.SetBackgroundImage(img)
 	}
-
 	if colImgData, _ := embeddedFiles.ReadFile("assets/Yellow_BG_col.jpg"); colImgData != nil {
 		app.selectColumnBgRes = fyne.NewStaticResource("Yellow_BG_col", colImgData)
 	}
@@ -305,7 +290,6 @@ func (app *App) buildUI() {
 	}
 
 	app.managePanelBgRect = canvas.NewRectangle(th.Color(themes.ColorManagePanelBg, variant))
-
 	panelContent := container.NewVBox(row1, row2)
 	if yellowBg != nil {
 		app.managePanel = container.NewStack(app.managePanelBgRect, yellowBg, panelContent)
@@ -404,29 +388,24 @@ func (app *App) buildUI() {
 			cont.Add(noteLabel)
 		}
 	}
-
 	app.systemModsTable = widget.NewTable(
 		func() (int, int) { return len(app.systemMods), TableColumnCount },
 		func() fyne.CanvasObject { return createTableRow(TableRowHeight) },
 		systemUpdateCell,
 	)
 	ApplyTableColumnWidths(app.systemModsTable)
-	// Скрываем колонки, которые не нужны для системных модов
-	app.systemModsTable.SetColumnWidth(0, 0)	// Колонка с галочкой управления скрыта
-		// app.systemModsTable.SetColumnWidth(1, 0)
-		// app.systemModsTable.SetColumnWidth(2, 0)
+	app.systemModsTable.SetColumnWidth(0, 0)
 
-	// Добавляем обработчик выделения для системной таблицы
 	app.systemModsTable.OnSelected = func(id widget.TableCellID) {
 		if id.Row < len(app.systemMods) {
 			mod := &app.systemMods[id.Row]
 			app.selectedModName = mod.Name
-			app.selectedModIndex.Store(-1) // нет в displayedMods
+			app.selectedModIndex.Store(-1)
 			app.updateDescriptionForMod(mod.Name)
-			go app.enrichModFromNexus(mod)
+			app.scheduleEnrich(mod)
 			app.updateUpDownButtons()
 			app.systemModsTable.Refresh()
-			app.modTable.UnselectAll() // снимаем выделение с основной таблицы
+			app.modTable.UnselectAll()
 		}
 	}
 
@@ -525,8 +504,9 @@ func (app *App) buildUI() {
 			if mod.IsSystem {
 				cont.Add(widget.NewLabel(""))
 			} else {
-				num := widget.NewLabel(fmt.Sprintf("%2d.", id.Row+1))
-				cont.Add(num)
+				numText := canvas.NewText(fmt.Sprintf("%2d", id.Row+1), th.Color(theme.ColorNameForeground, variant))
+				numText.Alignment = fyne.TextAlignCenter
+				cont.Add(numText)
 			}
 		case 3:
 			display := mod.DisplayName
@@ -540,7 +520,7 @@ func (app *App) buildUI() {
 			cont.Add(nameLabel)
 		case 4:
 			dateStr := app.formatDate(mod.ModTime, app.cfg.DateFormat)
-			dateText := canvas.NewText(dateStr, theme.ForegroundColor())
+			dateText := canvas.NewText(dateStr, th.Color(theme.ColorNameForeground, variant))
 			dateText.Alignment = fyne.TextAlignCenter
 			cont.Add(dateText)
 		case 5:
@@ -597,7 +577,7 @@ func (app *App) buildUI() {
 			app.selectedModName = app.displayedMods[id.Row].Name
 			app.selectedModIndex.Store(int32(id.Row))
 			app.updateDescriptionForMod(app.selectedModName)
-			go app.enrichModFromNexus(&app.displayedMods[id.Row])
+			app.scheduleEnrich(&app.displayedMods[id.Row])
 			app.updateUpDownButtons()
 			app.modTable.Refresh()
 		}
@@ -609,7 +589,20 @@ func (app *App) buildUI() {
 	app.tableBorder.StrokeColor = th.Color(themes.ColorTableBorderDirty, variant)
 	app.tableBorder.FillColor = color.Transparent
 	app.tableBorder.Hide()
-	app.tableBorderContainer = container.NewStack(app.modTable, app.tableBorder)
+	// Фоновое изображение таблицы
+	mechData, _ := embeddedFiles.ReadFile("assets/mechanicus.png")
+	var mechBg *canvas.Image
+	if mechData != nil {
+		mechBg = canvas.NewImageFromResource(fyne.NewStaticResource("mechanicus.png", mechData))
+		mechBg.FillMode = canvas.ImageFillContain // или ImageFillStretch, на ваш вкус
+		mechBg.Translucency = 0.99                // 1 - невидимый, 0 - видимый
+	}
+
+	if mechBg != nil {
+		app.tableBorderContainer = container.NewStack(mechBg, app.modTable, app.tableBorder)
+	} else {
+		app.tableBorderContainer = container.NewStack(app.modTable, app.tableBorder)
+	}
 
 	// Нижняя панель
 	app.counterLabel = widget.NewLabel("")
@@ -641,17 +634,14 @@ func (app *App) buildUI() {
 		modsArea,
 	)
 
-	// Описание
-	app.descTitle = widget.NewLabel(app.messages["select_mod"])
+	// Описание в карточке
+	app.descTitle = canvas.NewText(app.messages["select_mod"], th.Color(theme.ColorNameForeground, variant))
+	app.descTitle.TextSize = theme.TextSize() + 2
 	app.descTitle.TextStyle = fyne.TextStyle{Bold: true}
-
 	app.descAuthor = widget.NewLabel("—")
-
 	app.descInstalled = widget.NewLabel("")
-
 	app.descBody = widget.NewLabel(app.messages["desc_placeholder"])
 	app.descBody.Wrapping = fyne.TextWrapWord
-
 	app.descURL = widget.NewHyperlink("", nil)
 
 	th, variant = app.myApp.Settings().Theme(), app.myApp.Settings().ThemeVariant()
@@ -661,54 +651,41 @@ func (app *App) buildUI() {
 	app.descCardBgRect.StrokeColor = th.Color(themes.ColorDescCardStroke, variant)
 	descCardBg := app.descCardBgRect
 
-	// Создаём ссылку GitHub
 	app.githubLink = widget.NewHyperlink("", nil)
 	app.githubLink.Alignment = fyne.TextAlignLeading
 
-	// Создаём виджеты для данных из Nexus API
-	app.descLocalVersion = widget.NewLabel("")  // Версия установленная
-	app.descLatestVersion = widget.NewLabel("") // Версия новая на сайте
+	app.descLocalVersion = widget.NewLabel("")
+	app.descLatestVersion = widget.NewLabel("")
+	app.descConflict = widget.NewLabel("")
+	app.descConflict.Wrapping = fyne.TextWrapWord
+	app.descConflict.Hide()
 
-	// Карточка с описанием
 	descHeader := container.NewBorder(
 		nil, nil, nil, nil,
 		container.NewVBox(
-			app.descTitle,					// Название
-			app.descAuthor,					// Автор
-			container.NewHBox(
-				widget.NewLabel(""),
-				app.descURL ),				// Ссылка Nexus
-			container.NewHBox(
-				widget.NewLabel(""),
-				app.githubLink ),			// Ссылка GitHub
+			app.descTitle,
+			app.descAuthor,
+			container.NewHBox(widget.NewLabel(""), app.descURL),
+			container.NewHBox(widget.NewLabel(""), app.githubLink),
 			widget.NewSeparator(),
-			container.NewHBox(
-				widget.NewLabel(""),
-				app.descLocalVersion, app.descLatestVersion ),		//Версия установленная
-			// container.NewHBox(
-				// widget.NewLabel(""),
-				// app.descLatestVersion ),	// Версия новая на сайте
+			container.NewHBox(widget.NewLabel(""), app.descLocalVersion, app.descLatestVersion),
+			app.descConflict,
 		),
 	)
-
-	descScroll := container.NewScroll(app.descBody)
-	descScroll.SetMinSize(fyne.NewSize(DescScrollMinWidth, DescScrollMinHeight))
-
 	descCardContent := container.NewVBox(
 		descHeader,
 		widget.NewSeparator(),
-		descScroll,
+		app.descBody,
 	)
-
+	descCardScroll := container.NewScroll(descCardContent)
+	descCardScroll.SetMinSize(fyne.NewSize(DescScrollMinWidth, DescScrollMinHeight))
 	descCard := container.NewStack(
 		descCardBg,
-		container.NewPadded(descCardContent),
+		container.NewPadded(descCardScroll),
 	)
 
-	// кнопки правой панели
 	app.btnSortChecks = NewCustomButton(app.messages["btn_sort_checks"], func() { go app.runAllChecks() })
 	app.applyTooltip(app.btnSortChecks, "btn_sort_checks_tooltip")
-
 	if app.amlDetected {
 		app.btnSaveOrder.SetText(app.messages["btn_save_order_aml"])
 		app.btnSortChecks.SetText(app.messages["btn_sort_checks_aml"])
@@ -722,12 +699,17 @@ func (app *App) buildUI() {
 				defer reader.Close()
 				path := reader.URI().Path()
 				if strings.HasSuffix(strings.ToLower(path), ".zip") {
-					err := app.extractArchive(path)
+					installedName, version, err := app.InstallModFromArchive(path, true, "")
 					if err != nil {
 						app.appendLog(fmt.Sprintf(app.messages["log_extract_error"], err))
 					} else {
 						checks.AutoFixMalformed()
 						app.refreshModList()
+						// Пытаемся определить modID из имени файла
+						modID, _, _ := extractVersionAndModIDFromFilename(path)
+						if modID != 0 && version != "" {
+							app.cacheModVersion(fmt.Sprintf("%d", modID), installedName, version, 0)
+						}
 						app.appendLog(fmt.Sprintf(app.messages["log_installed"], filepath.Base(path)))
 					}
 				} else {
@@ -740,7 +722,6 @@ func (app *App) buildUI() {
 		fd.Show()
 	})
 	app.applyTooltip(app.btnInstall, "btn_install_tooltip")
-
 	app.btnRemove = NewCustomButton(app.messages["btn_remove"], func() {
 		if app.selectedModName == "" {
 			return
@@ -771,66 +752,71 @@ func (app *App) buildUI() {
 	})
 	app.applyTooltip(app.btnRemove, "btn_remove_tooltip")
 
-	// запуск
 	gameVer := detectGameVersion(app.gameRoot)
-	app.btnLaunchNormal = NewCustomButton(app.messages["btn_launch_game"],
-		func() {
-			go func() {
-				if isDarktideRunning() {
-					app.appendLog(app.messages["game_already_running"])
-					return
-				}
-				ver := detectGameVersion(app.gameRoot)
-				err := app.launchGameFunc(ver, app.gameRoot, false)
-				if err != nil {
-					app.appendLog(fmt.Sprintf(app.messages["launch_error"], err))
-				}
-			}()
-		})
+	app.btnLaunchNormal = NewCustomButton(app.messages["btn_launch_game"], func() {
+		go func() {
+			if isDarktideRunning() {
+				app.appendLog(app.messages["game_already_running"])
+				return
+			}
+			ver := detectGameVersion(app.gameRoot)
+			err := app.launchGameFunc(ver, app.gameRoot, false)
+			if err != nil {
+				app.appendLog(fmt.Sprintf(app.messages["launch_error"], err))
+			}
+		}()
+	})
 	app.applyTooltip(app.btnLaunchNormal, "btn_launch_game_tooltip")
-
-	app.btnLaunchNoLauncher = NewCustomButton(app.messages["btn_launch_nolauncher_long"],
-		func() {
-			go func() {
-				if isDarktideRunning() {
-					app.appendLog(app.messages["game_already_running"])
-					return
-				}
-				ver := detectGameVersion(app.gameRoot)
-				err := app.launchGameFunc(ver, app.gameRoot, true)
-				if err != nil {
-					app.appendLog(fmt.Sprintf(app.messages["launch_error"], err))
-				}
-			}()
-		})
+	app.btnLaunchNoLauncher = NewCustomButton(app.messages["btn_launch_nolauncher_long"], func() {
+		go func() {
+			if isDarktideRunning() {
+				app.appendLog(app.messages["game_already_running"])
+				return
+			}
+			ver := detectGameVersion(app.gameRoot)
+			err := app.launchGameFunc(ver, app.gameRoot, true)
+			if err != nil {
+				app.appendLog(fmt.Sprintf(app.messages["launch_error"], err))
+			}
+		}()
+	})
 	app.applyTooltip(app.btnLaunchNoLauncher, "btn_launch_nolauncher_long_tooltip")
 
-	// Кнопка обновления мода (с проверкой на системные)
 	app.btnUpdateMod = NewCustomButton(app.messages["btn_update_mod"], func() {
 		if app.selectedModName == "" {
 			return
 		}
 		mod := app.findModByName(app.selectedModName)
-		if mod == nil || mod.URL == "" {
+		if mod == nil {
 			return
 		}
-		if mod.Name == "base" { // DMLoader
+		if mod.URL == "" {
+			app.appendLog(app.messages["update_no_url"])
+			return
+		}
+		if mod.Name == "base" {
 			app.updateDML()
 			return
 		}
-		if mod.IsSystem { // DMFramework и другие системные
+		if mod.Name == "dmf" {
+			app.updateDMF()
+			return
+		}
+		if mod.Name == "autopatch" {
+			app.updateAutopatcher()
+			return
+		}
+		if mod.IsSystem {
 			app.appendLog(app.messages["log_cannot_update_system"])
 			return
 		}
 		app.updateModFromNexus(mod)
 	})
-	app.applyTooltip(app.btnUpdateMod, "btn_update_mod_tooltip")
-
+	app.applyTooltip(app.btnUpdateMod, "btn_update_mod_premium_only")
 	app.btnUpdateAll = NewCustomButton(app.messages["btn_update_all"], func() {
 		app.updateAllModsFromNexus()
 	})
-	app.applyTooltip(app.btnUpdateAll, "btn_update_all_tooltip")
-
+	app.applyTooltip(app.btnUpdateAll, "btn_update_all_premium_only")
 	app.btnCheckUpdates = NewCustomButton(app.messages["btn_check_updates"], func() {
 		go app.checkNexusUpdates()
 	})
@@ -846,21 +832,16 @@ func (app *App) buildUI() {
 		container.NewHBox(app.btnLaunchNormal, app.btnLaunchNoLauncher, app.btnToggle),
 		container.NewHBox(app.btnCheckUpdates, app.btnUpdateMod, app.btnUpdateAll),
 	)
-
 	rightContent := container.NewVSplit(descCard, app.consoleScroll)
 	rightContent.Offset = 0.65
-
 	rightPanel := container.NewBorder(topRight, nil, nil, nil, rightContent)
-
 	split := container.NewHSplit(leftPanel, rightPanel)
 	split.Offset = SplitOffset
-
 	content := container.NewBorder(nil, nil, nil, nil, split)
 	app.mainWindow.SetContent(content)
 
 	app.appendCenteredLog(app.messages["log_start0"])
 	app.filterModList()
-
 	app.updateTableBorder()
 }
 
@@ -963,47 +944,10 @@ func (app *App) appendCenteredLog(text string) {
 	})
 }
 
-func (app *App) showChoiceDialog(parent fyne.Window, title, message string, options ...string) int {
-	resultChan := make(chan int, 1)
-	fyne.DoAndWait(func() {
-		var buttons []fyne.CanvasObject
-		for i, opt := range options {
-			idx := i
-			btn := NewCustomButton(opt, func() {
-				resultChan <- idx
-			})
-			buttons = append(buttons, btn)
-		}
-		gradHeader := canvas.NewImageFromImage(app.makeRedCRTGradient(DialogGradientWidth, DialogGradientHeight))
-		gradHeader.FillMode = canvas.ImageFillStretch
-		titleLabel := widget.NewLabelWithStyle(title, fyne.TextAlignCenter, fyne.TextStyle{Bold: true})
-		headerContainer := container.NewStack(gradHeader, container.NewCenter(titleLabel))
-
-		msgLabel := widget.NewLabel(message)
-		msgLabel.Wrapping = fyne.TextWrapWord // Перенос строк для включения скролла
-		msgScroll := container.NewScroll(msgLabel)
-		msgScroll.SetMinSize(fyne.NewSize(666, 250)) // ограничение высоты для скролла
-		content := container.NewVBox(
-			headerContainer,
-			msgScroll,
-			container.NewCenter(container.NewHBox(buttons...)),
-		)
-
-		popUp := widget.NewModalPopUp(content, parent.Canvas())
-		popUp.Resize(fyne.NewSize(DialogMinWidth, DialogMinHeight))
-		popUp.Show()
-		go func() {
-			idx := <-resultChan
-			fyne.Do(func() { popUp.Hide() })
-			resultChan <- idx
-		}()
-	})
-	return <-resultChan
-}
-
 func (app *App) updateDescriptionForMod(name string) {
 	if name == "" {
-		app.descTitle.SetText(app.messages["select_mod"])
+		app.descTitle.Text = app.messages["select_mod"]
+		app.descTitle.Refresh()
 		app.descAuthor.SetText("—")
 		app.descURL.SetURL(nil)
 		app.descURL.SetText("")
@@ -1018,8 +962,8 @@ func (app *App) updateDescriptionForMod(name string) {
 	if display == "" {
 		display = mod.Name
 	}
-	app.descTitle.SetText(display)
-
+	app.descTitle.Text = display
+	app.descTitle.Refresh()
 	author := mod.Author
 	if author == "" {
 		author = app.messages["author_unknown"]
@@ -1027,13 +971,24 @@ func (app *App) updateDescriptionForMod(name string) {
 	app.descAuthor.SetText(fmt.Sprintf(app.messages["author_label"], author))
 	app.descInstalled.SetText(fmt.Sprintf(app.messages["installed_label"], app.formatDate(mod.ModTime, app.cfg.DateFormat)))
 
-    // Данные из Nexus API
-	// Локальная версия (установленная)
 	if app.descLocalVersion != nil {
-		if mod.URL != "" {
-			modID := fmt.Sprintf("%d", extractModIDFromURL(mod.URL))
-			if cached, ok := app.nexusVersionCache[modID]; ok {
-				app.descLocalVersion.SetText(fmt.Sprintf(app.messages["nexus_local_version_label"], cached))
+		var modID string
+		// Специальные ID для системных модов
+		switch mod.Name {
+		case "dmf":
+			modID = "8"
+		case "base":
+			modID = "19"
+		case "autopatch":
+			modID = "709"
+		default:
+			if mod.URL != "" {
+				modID = fmt.Sprintf("%d", extractModIDFromURL(mod.URL))
+			}
+		}
+		if modID != "" {
+			if info, ok := app.nexusVersionCache[modID]; ok && info.Version != "" {
+				app.descLocalVersion.SetText(fmt.Sprintf(app.messages["nexus_local_version_label"], info.Version))
 			} else {
 				app.descLocalVersion.SetText(app.messages["nexus_local_version_unknown"])
 			}
@@ -1041,10 +996,22 @@ func (app *App) updateDescriptionForMod(name string) {
 			app.descLocalVersion.SetText("")
 		}
 	}
-	// Последняя версия с сайта
+
 	if app.descLatestVersion != nil {
-		if mod.URL != "" {
-			modID := fmt.Sprintf("%d", extractModIDFromURL(mod.URL))
+		var modID string
+		switch mod.Name {
+		case "dmf":
+			modID = "8"
+		case "base":
+			modID = "19"
+		case "autopatch":
+			modID = "709"
+		default:
+			if mod.URL != "" {
+				modID = fmt.Sprintf("%d", extractModIDFromURL(mod.URL))
+			}
+		}
+		if modID != "" {
 			if latest, ok := app.nexusLatestVersions[modID]; ok {
 				app.descLatestVersion.SetText(fmt.Sprintf(app.messages["nexus_latest_version_label"], latest))
 			} else {
@@ -1055,20 +1022,13 @@ func (app *App) updateDescriptionForMod(name string) {
 		}
 	}
 
-	body := mod.Description
+	desc := strings.TrimSpace(mod.Description)
+	// if desc == "" || desc == "{" || desc == "}" || desc == "[]" || desc == "()" {
+	// 	desc = app.messages["desc_placeholder"]
+	// }
+	app.descBody.SetText(desc)
+	app.descBody.SetText(mod.Description)
 
-	if mod.Incompatible {
-		body += "\n" + app.messages["desc_conflict"]
-	}
-	if mod.Obsolete {
-		body += "\n" + app.messages["desc_obsolete"]
-	}
-	if mod.Broken {
-		body += "\n" + app.messages["desc_broken"]
-	}
-	app.descBody.SetText(body)
-
-	// Ссылка Nexus (основная)
 	if mod.URL != "" {
 		u, err := url.Parse(mod.URL)
 		if err == nil {
@@ -1083,9 +1043,7 @@ func (app *App) updateDescriptionForMod(name string) {
 		app.descURL.SetText("")
 	}
 
-	// Новая ссылка GitHub (под ней)
 	if app.githubLink != nil {
-		// Ссылка GitHub (если есть)
 		if mod.GitHubURL != "" {
 			u, err := url.Parse(mod.GitHubURL)
 			if err == nil {
@@ -1100,56 +1058,65 @@ func (app *App) updateDescriptionForMod(name string) {
 			app.githubLink.SetText("")
 		}
 	}
+
+	if mod.Incompatible {
+		for _, pair := range checks.IncompatiblePairs {
+			if pair.Mod1 == mod.Name || pair.Mod2 == mod.Name {
+				other := pair.Mod1
+				if other == mod.Name {
+					other = pair.Mod2
+				}
+				desc := checks.GetIncompatibleDesc(pair.Mod1, pair.Mod2)
+				if desc != "" {
+					app.descConflict.SetText(desc)
+				} else {
+					app.descConflict.SetText("")
+				}
+				app.descConflict.Show()
+				break
+			}
+		}
+	} else {
+		app.descConflict.Hide()
+		app.descConflict.SetText("")
+	}
 }
 
-// enrichModFromNexus пытается получить информацию из Nexus API и обновить модель и UI.
 func (app *App) enrichModFromNexus(mod *checks.ModInfo) {
-    if app.cfg.NexusAPIKey == "" || mod.URL == "" {
-        return
-    }
-    modID := extractModIDFromURL(mod.URL)
-    if modID == 0 {
-        return
-    }
-    // app.appendLog(fmt.Sprintf("DEBUG: Fetching Nexus info for mod ID %d", modID))
-
-    // Запускаем горутину ТОЛЬКО ЗДЕСЬ, не дублируем
-    go func() {
-        defer func() {
-            if r := recover(); r != nil {
-                // app.appendLog(fmt.Sprintf("PANIC in enrichModFromNexus: %v", r))
-            }
-        }()
-
-        info, err := app.FetchNexusModInfo(modID, app.cfg.NexusAPIKey)
-        if err != nil {
-            app.appendLog(fmt.Sprintf(app.messages["log_nexus_api_error"], mod.Name, err))
-            return
-        }
-        // app.appendLog(fmt.Sprintf("DEBUG: Nexus info received: Name=%s, Version=%s", info.Name, info.Version))
-
-        // Обновляем поля мода
-        mod.NexusVersion = info.Version
-        mod.NexusSummary = info.Summary
-        mod.NexusDownloads = info.Downloads
-        mod.NexusEndorsements = info.Endorsements
-        mod.NexusPictureURL = info.PictureURL
-        if info.Author != "" {
-            mod.Author = info.Author
-        }
-
+	if app.getAuthToken() == "" || mod.URL == "" {
+		return
+	}
+	modID := extractModIDFromURL(mod.URL)
+	if modID == 0 {
+		return
+	}
+	go func() {
+		defer func() {
+			if r := recover(); r != nil {
+			}
+		}()
+		info, err := app.FetchNexusModInfo(modID, app.getAuthToken())
+		if err != nil {
+			app.appendLog(fmt.Sprintf(app.messages["log_nexus_api_error"], mod.Name, err))
+			return
+		}
+		mod.NexusVersion = info.Version
+		mod.NexusSummary = info.Summary
+		mod.NexusDownloads = info.Downloads
+		mod.NexusEndorsements = info.Endorsements
+		mod.NexusPictureURL = info.PictureURL
+		if info.Author != "" {
+			mod.Author = info.Author
+		}
 		modIDStr := fmt.Sprintf("%d", extractModIDFromURL(mod.URL))
 		app.nexusLatestVersions[modIDStr] = info.Version
-
-        // Обновляем UI только если этот мод всё ещё выбран
-        fyne.Do(func() {
-            if app.selectedModName == mod.Name {
-                app.updateDescriptionForMod(mod.Name)
-            }
-        })
-    }()
+		fyne.Do(func() {
+			if app.selectedModName == mod.Name {
+				app.updateDescriptionForMod(mod.Name)
+			}
+		})
+	}()
 }
-
 
 func (app *App) updateToggleButtonText(btn *CustomButton) {
 	switch app.patcherType {
@@ -1194,7 +1161,6 @@ func (app *App) updateUpDownButtons() {
 		app.moveToBottomBtn.Refresh()
 		return
 	}
-
 	idx := -1
 	for i, m := range app.displayedMods {
 		if m.Name == app.selectedModName {
@@ -1228,20 +1194,18 @@ func (app *App) filterModList() {
 	}
 	if app.filterSelect == nil {
 		app.displayedMods = app.allMods
-		if app.modTable != nil {
-			app.modTable.Length = func() (int, int) { return len(app.displayedMods), TableColumnCount }
-			if app.selectedModName != "" {
-				for i, m := range app.displayedMods {
-					if m.Name == app.selectedModName {
-						app.selectedModIndex.Store(int32(i))
-						break
-					}
+		app.modTable.Length = func() (int, int) { return len(app.displayedMods), TableColumnCount }
+		if app.selectedModName != "" {
+			for i, m := range app.displayedMods {
+				if m.Name == app.selectedModName {
+					app.selectedModIndex.Store(int32(i))
+					break
 				}
-			} else {
-				app.selectedModIndex.Store(-1)
 			}
-			app.modTable.Refresh()
+		} else {
+			app.selectedModIndex.Store(-1)
 		}
+		app.modTable.Refresh()
 		activeCount := 0
 		for _, m := range app.displayedMods {
 			if m.Active {
@@ -1261,7 +1225,6 @@ func (app *App) filterModList() {
 		app.messages["filter_obsolete"]: func(m checks.ModInfo) bool { return m.Obsolete },
 		app.messages["filter_conflict"]: func(m checks.ModInfo) bool { return m.Incompatible },
 	}
-
 	filter := app.filterSelect.Selected
 	if filter == "" {
 		filter = app.messages["filter_all"]
@@ -1270,7 +1233,6 @@ func (app *App) filterModList() {
 	if !ok {
 		filterFn = predicates[app.messages["filter_all"]]
 	}
-
 	search := strings.ToLower(app.searchEntry.Text)
 	app.displayedMods = nil
 	for _, mod := range app.allMods {
@@ -1284,39 +1246,31 @@ func (app *App) filterModList() {
 			app.displayedMods = append(app.displayedMods, mod)
 		}
 	}
-
-	if app.modTable != nil {
-		app.modTable.Length = func() (int, int) { return len(app.displayedMods), TableColumnCount }
-
-		if app.selectedModName != "" {
-			found := false
-			for i, m := range app.displayedMods {
-				if m.Name == app.selectedModName {
-					app.selectedModIndex.Store(int32(i))
-					found = true
-					break
-				}
+	app.modTable.Length = func() (int, int) { return len(app.displayedMods), TableColumnCount }
+	if app.selectedModName != "" {
+		found := false
+		for i, m := range app.displayedMods {
+			if m.Name == app.selectedModName {
+				app.selectedModIndex.Store(int32(i))
+				found = true
+				break
 			}
-			if !found {
-				app.selectedModIndex.Store(-1)
-				app.selectedModName = ""
-			}
-		} else {
+		}
+		if !found {
 			app.selectedModIndex.Store(-1)
+			app.selectedModName = ""
 		}
-
-		app.modTable.Refresh()
-
-		selIdx := app.selectedModIndex.Load()
-		if selIdx >= 0 {
-			app.modTable.ScrollTo(widget.TableCellID{Row: int(selIdx), Col: 0})
-		} else {
-			app.modTable.ScrollToTop()
-		}
-
-		app.updateUpDownButtons()
+	} else {
+		app.selectedModIndex.Store(-1)
 	}
-
+	app.modTable.Refresh()
+	selIdx := app.selectedModIndex.Load()
+	if selIdx >= 0 {
+		app.modTable.ScrollTo(widget.TableCellID{Row: int(selIdx), Col: 0})
+	} else {
+		app.modTable.ScrollToTop()
+	}
+	app.updateUpDownButtons()
 	activeCount := 0
 	for _, m := range app.displayedMods {
 		if m.Active {
@@ -1335,17 +1289,6 @@ func (app *App) filterOptions() []string {
 	}
 }
 
-func (app *App) setAllModsActive(active bool) {
-	for i := range app.allMods {
-		if !app.allMods[i].IsSystem {
-			app.allMods[i].Active = active
-		}
-	}
-	app.orderDirty = true
-	app.updateTableBorder()
-	app.filterModList()
-}
-
 func (app *App) selectAllMods(selected bool) {
 	for i := range app.allMods {
 		app.allMods[i].Selected = selected
@@ -1354,14 +1297,37 @@ func (app *App) selectAllMods(selected bool) {
 }
 
 func (app *App) setSelectedActive(active bool) {
+	changed := false
 	for i := range app.allMods {
 		if app.allMods[i].Selected && !app.allMods[i].IsSystem {
-			app.allMods[i].Active = active
+			if app.allMods[i].Active != active {
+				app.allMods[i].Active = active
+				changed = true
+			}
 		}
 	}
-	app.orderDirty = true
-	app.updateTableBorder()
-	app.filterModList()
+	if changed {
+		app.orderDirty = true
+		app.updateTableBorder()
+		app.filterModList()
+	}
+}
+
+func (app *App) setAllModsActive(active bool) {
+	changed := false
+	for i := range app.allMods {
+		if !app.allMods[i].IsSystem {
+			if app.allMods[i].Active != active {
+				app.allMods[i].Active = active
+				changed = true
+			}
+		}
+	}
+	if changed {
+		app.orderDirty = true
+		app.updateTableBorder()
+		app.filterModList()
+	}
 }
 
 func (app *App) startBlink(btn *CustomButton, activeFlag *bool, condition func() bool) {
@@ -1414,313 +1380,11 @@ func (app *App) updateTableBorder() {
 	}
 }
 
-// requestNexusAPIKey показывает диалог для ввода ключа API Nexus Mods.
-func (app *App) requestNexusAPIKey() {
-    if app.cfg.NexusAPIKey != "" { return }
-    fyne.Do(func() {
-        entry := widget.NewEntry()
-        entry.SetPlaceHolder(app.messages["nexus_api_key_placeholder"])
-        // Создаём диалог с явной переменной
-        var dlg dialog.Dialog
-        content := container.NewVBox(
-            widget.NewLabel(app.messages["nexus_api_key_label"]),
-            entry,
-            widget.NewButton(app.messages["btn_save"], func() {
-                app.cfg.NexusAPIKey = entry.Text
-                saveConfig(app.cfg)
-                app.appendLog(app.messages["nexus_api_key_saved"])
-                dlg.Hide()           // закрываем
-            }),
-        )
-        dlg = dialog.NewCustom(app.messages["nexus_api_key_title"], app.messages["btn_cancel"], content, app.mainWindow)
-        dlg.Show()
-    })
-}
-
-func (app *App) applyTooltip(btn *CustomButton, tipKey string) {
-	tip := ""
-	if tipKey != "" {
-		tip = app.messages[tipKey]
+func (app *App) scheduleEnrich(mod *checks.ModInfo) {
+	if app.enrichDebounce != nil {
+		app.enrichDebounce.Stop()
 	}
-	btn.OnMouseIn = func() {
-		if tip != "" {
-			app.tooltipStatus.Show(tip)
-		}
-	}
-	btn.OnMouseMoved = func(*desktop.MouseEvent) {
-		app.tooltipStatus.HideAfterDelay()
-	}
-	btn.OnMouseOut = func() {
-		app.tooltipStatus.HideAfterDelay()
-	}
-}
-
-// showChoiceDialogAsync - асинхронная версия диалога с красным градиентом.
-func (app *App) showChoiceDialogAsync(parent fyne.Window, title, message string, callback func(int), options ...string) {
-    fyne.Do(func() {
-        var buttons []*CustomButton
-        popUp := widget.NewModalPopUp(nil, parent.Canvas())
-        
-        var btnObjects []fyne.CanvasObject
-        for i, opt := range options {
-            idx := i
-            btn := NewCustomButton(opt, func() {
-                popUp.Hide()
-                if callback != nil {
-                    callback(idx)
-                }
-            })
-            buttons = append(buttons, btn)
-            btnObjects = append(btnObjects, btn)
-        }
-        
-        gradHeader := canvas.NewImageFromImage(app.makeRedCRTGradient(DialogGradientWidth, DialogGradientHeight))
-        gradHeader.FillMode = canvas.ImageFillStretch
-        titleLabel := widget.NewLabelWithStyle(title, fyne.TextAlignCenter, fyne.TextStyle{Bold: true})
-        headerContainer := container.NewStack(gradHeader, container.NewCenter(titleLabel))
-
-		msgLabel := widget.NewLabel(message)
-		msgLabel.Wrapping = fyne.TextWrapWord // Перенос строк для включения скролла
-		msgScroll := container.NewScroll(msgLabel)
-		msgScroll.SetMinSize(fyne.NewSize(666, 250)) // Ограничение высоты для скролла
-		content := container.NewVBox(
-			headerContainer,
-			msgScroll,
-			container.NewCenter(container.NewHBox(btnObjects...)),
-		)
-
-        popUp.Content = content
-        popUp.Resize(fyne.NewSize(DialogMinWidth, DialogMinHeight))
-        popUp.Show()
-    })
-}
-
-// Новый метод для установки DML (вызывается из кнопки «Обновить мод»)
-func (app *App) updateDML() {
-	if app.cfg.NexusAPIKey == "" {
-		app.appendLog(app.messages["nexus_api_key_missing"])
-		return
-	}
-	const dmlModID = 19
-	info, err := app.FetchNexusModInfo(dmlModID, app.cfg.NexusAPIKey)
-	if err != nil {
-		app.appendLog(fmt.Sprintf(app.messages["version_check_failed"], "DML", err))
-		return
-	}
-	modIDStr := fmt.Sprintf("%d", dmlModID)
-	cached, exists := app.nexusVersionCache[modIDStr]
-	if exists && cached == info.Version {
-		app.appendLog(fmt.Sprintf(app.messages["already_latest"], "DML", info.Version))
-		return
-	}
-	app.appendLog(fmt.Sprintf(app.messages["looking_for_latest_file"], dmlModID))
-	fileID, err := getLatestFileID(dmlModID, app.cfg.NexusAPIKey)
-	if err != nil {
-		app.appendLog(fmt.Sprintf(app.messages["failed_get_latest_file_id"], err))
-		return
-	}
-	directURL, filename, err := app.fetchDirectDownloadLink(
-		fmt.Sprintf("%d", dmlModID), fmt.Sprintf("%d", fileID), app.cfg.NexusAPIKey)
-	if err != nil {
-		app.appendLog(fmt.Sprintf(app.messages["failed_get_download_link"], err))
-		return
-	}
-	fyne.Do(func() {
-		app.showDMLDownloadDialog(directURL, filename, app.cfg.NexusAPIKey)
+	app.enrichDebounce = time.AfterFunc(1500*time.Millisecond, func() {
+		app.enrichModFromNexus(mod)
 	})
-}
-
-// Диалог загрузки и установки DML
-func (app *App) showDMLDownloadDialog(url, filename, apiKey string) {
-    app.appendLog(fmt.Sprintf(app.messages["log_downloading_mod"], "Darktide Mod Loader"))
-	bar := widget.NewProgressBar()
-	lbl := widget.NewLabel(fmt.Sprintf(app.messages["downloading_dml"], filename))
-	content := container.NewVBox(lbl, bar)
-	dlg := dialog.NewCustom(app.messages["download_title"], app.messages["btn_cancel"], content, app.mainWindow)
-	dlg.Show()
-
-	go func() {
-		dest := filepath.Join(app.cfg.ModsPath, filename) // временно скачиваем в mods
-		err := app.DownloadFileWithProgress(url, dest, apiKey, bar, app.mainWindow)
-		fyne.Do(func() {
-			dlg.Hide()
-			if err != nil {
-				app.appendLog(fmt.Sprintf(app.messages["download_failed"], err))
-				return
-			}
-			app.appendLog(app.messages["installing_dml"])
-			if err := app.installDMLFromArchive(dest); err != nil {
-				app.appendLog(fmt.Sprintf(app.messages["dml_install_failed"], err))
-			} else {
-				app.appendLog(app.messages["dml_updated"])
-			}
-			os.Remove(dest)
-		})
-	}()
-}
-
-// handleNXMLink с поддержкой DML (ID=19)
-func (app *App) handleNXMLink(nxmURL string) {
-	parts := strings.Split(nxmURL, "/")
-	if len(parts) < 5 {
-		app.appendLog(app.messages["log_invalid_nmx_link"])
-		return
-	}
-
-	modID := parts[len(parts)-3]
-	fileID := strings.Split(parts[len(parts)-1], "?")[0]
-
-	if app.cfg.NexusAPIKey == "" {
-		app.appendLog(app.messages["nexus_api_key_missing"])
-		return
-	}
-
-	// DML устанавливается в корень игры
-	if modID == "19" {
-		go func() {
-			directURL, filename, err := app.fetchDirectDownloadLink(modID, fileID, app.cfg.NexusAPIKey)
-			if err != nil {
-				app.appendLog(fmt.Sprintf(app.messages["failed_get_download_link"], err))
-				return
-			}
-			fyne.Do(func() {
-				app.showDMLDownloadDialog(directURL, filename, app.cfg.NexusAPIKey)
-			})
-		}()
-		return
-	}
-
-	// Обычные моды, с получением версии файла и сохранением после установки
-	go func() {
-		directURL, filename, err := app.fetchDirectDownloadLink(modID, fileID, app.cfg.NexusAPIKey)
-		if err != nil {
-			app.appendLog(fmt.Sprintf(app.messages["failed_get_download_link"], err))
-			return
-		}
-		mid, _ := strconv.Atoi(modID)
-		fid, _ := strconv.Atoi(fileID)
-		var fileVersion string
-		if mid > 0 && fid > 0 {
-			if fi, err := app.FetchFileInfo(mid, fid, app.cfg.NexusAPIKey); err == nil {
-				fileVersion = fi.Version
-			}
-		}
-		// Получаем имя мода, если возможно
-		modName := "Mod " + modID
-		if mid > 0 {
-			if info, err := app.FetchNexusModInfo(mid, app.cfg.NexusAPIKey); err == nil {
-				modName = info.Name
-			}
-		}
-		fyne.Do(func() {
-			app.showDownloadDialog(directURL, filename, app.cfg.NexusAPIKey, modName, fileVersion, modID)
-		})
-	}()
-}
-
-// showNexusAPIKeyDialog открывает диалог ввода/изменения ключа API Nexus.
-func (app *App) showNexusAPIKeyDialog() {
-	fyne.Do(func() {
-		entry := widget.NewEntry()
-		entry.SetPlaceHolder(app.messages["nexus_api_key_placeholder"])
-		entry.SetText(app.cfg.NexusAPIKey) // показываем текущий ключ, если есть
-		var dlg dialog.Dialog
-		content := container.NewVBox(
-			widget.NewLabel(app.messages["nexus_api_key_label"]),
-			entry,
-			widget.NewButton(app.messages["btn_save_api"], func() {
-				app.cfg.NexusAPIKey = entry.Text
-				saveConfig(app.cfg)
-				app.appendLog(app.messages["nexus_api_key_saved"])
-				dlg.Hide()
-			}),
-		)
-		dlg = dialog.NewCustom(app.messages["nexus_api_key_title"], app.messages["btn_cancel"], content, app.mainWindow)
-		dlg.Show()
-	})
-}
-
-// showDownloadDialog скачивает и устанавливает обычный мод с параметрами modName, fileVersion, modID и сохранением версии в кэш
-func (app *App) showDownloadDialog(url, filename, apiKey, modName, fileVersion, modID string) {
-    if modName != "" {
-        app.appendLog(fmt.Sprintf(app.messages["log_downloading_mod"], modName))
-    }
-    bar := widget.NewProgressBar()
-    bar.SetValue(0)
-    lbl := widget.NewLabel(fmt.Sprintf(app.messages["downloading"], filename))
-    content := container.NewVBox(lbl, bar)
-    dlg := dialog.NewCustom(app.messages["download_title"], app.messages["btn_cancel"], content, app.mainWindow)
-    dlg.Show()
-    go func() {
-        dest := filepath.Join(app.cfg.ModsPath, filename)
-        // Проверяем расширение, добавляем .zip при необходимости - мод Healthbars и т.д.
-        ext := strings.ToLower(filepath.Ext(dest))
-        knownExts := map[string]bool{".zip": true, ".rar": true, ".7z": true}
-        if !knownExts[ext] {
-            newDest := dest + ".zip"
-            if err := os.Rename(dest, newDest); err == nil {
-                dest = newDest
-            }
-        }
-        err := app.DownloadFileWithProgress(url, dest, apiKey, bar, app.mainWindow)
-        fyne.Do(func() {
-            dlg.Hide()
-            if err != nil {
-                app.appendLog(fmt.Sprintf(app.messages["download_failed"], err))
-                return
-            }
-            if info, e := os.Stat(dest); e == nil {
-                app.appendLog(fmt.Sprintf(app.messages["log_downloaded_file_size"], float64(info.Size())/1024/1024))
-            } else {
-                app.appendLog(fmt.Sprintf(app.messages["log_downloaded_file_not_found"], e))
-            }
-            app.appendLog(app.messages["download_complete"])
-            installedName, err := app.InstallModFromArchive(dest, false)
-            if err != nil {
-                app.appendLog(fmt.Sprintf(app.messages["log_install_failed"], err))
-            } else {
-                os.Remove(dest)
-                if fileVersion != "" && modID != "" {
-                    app.nexusVersionCache[modID] = fileVersion
-                    app.saveNexusVersionCache()
-                }
-                if installedName != "" {
-                    app.selectModByName(installedName)
-                }
-            }
-        })
-    }()
-}
-
-// showConfirmDialog показывает локализованный диалог подтверждения.
-func (app *App) showConfirmDialog(title, message, confirmKey, cancelKey string, callback func(bool)) {
-    fyne.Do(func() {
-        var popUp *widget.PopUp
-        confirmBtn := widget.NewButton(app.messages[confirmKey], func() {
-            popUp.Hide()
-            if callback != nil {
-                callback(true)
-            }
-        })
-        cancelBtn := widget.NewButton(app.messages[cancelKey], func() {
-            popUp.Hide()
-            if callback != nil {
-                callback(false)
-            }
-        })
-        // Красный градиентный заголовок
-        gradHeader := canvas.NewImageFromImage(app.makeRedCRTGradient(DialogGradientWidth, DialogGradientHeight))
-        gradHeader.FillMode = canvas.ImageFillStretch
-        titleLabel := widget.NewLabelWithStyle(title, fyne.TextAlignCenter, fyne.TextStyle{Bold: true})
-        headerContainer := container.NewStack(gradHeader, container.NewCenter(titleLabel))
-        msgLabel := widget.NewLabel(message)
-        // msgLabel.Wrapping = fyne.TextWrapWord
-        content := container.NewVBox(
-            headerContainer,
-            msgLabel,
-            container.NewCenter(container.NewHBox(confirmBtn, cancelBtn)),
-        )
-        popUp = widget.NewModalPopUp(content, app.mainWindow.Canvas())
-        popUp.Show()
-    })
 }

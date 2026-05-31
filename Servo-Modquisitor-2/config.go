@@ -1,3 +1,4 @@
+// config.go
 package main
 
 import (
@@ -7,9 +8,27 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-const AppVersion = "0.9.6"
+const AppVersion = "1.0.0"
 
-// ────────────────────────── ОКНО ──────────────────────────
+// ────────────────────────── ID ИГРЫ ──────────────────────────
+const DarktideAppID = "1361210"
+
+// ────────────────────────── ФАЙЛЫ ──────────────────────────
+const (
+	FileNameLoadOrder      = "mod_load_order.txt"
+	FileNameMandatoryRules = "mandatory_obsolete_incompatible_dependencies.json"
+	FileNameModDatabase    = "mod_database.json"
+
+	gitHubRepoURL = "https://api.github.com/repos/xsSplater/Darktide-Servo-Modquisitor-2/releases/latest"
+
+	modDatabaseURL  = "https://raw.githubusercontent.com/xsSplater/Darktide-Servo-Modquisitor-2/main/SortingRules_and_ModDatabase/mod_database.json"
+	modMandatoryURL = "https://raw.githubusercontent.com/xsSplater/Darktide-Servo-Modquisitor-2/main/SortingRules_and_ModDatabase/mandatory_obsolete_incompatible_dependencies.json"
+)
+
+// ────────────────────────── ФОРМАТ ВРЕМЕНИ ──────────────────────────
+const LogTimeFormat = "15:04:05"
+
+// ────────────────────────── ОКНО ПРОГРАММЫ ──────────────────────────
 const (
 	MainWindowWidth  float32 = 900
 	MainWindowHeight float32 = 700
@@ -34,6 +53,14 @@ const (
 )
 
 // ────────────────────────── ДИАЛОГИ ──────────────────────────
+type DialogType int
+
+const (
+	DialogTypeInfo  DialogType = iota // зелёный
+	DialogTypeWarn                    // красный
+	DialogTypeError                   // красный
+)
+
 const (
 	FileDialogWidth  float32 = 800
 	FileDialogHeight float32 = 600
@@ -45,8 +72,13 @@ const (
 )
 
 const (
-	DialogGradientWidth  = 600
+	DialogGradientWidth  = 400
 	DialogGradientHeight = 50
+)
+
+const (
+	DialogButtonMinWidth float32 = 120
+	DialogButtonHeight   float32 = 36
 )
 
 // ────────────────────────── ОПИСАНИЕ ──────────────────────────
@@ -61,7 +93,7 @@ const TableColumnCount = 7
 const (
 	ColCheckboxWidth float32 = 30
 	ColSelectWidth   float32 = 30
-	ColNumberWidth   float32 = 30
+	ColNumberWidth   float32 = 40
 	ColNameWidth     float32 = 350
 	ColDateWidth     float32 = 100
 	ColStatusWidth   float32 = 120
@@ -74,17 +106,7 @@ const (
 )
 
 // ────────────────────────── ПОИСК ──────────────────────────
-const SearchMinWidth = 250
-
-// ────────────────────────── ФАЙЛЫ ──────────────────────────
-const (
-	FileNameLoadOrder      = "mod_load_order.txt"
-	FileNameMandatoryRules = "mandatory_obsolete_incompatible_dependencies.json"
-	FileNameModDatabase    = "mod_database.json"
-)
-
-// ────────────────────────── ФОРМАТ ВРЕМЕНИ ──────────────────────────
-const LogTimeFormat = "15:04:05"
+const SearchMinWidth = 350
 
 // ────────────────────────── ЗАДЕРЖКИ ──────────────────────────
 const (
@@ -94,9 +116,6 @@ const (
 	BlinkOffDuration    = 1000 * time.Millisecond
 	BlinkCheckInterval  = 2 * time.Second
 )
-
-// ────────────────────────── ID ИГРЫ ──────────────────────────
-const DarktideAppID = "1361210"
 
 // ────────────────────────── ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ──────────────────────────
 
