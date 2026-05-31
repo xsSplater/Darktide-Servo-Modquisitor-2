@@ -1,7 +1,7 @@
 # Darktide-Servo-ModQuisitor-2
 Darktide Mod Manager
 
-<img src="https://staticdelivery.nexusmods.com/mods/4943/images/139/139-1780151868-2122448607.png">
+<img src="https://staticdelivery.nexusmods.com/mods/4943/images/139/139-1780241394-1854967499.png">
 
 ## Features:
 - Drag and drop mod installation directly onto the program window.
