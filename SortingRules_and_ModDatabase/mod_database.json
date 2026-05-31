@@ -1,5 +1,5 @@
 {
-	"version": "0.86",
+	"version": "0.9.7",
 	"mod_database": [
 		{
 			"folder": "pickup_spawner",
@@ -8640,924 +8640,6 @@
 			"note": { "en": "", "ru": "" }
 		},
 		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "",
-			"name": {
-				"en": "",
-				"ru": ""
-			},
-			"description": {
-				"en": "",
-				"ru": ""
-			},
-			"author": "",
-			"url": "",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
 			"folder": "autopatch",
 			"name": {
 				"en": "Darktide Mod Autopatcher",
@@ -9570,6 +8652,876 @@
 			"author": "Darktide Modders",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/709",
 			"github_url": "https://github.com/manshanko/dt-mod-autopatch/",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "DisposalObjectives",
+			"name": {
+				"en": "Disposal Unit",
+				"ru": "Disposal Unit"
+			},
+			"description": {
+				"en": "Disposal Unit (Clutch - Bosses - Objectives) - It plays Disposal Unit (Imperium Mix) when:\n- 'Last Man Standfing'(CLUTCH) objective.\n- During game objectives.\n- On boss fights.",
+				"ru": "Disposal Unit (Clutch - Bosses - Objectives) - Композиция Disposal Unit (Imperium Mix) активируется в следующих случаях:\n- В рамках задачи «последний выживший».\n- Во время выполнения игровых задач.\n- В боях с боссами."
+			},
+			"author": "prokopenko7797v",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/710",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "HideYoKeybinds",
+			"name": {
+				"en": "Hide Yo Keybinds",
+				"ru": "Скрой эти клавиши"
+			},
+			"description": {
+				"en": "Hides the keybind text for player ability, weapons, and items.",
+				"ru": "Hide Yo Keybinds - Скрывает текст, отвечающий за назначение клавиш для способностей игрока, оружия и предметов."
+			},
+			"author": "turkoid",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/712",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "mixed_input_ckbm",
+			"name": {
+				"en": "Mixed Input Console-Keyboard-Mouse",
+				"ru": "Смешанный ввод: консоль, клавиатура, мышь"
+			},
+			"description": {
+				"en": "Mixed Input Console-Keyboard-Mouse - Enables simultaneous Controller + Keyboard + Mouse input by activating Darktide's built-in combined' selection mode. Intended for gaming keypads and multi-device setups where the default 'latest device' switching causes input conflicts.",
+				"ru": "Mixed Input Console-Keyboard-Mouse - Позволяет одновременно использовать контроллер, клавиатуру и мышь, активируя встроенный в Darktide режим комбинированного выбора. Предназначено для игровых клавиатур и многоустройственных конфигураций, где переключение на «последнее устройство» по умолчанию вызывает конфликты ввода."
+			},
+			"author": "bsod",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/713",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "BetterMovement",
+			"name": {
+				"en": "Better Movement",
+				"ru": "Улучшенное движение"
+			},
+			"description": {
+				"en": "Integrates core movement optimizations including continuous sprint, dodge jump prevention, double-tap dodge slide, and dodge key triggered slide.",
+				"ru": "Better Movement - Включает в себя основные оптимизации движений, в том числе непрерывный спринт, предотвращение прыжков при уклонении, скольжение при уклонении двойным нажатием и скольжение, активируемое клавишей уклонения."
+			},
+			"author": "Shui Yu",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/714",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "ChatGremlin",
+			"name": {
+				"en": "Chat Gremlin",
+				"ru": "Чат-гремлин"
+			},
+			"description": {
+				"en": "Colors your chat messages. you type like normal, it just adds color/gradients (incl pride flags) before sending. can do random gradients + some silly effects if you want. pls don’t spam it in pubs.",
+				"ru": "Chat Gremlin - Раскрашивает ваши сообщения в чате. Вы пишете как обычно, просто перед отправкой добавляется цвет/градиенты (включая радужные флаги). Можно использовать случайные градиенты и некоторые забавные эффекты, если хотите. Пожалуйста, не спамьте в публичных сообщениях."
+			},
+			"author": "Velvet6423",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/715",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "inspect_special",
+			"name": {
+				"en": "Inspect Special",
+				"ru": "Спец анимации при осмотре"
+			},
+			"description": {
+				"en": "Brute-force automation mod that rapidly triggers weapon inspect inputs to find and play rare special inspect animations.",
+				"ru": "Inspect Special - Мод грубо автоматизирует и быстро активирует команды осмотра оружия, чтобы найти и воспроизвести редкие специальные анимации при осмотре."
+			},
+			"author": "bsod",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/716",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "AbilityGod",
+			"name": {
+				"en": "Ability God",
+				"ru": "Бог способностей"
+			},
+			"description": {
+				"en": "Automatically activates your ability based on user-determined criteria.",
+				"ru": "Ability God - Автоматически активирует вашу способность на основе заданных пользователем критериев."
+			},
+			"author": "Kevinna",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/717",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "QuickLeave",
+			"name": {
+				"en": "Quick Leave",
+				"ru": "Быстрый выход"
+			},
+			"description": {
+				"en": "QuickLeave adds a 'Leave Mission' button during intro, mission end, and defeat cutscenes, so you can exit immediately instead of waiting for the cutscene or final score screen.",
+				"ru": "Quick Leave - Мод добавляет кнопку «Покинуть миссию» во время вступительной заставки, финальной сцены и сцены поражения, позволяя немедленно выйти из игры, не дожидаясь кат-сцены или экрана с окончательным счётом."
+			},
+			"author": "LAUR3HTE",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/719",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "bot_counter",
+			"name": {
+				"en": "Bot Counter",
+				"ru": "Счётчик ботов"
+			},
+			"description": {
+				"en": "Bot Counter tracks how many bots are currently in your Strike Team.",
+				"ru": "Bot Counter - Мод отслеживает, сколько ботов в данный момент находится в вашей ударной группе."
+			},
+			"author": "Zeil",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/720",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "no_sway",
+			"name": {
+				"en": "No Sway",
+				"ru": "Без колебаний"
+			},
+			"description": {
+				"en": "Removes weapon sway/crosshair breathing (2 versions/approaches).",
+				"ru": "No Sway - Устраняет колебание оружия/дыхание прицела (2 версии/подхода)."
+			},
+			"author": "malevhf",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/721",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "SortModMenu",
+			"name": {
+				"en": "Sorted Mod Menu",
+				"ru": "Сортированное меню модов"
+			},
+			"description": {
+				"en": "Adds a search bar and alphabetically sorts mods on the 'Mod Options' page. Pin your favorite mods to the top, and optionally add icons to them.",
+				"ru": "Sorted Mod Menu - Добавляет строку поиска и сортирует моды по алфавиту на странице «Настройки модов». Закрепляйте любимые моды вверху и, при желании, добавляйте к ним значки."
+			},
+			"author": "ASingleFaith",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/723",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "PortraitFrameToggler",
+			"name": {
+				"en": "Portrait Frame Toggler",
+				"ru": "Выключатель рамки портрета"
+			},
+			"description": {
+				"en": "Portrait Frame Toggler allows players to control the display or hiding of portrait frames in different game scenes.",
+				"ru": "Portrait Frame Toggler - Позволяет игрокам управлять отображением рамок портретов в различных игровых сценах."
+			},
+			"author": "Khiral",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/726",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "what_are_you",
+			"name": {
+				"en": "What Are You",
+				"ru": "Что ты?"
+			},
+			"description": {
+				"en": "Display class and/or primary talent for yourself and teammates in the HUD.",
+				"ru": "What Are You - Показывает класс и/или основные таланты себя и своих товарищей по команде в интерфейсе."
+			},
+			"author": "malevhf",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/728",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "IWantToHear",
+			"name": {
+				"en": "I Want To Hear",
+				"ru": "Я хочу слышать"
+			},
+			"description": {
+				"en": "I Want To Hear - Remove bullet dodge and howling SFX - Disables the bullet dodge SFX and the pox hound howling when it spawns in.",
+				"ru": "I Want To Hear - Remove bullet dodge and howling SFX - Отключает звуковые эффекты уклонения от пуль и вой чумной гончей при её появлении."
+			},
+			"author": "Harridas",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/729",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "AccurateCurioNames",
+			"name": {
+				"en": "Accurate Curio Names",
+				"ru": "Точные названия редкостей"
+			},
+			"description": {
+				"en": "Changes the name of every curio to its blessing, optionally with perks. Respects other mod's custom names.",
+				"ru": "Accurate Curio Names - Меняет название каждого предмета на его благословение, при желании с добавлением бонусов. Учитывает пользовательские названия других модов."
+			},
+			"author": "Faith",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/730",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "",
+			"name": {
+				"en": "",
+				"ru": ""
+			},
+			"description": {
+				"en": "",
+				"ru": ""
+			},
+			"author": "",
+			"url": "",
+			"github_url": "",
 			"note": {
 				"en": "",
 				"ru": ""

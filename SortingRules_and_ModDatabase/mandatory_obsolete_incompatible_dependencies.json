@@ -1,5 +1,5 @@
 {
-	"version": "0.86",
+	"version": "0.9.7",
 
 	"mandatory_order": [
 		"LogMeIn",
@@ -77,10 +77,12 @@
 		"ads_crosshair",
 		"AimSensitivity",
 		"ammo_med_markers",
+
 		"barter_at_once",
 		"barter_with_hadron",
 		"book_finder",
 		"bugfix_loc_markers",
+
 		"Cameleoline",
 		"CaptainShield",
 		"CharWallets",
@@ -95,42 +97,56 @@
 		"CustomCrit",
 		"CustomCrit1Sound",
 		"CustomResolutions",
+
 		"DarkCache",
 		"default_to_strike_team",
+
 		"emote_wheel_fix",
 		"EnemyAudioReplacer",
+
 		"fancy_bots",
+
 		"graphics_options",
+
 		"Height Changer",
 		"heretical_idol_marker",
+
 		"IgnorePsykerGrenades",
 		"InventoryInspect",
+
 		"Jukebox",
+
 		"LoadingFix",
 		"LocalizationFixForKOAllinone",
 		"LessAnnoyingFx",
+
 		"material_markers",
 		"minimap",
 		"ModificationIconColor",
 		"MultipleKeybinds",
 		"MuteInBackground",
 		"MutePerilSounds",
+
 		"no_chitchat",
 		"NoLetterbox",
 		"NoSkull",
+
 		"OpenSteamProfile",
+
 		"PenanceDetails",
 		"PlasmaGunLagFix",
 		"PreferAuric",
 		"PsykaniumDefaultDifficulty",
 		"PsykaniumInvHotkey",
 		"PsykerCriticalPerilQuiet",
+
 		"RejectInvitesWhileInMission",
 		"recoil_fix",
 		"reroll_until_rarity",
 		"RestoreRagdollInteraction",
 		"RetainSelection",
 		"reveal_blessings",
+
 		"ScoreboardDamage",
 		"settings_extension",
 		"sorted_mission_grid",
@@ -139,11 +155,14 @@
 		"stimm_markers",
 		"stuff_searcher",
 		"SuperFlashlight",
+
 		"TaintedDevices_markers",
 		"tome_markers",
 		"TransparentShield",
 		"TruePeril",
+
 		"ViewModelTweaker",
+
 		"weapon_customization",
 		"weapon_customization_chains",
 		"weapon_customization_mt_stuff",
@@ -154,6 +173,7 @@
 		"weapon_customization_syn_edits",
 		"which_book",
 		"WhichMissions",
+
 		"ZipIt",
 
 		"ENLocalizationFIX",
@@ -162,6 +182,7 @@
 		"ENLocalizationFIXCurios",
 		"ENLocalizationFIXTalents",
 		"ENLocalizationFIXTraits",
+
 		"RULocalizationFIX",
 		"RULocalizationFIXAchievements",
 		"RULocalizationFIXBlessings",
@@ -174,6 +195,7 @@
 		"RULocalizationFIXTraits",
 		"RULocalizationFIXTitles",
 		"RULocalizationFIXWeaponnames",
+
 		"x_Enhanced_RU_Localization"
 	],
 
@@ -182,253 +204,306 @@
 			"mod2": "debuff_indicator",
 				"desc": {
 					"en": "🔴 Conflict:\nEnemies Improved  ⚔ Debuff Indicator.\nEnemies receive two identical debuff markers.",
-					"ru": "🔴 Конфликт:\nEnemies Improved  ⚔ Debuff Indicator.\nВраги получают два одинаковых маркера дебаффа." } },
+					"ru": "🔴 Конфликт:\nEnemies Improved  ⚔ Debuff Indicator.\nВраги получают два одинаковых маркера дебаффа."}},
 		{"mod1": "enemies_improved",
 			"mod2": "crusher_attack_indicator",
 				"desc": {
 					"en": "🔴 Conflict:\nEnemies Improved  ⚔ Crusher Attack Indicator.\nThey work together, but the attack indicators on enemies are buggy.",
-					"ru": "🔴 Конфликт:\nEnemies Improved  ⚔ Crusher Attack Indicator.\nРаботают вместе, но багуются индикаторы атаки на врагах." } },
+					"ru": "🔴 Конфликт:\nEnemies Improved  ⚔ Crusher Attack Indicator.\nРаботают вместе, но багуются индикаторы атаки на врагах."}},
 		{"mod1": "enemies_improved",
 			"mod2": "crusher_attack_indicator",
 				"desc": {
 					"en": "🔴 Conflict:\nEnemies Improved  ⚔ Mauler Attack Indicator.\nThey work together, but the attack indicators on enemies are buggy.",
-					"ru": "🔴 Конфликт:\nEnemies Improved  ⚔ Mauler Attack Indicator.\nРаботают вместе, но багуются индикаторы атаки на врагах." } },
+					"ru": "🔴 Конфликт:\nEnemies Improved  ⚔ Mauler Attack Indicator.\nРаботают вместе, но багуются индикаторы атаки на врагах."}},
 		{"mod1": "enemies_improved",
 			"mod2": "Healthbars",
 				"desc": {
 					"en": "🔴 Conflict:\nEnemies Improved  ⚔ Healthbars.\nEnemies Improved includes Healthbars functionality.",
-					"ru": "🔴 Конфликт:\nEnemies Improved  ⚔ Healthbars.\nEnemies Improved содержит в себе функционал Healthbars." } },
+					"ru": "🔴 Конфликт:\nEnemies Improved  ⚔ Healthbars.\nEnemies Improved содержит в себе функционал Healthbars."}},
 		{"mod1": "enemies_improved",
 			"mod2": "outline_colours",
 				"desc": {
 					"en": "🔴 Conflict:\nEnemies Improved  ⚔ Outline Colours.\nEnemies Improved includes Outline Colours functionality.",
-					"ru": "🔴 Конфликт:\nEnemies Improved  ⚔ Outline Colours.\nEnemies Improved содержит в себе функционал Outline Colours." } },
+					"ru": "🔴 Конфликт:\nEnemies Improved  ⚔ Outline Colours.\nEnemies Improved содержит в себе функционал Outline Colours."}},
 		{"mod1": "enemies_improved",
 			"mod2": "ColorCodedHealthbars",
 				"desc": {
 					"en": "🔴 Conflict:\nEnemies Improved  ⚔ Color Coded Healthbars.\nEnemies Improved includes Color Coded Healthbars functionality.",
-					"ru": "🔴 Конфликт:\nEnemies Improved  ⚔ Color Coded Healthbars.\nEnemies Improved содержит в себе функционал Color Coded Healthbars." } },
+					"ru": "🔴 Конфликт:\nEnemies Improved  ⚔ Color Coded Healthbars.\nEnemies Improved содержит в себе функционал Color Coded Healthbars."}},
 
 		{"mod1": "AutoLoot",
 			"mod2": "auto_rations",
 				"desc": {
 					"en": "🔴 Conflict:\nAutoLoot  ⚔ Auto Rations.\nAutoLoot includes Auto Rations functionality.",
-					"ru": "🔴 Конфликт:\nAutoLoot  ⚔ Auto Rations.\nAutoLoot содержит в себе функционал Auto Rations." } },
+					"ru": "🔴 Конфликт:\nAutoLoot  ⚔ Auto Rations.\nAutoLoot содержит в себе функционал Auto Rations."}},
 
 		{"mod1": "ViewModelTweaker",
 			"mod2": "weapon_fov",
 				"desc": {
 					"en": "🔴 Conflict:\nViewModel Tweaker  ⚔ Weapon FoV.\nViewModel Tweaker includes Weapon FoV functionality.",
-					"ru": "🔴 Конфликт:\nViewModel Tweaker  ⚔ Weapon FoV.\nViewModel Tweaker содержит в себе функционал Weapon FoV." } },
+					"ru": "🔴 Конфликт:\nViewModel Tweaker  ⚔ Weapon FoV.\nViewModel Tweaker содержит в себе функционал Weapon FoV."}},
 
 		{"mod1": "Radar",
 			"mod2": "minimap",
 				"desc": {
 					"en": "🔴 Conflict:\nRadar  ⚔ Minimap.\nRadar includes Minimap functionality.",
-					"ru": "🔴 Конфликт:\nRadar  ⚔ Minimap.\nRadar содержит в себе функционал Minimap." } },
+					"ru": "🔴 Конфликт:\nRadar  ⚔ Minimap.\nRadar содержит в себе функционал Minimap."}},
 
 		{"mod1": "Archivum Messelina",
 			"mod2": "ImprovedPenanceTracking",
 				"desc": {
 					"en": "🔴 Conflict:\nArchivum Messelina  ⚔ Penance Tracking.\nArchivum Messelina includes Improved Penance Tracking functionality.",
-					"ru": "🔴 Конфликт:\nArchivum Messelina  ⚔ Penance Tracking.\nArchivum Messelina содержит в себе функционал Penance Tracking." } },
+					"ru": "🔴 Конфликт:\nArchivum Messelina  ⚔ Penance Tracking.\nArchivum Messelina содержит в себе функционал Penance Tracking."}},
 
 		{"mod1": "AutoMark",
 			"mod2": "AutoPing",
 				"desc": {
 					"en": "🔴 Conflict:\nAutoMark  ⚔ AutoPing.\nBoth mods attempt to mark enemies automatically.",
-					"ru": "🔴 Конфликт:\nAutoMark  ⚔ AutoPing.\nОба мода пытаются ставить метки на врагов автоматически." } },
+					"ru": "🔴 Конфликт:\nAutoMark  ⚔ AutoPing.\nОба мода пытаются ставить метки на врагов автоматически."}},
 		{"mod1": "AutoMark",
 			"mod2": "DogWhistle",
 				"desc": {
 					"en": "🔴 Conflict:\nAutoMark  ⚔ Dog Whistle.\nBoth can give the dog a command at the same time.",
-					"ru": "🔴 Конфликт:\nAutoMark  ⚔ Dog Whistle.\nОба могут давать команду собаке одновременно." } },
+					"ru": "🔴 Конфликт:\nAutoMark  ⚔ Dog Whistle.\nОба могут давать команду собаке одновременно."}},
 		{"mod1": "AutoMark",
 			"mod2": "AutoTag",
 				"desc": {
 					"en": "🔴 Conflict:\nAutoMark  ⚔ AutoTag.\nTwo auto-tags compete with each other.",
-					"ru": "🔴 Конфликт:\nAutoMark  ⚔ AutoTag.\nДва авто-тега конкурируют друг с другом." } },
+					"ru": "🔴 Конфликт:\nAutoMark  ⚔ AutoTag.\nДва авто-тега конкурируют друг с другом."}},
 		{"mod1": "AutoMark",
 			"mod2": "LessAnnoyingArbites",
 				"desc": {
 					"en": "🔴 Conflict:\nAutoMark  ⚔ Less Annoying Arbites.\nDog control conflict.",
-					"ru": "🔴 Конфликт:\nAutoMark  ⚔ Less Annoying Arbites.\nКонфликт управления собакой." } },
+					"ru": "🔴 Конфликт:\nAutoMark  ⚔ Less Annoying Arbites.\nКонфликт управления собакой."}},
 
 		{"mod1": "AutoPing",
 			"mod2": "DogWhistle",
 				"desc": {
 					"en": "🔴 Conflict:\nAutoPing  ⚔ Dog Whistle.\nBoth intercept the tagging button.",
-					"ru": "🔴 Конфликт:\nAutoPing  ⚔ Dog Whistle.\nОба перехватывают кнопку метки." } },
+					"ru": "🔴 Конфликт:\nAutoPing  ⚔ Dog Whistle.\nОба перехватывают кнопку метки."}},
 		{"mod1": "AutoPing",
 			"mod2": "AutoTag",
 				"desc": {
 					"en": "🔴 Conflict:\nAutoPing  ⚔ AutoTag.\nBoth mods control the same button at the same time.",
-					"ru": "🔴 Конфликт:\nAutoPing  ⚔ AutoTag.\nОба мода одновременно управляют одной и той же кнопкой." } },
+					"ru": "🔴 Конфликт:\nAutoPing  ⚔ AutoTag.\nОба мода одновременно управляют одной и той же кнопкой."}},
 		{"mod1": "AutoPing",
 			"mod2": "LessAnnoyingArbites",
 				"desc": {
 					"en": "🔴 Conflict:\nAutoPing  ⚔ Less Annoying Arbites.\nBoth mods change the logic for target detection under crosshairs.",
-					"ru": "🔴 Конфликт:\nAutoPing  ⚔ Less Annoying Arbites.\nОба мода меняют логику определения цели под прицелом." } },
+					"ru": "🔴 Конфликт:\nAutoPing  ⚔ Less Annoying Arbites.\nОба мода меняют логику определения цели под прицелом."}},
 
 		{"mod1": "AutoTag",
 			"mod2": "DogWhistle",
 				"desc": {
 					"en": "🔴 Conflict:\nAutoTag  ⚔ Dog Whistle.\nDog Whistle fully controls tag types (dog or veteran), while AutoTag simply places a regular tag.",
-					"ru": "🔴 Конфликт:\nAutoTag  ⚔ Dog Whistle.\nDog Whistle полностью управляет типами меток (для собаки или ветерана), а AutoTag просто ставит обычную метку." } },
+					"ru": "🔴 Конфликт:\nAutoTag  ⚔ Dog Whistle.\nDog Whistle полностью управляет типами меток (для собаки или ветерана), а AutoTag просто ставит обычную метку."}},
 		{"mod1": "AutoTag",
 			"mod2": "LessAnnoyingArbites",
 				"desc": {
 					"en": "🔴 Conflict:\nAutoTag  ⚔ Less Annoying Arbites.\nThe AutoTag replaces a button press, while the Less Annoying Arbites mod expects a manual double-tap.",
-					"ru": "🔴 Конфликт:\nAutoTag  ⚔ Less Annoying Arbites.\nAutoTag подменяет нажатие кнопки, а мод Less Annoying Arbites ждёт именно ручного двойного тапа." } },
+					"ru": "🔴 Конфликт:\nAutoTag  ⚔ Less Annoying Arbites.\nAutoTag подменяет нажатие кнопки, а мод Less Annoying Arbites ждёт именно ручного двойного тапа."}},
 
 		{"mod1": "DogWhistle",
 			"mod2": "LessAnnoyingArbites",
 				"desc": {
 					"en": "🔴 Conflict:\nAutoTag  ⚔ Less Annoying Arbites.\nThe two methods of calling the dog (whistle and double tap) conflict.",
-					"ru": "🔴 Конфликт:\nAutoTag  ⚔ Less Annoying Arbites.\nДва способа позвать собаку (свисток и двойной тап) конфликтуют." } },
+					"ru": "🔴 Конфликт:\nAutoTag  ⚔ Less Annoying Arbites.\nДва способа позвать собаку (свисток и двойной тап) конфликтуют."}},
 		{"mod1": "DogWhistle",
 			"mod2": "HoldToDogAttack",
 				"desc": {
 					"en": "🔴 Conflict:\nAutoTag  ⚔ Hold To Dog Attack.\nThe two methods of calling the dog (whistle and double tap) conflict.",
-					"ru": "🔴 Конфликт:\nAutoTag  ⚔ Hold To Dog Attack.\nДва способа позвать собаку (свисток и двойной тап) конфликтуют." } },
+					"ru": "🔴 Конфликт:\nAutoTag  ⚔ Hold To Dog Attack.\nДва способа позвать собаку (свисток и двойной тап) конфликтуют."}},
 
 		{"mod1": "Skitarius",
 			"mod2": "AutoSwing",
 				"desc": {
 					"en": "🔴 Conflict:\nSkitarius  ⚔ AutoSwing.\nConflict when intercepting light attacks.",
-					"ru": "🔴 Конфликт:\nSkitarius  ⚔ AutoSwing.\nКонфликт при перехвате лёгких атак." } },
+					"ru": "🔴 Конфликт:\nSkitarius  ⚔ AutoSwing.\nКонфликт при перехвате лёгких атак."}},
 		{"mod1": "Skitarius",
 			"mod2": "KeepSwinging",
 				"desc": {
 					"en": "🔴 Conflict:\nSkitarius  ⚔ Keep Swinging.\nConflict over attack and special action handling.",
-					"ru": "🔴 Конфликт:\nSkitarius  ⚔ Keep Swinging.\nКонфликт из-за одновременного управления атаками и специальными действиями." } },
+					"ru": "🔴 Конфликт:\nSkitarius  ⚔ Keep Swinging.\nКонфликт из-за одновременного управления атаками и специальными действиями."}},
 		{"mod1": "Skitarius",
 			"mod2": "FullAuto",
 				"desc": {
 					"en": "🔴 Conflict:\nSkitarius  ⚔ FullAuto.\nConflict in shooting input handling.",
-					"ru": "🔴 Конфликт:\nSkitarius  ⚔ FullAuto.\nКонфликт в обработке удержания кнопки стрельбы." } },
+					"ru": "🔴 Конфликт:\nSkitarius  ⚔ FullAuto.\nКонфликт в обработке удержания кнопки стрельбы."}},
 		{"mod1": "Skitarius",
 			"mod2": "UngaBunga",
 				"desc": {
 					"en": "🔴 Conflict:\nSkitarius  ⚔ UngaBunga.\nConflict in auto-heavy attacks and cancels.",
-					"ru": "🔴 Конфликт:\nSkitarius  ⚔ UngaBunga.\nКонфликт в автоматических тяжёлых атаках и отменах." } },
+					"ru": "🔴 Конфликт:\nSkitarius  ⚔ UngaBunga.\nКонфликт в автоматических тяжёлых атаках и отменах."}},
 
 		{"mod1": "KeepSwinging",
 			"mod2": "AutoSwing",
 				"desc": {
 					"en": "🔴 Conflict:\nKeep Swinging  ⚔ AutoSwing.\nThey do the same thing.",
-					"ru": "🔴 Конфликт:\nKeep Swinging  ⚔ AutoSwing.\nДелают одно и тоже." } },
+					"ru": "🔴 Конфликт:\nKeep Swinging  ⚔ AutoSwing.\nДелают одно и тоже."}},
+
+		{"mod1": "hideprompts",
+			"mod2": "HideYoKeybinds",
+				"desc": {
+					"en": "🔴 Conflict:\nHide Prompts  ⚔ Hide Yo Keybinds.\nHide Prompts includes functionality of Hide Yo Keybinds.",
+					"ru": "🔴 Конфликт:\nHide Prompts  ⚔ Hide Yo Keybinds.\nHide Prompts уже включает возможности Hide Yo Keybinds."}},
 
 		{"mod1": "ZipIt2",
 			"mod2": "no_chitchat",
 				"desc": {
 					"en": "Zip It 2 includes functionality of No ChitChat.",
-					"ru": "Zip It 2 уже включает возможности No ChitChat." } },
+					"ru": "Zip It 2 уже включает возможности No ChitChat."}},
 
 		{"mod1": "LessAnnoyingArbites",
 			"mod2": "LessAnnoyingDog",
 				"desc": {
 					"en": "Less Annoying Arbites includes functionality of Less Annoying Dog.",
-					"ru": "Less Annoying Arbites уже включает возможности Less Annoying Dog." } },
+					"ru": "Less Annoying Arbites уже включает возможности Less Annoying Dog."}},
+
+		{"mod1": "BetterMovement",
+			"mod2": "no_dodge_jump",
+				"desc": {
+					"en": "🔴 Conflict:\nBetter Movement  ⚔ Stop accidental jumps.\nBetter Movement includes functionality of Stop accidental jumps.",
+					"ru": "🔴 Конфликт:\nBetter Movement  ⚔ Stop accidental jumps.\nBetter Movement уже включает возможности Stop accidental jumps."}},
+		{"mod1": "BetterMovement",
+			"mod2": "DefaultSprint",
+				"desc": {
+					"en": "🔴 Conflict:\nBetter Movement  ⚔ Default Sprint.\nBetter Movement includes functionality of Default Sprint.",
+					"ru": "🔴 Конфликт:\nBetter Movement  ⚔ Default Sprint.\nBetter Movement уже включает возможности Default Sprint."}},
+		{"mod1": "BetterMovement",
+			"mod2": "DodgeSlide",
+				"desc": {
+					"en": "🔴 Conflict:\nBetter Movement  ⚔ DodgeSlide.\nBetter Movement includes functionality of DodgeSlide.",
+					"ru": "🔴 Конфликт:\nBetter Movement  ⚔ DodgeSlide.\nBetter Movement уже включает возможности DodgeSlide."}},
+		{"mod1": "BetterMovement",
+			"mod2": "Walk",
+				"desc": {
+					"en": "🔴 Conflict:\nBetter Movement  ⚔ Walk.\nBetter Movement includes functionality of Walk.",
+					"ru": "🔴 Конфликт:\nBetter Movement  ⚔ Walk.\nBetter Movement уже включает возможности Walk."}},
+		{"mod1": "BetterMovement",
+			"mod2": "hybrid_sprint",
+				"desc": {
+					"en": "🔴 Conflict:\nBetter Movement  ⚔ Hybrid Sprint.\nBetter Movement includes functionality of Hybrid Sprint.",
+					"ru": "🔴 Конфликт:\nBetter Movement  ⚔ Hybrid Sprint.\nBetter Movement уже включает возможности Hybrid Sprint."}},
+		{"mod1": "BetterMovement",
+			"mod2": "AutoVault",
+				"desc": {
+					"en": "🔴 Conflict:\nBetter Movement  ⚔ AutoVault.\nBetter Movement includes functionality of AutoVault.",
+					"ru": "🔴 Конфликт:\nBetter Movement  ⚔ AutoVault.\nBetter Movement уже включает возможности AutoVault."}},
+		{"mod1": "BetterMovement",
+			"mod2": "StickySprint",
+				"desc": {
+					"en": "🔴 Conflict:\nBetter Movement  ⚔ Sticky Sprint.\nBetter Movement includes functionality of Sticky Sprint.",
+					"ru": "🔴 Конфликт:\nBetter Movement  ⚔ Sticky Sprint.\nBetter Movement уже включает возможности Sticky Sprint."}},
+		{"mod1": "BetterMovement",
+			"mod2": "keep_dodging",
+				"desc": {
+					"en": "🔴 Conflict:\nBetter Movement  ⚔ Keep Dodging.\nBetter Movement includes functionality of Keep Dodging.",
+					"ru": "🔴 Конфликт:\nBetter Movement  ⚔ Keep Dodging.\nBetter Movement уже включает возможности Keep Dodging."}},
+
+		{"mod1": "SprintVault",
+			"mod2": "AutoVault",
+				"desc": {
+					"en": "🔴 Conflict:\nSprintVault  ⚔ AutoVault.\nSprintVault includes functionality of AutoVault.",
+					"ru": "🔴 Конфликт:\nSprintVault  ⚔ AutoVault.\nSprintVault уже включает возможности AutoVault."}},
 
 		{"mod1": "CustomUIColors",
 			"mod2": "DarkMode",
 				"desc": {
 					"en": "Custom UI Colors are not compatible with Dark Mode, as they change the colors of the same interface elements.",
-					"ru": "Custom UI Colors несовместим с Dark Mode, т.к. они меняют цвета тех же элементов интерфейса." } },
+					"ru": "Custom UI Colors несовместим с Dark Mode, т.к. они меняют цвета тех же элементов интерфейса."}},
 
 		{"mod1": "hybrid_sprint",
 			"mod2": "StickySprint",
 				"desc": {
 					"en": "Hybrid Sprint includes functionality of Sticky Sprint.",
-					"ru": "Hybrid Sprint уже включает возможности Sticky Sprint." } },
+					"ru": "Hybrid Sprint уже включает возможности Sticky Sprint."}},
 
 		{"mod1": "MenuUIHider",
 			"mod2": "InventoryHider",
 				"desc": {
 					"en": "Menu UI Hider includes functionality of Inventory Hider.",
-					"ru": "Menu UI Hider уже включает возможности Inventory Hider." } },
+					"ru": "Menu UI Hider уже включает возможности Inventory Hider."}},
 
 		{"mod1": "ReorderChars",
 			"mod2": "CharacterMenuReorder",
 				"desc": {
 					"en": "Character Menu Reorder includes functionality of Reorder Characters.",
-					"ru": "Character Menu Reorder уже включает возможности Reorder Characters." } },
+					"ru": "Character Menu Reorder уже включает возможности Reorder Characters."}},
 
 		{"mod1": "BetterLoadouts",
 			"mod2": "more_characters_and_loadouts",
 				"desc": {
 					"en": "Better Loadouts includes functionality of More Characters and Loadouts.",
-					"ru": "Better Loadouts уже включает возможности More Characters and Loadouts." } },
+					"ru": "Better Loadouts уже включает возможности More Characters and Loadouts."}},
 
 		{"mod1": "custom_hud",
 			"mod2": "ToggleHUD",
 				"desc": {
 					"en": "Custom HUD also can hide UI.",
-					"ru": "Custom HUD также может скрывать интерфейс." } },
+					"ru": "Custom HUD также может скрывать интерфейс."}},
 		{"mod1": "custom_hud",
 			"mod2": "NoneHUD",
 				"desc": {
 					"en": "Custom HUD also can hide UI.",
-					"ru": "Custom HUD также может скрывать интерфейс." } },
+					"ru": "Custom HUD также может скрывать интерфейс."}},
 
 		{"mod1": "ToggleHUD",
 			"mod2": "NoneHUD",
 				"desc": {
 					"en": "Both do the same thing.",
-					"ru": "Оба делают одно и то же." } },
+					"ru": "Оба делают одно и то же."}},
 
 		{"mod1": "DisplayPing",
 			"mod2": "PingMonitor",
 				"desc": {
 					"en": "Display Ping includes Ping Monitor functionality.",
-					"ru": "Display Ping включает функциональность Ping Monitor." } },
+					"ru": "Display Ping включает функциональность Ping Monitor."}},
 
 		{"mod1": "KillfeedImprovements",
 			"mod2": "Killfeed Details",
 				"desc": {
 					"en": "These two conflict.",
-					"ru": "Эти два конфликтуют." } },
+					"ru": "Эти два конфликтуют."}},
 
 		{"mod1": "markers_aio",
 			"mod2": "FoundYa",
 				"desc": {
 					"en": "Markers Improved AIO includes functionality of Found Ya.",
-					"ru": "Markers Improved AIO включает функциональность Found Ya." } },
+					"ru": "Markers Improved AIO включает функциональность Found Ya."}},
 		{"mod1": "markers_aio",
 			"mod2": "Ration Pack",
 				"desc": {
 					"en": "Markers Improved AIO includes functionality of Ration Pack.",
-					"ru": "Markers Improved AIO включает функциональность Ration Pack." } },
+					"ru": "Markers Improved AIO включает функциональность Ration Pack."}},
 		{"mod1": "markers_aio",
 			"mod2": "StimmsPickupIcon",
 				"desc": {
 					"en": "Markers Improved AIO includes functionality of Stimms Pickup Icon.",
-					"ru": "Markers Improved AIO включает функциональность Stimms Pickup Icon." } },
+					"ru": "Markers Improved AIO включает функциональность Stimms Pickup Icon."}},
 
 		{"mod1": "NumericUI",
 			"mod2": "RemoveTagSkulls",
 				"desc": {
 					"en": "Numeric UI already includes all functionality of Remove Tag Skulls.",
-					"ru": "Numeric UI уже включает всю функциональность Remove Tag Skulls." } },
+					"ru": "Numeric UI уже включает всю функциональность Remove Tag Skulls."}},
 
 		{"mod1": "ShowEquippedInLobby",
 			"mod2": "Mission Lobby - Show Ranged Weapons",
 				"desc": {
 					"en": "Both show weapons in lobby.",
-					"ru": "Оба показывают оружие в лобби." } },
+					"ru": "Оба показывают оружие в лобби."}},
 
 		{"mod1": "simplecolorselector",
 			"mod2": "ColorSelection",
 				"desc": {
 					"en": "Simple Color Selector includes functionality of Color Selection.",
-					"ru": "Simple Color Selector включает функциональность Color Selection." } },
+					"ru": "Simple Color Selector включает функциональность Color Selection."}},
 
 		{"mod1": "SoloPlay",
 			"mod2": "prologue",
 				"desc": {
 					"en": "SoloPlay already includes Prologue functionality.",
-					"ru": "SoloPlay уже включает функциональность Prologue." } },
+					"ru": "SoloPlay уже включает функциональность Prologue."}},
 
 		{"mod1": "teammate_tracker",
 			"mod2": "Do I Know You",
