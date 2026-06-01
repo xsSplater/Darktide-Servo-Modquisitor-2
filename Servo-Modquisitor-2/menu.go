@@ -127,20 +127,16 @@ func (app *App) buildMainMenu() *fyne.MainMenu {
 	)
 
 	// Контакты
-	// contactNexus := fyne.NewMenuItem(app.messages["menu_nexus_mod_page"], func() {
-	// 	u, _ := url.Parse("https://www.nexusmods.com/warhammer40kdarktide/mods/139")
-	// 	_ = app.myApp.OpenURL(u)
-	// })
 	contactGitHub := fyne.NewMenuItem(app.messages["menu_github"], func() {
-		u, _ := url.Parse("https://github.com/xsSplater/Darktide-Servo-Modquisitor-2")
+		u, _ := url.Parse(GitHubRepoSMQ)
 		_ = app.myApp.OpenURL(u)
 	})
 	contactDiscordMy := fyne.NewMenuItem(app.messages["menu_discord_my"], func() {
-		u, _ := url.Parse("https://discord.gg/BGZagw3xnz")
+		u, _ := url.Parse(DiscordDTMy)
 		_ = app.myApp.OpenURL(u)
 	})
 	contactDiscord := fyne.NewMenuItem(app.messages["menu_discord_dtmoddrs"], func() {
-		u, _ := url.Parse("https://discord.com/channels/1048312349867646996/1506507675976859679")
+		u, _ := url.Parse(DiscordDTModders)
 		_ = app.myApp.OpenURL(u)
 	})
 	contactMenu := fyne.NewMenu(app.messages["menu_contact"], contactGitHub, contactDiscord, contactDiscordMy)
@@ -174,8 +170,6 @@ func (app *App) buildMainMenu() *fyne.MainMenu {
 		forceEnglishItem,
 		showSystemItem,
 	)
-	// Разделитель после настроек
-	// settingsMenu.Items = append(settingsMenu.Items, fyne.NewMenuItemSeparator())
 
 	return fyne.NewMainMenu(settingsMenu, nexusMenu, updatesMenu, contactMenu)
 }

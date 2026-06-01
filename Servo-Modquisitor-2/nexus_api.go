@@ -2,7 +2,6 @@
 package main
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -19,8 +18,8 @@ import (
 
 const nexusAPIBase = "https://api.nexusmods.com/v1"
 const (
-	appName    = "Servo-Modquisitor-2"
-	appVersion = AppVersion // берётся из config.go
+	appName    = AppName
+	appVersion = AppVersion
 )
 
 type NexusModInfo struct {
@@ -132,7 +131,12 @@ func (app *App) checkNexusUpdates() {
 		app.appendLog(app.messages["nexus_api_key_missing"])
 		return
 	}
+
+	app.appendLog("🔍 Checking for updates...")
+	total := len(app.allMods)
+	processed := 0
 	updatesFound := 0
+
 	for i := range app.allMods {
 		mod := &app.allMods[i]
 		if mod.URL == "" {
@@ -145,7 +149,13 @@ func (app *App) checkNexusUpdates() {
 
 		fileInfo, err := app.getLatestFileInfo(modID)
 		if err != nil {
-			app.appendLog(fmt.Sprintf(app.messages["log_update_check_failed_for"], mod.Name, err))
+			// Проверяем, не является ли ошибка 403 (мод недоступен)
+			errMsg := err.Error()
+			if strings.Contains(errMsg, "403") || strings.Contains(errMsg, "Mod not available") {
+				app.appendLog(fmt.Sprintf("⚠️ Mod %s is not available on Nexus (removed or hidden). Skipping.", mod.Name))
+			} else {
+				app.appendLog(fmt.Sprintf(app.messages["log_update_check_failed_for"], mod.Name, err))
+			}
 			continue
 		}
 
@@ -155,7 +165,7 @@ func (app *App) checkNexusUpdates() {
 			saved = info
 		}
 
-		// Если нет сохранённой информации (первые запуск) - сохраняем текущую и не считаем обновлением
+		// Если нет сохранённой информации (первый запуск) - сохраняем текущую и не считаем обновлением
 		if saved.Timestamp == 0 {
 			app.nexusVersionCache[modIDStr] = ModVersionInfo{
 				Timestamp: fileInfo.UploadedTimestamp,
@@ -163,6 +173,7 @@ func (app *App) checkNexusUpdates() {
 				Folder:    mod.Name,
 			}
 			app.saveNexusVersionCache()
+			processed++
 			continue
 		}
 
@@ -170,12 +181,20 @@ func (app *App) checkNexusUpdates() {
 			app.appendLog(fmt.Sprintf(app.messages["log_update_available"], mod.Name, saved.Version, fileInfo.Version))
 			updatesFound++
 		}
+
+		processed++
+		// Логируем прогресс каждые 10 модов (не чаще, чтобы не засорять лог)
+		if processed%10 == 0 {
+			app.appendLog(fmt.Sprintf("  Progress: %d of %d mods checked", processed, total))
+		}
 	}
+
 	if updatesFound == 0 {
 		app.appendLog(app.messages["no_updates_found"])
 	} else {
 		app.appendLog(fmt.Sprintf(app.messages["updates_found_count"], updatesFound))
 	}
+	app.appendLog("✅ Update check completed")
 }
 
 // getPremiumDownloadURL - для Premium-пользователей (key и expires не нужны).
@@ -224,7 +243,7 @@ func (app *App) getPremiumDownloadURL(modID, fileID string) (string, string, err
 	if len(snippet) > 500 {
 		snippet = snippet[:500] + "..."
 	}
-	app.appendLog(fmt.Sprintf(app.messages["premium_download_response"], snippet))
+	// app.appendLog("Premium download response received (content omitted for privacy)")
 
 	if resp.StatusCode != http.StatusOK {
 		return "", "", fmt.Errorf("API error %d: %s", resp.StatusCode, snippet)
@@ -353,70 +372,6 @@ func extractFileNameFromURL(rawURL string) string {
 		return ""
 	}
 	return segments[len(segments)-1]
-}
-
-// getFileInfo получает информацию о файле через GraphQL.
-func (app *App) getFileInfo(modID, fileID string) (*FileInfo, error) {
-	token := app.getAuthToken()
-	if token == "" {
-		return nil, fmt.Errorf("no authentication token")
-	}
-
-	query := `query GetFileInfo($modId: ID!, $fileId: ID!) {
-		mod(id: $modId) {
-			file(id: $fileId) {
-				version
-			}
-		}
-	}`
-	variables := map[string]interface{}{
-		"modId":  modID,
-		"fileId": fileID,
-	}
-	body, err := json.Marshal(map[string]interface{}{
-		"query":     query,
-		"variables": variables,
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("POST", "https://api.nexusmods.com/v1/graphql", bytes.NewReader(body))
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Set("Authorization", "Bearer "+token)
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Application-Name", appName)
-	req.Header.Set("Application-Version", appVersion)
-	req.Header.Set("Referer", "https://www.nexusmods.com/")
-
-	client := &http.Client{Timeout: 10 * time.Second}
-	resp, err := client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	respBody, _ := io.ReadAll(resp.Body)
-	app.appendLog("GraphQL response: " + string(respBody))
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("HTTP %d: %s", resp.StatusCode, string(respBody))
-	}
-
-	var result struct {
-		Data struct {
-			Mod struct {
-				File struct {
-					Version string `json:"version"`
-				} `json:"file"`
-			} `json:"mod"`
-		} `json:"data"`
-	}
-	if err := json.Unmarshal(respBody, &result); err != nil {
-		return nil, err
-	}
-	return &FileInfo{Version: result.Data.Mod.File.Version}, nil
 }
 
 // getLatestFileID возвращает ID самого свежего файла мода через REST API

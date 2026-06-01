@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"net"
 	"os"
 	"path/filepath"
@@ -38,8 +39,7 @@ type Config struct {
 	SkipSortFilesPrompt       bool   `json:"skip_sort_files_prompt"`
 	UpdateCheckFrequency      string `json:"update_check_frequency"`
 	ShowSystemMods            bool   `json:"show_system_mods"`
-	// скрывать предупреждение об AML
-	SuppressAMLWarning bool `json:"suppress_aml_warning"`
+	SuppressAMLWarning        bool   `json:"suppress_aml_warning"` // скрывать предупреждение об AML
 
 	// Nexus API
 	NexusAPIKey       string    `json:"nexus_api_key"`
@@ -51,7 +51,7 @@ type Config struct {
 type ModVersionInfo struct {
 	Timestamp int64  `json:"timestamp"`
 	Version   string `json:"version"`
-	Folder    string `json:"folder"` // Название папки мода
+	Folder    string `json:"folder"` // Название папки мода в nexus_versions.json
 }
 
 type App struct {
@@ -86,7 +86,8 @@ type App struct {
 	moveLabel   *widget.Label
 	statusLabel *widget.Label
 
-	tooltipStatus       *TooltipStatusManager
+	tooltipStatus *TooltipStatusManager
+
 	manageBtn           *CustomButton
 	selectAllBtn        *CustomButton
 	deselectAllBtn      *CustomButton
@@ -189,7 +190,7 @@ func NewApp(cfg *Config, myApp fyne.App) *App {
 }
 
 func (app *App) loadNexusVersionCache() {
-	path := filepath.Join(filepath.Dir(configFilePath()), "nexus_versions.json")
+	path := filepath.Join(filepath.Dir(configFilePath()), FileNameNexusVersions)
 	data, err := os.ReadFile(path)
 	if err != nil {
 		app.nexusVersionCache = make(map[string]ModVersionInfo)
@@ -223,29 +224,31 @@ func (app *App) loadNexusVersionCache() {
 }
 
 func (app *App) saveNexusVersionCache() {
-	path := filepath.Join(filepath.Dir(configFilePath()), "nexus_versions.json")
+	path := filepath.Join(filepath.Dir(configFilePath()), FileNameNexusVersions)
 	data, _ := json.MarshalIndent(app.nexusVersionCache, "", "  ")
 	os.WriteFile(path, data, 0644)
 }
 
 func configFilePath() string {
 	dir, _ := os.UserConfigDir()
-	appDir := filepath.Join(dir, "Servo-Modquisitor")
-	os.MkdirAll(appDir, 0755)
-	return filepath.Join(appDir, "config.json")
+	appDir := filepath.Join(dir, СonfigFolderSMQ)
+	if err := os.MkdirAll(appDir, 0755); err != nil {
+		log.Printf("Failed to create config directory: %v", err)
+	}
+	return filepath.Join(appDir, FileNameConfig)
 }
 
 func loadConfig() *Config {
 	path := configFilePath()
 	data, err := os.ReadFile(path)
 	if err != nil {
-		c := &Config{Language: "en", Theme: "dark", DateFormat: "dd-mm-yyyy", UpdateCheckFrequency: "every_start", ShowSystemMods: true}
-		return c
+		log.Printf("Config file not found, using defaults: %v", err)
+		return defaultConfig()
 	}
 	var c Config
 	if err := json.Unmarshal(data, &c); err != nil {
-		c = Config{Language: "en", Theme: "dark", DateFormat: "dd-mm-yyyy", UpdateCheckFrequency: "every_start", ShowSystemMods: true}
-		return &c
+		log.Printf("Failed to parse config, using defaults: %v", err)
+		return defaultConfig()
 	}
 	if c.UpdateCheckFrequency == "" {
 		c.UpdateCheckFrequency = "every_start"
@@ -257,14 +260,31 @@ func loadConfig() *Config {
 	return &c
 }
 
+// вспомогательная функция
+func defaultConfig() *Config {
+	return &Config{
+		Language:             "en",
+		Theme:                "dark",
+		DateFormat:           "dd-mm-yyyy",
+		UpdateCheckFrequency: "every_start",
+		ShowSystemMods:       true,
+	}
+}
+
 func saveConfig(c *Config) {
 	path := configFilePath()
-	data, _ := json.MarshalIndent(c, "", "	")
-	os.WriteFile(path, data, 0644)
+	data, err := json.MarshalIndent(c, "", "	")
+	if err != nil {
+		log.Printf("Failed to marshal config: %v", err)
+		return
+	}
+	if err := os.WriteFile(path, data, 0644); err != nil {
+		log.Printf("Failed to save config: %v", err)
+	}
 }
 
 func (app *App) loadLanguage(lang string) error {
-	data, err := embeddedFiles.ReadFile("lang/messages.json")
+	data, err := embeddedFiles.ReadFile(FileNameMessages)
 	if err != nil {
 		return fmt.Errorf("cannot read messages.json: %w", err)
 	}
@@ -332,11 +352,11 @@ func (app *App) getTitle() string {
 func (app *App) formatDate(t time.Time, pattern string) string {
 	switch pattern {
 	case "yyyy-mm-dd":
-		return t.Format("2006-01-02")
+		return t.Format(YYYYMMDD_TimeFormat)
 	case "mm-dd-yyyy":
-		return t.Format("01-02-2006")
+		return t.Format(MMDDYYYY_TimeFormat)
 	default:
-		return t.Format("02-01-2006")
+		return t.Format(DDMMYYYY_TimeFormat)
 	}
 }
 

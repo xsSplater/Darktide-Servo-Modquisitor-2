@@ -590,12 +590,12 @@ func (app *App) buildUI() {
 	app.tableBorder.FillColor = color.Transparent
 	app.tableBorder.Hide()
 	// Фоновое изображение таблицы
-	mechData, _ := embeddedFiles.ReadFile("assets/mechanicus.png")
+	mechData, _ := embeddedFiles.ReadFile(TableBackgroundImage)
 	var mechBg *canvas.Image
 	if mechData != nil {
-		mechBg = canvas.NewImageFromResource(fyne.NewStaticResource("mechanicus.png", mechData))
+		mechBg = canvas.NewImageFromResource(fyne.NewStaticResource(TableBackgroundImage, mechData))
 		mechBg.FillMode = canvas.ImageFillContain // или ImageFillStretch, на ваш вкус
-		mechBg.Translucency = 0.99                // 1 - невидимый, 0 - видимый
+		mechBg.Translucency = TableBackgroundOpacity
 	}
 
 	if mechBg != nil {
@@ -699,19 +699,23 @@ func (app *App) buildUI() {
 				defer reader.Close()
 				path := reader.URI().Path()
 				if strings.HasSuffix(strings.ToLower(path), ".zip") {
-					installedName, version, err := app.InstallModFromArchive(path, true, "")
-					if err != nil {
-						app.appendLog(fmt.Sprintf(app.messages["log_extract_error"], err))
-					} else {
-						checks.AutoFixMalformed()
-						app.refreshModList()
-						// Пытаемся определить modID из имени файла
-						modID, _, _ := extractVersionAndModIDFromFilename(path)
-						if modID != 0 && version != "" {
-							app.cacheModVersion(fmt.Sprintf("%d", modID), installedName, version, 0)
-						}
-						app.appendLog(fmt.Sprintf(app.messages["log_installed"], filepath.Base(path)))
-					}
+					// Запускаем установку в отдельной горутине, чтобы не блокировать UI
+					go func(p string) {
+						installedName, version, err := app.InstallModFromArchive(p, true, "")
+						fyne.Do(func() {
+							if err != nil {
+								app.appendLog(fmt.Sprintf(app.messages["log_extract_error"], err))
+								return
+							}
+							checks.AutoFixMalformed()
+							app.refreshModList()
+							modID, _, _ := extractVersionAndModIDFromFilename(p)
+							if modID != 0 && version != "" {
+								app.cacheModVersion(fmt.Sprintf("%d", modID), installedName, version, 0)
+							}
+							app.appendLog(fmt.Sprintf(app.messages["log_installed"], filepath.Base(p)))
+						})
+					}(path)
 				} else {
 					app.appendLog(app.messages["log_zip_only"])
 				}
@@ -1023,11 +1027,10 @@ func (app *App) updateDescriptionForMod(name string) {
 	}
 
 	desc := strings.TrimSpace(mod.Description)
-	// if desc == "" || desc == "{" || desc == "}" || desc == "[]" || desc == "()" {
-	// 	desc = app.messages["desc_placeholder"]
-	// }
+	if desc == "" || desc == "{" || desc == "}" || desc == "[]" || desc == "()" {
+		desc = app.messages["desc_placeholder"]
+	}
 	app.descBody.SetText(desc)
-	app.descBody.SetText(mod.Description)
 
 	if mod.URL != "" {
 		u, err := url.Parse(mod.URL)

@@ -45,7 +45,7 @@ func (app *App) refreshModList() {
 				app.appendLog(fmt.Sprintf("Failed to rename hub_hotkey_menus-main: %v", err))
 			}
 		} else {
-			// Обе папки есть – удаляем неправильную
+			// Обе папки есть - удаляем неправильную
 			os.RemoveAll(wrongFolder)
 			app.appendLog("Removed duplicate hub_hotkey_menus-main")
 		}
@@ -262,22 +262,23 @@ func (app *App) handleDrop(uris []fyne.URI) {
 		} else {
 			ext := strings.ToLower(filepath.Ext(path))
 			if ext == ".zip" || ext == ".rar" || ext == ".7z" {
-				installedName, version, err := app.InstallModFromArchive(path, true, "")
-				if err != nil {
-					app.appendLog(fmt.Sprintf(app.messages["log_extract_error"], err))
-				} else {
-					checks.AutoFixMalformed()
-					app.refreshModList()
-					// Попробуем найти modID по имени папки или извлечь из имени архива
-					modID, _, _ := extractVersionAndModIDFromFilename(path)
-					if modID != 0 && version != "" {
-						app.cacheModVersion(fmt.Sprintf("%d", modID), installedName, version, 0)
-					} else if version != "" {
-						// Не знаем modID, не сохраняем в кэш (или сохраняем с ключом = folderName?)
-						// Можно сохранить с ключом = installedName, но потом не будет связи с API
-					}
-					app.appendLog(fmt.Sprintf(app.messages["log_installed"], filepath.Base(path)))
-				}
+				go func(p string) {
+					installedName, version, err := app.InstallModFromArchive(p, true, "")
+					fyne.Do(func() {
+						if err != nil {
+							app.appendLog(fmt.Sprintf(app.messages["log_extract_error"], err))
+							return
+						}
+						checks.AutoFixMalformed()
+						app.refreshModList()
+						// Попробуем найти modID по имени папки или извлечь из имени архива
+						modID, _, _ := extractVersionAndModIDFromFilename(p)
+						if modID != 0 && version != "" {
+							app.cacheModVersion(fmt.Sprintf("%d", modID), installedName, version, 0)
+						}
+						app.appendLog(fmt.Sprintf(app.messages["log_installed"], filepath.Base(p)))
+					})
+				}(path)
 			} else {
 				app.appendLog(app.messages["log_zip_only"])
 			}
@@ -1049,7 +1050,9 @@ func (app *App) installAutopatcherFromArchive(archivePath string) error {
 }
 
 // extractVersionAndModIDFromFilename пытается извлечь версию и ID мода из имени файла
-// Формат: "ИмяМода-MODID-Версия-Время.zip" или "ИмяМода-Версия-MODID-Время.zip"
+// Паттерн: Название-МодID-Версия-Время.zip
+// Версия может состоять из нескольких частей (например, 1-01, 26.02.08-1).
+// Последняя часть, похожая на Unix timestamp (число из 8-10 цифр), не включается в версию.
 func extractVersionAndModIDFromFilename(filename string) (modID int, version string, ok bool) {
 	name := filepath.Base(filename)
 	// Удаляем расширение
@@ -1058,33 +1061,56 @@ func extractVersionAndModIDFromFilename(filename string) (modID int, version str
 		name = name[:len(name)-len(ext)]
 	}
 	parts := strings.Split(name, "-")
-	if len(parts) < 4 {
+	if len(parts) < 3 {
 		return 0, "", false
 	}
-	// Ищем часть, похожую на число (modID) – обычно 2-3 цифры
+
+	// Ищем часть, которая является modID (число от 1 до 9999)
+	modIDIdx := -1
 	for i, part := range parts {
 		if id, err := strconv.Atoi(part); err == nil && id > 0 && id < 10000 {
 			modID = id
-			// Версия – обычно следующая часть или предыдущая?
-			// Пробуем разные варианты
-			if i+1 < len(parts) && strings.Contains(parts[i+1], ".") {
-				version = parts[i+1]
-				return modID, version, true
-			}
-			if i-1 >= 0 && strings.Contains(parts[i-1], ".") {
-				version = parts[i-1]
-				return modID, version, true
-			}
+			modIDIdx = i
+			break
 		}
 	}
-	// Если не нашли modID, но есть часть с точкой – считаем её версией
-	for _, part := range parts {
-		if strings.Contains(part, ".") && len(part) > 1 && !strings.Contains(part, " ") {
-			version = part
-			return 0, version, true
+	if modIDIdx == -1 {
+		return 0, "", false
+	}
+
+	// Собираем версию из частей, следующих за modID, до тех пор, пока не встретим timestamp
+	var versionParts []string
+	for i := modIDIdx + 1; i < len(parts); i++ {
+		part := parts[i]
+		// Если часть выглядит как Unix timestamp (все цифры, длина 8-10) - останавливаемся
+		if isNumeric(part) && len(part) >= 8 && len(part) <= 10 {
+			break
+		}
+		versionParts = append(versionParts, part)
+	}
+
+	if len(versionParts) == 0 {
+		return modID, "", false
+	}
+
+	// Объединяем части версии через точку
+	version = strings.Join(versionParts, ".")
+	// Убираем лишние точки в начале/конце
+	version = strings.Trim(version, ".")
+	if version == "" {
+		return modID, "", false
+	}
+	return modID, version, true
+}
+
+// isNumeric проверяет, состоит ли строка только из цифр
+func isNumeric(s string) bool {
+	for _, c := range s {
+		if c < '0' || c > '9' {
+			return false
 		}
 	}
-	return 0, "", false
+	return len(s) > 0
 }
 
 // promptUserForVersion показывает диалог ввода версии и возвращает введённую строку

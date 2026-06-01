@@ -18,13 +18,6 @@ import (
 	"fyne.io/fyne/v2"
 )
 
-const (
-	oauthAuthorizeURL = "https://users.nexusmods.com/oauth/authorize"
-	oauthTokenURL     = "https://users.nexusmods.com/oauth/token"
-	redirectURI       = "http://localhost:31337/callback"
-	clientID          = "servomodquisitor2"
-)
-
 type OAuthTokenResponse struct {
 	AccessToken  string `json:"access_token"`
 	RefreshToken string `json:"refresh_token"`
@@ -83,7 +76,7 @@ func (app *App) startOAuthFlow() {
 }
 
 func (app *App) startCallbackServer() {
-	listener, err := net.Listen("tcp", "localhost:31337")
+	listener, err := net.Listen(NXMProtocol, NXMAddress)
 	if err != nil {
 		app.appendLog(fmt.Sprintf(app.messages["oauth_failed_callback_server"], err.Error()))
 		return
@@ -259,7 +252,7 @@ func (app *App) startNXMListener() {
 		return // уже запущен
 	}
 	var err error
-	app.nxmListener, err = net.Listen("tcp", "localhost:31337")
+	app.nxmListener, err = net.Listen(NXMProtocol, NXMAddress)
 	if err != nil {
 		app.appendLog("Failed to restart nxm listener: " + err.Error())
 		return

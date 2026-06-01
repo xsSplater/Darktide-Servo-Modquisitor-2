@@ -144,8 +144,8 @@
         "ru": "⏬ Установить мод"
     },
     "btn_install_tooltip": {
-        "en": "You can install mods by opening the selection window with this button or by dragging the archive onto this window.",
-        "ru": "Вы можете установить моды открыв окно выбора этой кнопкой или перетаскиванием архива на это окно."
+        "en": "Allows you to install mods from an archive (or you can drag and drop an archive onto this window).",
+        "ru": "Позволяет установить моды из архива (или вы можете перетащить архив на это окно)."
     },
     "btn_launch_game": {
         "en": "▶ Launch Game",
@@ -168,8 +168,8 @@
         "ru": "⚙ Управление модами ⚙"
     },
     "btn_manage_mods_tooltip": {
-        "en": "Opens the mod management panel: move, enable, disable, delete mods.",
-        "ru": "Открывает панель управления модами: перемещение, включение, выключение, удаление."
+        "en": "Opens the mod control panel: select mods, then move them, turn them on, turn them off, delete them...",
+        "ru": "Открывает панель управления модами: выделяйте моды, перемещайте, включайте, выключайте, удаляйте..."
     },
     "btn_move_to_bottom": {
         "en": "⏬ Move to Bottom",
@@ -292,8 +292,8 @@
         "ru": "Запускает диагностику ваших модов, устраняет неисправности и сортирует."
     },
     "btn_toggle_tooltip": {
-        "en": "Completely disable/enable mods in the game using 'toggle_darktide_mods.bat' or 'toggle_dt_mod_autopatch.cmd'.",
-        "ru": "Полностью выключает/включает моды в игре с помощью «toggle_darktide_mods.bat» или «toggle_dt_mod_autopatch.cmd»."
+        "en": "Disable/Enable mods in the game using 'toggle_darktide_mods.bat' or 'toggle_dt_mod_autopatch.cmd'.",
+        "ru": "Выключает/Включает моды в игре с помощью «toggle_darktide_mods.bat» или «toggle_dt_mod_autopatch.cmd»."
     },
     "btn_up": {
         "en": "🔼 Move up",

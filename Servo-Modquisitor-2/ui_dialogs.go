@@ -370,7 +370,7 @@ func (app *App) handleNXMLink(nxmURL string) {
 	app.lastNxmTime = now
 	u, err := url.Parse(nxmURL)
 	if err != nil {
-		app.appendLog(app.messages["log_invalid_nmx_link"])
+		// app.appendLog(app.messages["log_invalid_nmx_link"])
 		return
 	}
 	segments := strings.Split(strings.Trim(u.Path, "/"), "/")
@@ -384,7 +384,7 @@ func (app *App) handleNXMLink(nxmURL string) {
 		}
 	}
 	if modID == "" || fileID == "" {
-		app.appendLog(app.messages["log_invalid_nmx_link"])
+		// app.appendLog(app.messages["log_invalid_nmx_link"])
 		return
 	}
 	key := u.Query().Get("key")
@@ -507,6 +507,7 @@ func (app *App) showAutopatcherDownloadDialog(url, filename string, fileInfo *Fi
 					app.nexusVersionCache["709"] = ModVersionInfo{
 						Timestamp: fileInfo.UploadedTimestamp,
 						Version:   fileInfo.Version,
+						Folder:    "Darktide Autopatch",
 					}
 					app.saveNexusVersionCache()
 				}
@@ -572,7 +573,7 @@ func (app *App) showDMFDownloadDialog(url, filename string, fileInfo *FileInfo) 
 				os.Remove(dest)
 				return
 			}
-			app.appendLog(app.messages["installing_dml"]) // текст "Installing Darktide Mod Loader..." – можно оставить или заменить
+			app.appendLog(app.messages["installing_dml"]) // текст "Installing Darktide Mod Loader..." - можно оставить или заменить
 			if err := app.installDMLFromArchive(dest); err != nil {
 				app.appendLog(fmt.Sprintf(app.messages["dml_install_failed"], err))
 			} else {
@@ -580,7 +581,7 @@ func (app *App) showDMFDownloadDialog(url, filename string, fileInfo *FileInfo) 
 					app.nexusVersionCache["8"] = ModVersionInfo{
 						Timestamp: fileInfo.UploadedTimestamp,
 						Version:   fileInfo.Version,
-						Folder:    "dmf",
+						Folder:    "Darktide Mod Framework",
 					}
 					app.saveNexusVersionCache()
 				}

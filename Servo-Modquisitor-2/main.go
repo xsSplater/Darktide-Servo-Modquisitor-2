@@ -12,7 +12,9 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"syscall"
 	"time"
+	"unsafe"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
@@ -22,12 +24,29 @@ import (
 //go:embed lang/messages.json assets/CRT_BlackBG.jpg assets/Yellow_BG.jpg assets/Yellow_BG_button.jpg assets/Yellow_BG_col.jpg assets/icon.png assets/mechanicus.png
 var embeddedFiles embed.FS
 
+func isAlreadyRunning() bool {
+	kernel32 := syscall.NewLazyDLL("kernel32.dll")
+	createMutex := kernel32.NewProc("CreateMutexW")
+	// Глобальный мьютекс (префикс "Global\\")
+	mutexName, _ := syscall.UTF16PtrFromString("Global\\Servo-Modquisitor-Mutex")
+	ret, _, err := createMutex.Call(0, 1, uintptr(unsafe.Pointer(mutexName)))
+	if ret == 0 {
+		// Ошибка создания мьютекса - считаем, что он не существует, разрешаем запуск
+		return false
+	}
+	// Если мьютекс уже существовал, GetLastError() вернёт ERROR_ALREADY_EXISTS (183)
+	if err != nil && err.(syscall.Errno) == syscall.ERROR_ALREADY_EXISTS {
+		return true
+	}
+	return false
+}
+
 func main() {
 	// Проверяем, не передали ли нам nxm-ссылку при запуске
-	if len(os.Args) > 1 && os.Args[1] == "--nxm" && len(os.Args) > 2 {
+	if len(os.Args) > 1 && os.Args[1] == NXMCommLine && len(os.Args) > 2 {
 		nxmURL := os.Args[2]
 		// Пытаемся подключиться к уже запущенному экземпляру
-		conn, err := net.Dial("tcp", "localhost:31337")
+		conn, err := net.Dial(NXMProtocol, NXMAddress)
 		if err == nil {
 			fmt.Fprintln(conn, nxmURL)
 			conn.Close()
@@ -36,26 +55,48 @@ func main() {
 		// Если не удалось - это первый экземпляр, продолжаем обычный запуск
 	}
 
-	myApp := app.NewWithID("com.xssplater.servo-modquisitor")
+	if isAlreadyRunning() {
+		fmt.Println("Program is already running. Please close the other instance.")
+		return
+	}
+
+	myApp := app.NewWithID(AppID)
 	cfg := loadConfig()
 	// cfg.ModsPath, _ = os.Getwd()
 	exePath, _ := os.Executable()
 	cfg.ModsPath = filepath.Dir(exePath)
 
 	application := NewApp(cfg, myApp)
-	logPath := filepath.Join(cfg.ModsPath, "app.log")
-	f, err := os.OpenFile(logPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
+	logPath := filepath.Join(cfg.ModsPath, FileNameLog)
+	f, err := os.OpenFile(logPath, os.O_CREATE|os.O_RDWR|os.O_APPEND, 0644)
 	if err == nil {
-		application.logFile = f
-		application.appendLog(application.messages["log_started"])
+		// Проверяем размер файла. Если больше 240 Кб - удаляем, чтобы не засорять систему.
+		if info, err := f.Stat(); err == nil && info.Size() > 240*1024 { // 1*1024*1024 = 1 МБ
+			f.Close()
+			// Удаляем старый файл и создаём новый пустой
+			os.Remove(logPath)
+			f, err = os.OpenFile(logPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
+			if err != nil {
+				application.appendLog(fmt.Sprintf("Failed to recreate log after size limit: %v", err))
+				application.logFile = nil
+			} else {
+				application.logFile = f
+				application.appendLog("Log file cleared (exceeded 200 KB limit)")
+				application.appendLog(application.messages["log_started"])
+			}
+		} else {
+			application.logFile = f
+			application.appendLog(application.messages["log_started"])
+		}
 	} else {
 		application.appendLog(fmt.Sprintf(application.messages["log_could_not_open_log"], err))
+		application.logFile = nil
 	}
 	application.mainWindow = myApp.NewWindow(application.messages["app_title_long"])
 	ApplyWindowSettings(application.mainWindow)
 	application.mainWindow.SetMaster()
 
-	iconData, _ := embeddedFiles.ReadFile("assets/icon.png")
+	iconData, _ := embeddedFiles.ReadFile(AppIcon)
 	if iconData != nil {
 		icon := fyne.NewStaticResource("icon", iconData)
 		application.mainWindow.SetIcon(icon)
@@ -199,7 +240,7 @@ func main() {
 			func(choice int) {
 				switch choice {
 				case 0:
-					if u, err := url.Parse("https://www.nexusmods.com/warhammer40kdarktide/mods/19"); err == nil {
+					if u, err := url.Parse(DarktideModDML); err == nil {
 						application.myApp.OpenURL(u)
 					}
 				case 2:
@@ -219,7 +260,7 @@ func main() {
 	}
 
 	// Запускаем слушатель для межпроцессного взаимодействия (nxm-ссылки)
-	application.nxmListener, err = net.Listen("tcp", "localhost:31337")
+	application.nxmListener, err = net.Listen(NXMProtocol, NXMAddress)
 	if err == nil {
 		go func() {
 			for {
