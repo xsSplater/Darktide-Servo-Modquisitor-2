@@ -56,8 +56,19 @@ func main() {
 	}
 
 	if isAlreadyRunning() {
-		fmt.Println("Program is already running. Please close the other instance.")
-		return
+		// Инициализируем минимальное fyne-приложение, чтобы показать диалог
+		alreadyApp := app.NewWithID(AppID)
+		// Создаём пустое окно - оно не будет показано, но нужно как родитель для диалога
+		dummyWin := alreadyApp.NewWindow("")
+		dummyWin.SetCloseIntercept(func() { alreadyApp.Quit() })
+		// Показываем информационный диалог
+		dialog.ShowInformation(
+			"Already Running",
+			"Servo-Modquisitor is already running.\n\nPlease close the other instance before starting a new one.",
+			dummyWin,
+		)
+		// Завершаем приложение после закрытия диалога
+		os.Exit(0)
 	}
 
 	myApp := app.NewWithID(AppID)

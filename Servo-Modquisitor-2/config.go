@@ -11,22 +11,25 @@ import (
 // ───────────── Программа ─────────────────────────────────────────
 const (
 	AppName         = "Servo-Modquisitor-2"
-	AppVersion      = "1.1.0"
+	AppVersion      = "1.1.1"
 	AppID           = "com.xssplater.servo-modquisitor"
 	AppIcon         = "assets/icon.png"
 	СonfigFolderSMQ = "Servo-Modquisitor"
+	DarktideAppID   = "1361210"
 )
 
 // ───────────── Нексус ────────────────────────────────────────────
-const ( // redirectURI       = "http://localhost:31337/callback"
+const (
+	clientID          = "servomodquisitor2"
+	NexusMainURL      = "https://www.nexusmods.com/"
+	nexusAPIBase      = "https://api.nexusmods.com/v1"
 	oauthAuthorizeURL = "https://users.nexusmods.com/oauth/authorize"
 	oauthTokenURL     = "https://users.nexusmods.com/oauth/token"
-	redirectURI       = "http://127.0.0.1:31337/callback"
-	clientID          = "servomodquisitor2"
+	redirectURI       = "http://localhost:31337/callback" // (не менять!)
+	NexusV1Files      = "https://api.nexusmods.com/v1/games/warhammer40kdarktide/mods/%d/files.json"
+	NexusV1Filess     = "https://api.nexusmods.com/v1/games/warhammer40kdarktide/mods/%s/files/%s.json"
+	NexusV1DownLink   = "https://api.nexusmods.com/v1/games/warhammer40kdarktide/mods/%s/files/%s/download_link.json"
 )
-
-// ───────────── ID ИГРЫ ───────────────────────────────────────────
-const DarktideAppID = "1361210"
 
 // ───────────── Файлы ─────────────────────────────────────────────
 const (
@@ -55,10 +58,11 @@ const (
 )
 
 // ───────────── Сетевой слушатель и аргументы ─────────────────────
-const ( // NXMAddress  = "localhost:31337"
-	NXMProtocol = "tcp"
-	NXMAddress  = "127.0.0.1:31337" // Фикс для Линукс
-	NXMCommLine = "--nxm"
+const (
+	NXMProtocol     = "tcp"
+	NXMAddress      = "localhost:31338" // порт для приёма nxm-ссылок
+	OAuthListenAddr = "localhost:31337" // порт для OAuth-колбэка (не менять!)
+	NXMCommLine     = "--nxm"
 )
 
 // ───────────── Форматы времени ───────────────────────────────────
@@ -93,7 +97,7 @@ const (
 	ConsoleGradientOpacity = 0.4 // 1.00 - невидимый, 0 - видимый
 )
 
-// ───────────── Таблицы ───────────────────────────────────────────
+// ───────────── Таблица ───────────────────────────────────────────
 const TableColumnCount = 7
 
 const (
@@ -114,6 +118,12 @@ const (
 const (
 	TableBackgroundImage   = "assets/mechanicus.png"
 	TableBackgroundOpacity = 0.98 // 1.00 - невидимый, 0 - видимый
+)
+
+const (
+	HeaderBackgroundImage = "assets/Yellow_BG.jpg"
+	ButtonBackgroundImage = "assets/Yellow_BG_button.jpg"
+	ColBackgroundImage    = "assets/Yellow_BG_col.jpg"
 )
 
 // ───────────── Диалоги ───────────────────────────────────────────
@@ -156,11 +166,13 @@ const SearchMinWidth = 350
 
 // ───────────── Задержки ──────────────────────────────────────────
 const (
-	TooltipHideDelay    = 10 * time.Second
 	WindowMaximizeDelay = 200 * time.Millisecond
 	BlinkOnDuration     = 600 * time.Millisecond
 	BlinkOffDuration    = 1000 * time.Millisecond
 	BlinkCheckInterval  = 2 * time.Second
+	TooltipHideDelay    = 10 * time.Second
+	Timeout10Seconds    = 10 * time.Second
+	Timeout30Minutes    = 30 * time.Minute
 )
 
 // ───────────── Вспомогательные функции ───────────────────────────

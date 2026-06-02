@@ -40,14 +40,14 @@ func (app *App) refreshModList() {
 	if info, err := os.Stat(wrongFolder); err == nil && info.IsDir() {
 		if _, err := os.Stat(correctFolder); os.IsNotExist(err) {
 			if err := os.Rename(wrongFolder, correctFolder); err == nil {
-				app.appendLog("Auto-renamed existing folder: hub_hotkey_menus-main -> hub_hotkey_menus")
+				app.appendLog(app.messages["log_fix_hub_hk_menus"])
 			} else {
-				app.appendLog(fmt.Sprintf("Failed to rename hub_hotkey_menus-main: %v", err))
+				app.appendLog(fmt.Sprintf(app.messages["log_failed_fix_hub_hk_menus"], err))
 			}
-		} else {
+			// } else {
 			// Обе папки есть - удаляем неправильную
-			os.RemoveAll(wrongFolder)
-			app.appendLog("Removed duplicate hub_hotkey_menus-main")
+			// os.RemoveAll(wrongFolder)
+			// app.appendLog("Removed duplicate hub_hotkey_menus-main")
 		}
 	}
 	// --- конец фикса ---
@@ -768,7 +768,7 @@ func (app *App) InstallModFromArchive(archivePath string, activate bool, knownVe
 			if err != nil {
 				return "", "", err
 			}
-			app.appendLog("Fixed missing root folder for pulsing_barrels")
+			app.appendLog(app.messages["log_fix_pulsing_barrels"])
 		}
 	}
 	// ========= КОНЕЦ ФИКСА =========
@@ -782,17 +782,17 @@ func (app *App) InstallModFromArchive(archivePath string, activate bool, knownVe
 				oldPath := filepath.Join(tmpDir, modName)
 				newPath := filepath.Join(tmpDir, newName)
 				if err := os.Rename(oldPath, newPath); err == nil {
-					app.appendLog(fmt.Sprintf("Auto-renamed temp folder: %s -> %s", modName, newName))
+					app.appendLog(fmt.Sprintf(app.messages["log_fix_hub_hk_menus_temp"], modName, newName))
 					modName = newName
 				} else {
-					app.appendLog(fmt.Sprintf("Failed to rename %s: %v", modName, err))
+					app.appendLog(fmt.Sprintf(app.messages["log_failed_fix_hub_hkm_temp"], modName, err))
 				}
 			}
 			// ========= КОНЕЦ ФИКСА =========
 			dest := filepath.Join(app.cfg.ModsPath, modName)
-			app.appendLog(fmt.Sprintf("Moving %s -> %s", modName, dest))
+			app.appendLog(fmt.Sprintf(app.messages["log_moving_folder"], modName, dest))
 			if err := app.copyFolder(filepath.Join(tmpDir, modName), dest); err != nil {
-				app.appendLog(fmt.Sprintf("Copy failed: %v", err))
+				app.appendLog(fmt.Sprintf(app.messages["log_failed_copy"], err))
 				return "", "", err
 			}
 
@@ -827,7 +827,7 @@ func (app *App) InstallModFromArchive(archivePath string, activate bool, knownVe
 			}
 		}
 	}
-	return "", "", fmt.Errorf("no mod folder found in archive")
+	return "", "", fmt.Errorf(app.messages["log_no_mod_folder_found"], err)
 }
 
 // Обновление одного мода. Только для Premium-пользователей!
@@ -881,7 +881,7 @@ func (app *App) updateAllModsFromNexus() {
 		// Получаем актуальную информацию о последнем файле
 		fileInfo, err := app.getLatestFileInfo(modID)
 		if err != nil {
-			app.appendLog(fmt.Sprintf("Failed to check %s: %v", mod.Name, err))
+			app.appendLog(fmt.Sprintf(app.messages["log_failed_to_check_update"], mod.Name, err))
 			continue
 		}
 		modIDStr := fmt.Sprintf("%d", modID)
@@ -903,7 +903,7 @@ func (app *App) updateAllModsFromNexus() {
 	choice := app.showChoiceDialog(
 		app.mainWindow,
 		app.messages["update_title"],
-		fmt.Sprintf("Найдено обновлений: %d. Обновить все?", len(modsToUpdate)),
+		fmt.Sprintf(app.messages["updates_found_count_update"], len(modsToUpdate)),
 		app.messages["yes"],
 		app.messages["btn_cancel"],
 	)
@@ -967,7 +967,7 @@ func (app *App) installDMLFromArchive(archivePath string) error {
 	for _, entry := range entries {
 		srcPath := filepath.Join(tmpDir, entry.Name())
 		if err := copyPath(srcPath, filepath.Join(app.gameRoot, entry.Name())); err != nil {
-			app.appendLog(fmt.Sprintf("Failed to copy %s: %v", entry.Name(), err))
+			app.appendLog(fmt.Sprintf(app.messages["log_failed_to_copy_dml"], entry.Name(), err))
 		}
 	}
 	return nil
@@ -1118,23 +1118,23 @@ func (app *App) promptUserForVersion(modName string) string {
 	resultChan := make(chan string, 1)
 	fyne.Do(func() {
 		entry := widget.NewEntry()
-		entry.SetPlaceHolder("например, 1.0.0 или 26.04.12")
+		entry.SetPlaceHolder(app.messages["placeholder_mod_verion"])
 		var dlg dialog.Dialog
 		content := container.NewVBox(
-			widget.NewLabel(fmt.Sprintf("Не удалось определить версию мода '%s'.\nВведите версию вручную:", modName)),
+			widget.NewLabel(fmt.Sprintf(app.messages["failed_get_mod_version"], modName)),
 			entry,
 			container.NewHBox(
-				widget.NewButton("Сохранить", func() {
+				widget.NewButton(app.messages["btn_save"], func() {
 					resultChan <- entry.Text
 					dlg.Hide()
 				}),
-				widget.NewButton("Отмена", func() {
+				widget.NewButton(app.messages["btn_cancel"], func() {
 					resultChan <- ""
 					dlg.Hide()
 				}),
 			),
 		)
-		dlg = dialog.NewCustom("Версия мода", "", content, app.mainWindow)
+		dlg = dialog.NewCustom(app.messages["mod_version"], "", content, app.mainWindow)
 		dlg.Resize(fyne.NewSize(400, 200))
 		dlg.Show()
 	})

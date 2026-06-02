@@ -251,6 +251,10 @@
         "en": "Permanently deletes mods marked with managed checkboxes in the list.",
         "ru": "Безвозвратно удаляет моды, выделенные в списке галочками управления."
     },
+    "btn_save": {
+        "en": "💾 Save",
+        "ru": "💾 Сохранить"
+    },
     "btn_save_api": {
         "en": "💾 Save your API key to the settings file",
         "ru": "💾 Сохранить ваш API-ключ в файл настроек"
@@ -535,6 +539,10 @@
         "en": "Failed to get download link: %v",
         "ru": "Не удалось получить ссылку для скачивания: %v"
     },
+    "failed_get_mod_version": {
+        "en": "Unable to determine the version of mod '%s'.\nPlease enter the version manually:",
+        "ru": "Не удалось определить версию мода '%s'.\nВведите версию вручную:"
+    },
     "filter_active": {
         "en": "✔ Active",
         "ru": "✔ Активные"
@@ -701,11 +709,11 @@
     },
     "log_autopatcher": {
         "en": " (Autopatcher)",
-        "ru": " (автопатчер)"
+        "ru": " (Автопатчер)"
     },
     "log_autopatcher_old": {
         "en": " (BAT patcher)",
-        "ru": " (старый патчер)"
+        "ru": " (BAT-патчер)"
     },
     "log_all_mods_removed": {
         "en": "All mods have been removed.",
@@ -714,6 +722,10 @@
     "log_cannot_delete_system": {
         "en": "Unable to delete base or dmf folders.",
         "ru": "Невозможно удалить папки base или dmf."
+    },
+    "log_checking_updates": {
+        "en": "🔍 Checking for updates...",
+        "ru": "🔍 Проверяем наличие обновлений..."
     },
     "log_could_not_open_log": {
         "en": "Could not open log file: %v",
@@ -743,21 +755,73 @@
         "en": "Downloading mod: %s",
         "ru": "Скачивается мод: %s"
     },
+    "log_dmf_updated_succ": {
+        "en": "Darktide Mod Framework updated successfully.",
+        "ru": "Обновление Darktide Mod Framework прошло успешно."
+    },
     "log_error_drop": {
         "en": "Error getting information about the dragged object: %v",
         "ru": "Ошибка при получении информации о перетащенном объекте: %v"
+    },
+    "log_error_file_too_small": {
+        "en": "Downloaded file %s is too small (%d bytes), probably broken",
+        "ru": "Загруженный файл %s слишком мал (%d байт), вероятно, повреждён."
+    },
+    "log_error_mod_not_available": {
+        "en": "⚠️ Mod %s is not available on Nexus (removed or hidden). Skipping.",
+        "ru": "⚠️ Мод %s недоступен на Nexus (удалён или скрыт). Пропускаю."
+    },
+    "log_error_prem_download_oauth": {
+        "en": "Premium download requires authentication. Please log in via OAuth (menu Nexus → Login) or set your API key.",
+        "ru": "Для загрузки требуется аутентификация на премиум-аккаунте. Пожалуйста, войдите через OAuth (меню Nexus → Вход...) или введите свой API-ключ."
     },
     "log_error_reading_mods_dir": {
         "en": "Error reading mods directory: %v",
         "ru": "Ошибка чтения папки с модами: %v"
     },
+    "log_error_token_expired": {
+        "en": "OAuth token expired and could not be refreshed: %w. Please re-login.",
+        "ru": "Срок действия токена OAuth истек, и его не удалось обновить: %w. Пожалуйста, войдите в систему заново."
+    },
     "log_extract_error": {
         "en": "Extraction error: %v",
         "ru": "Ошибка распаковки: %v"
     },
+    "log_failed_copy": {
+        "en": "Copy failed: %v",
+        "ru": "Не удалось скопировать: %v"
+    },
+    "log_failed_fix_hub_hk_menus": {
+        "en": "Failed to rename hub_hotkey_menus-main: %v",
+        "ru": "Не удалось переименовать hub_hotkey_menus-main: %v"
+    },
+    "log_failed_fix_hub_hkm_temp": {
+        "en": "Failed to rename %s: %v",
+        "ru": "Не удалось переименовать %s: %v"
+    },
+    "log_failed_to_check_update": {
+        "en": "Failed to check %s: %v",
+        "ru": "Не удалось проверить %s: %v"
+    },
+    "log_failed_to_copy_dml": {
+        "en": "Failed to copy %s: %v",
+        "ru": "Не удалось скопировать %s: %v"
+    },
     "log_failed_open_file": {
         "en": "Failed to open file: %v",
         "ru": "Не удалось открыть файл: %v"
+    },
+    "log_fix_hub_hk_menus": {
+        "en": "Auto-renamed existing folder: hub_hotkey_menus-main -> hub_hotkey_menus",
+        "ru": "Существующая папка автоматически переименована: hub_hotkey_menus-main -> hub_hotkey_menus"
+    },
+    "log_fix_hub_hk_menus_temp": {
+        "en": "Auto-renamed temp folder: %s -> %s",
+        "ru": "Временная папка автоматически переименована: %s -> %s"
+    },
+    "log_fix_pulsing_barrels": {
+        "en": "Fixed missing root folder for Pulsing barrels mod",
+        "ru": "Исправлена ошибка с отсутствующей корневой папкой для мода Pulsing barrels"
     },
     "log_installed": {
         "en": "Mod installed: %s",
@@ -795,6 +859,10 @@
         "en": "Mod database (mod_database.json) not found. Using empty list.",
         "ru": "База модов (mod_database.json) не найдена. Использую пустой список."
     },
+    "log_mods_checked_progress": {
+        "en": "Progress: %d of %d mods checked",
+        "ru": "Прогресс: проверено %d из %d модов"
+    },
     "log_mods_disabled": {
         "en": "Mods disabled",
         "ru": "Моды выключены"
@@ -802,6 +870,10 @@
     "log_mods_enabled": {
         "en": "Mods enabled",
         "ru": "Моды включены"
+    },
+    "log_moving_folder": {
+        "en": "Moving %s -> %s",
+        "ru": "Перемещение %s -> %s"
     },
     "log_new_sorting_files_available": {
         "en": "New sorting file versions available: %s. Use menu to update.",
@@ -814,6 +886,10 @@
     "log_nexus_version_found": {
         "en": "Found Nexus version for %s: %s",
         "ru": "Найдена версия на Nexus для %s: %s"
+    },
+    "log_no_mod_folder_found": {
+        "en": "No mod folder found in archive!",
+        "ru": "Папка с модами не найдена в архиве!"
     },
     "log_no_patcher": {
         "en": "Error: no patcher found. Install DML or autopatcher.",
@@ -870,6 +946,10 @@
     "log_update_available": {
         "en": "Update available for %s: %s -> %s",
         "ru": "Доступно обновление для %s: %s -> %s"
+    },
+    "log_update_check_completed": {
+        "en": "✅ Update check completed",
+        "ru": "✅ Проверка обновлений завершена"
     },
     "log_update_check_error_db": {
         "en": "Update check error for mod_database: %v",
@@ -1018,6 +1098,10 @@
     "mod_url_label": {
         "en": "🔗 Open mod page [Nexus]",
         "ru": "🔗 Открыть страницу мода [Nexus]"
+    },
+    "mod_version": {
+        "en": "Mod version",
+        "ru": "Версия мода"
     },
     "mods_counter": {
         "en": "Showing %d of %d (active %d)",
@@ -1203,6 +1287,10 @@
         "en": "Order saved on exit.",
         "ru": "Порядок сохранён при выходе."
     },
+    "placeholder_mod_verion": {
+        "en": "for example, 1.0.0 or 26.04.12",
+        "ru": "например, 1.0.0 или 26.04.12"
+    },
     "premium_download_response": {
         "en": "Premium download response: %s",
         "ru": "Ответ премиум-загрузки: %s"
@@ -1318,6 +1406,10 @@
     "updates_found_count": {
         "en": "Updates found: %d",
         "ru": "Найдено обновлений: %d"
+    },
+    "updates_found_count_update": {
+        "en": "Updates found: %d. Update all?",
+        "ru": "Найдено обновлений: %d. Обновить все?"
     },
     "updating_mod": {
         "en": "Updating: %s",

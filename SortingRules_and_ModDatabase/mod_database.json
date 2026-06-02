@@ -3555,6 +3555,24 @@
 			}
 		},
 		{
+			"folder": "extended_weapon_customization_base_additions",
+			"name": {
+				"en": "Extended Weapon Customization Base Additions",
+				"ru": "Расширенная настройка оружия - дополнения"
+			},
+			"description": {
+				"en": "Weapon customization, flashlights, sights, scopes, equipment on back. Adds different kinds of qol and immersion things. And a bunch more stuff.",
+				"ru": "Extended Weapon Customization - Настройка оружия, фонарики, прицелы, оптические прицелы, снаряжение на спине. Добавляет различные улучшения и другие штуки для погружения в игру. И много чего ещё."
+			},
+			"author": "Grasmann",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/277",
+			"github_url": "https://github.com/grasmann/darktide-mods/tree/main/extended_weapon_customization",
+			"note": {
+				"en": "Required: Extended Weapon Customization.",
+				"ru": "Требуется: Extended Weapon Customization."
+			}
+		},
+		{
 			"folder": "weapon_customization_no_scope",
 			"name": {
 				"en": "Extended Weapon Customization No Sights Plugin",
@@ -6931,7 +6949,7 @@
 				"fr": "Jeanne au secours"
 			},
 			"description": {
-				"en": "It’s a mod for french speaker how know an old french politician.\nThis is a mod I made as a joke.\nIt replaces the sound of the player being put down by a dog with Jean-Marie Lepen’s famous “Jeanne au secours” line.",
+				"en": "It's a mod for french speaker how know an old french politician.\nThis is a mod I made as a joke.\nIt replaces the sound of the player being put down by a dog with Jean-Marie Lepen's famous 'Jeanne au secours' line.",
 				"ru": "Этот мод для франкоговорящих пользователей, знакомых со старым французским политиком.\nЭто модификация, которую я сделал в шутку.\nОна заменяет звук того, как игрока убивает собака, знаменитой фразой Жан-Мари Лепена «Jeanne au secours».",
 				"fr": "C’est un mods que j’ai fais pour la blague.\nil remplace le son du joueur de mise à terre par un chien ou quand il est attraper par un mutant par la fameuse réplique “Jeanne au secours” de Jean-marie Lepen."
 			},
@@ -8416,7 +8434,7 @@
 				"ru": "Режим замедления"
 			},
 			"description": {
-				"en": "Adds a client-side “bullet time” control that lets the player slow down gameplay speed for practice and testing. Intended for offline play or local gameplay in Psykanium.",
+				"en": "Adds a client-side 'bullet time' control that lets the player slow down gameplay speed for practice and testing. Intended for offline play or local gameplay in Psykanium.",
 				"ru": "Slow Mode - Добавляет на стороне клиента элемент управления «замедлением времени», позволяющий игроку замедлять скорость игрового процесса для тренировки и тестирования. Предназначен для игры в офлайн-режиме или локальной игры в Psykanium."
 			},
 			"author": "LAUR3HTE",
@@ -8631,7 +8649,7 @@
 				"ru": "Предосмотр талантов"
 			},
 			"description": {
-				"en": "Adds a simple talent preview to the lobby, showing each player’s selected talents as icons above their loadout slot. Hover over an icon to see the full tooltip and details. Customize icon size, number of icons per row, and the preview position in the mod settings.",
+				"en": "Adds a simple talent preview to the lobby, showing each player's selected talents as icons above their loadout slot. Hover over an icon to see the full tooltip and details. Customize icon size, number of icons per row, and the preview position in the mod settings.",
 				"ru": "Talent Preview - Добавляет в лобби простой предварительный просмотр талантов, отображая выбранные таланты каждого игрока в виде значков над слотом снаряжения. Наведите курсор на значок, чтобы увидеть полную всплывающую подсказку и подробности. Размер значка, количество значков в ряду и положение предварительного просмотра можно настроить в параметрах мода."
 			},
 			"author": "LAUR3HTE",
@@ -8721,7 +8739,7 @@
 				"ru": "Чат-гремлин"
 			},
 			"description": {
-				"en": "Colors your chat messages. you type like normal, it just adds color/gradients (incl pride flags) before sending. can do random gradients + some silly effects if you want. pls don’t spam it in pubs.",
+				"en": "Colors your chat messages. you type like normal, it just adds color/gradients (incl pride flags) before sending. can do random gradients + some silly effects if you want. pls don't spam it in pubs.",
 				"ru": "Chat Gremlin - Раскрашивает ваши сообщения в чате. Вы пишете как обычно, просто перед отправкой добавляется цвет/градиенты (включая радужные флаги). Можно использовать случайные градиенты и некоторые забавные эффекты, если хотите. Пожалуйста, не спамьте в публичных сообщениях."
 			},
 			"author": "Velvet6423",

@@ -263,13 +263,13 @@ func (app *App) buildUI() {
 	})
 	app.applyTooltip(app.manageBtn, "btn_manage_mods_tooltip")
 
-	if btnImgData, _ := embeddedFiles.ReadFile("assets/Yellow_BG_button.jpg"); btnImgData != nil {
+	if btnImgData, _ := embeddedFiles.ReadFile(ButtonBackgroundImage); btnImgData != nil {
 		img := canvas.NewImageFromResource(fyne.NewStaticResource("Yellow_BG_button", btnImgData))
 		img.FillMode = canvas.ImageFillStretch
 		img.Translucency = 0.8
 		app.manageBtn.SetBackgroundImage(img)
 	}
-	if colImgData, _ := embeddedFiles.ReadFile("assets/Yellow_BG_col.jpg"); colImgData != nil {
+	if colImgData, _ := embeddedFiles.ReadFile(ColBackgroundImage); colImgData != nil {
 		app.selectColumnBgRes = fyne.NewStaticResource("Yellow_BG_col", colImgData)
 	}
 
@@ -281,7 +281,7 @@ func (app *App) buildUI() {
 	row1 := container.NewHBox(moveToGroup, navigationGroup)
 	row2 := container.NewHBox(selectGroup, allModsGroup)
 
-	yellowData, _ := embeddedFiles.ReadFile("assets/Yellow_BG.jpg")
+	yellowData, _ := embeddedFiles.ReadFile(HeaderBackgroundImage)
 	var yellowBg *canvas.Image
 	if yellowData != nil {
 		yellowBg = canvas.NewImageFromResource(fyne.NewStaticResource("Yellow_BG", yellowData))
@@ -445,7 +445,7 @@ func (app *App) buildUI() {
 		switch id.Col {
 		case 0:
 			if app.showSelectColumn && !mod.IsSystem {
-				cellBg := canvas.NewRectangle(theme.ButtonColor())
+				cellBg := canvas.NewRectangle(th.Color(themes.ColorButtonShadow, variant))
 				bgStack := []fyne.CanvasObject{}
 				if app.selectColumnBgRes != nil {
 					img := canvas.NewImageFromResource(app.selectColumnBgRes)

@@ -262,7 +262,7 @@ func (app *App) showDownloadDialog(url, filename, modName string, fileInfo *File
 
 			// Проверка на битый архив (размер менее 100 байт)
 			if info.Size() < 100 {
-				app.appendLog(fmt.Sprintf("Downloaded file %s is too small (%d bytes), probably broken", filename, info.Size()))
+				app.appendLog(fmt.Sprintf(app.messages["log_error_file_too_small"], filename, info.Size()))
 				os.Remove(dest)
 				return
 			}
@@ -336,7 +336,7 @@ func (app *App) showDMLDownloadDialog(url, filename string, fileInfo *FileInfo) 
 			}
 			info, e := os.Stat(dest)
 			if e == nil && info.Size() < 100 {
-				app.appendLog(fmt.Sprintf("Downloaded file is too small (%d bytes), probably broken", info.Size()))
+				app.appendLog(fmt.Sprintf(app.messages["log_error_file_too_small"], info.Size()))
 				os.Remove(dest)
 				return
 			}
@@ -495,7 +495,7 @@ func (app *App) showAutopatcherDownloadDialog(url, filename string, fileInfo *Fi
 			}
 			info, e := os.Stat(dest)
 			if e == nil && info.Size() < 100 {
-				app.appendLog(fmt.Sprintf("Downloaded file is too small (%d bytes), probably broken", info.Size()))
+				app.appendLog(fmt.Sprintf(app.messages["log_error_file_too_small"], info.Size()))
 				os.Remove(dest)
 				return
 			}
@@ -569,7 +569,7 @@ func (app *App) showDMFDownloadDialog(url, filename string, fileInfo *FileInfo) 
 			}
 			info, e := os.Stat(dest)
 			if e == nil && info.Size() < 100 {
-				app.appendLog(fmt.Sprintf("Downloaded file is too small (%d bytes), probably broken", info.Size()))
+				app.appendLog(fmt.Sprintf(app.messages["log_error_file_too_small"], info.Size()))
 				os.Remove(dest)
 				return
 			}
@@ -585,7 +585,7 @@ func (app *App) showDMFDownloadDialog(url, filename string, fileInfo *FileInfo) 
 					}
 					app.saveNexusVersionCache()
 				}
-				app.appendLog("Darktide Mod Framework updated successfully.")
+				app.appendLog(app.messages["log_dmf_updated_succ"])
 			}
 			os.Remove(dest)
 		})

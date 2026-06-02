@@ -3,6 +3,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -16,7 +17,6 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-const nexusAPIBase = "https://api.nexusmods.com/v1"
 const (
 	appName    = AppName
 	appVersion = AppVersion
@@ -51,8 +51,8 @@ func (app *App) FetchNexusModInfo(modID int, apiKey string) (*NexusModInfo, erro
 	}
 	req.Header.Set("Application-Name", appName)
 	req.Header.Set("Application-Version", appVersion)
-	req.Header.Set("Referer", "https://www.nexusmods.com/")
-	client := &http.Client{Timeout: 10 * time.Second}
+	req.Header.Set("Referer", NexusMainURL)
+	client := &http.Client{Timeout: Timeout10Seconds}
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
@@ -85,11 +85,11 @@ func extractModIDFromURL(rawURL string) int {
 // DownloadFileWithProgress скачивает файл и обновляет прогресс‑бар.
 func (app *App) DownloadFileWithProgress(url, destPath string, bar *widget.ProgressBar) error {
 	req, _ := http.NewRequest("GET", url, nil)
-	req.Header.Set("User-Agent", "Servo-Modquisitor")
+	req.Header.Set("User-Agent", СonfigFolderSMQ)
 	req.Header.Set("Application-Name", appName)
 	req.Header.Set("Application-Version", appVersion)
-	req.Header.Set("Referer", "https://www.nexusmods.com/")
-	client := &http.Client{Timeout: 30 * time.Minute}
+	req.Header.Set("Referer", NexusMainURL)
+	client := &http.Client{Timeout: Timeout30Minutes}
 	resp, err := client.Do(req)
 	if err != nil {
 		return err
@@ -132,7 +132,7 @@ func (app *App) checkNexusUpdates() {
 		return
 	}
 
-	app.appendLog("🔍 Checking for updates...")
+	app.appendLog(app.messages["log_checking_updates"])
 	total := len(app.allMods)
 	processed := 0
 	updatesFound := 0
@@ -152,7 +152,7 @@ func (app *App) checkNexusUpdates() {
 			// Проверяем, не является ли ошибка 403 (мод недоступен)
 			errMsg := err.Error()
 			if strings.Contains(errMsg, "403") || strings.Contains(errMsg, "Mod not available") {
-				app.appendLog(fmt.Sprintf("⚠️ Mod %s is not available on Nexus (removed or hidden). Skipping.", mod.Name))
+				app.appendLog(fmt.Sprintf(app.messages["log_error_mod_not_available"], mod.Name))
 			} else {
 				app.appendLog(fmt.Sprintf(app.messages["log_update_check_failed_for"], mod.Name, err))
 			}
@@ -185,7 +185,7 @@ func (app *App) checkNexusUpdates() {
 		processed++
 		// Логируем прогресс каждые 10 модов (не чаще, чтобы не засорять лог)
 		if processed%10 == 0 {
-			app.appendLog(fmt.Sprintf("  Progress: %d of %d mods checked", processed, total))
+			app.appendLog(fmt.Sprintf(app.messages["log_mods_checked_progress"], processed, total))
 		}
 	}
 
@@ -194,7 +194,7 @@ func (app *App) checkNexusUpdates() {
 	} else {
 		app.appendLog(fmt.Sprintf(app.messages["updates_found_count"], updatesFound))
 	}
-	app.appendLog("✅ Update check completed")
+	app.appendLog(app.messages["log_update_check_completed"])
 }
 
 // getPremiumDownloadURL - для Premium-пользователей (key и expires не нужны).
@@ -202,18 +202,18 @@ func (app *App) checkNexusUpdates() {
 func (app *App) getPremiumDownloadURL(modID, fileID string) (string, string, error) {
 	token := app.getAuthToken()
 	if token == "" {
-		return "", "", fmt.Errorf("Premium download requires authentication. Please log in via OAuth (menu Nexus → Login) or set your API key.")
+		return "", "", errors.New(app.messages["log_error_prem_download_oauth"])
 	}
 
 	// Принудительное обновление OAuth-токена, если истёк
 	if app.cfg.OAuthRefreshToken != "" && time.Now().After(app.cfg.OAuthExpiry) {
 		if err := app.refreshAccessToken(); err != nil {
-			return "", "", fmt.Errorf("OAuth token expired and could not be refreshed: %w. Please re-login.", err)
+			return "", "", fmt.Errorf(app.messages["log_error_token_expired"], err)
 		}
 		token = app.getAuthToken()
 	}
 
-	urlStr := fmt.Sprintf("https://api.nexusmods.com/v1/games/warhammer40kdarktide/mods/%s/files/%s/download_link.json", modID, fileID)
+	urlStr := fmt.Sprintf(NexusV1DownLink, modID, fileID)
 	req, err := http.NewRequest("GET", urlStr, nil)
 	if err != nil {
 		return "", "", err
@@ -228,8 +228,8 @@ func (app *App) getPremiumDownloadURL(modID, fileID string) (string, string, err
 
 	req.Header.Set("Application-Name", appName)
 	req.Header.Set("Application-Version", appVersion)
-	req.Header.Set("Referer", "https://www.nexusmods.com/")
-	req.Header.Set("User-Agent", "Servo-Modquisitor")
+	req.Header.Set("Referer", NexusMainURL)
+	req.Header.Set("User-Agent", СonfigFolderSMQ)
 
 	client := &http.Client{Timeout: 15 * time.Second}
 	resp, err := client.Do(req)
@@ -243,7 +243,6 @@ func (app *App) getPremiumDownloadURL(modID, fileID string) (string, string, err
 	if len(snippet) > 500 {
 		snippet = snippet[:500] + "..."
 	}
-	// app.appendLog("Premium download response received (content omitted for privacy)")
 
 	if resp.StatusCode != http.StatusOK {
 		return "", "", fmt.Errorf("API error %d: %s", resp.StatusCode, snippet)
@@ -264,7 +263,7 @@ func (app *App) getPremiumDownloadURL(modID, fileID string) (string, string, err
 // getFreeDownloadURL - для бесплатных пользователей (требует key и expires).
 // Авторизация не обязательна, но если есть токен - добавим.
 func (app *App) getFreeDownloadURL(modID, fileID, key, expires string) (string, string, error) {
-	urlStr := fmt.Sprintf("https://api.nexusmods.com/v1/games/warhammer40kdarktide/mods/%s/files/%s/download_link.json", modID, fileID)
+	urlStr := fmt.Sprintf(NexusV1DownLink, modID, fileID)
 
 	// Добавляем параметры key и expires
 	params := url.Values{}
@@ -289,8 +288,8 @@ func (app *App) getFreeDownloadURL(modID, fileID, key, expires string) (string, 
 
 	req.Header.Set("Application-Name", appName)
 	req.Header.Set("Application-Version", appVersion)
-	req.Header.Set("Referer", "https://www.nexusmods.com/")
-	req.Header.Set("User-Agent", "Servo-Modquisitor")
+	req.Header.Set("Referer", NexusMainURL)
+	req.Header.Set("User-Agent", СonfigFolderSMQ)
 
 	client := &http.Client{Timeout: 15 * time.Second}
 	resp, err := client.Do(req)
@@ -381,7 +380,7 @@ func (app *App) getLatestFileID(modID int) (int, error) {
 		return 0, fmt.Errorf("no authentication token")
 	}
 
-	url := fmt.Sprintf("https://api.nexusmods.com/v1/games/warhammer40kdarktide/mods/%d/files.json", modID)
+	url := fmt.Sprintf(NexusV1Files, modID)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return 0, err
@@ -394,9 +393,9 @@ func (app *App) getLatestFileID(modID int) (int, error) {
 	}
 	req.Header.Set("Application-Name", appName)
 	req.Header.Set("Application-Version", appVersion)
-	req.Header.Set("Referer", "https://www.nexusmods.com/")
+	req.Header.Set("Referer", NexusMainURL)
 
-	client := &http.Client{Timeout: 10 * time.Second}
+	client := &http.Client{Timeout: Timeout10Seconds}
 	resp, err := client.Do(req)
 	if err != nil {
 		return 0, err
@@ -429,7 +428,7 @@ func (app *App) getLatestFileInfo(modID int) (*FileInfo, error) {
 		return nil, fmt.Errorf("no authentication token")
 	}
 
-	url := fmt.Sprintf("https://api.nexusmods.com/v1/games/warhammer40kdarktide/mods/%d/files.json", modID)
+	url := fmt.Sprintf(NexusV1Files, modID)
 	req, _ := http.NewRequest("GET", url, nil)
 	if app.cfg.OAuthAccessToken != "" {
 		req.Header.Set("Authorization", "Bearer "+token)
@@ -438,9 +437,9 @@ func (app *App) getLatestFileInfo(modID int) (*FileInfo, error) {
 	}
 	req.Header.Set("Application-Name", appName)
 	req.Header.Set("Application-Version", appVersion)
-	req.Header.Set("Referer", "https://www.nexusmods.com/")
+	req.Header.Set("Referer", NexusMainURL)
 
-	client := &http.Client{Timeout: 10 * time.Second}
+	client := &http.Client{Timeout: Timeout10Seconds}
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
@@ -488,7 +487,7 @@ func (app *App) getFileInfoByID(modID, fileID string) (*FileInfo, error) {
 		return nil, fmt.Errorf("no authentication token")
 	}
 
-	url := fmt.Sprintf("https://api.nexusmods.com/v1/games/warhammer40kdarktide/mods/%s/files/%s.json", modID, fileID)
+	url := fmt.Sprintf(NexusV1Filess, modID, fileID)
 	req, _ := http.NewRequest("GET", url, nil)
 
 	if app.cfg.OAuthAccessToken != "" {
@@ -498,9 +497,9 @@ func (app *App) getFileInfoByID(modID, fileID string) (*FileInfo, error) {
 	}
 	req.Header.Set("Application-Name", appName)
 	req.Header.Set("Application-Version", appVersion)
-	req.Header.Set("Referer", "https://www.nexusmods.com/")
+	req.Header.Set("Referer", NexusMainURL)
 
-	client := &http.Client{Timeout: 10 * time.Second}
+	client := &http.Client{Timeout: Timeout10Seconds}
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
