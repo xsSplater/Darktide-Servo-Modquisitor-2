@@ -39,6 +39,14 @@
         "en": "unknown",
         "ru": "неизвестен"
     },
+    "authorization_completed": {
+        "en": "Authorization already completed. You can close this window.",
+        "ru": "Авторизация завершена. Вы можете закрыть это окно."
+    },
+    "authorization_completed_exp": {
+        "en": "Authorization already completed or code expired. You can close this window.",
+        "ru": "Авторизация завершена или срок действия кода истёк. Вы можете закрыть это окно."
+    },
     "autopatcher_updated": {
         "en": "Autopatcher updated successfully.",
         "ru": "Автопатчер успешно обновлён."
@@ -114,6 +122,10 @@
     "btn_down_tooltip": {
         "en": "Moves the selected mods down one line.",
         "ru": "Опускает выбранные моды ниже на одну строку."
+    },
+    "btn_downloading": {
+        "en": "Downloading",
+        "ru": "Загрузка"
     },
     "btn_enable_all_mods": {
         "en": "Enable All Mods",
@@ -515,6 +527,10 @@
         "en": "Downloading DML: %s",
         "ru": "Загрузка DML: %s"
     },
+    "downloading_update": {
+        "en": "Downloading update...",
+        "ru": "Загрузка обновления..."
+    },
     "empty_folder_message": {
         "en": "The following folders are empty:",
         "ru": "Следующие папки пусты:"
@@ -636,8 +652,8 @@
         "ru": "Доступна новая версия! Текущая: %s, последняя: %s"
     },
     "github_update_message": {
-        "en": "A new release %s is available on GitHub. Open the release page?",
-        "ru": "Доступен новый релиз %s на GitHub. Открыть страницу релиза?"
+        "en": "A new version %s is available.\nDownload and install now?",
+        "ru": "Доступна новая версия %s.\nХотите скачать и установить?"
     },
     "github_update_title": {
         "en": "⬆ Program Update Available",
@@ -807,9 +823,17 @@
         "en": "Failed to copy %s: %v",
         "ru": "Не удалось скопировать %s: %v"
     },
+    "log_failed_to_recreate_log": {
+        "en": "Failed to recreate log after size limit: %v",
+        "ru": "Не удалось восстановить лог после превышения лимита размера: %v"
+    },
     "log_failed_open_file": {
         "en": "Failed to open file: %v",
         "ru": "Не удалось открыть файл: %v"
+    },
+    "log_file_cleared": {
+        "en": "Log file cleared (exceeded 240 KB limit)",
+        "ru": "Файл лога очищен (превышен лимит в 240 КБ)"
     },
     "log_fix_hub_hk_menus": {
         "en": "Auto-renamed existing folder: hub_hotkey_menus-main -> hub_hotkey_menus",
@@ -1063,6 +1087,10 @@
         "en": "[ ⚙ Settings ]",
         "ru": "[ ⚙ Настройки ]"
     },
+    "menu_show_list_after_sort": {
+        "en": "Show list after sorting",
+        "ru": "Показывать список после сортировки"
+    },
     "menu_theme": {
         "en": "🌓 Theme",
         "ru": "🌓 Тема"
@@ -1080,6 +1108,10 @@
         "ru": "⏬ Обновить программу [Nexus]"
     },
     "menu_update_program_github": {
+        "en": "⏬ Update Program [Github]",
+        "ru": "⏬ Обновить программу [Github]"
+    },
+    "menu_update_program_auto": {
         "en": "⏬ Update Program [Github]",
         "ru": "⏬ Обновить программу [Github]"
     },
@@ -1391,6 +1423,14 @@
         "en": "Selected mod does not have a Nexus URL.",
         "ru": "У выбранного мода нет ссылки на Nexus."
     },
+    "update_ready": {
+        "en": "Update Ready",
+        "ru": "Обновление готово"
+    },
+    "update_ready_restart": {
+        "en": "The update has been downloaded.\nDo you want to restart the program to apply the changes?",
+        "ru": "Обновление загружено.\nХотите перезапустить программу, чтобы применить изменения?"
+    },
     "update_skipped_no_url": {
         "en": "Update skipped: no Nexus URL or API key",
         "ru": "Обновление пропущено: нет ссылки на Nexus или ключа API"
@@ -1418,6 +1458,10 @@
     "version_check_failed": {
         "en": "Failed to check version for %s: %v",
         "ru": "Ошибка проверки версии для %s: %v"
+    },
+    "version_check_failed_program": {
+        "en": "Failed to check updates: %v",
+        "ru": "Ошибка проверки версии: %v"
     },
     "vortex_managed": {
         "en": "🌪 Managed by Vortex.",

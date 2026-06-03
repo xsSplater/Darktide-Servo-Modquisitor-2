@@ -85,7 +85,7 @@ func (app *App) startCallbackServer() {
 
 	mux.HandleFunc("/callback", func(w http.ResponseWriter, r *http.Request) {
 		if exchangeDone {
-			w.Write([]byte("Authorization already completed. You can close this window."))
+			w.Write([]byte(app.messages["authorization_completed"]))
 			return
 		}
 		query := r.URL.Query()
@@ -102,10 +102,10 @@ func (app *App) startCallbackServer() {
 		token, err := app.exchangeCodeForToken(code, app.oauthVerifier)
 		if err != nil {
 			if strings.Contains(err.Error(), "invalid_grant") {
-				w.Write([]byte("Authorization already completed or code expired. You can close this window."))
+				w.Write([]byte(app.messages["authorization_completed"]))
 				return
 			}
-			app.appendLog(fmt.Sprintf(app.messages["oauth_exchange_failed"], err.Error()))
+			app.appendLog(fmt.Sprintf(app.messages["authorization_completed_exp"], err.Error()))
 			http.Error(w, "Token exchange failed", http.StatusInternalServerError)
 			return
 		}
@@ -187,6 +187,7 @@ func (app *App) startCallbackServer() {
 
 					/* Дополнительные стили для текста, чтобы сохранить читаемость */
 					h1 {
+						font-size: 3.3rem;
 						margin: 0 0 10px 0;
 					}
 					h2 {

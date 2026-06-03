@@ -151,6 +151,7 @@ func (app *App) refreshModList() {
 	app.orderDirty = false
 	app.filterModList()
 	app.updateSystemModsTable()
+	app.forceRefreshTable()
 }
 
 func (app *App) updateSystemModsTable() {
@@ -258,6 +259,8 @@ func (app *App) handleDrop(uris []fyne.URI) {
 			app.copyFolder(path, filepath.Join(app.cfg.ModsPath, filepath.Base(path)))
 			checks.AutoFixMalformed()
 			app.refreshModList()
+			app.orderDirty = true
+			app.updateTableBorder()
 			app.appendLog(fmt.Sprintf(app.messages["log_installed_folder"], filepath.Base(path)))
 		} else {
 			ext := strings.ToLower(filepath.Ext(path))
@@ -274,8 +277,11 @@ func (app *App) handleDrop(uris []fyne.URI) {
 						// Попробуем найти modID по имени папки или извлечь из имени архива
 						modID, _, _ := extractVersionAndModIDFromFilename(p)
 						if modID != 0 && version != "" {
-							app.cacheModVersion(fmt.Sprintf("%d", modID), installedName, version, 0)
+							cacheKey := fmt.Sprintf("%d:%s", modID, installedName)
+							app.cacheModVersion(cacheKey, installedName, version, 0)
 						}
+						app.orderDirty = true
+						app.updateTableBorder()
 						app.appendLog(fmt.Sprintf(app.messages["log_installed"], filepath.Base(p)))
 					})
 				}(path)
@@ -578,6 +584,7 @@ func (app *App) moveSelected(delta int) {
 		app.orderDirty = true
 		app.updateTableBorder()
 		app.filterModList()
+		app.forceRefreshTable()
 		return
 	}
 
@@ -818,10 +825,14 @@ func (app *App) InstallModFromArchive(archivePath string, activate bool, knownVe
 					}
 				}
 				app.filterModList()
+				app.orderDirty = true
+				app.updateTableBorder()
 				app.appendLog(fmt.Sprintf(app.messages["log_installed_inactive"], modName))
 				return modName, version, nil
 			} else {
 				app.refreshModList()
+				app.orderDirty = true
+				app.updateTableBorder()
 				app.appendLog(fmt.Sprintf(app.messages["log_installed"], modName))
 				return modName, version, nil
 			}
@@ -832,9 +843,6 @@ func (app *App) InstallModFromArchive(archivePath string, activate bool, knownVe
 
 // Обновление одного мода. Только для Premium-пользователей!
 func (app *App) updateModFromNexus(mod *checks.ModInfo) {
-	// app.appendLog("DEBUG: getAuthToken = " + app.getAuthToken())
-	// app.appendLog("DEBUG: mod.URL = " + mod.URL)
-
 	if mod.URL == "" || app.getAuthToken() == "" {
 		app.appendLog(app.messages["update_skipped_no_url"])
 		return
@@ -845,11 +853,16 @@ func (app *App) updateModFromNexus(mod *checks.ModInfo) {
 		return
 	}
 
-	modIDStr := fmt.Sprintf("%d", modID)
-	fileInfo, err := app.getLatestFileInfo(modID)
+	modIDStr := fmt.Sprintf("%d", modID) // ← оставь эту строку
+
+	fileInfo, err := app.getFileInfoByFolderPattern(modID, mod.Name)
 	if err != nil {
-		app.appendLog(fmt.Sprintf(app.messages["failed_get_latest_file_id"], err))
-		return
+		// fallback на старый метод
+		fileInfo, err = app.getLatestFileInfo(modID)
+		if err != nil {
+			app.appendLog(fmt.Sprintf(app.messages["failed_get_latest_file_id"], err))
+			return
+		}
 	}
 
 	directURL, filename, err := app.getPremiumDownloadURL(modIDStr, fmt.Sprintf("%d", fileInfo.ID))
@@ -884,9 +897,9 @@ func (app *App) updateAllModsFromNexus() {
 			app.appendLog(fmt.Sprintf(app.messages["log_failed_to_check_update"], mod.Name, err))
 			continue
 		}
-		modIDStr := fmt.Sprintf("%d", modID)
+		cacheKey := fmt.Sprintf("%d:%s", modID, mod.Name)
 		var saved ModVersionInfo
-		if info, exists := app.nexusVersionCache[modIDStr]; exists {
+		if info, exists := app.nexusVersionCache[cacheKey]; exists {
 			saved = info
 		}
 		if saved.Timestamp == 0 || fileInfo.UploadedTimestamp > saved.Timestamp {
@@ -930,8 +943,9 @@ func (app *App) removeSelectedMods() {
 		}
 	}
 	app.refreshModList()
-	app.appendLog(app.messages["log_selected_mods_removed"])
+	app.orderDirty = true
 	app.updateTableBorder()
+	app.appendLog(app.messages["log_selected_mods_removed"])
 }
 
 // Удалить все моды
@@ -943,8 +957,9 @@ func (app *App) removeAllMods() {
 		}
 	}
 	app.refreshModList()
-	app.appendLog(app.messages["log_all_mods_removed"])
+	app.orderDirty = true
 	app.updateTableBorder()
+	app.appendLog(app.messages["log_all_mods_removed"])
 }
 
 // Установка DML в корень игры
@@ -1024,9 +1039,10 @@ func (app *App) updateAutopatcher() {
 		return
 	}
 
-	modIDStr := fmt.Sprintf("%d", autopatchModID)
+	modIDStr := fmt.Sprintf("%d", autopatchModID) // ← добавить эту строку
+	cacheKey := "709:autopatch"
 	var saved ModVersionInfo
-	if info, exists := app.nexusVersionCache[modIDStr]; exists {
+	if info, exists := app.nexusVersionCache[cacheKey]; exists {
 		saved = info
 	}
 	if saved.Timestamp != 0 && fileInfo.UploadedTimestamp <= saved.Timestamp {
@@ -1142,11 +1158,23 @@ func (app *App) promptUserForVersion(modName string) string {
 }
 
 // cacheModVersion сохраняет версию мода в кэш (без timestamp, если неизвестен)
-func (app *App) cacheModVersion(modID string, folderName string, version string, timestamp int64) {
+//
+//	func (app *App) cacheModVersion(modID string, folderName string, version string, timestamp int64) {
+//		if version == "" {
+//			return
+//		}
+//		app.nexusVersionCache[modID] = ModVersionInfo{
+//			Timestamp: timestamp,
+//			Version:   version,
+//			Folder:    folderName,
+//		}
+//		app.saveNexusVersionCache()
+//	}
+func (app *App) cacheModVersion(cacheKey, folderName, version string, timestamp int64) {
 	if version == "" {
 		return
 	}
-	app.nexusVersionCache[modID] = ModVersionInfo{
+	app.nexusVersionCache[cacheKey] = ModVersionInfo{
 		Timestamp: timestamp,
 		Version:   version,
 		Folder:    folderName,

@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -160,14 +161,15 @@ func (app *App) checkNexusUpdates() {
 		}
 
 		modIDStr := fmt.Sprintf("%d", modID)
+		cacheKey := modIDStr + ":" + mod.Name
 		var saved ModVersionInfo
-		if info, exists := app.nexusVersionCache[modIDStr]; exists {
+		if info, exists := app.nexusVersionCache[cacheKey]; exists {
 			saved = info
 		}
 
 		// Если нет сохранённой информации (первый запуск) - сохраняем текущую и не считаем обновлением
 		if saved.Timestamp == 0 {
-			app.nexusVersionCache[modIDStr] = ModVersionInfo{
+			app.nexusVersionCache[cacheKey] = ModVersionInfo{
 				Timestamp: fileInfo.UploadedTimestamp,
 				Version:   fileInfo.Version,
 				Folder:    mod.Name,
@@ -524,5 +526,103 @@ func (app *App) getFileInfoByID(modID, fileID string) (*FileInfo, error) {
 		ID:                result.FileID,
 		Version:           result.Version,
 		UploadedTimestamp: result.UploadedTimestamp,
+	}, nil
+}
+
+// getFileInfoByFolderPattern ищет файл мода, в имени которого содержится folderName.
+// Возвращает самый свежий подходящий файл (по uploaded_timestamp).
+func (app *App) getFileInfoByFolderPattern(modID int, folderName string) (*FileInfo, error) {
+	token := app.getAuthToken()
+	if token == "" {
+		return nil, fmt.Errorf("no authentication token")
+	}
+
+	url := fmt.Sprintf(NexusV1Files, modID)
+	req, _ := http.NewRequest("GET", url, nil)
+	if app.cfg.OAuthAccessToken != "" {
+		req.Header.Set("Authorization", "Bearer "+token)
+	} else {
+		req.Header.Set("apikey", token)
+	}
+	req.Header.Set("Application-Name", appName)
+	req.Header.Set("Application-Version", appVersion)
+	req.Header.Set("Referer", NexusMainURL)
+
+	client := &http.Client{Timeout: 10 * time.Second}
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("HTTP %d: %s", resp.StatusCode, string(body))
+	}
+
+	var result struct {
+		Files []struct {
+			FileID            int    `json:"file_id"`
+			Version           string `json:"version"`
+			UploadedTimestamp int64  `json:"uploaded_timestamp"`
+			FileName          string `json:"file_name"`
+		} `json:"files"`
+	}
+	if err := json.Unmarshal(body, &result); err != nil {
+		return nil, err
+	}
+	if len(result.Files) == 0 {
+		return nil, fmt.Errorf("no files found for mod %d", modID)
+	}
+
+	// Сортируем по убыванию timestamp (новые первыми)
+	files := result.Files
+	sort.Slice(files, func(i, j int) bool {
+		return files[i].UploadedTimestamp > files[j].UploadedTimestamp
+	})
+
+	// Нормализуем folderName: заменяем пробелы на подчёркивания, разбиваем на части
+	normalizedFolder := strings.ToLower(strings.ReplaceAll(folderName, " ", "_"))
+	folderParts := strings.Split(normalizedFolder, "_")
+
+	for _, f := range files {
+		name := strings.ToLower(f.FileName)
+		if dot := strings.LastIndex(name, "."); dot != -1 {
+			name = name[:dot]
+		}
+		name = strings.ReplaceAll(name, " ", "_")
+
+		firstPart := name
+		if idx := strings.Index(name, "-"); idx != -1 {
+			firstPart = name[:idx]
+		}
+		firstParts := strings.Split(firstPart, "_")
+
+		if len(firstParts) == len(folderParts) {
+			match := true
+			for i := 0; i < len(folderParts); i++ {
+				if firstParts[i] != folderParts[i] {
+					match = false
+					break
+				}
+			}
+			if match {
+				return &FileInfo{
+					ID:                f.FileID,
+					Version:           f.Version,
+					UploadedTimestamp: f.UploadedTimestamp,
+				}, nil
+			}
+		}
+	}
+	// Если точного совпадения не найдено - fallback на самый свежий файл
+	newest := files[0]
+	return &FileInfo{
+		ID:                newest.FileID,
+		Version:           newest.Version,
+		UploadedTimestamp: newest.UploadedTimestamp,
 	}, nil
 }

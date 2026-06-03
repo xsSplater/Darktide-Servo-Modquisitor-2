@@ -17,7 +17,6 @@ import (
 	"fyne.io/fyne/v2/dialog"
 )
 
-// ---- Новые методы для обновлений ----
 func (app *App) downloadSortFiles() error {
 	files := []struct {
 		remote string
@@ -148,7 +147,7 @@ func (app *App) downloadFile(url, dest string) error {
 }
 
 func (app *App) checkForProgramUpdate() {
-	u, _ := url.Parse("https://www.nexusmods.com/warhammer40kdarktide/mods/139")
+	u, _ := url.Parse(ServoMQModPage)
 	_ = app.myApp.OpenURL(u)
 	app.appendLog(app.messages["open_download_page"])
 }
@@ -158,13 +157,13 @@ func (app *App) updateSortFiles() {
 	if need, newVer, err := app.checkVersion(modDatabaseURL, app.cfg.LastModDatabaseVersion); err != nil {
 		app.appendLog(fmt.Sprintf(app.messages["log_update_check_error_db"], err))
 	} else if need {
-		updates = append(updates, "mod_database.json")
+		updates = append(updates, FileNameModDatabase)
 		app.cfg.LastModDatabaseVersion = newVer
 	}
 	if need, newVer, err := app.checkVersion(modMandatoryURL, app.cfg.LastMandatoryRulesVersion); err != nil {
 		app.appendLog(fmt.Sprintf(app.messages["log_update_check_error_mandatory"], err))
 	} else if need {
-		updates = append(updates, "mandatory_obsolete_incompatible_dependencies.json")
+		updates = append(updates, FileNameMandatoryRules)
 		app.cfg.LastMandatoryRulesVersion = newVer
 	}
 
@@ -185,9 +184,9 @@ func (app *App) updateSortFiles() {
 			dialog.ShowInformation(app.messages["update_title"], fmt.Sprintf(app.messages["download_failed"], err), app.mainWindow)
 		} else {
 			app.appendLog(app.messages["sort_files_updated"])
-			app.loadModDatabase("mod_database.json")
+			app.loadModDatabase(FileNameModDatabase)
 			checks.SetModDatabase(app.modDatabase)
-			checks.LoadExternalLists("mandatory_obsolete_incompatible_dependencies.json")
+			checks.LoadExternalLists(FileNameMandatoryRules)
 			app.refreshModList()
 			saveConfig(app.cfg)
 		}
@@ -221,29 +220,45 @@ func (app *App) checkVersion(url, localVersion string) (bool, string, error) {
 	return false, localVersion, nil
 }
 
+// compareVersions сравнивает две версии (например, "1.3.3" и "1.1.1").
+// Возвращает 1, если a > b; -1, если a < b; 0, если равны.
 func compareVersions(a, b string) int {
-	parse := func(s string) []int {
-		parts := strings.Split(s, ".")
-		nums := make([]int, len(parts))
-		for i, p := range parts {
-			nums[i], _ = strconv.Atoi(p)
-		}
-		return nums
+	// убираем 'v' в начале, если есть
+	a = strings.TrimPrefix(a, "v")
+	b = strings.TrimPrefix(b, "v")
+
+	partsA := strings.Split(a, ".")
+	partsB := strings.Split(b, ".")
+
+	// Добиваем нулями до одинаковой длины, чтобы корректно сравнивать, например, "1.2" и "1.2.0"
+	maxLen := len(partsA)
+	if len(partsB) > maxLen {
+		maxLen = len(partsB)
 	}
-	va := parse(a)
-	vb := parse(b)
-	for i := 0; i < len(va) && i < len(vb); i++ {
-		if va[i] < vb[i] {
+	for len(partsA) < maxLen {
+		partsA = append(partsA, "0")
+	}
+	for len(partsB) < maxLen {
+		partsB = append(partsB, "0")
+	}
+
+	for i := 0; i < maxLen; i++ {
+		numA, errA := strconv.Atoi(partsA[i])
+		numB, errB := strconv.Atoi(partsB[i])
+		if errA != nil || errB != nil {
+			// Если не удалось распарсить, сравниваем как строки
+			if partsA[i] < partsB[i] {
+				return -1
+			} else if partsA[i] > partsB[i] {
+				return 1
+			}
+			continue
+		}
+		if numA < numB {
 			return -1
-		} else if va[i] > vb[i] {
+		} else if numA > numB {
 			return 1
 		}
-	}
-	// если все числа равны, но разная длина (например, "0.63" vs "0.63.0")
-	if len(va) < len(vb) {
-		return -1
-	} else if len(va) > len(vb) {
-		return 1
 	}
 	return 0
 }
@@ -254,17 +269,17 @@ func (app *App) checkForUpdates() {
 
 	updates := []string{}
 	if need, newVer, err := app.checkVersion(modDatabaseURL, app.cfg.LastModDatabaseVersion); err == nil && need {
-		updates = append(updates, "mod_database.json")
+		updates = append(updates, FileNameModDatabase)
 		_ = newVer
 	}
 	if need, newVer, err := app.checkVersion(modMandatoryURL, app.cfg.LastMandatoryRulesVersion); err == nil && need {
-		updates = append(updates, "mandatory_obsolete_incompatible_dependencies.json")
+		updates = append(updates, FileNameMandatoryRules)
 		_ = newVer
 	}
 	if len(updates) > 0 {
 		app.appendLog(fmt.Sprintf(app.messages["log_new_sorting_files_available"], strings.Join(updates, ", ")))
 	}
-	go app.checkForProgramUpdateGitHub()
+	// go app.checkForProgramUpdateGitHub() // Раньше открывалась страница релизов на Гитхабе
 }
 
 func (app *App) checkForProgramUpdateGitHub() {
@@ -273,9 +288,8 @@ func (app *App) checkForProgramUpdateGitHub() {
 
 	// Запрос к GitHub API
 	client := &http.Client{Timeout: 10 * time.Second}
-	req, _ := http.NewRequest("GET", gitHubRepoURL, nil)
+	req, _ := http.NewRequest("GET", GitHubReleaseAPI, nil)
 	req.Header.Set("Accept", "application/vnd.github+json")
-	// Если есть GitHub токен (необязательно, для избежания лимитов)
 	if token := os.Getenv("GITHUB_TOKEN"); token != "" {
 		req.Header.Set("Authorization", "token "+token)
 	}

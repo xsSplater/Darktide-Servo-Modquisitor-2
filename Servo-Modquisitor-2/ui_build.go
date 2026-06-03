@@ -594,7 +594,7 @@ func (app *App) buildUI() {
 	var mechBg *canvas.Image
 	if mechData != nil {
 		mechBg = canvas.NewImageFromResource(fyne.NewStaticResource(TableBackgroundImage, mechData))
-		mechBg.FillMode = canvas.ImageFillContain // или ImageFillStretch, на ваш вкус
+		mechBg.FillMode = canvas.ImageFillContain // ImageFillStretch
 		mechBg.Translucency = TableBackgroundOpacity
 	}
 
@@ -711,7 +711,8 @@ func (app *App) buildUI() {
 							app.refreshModList()
 							modID, _, _ := extractVersionAndModIDFromFilename(p)
 							if modID != 0 && version != "" {
-								app.cacheModVersion(fmt.Sprintf("%d", modID), installedName, version, 0)
+								cacheKey := fmt.Sprintf("%d:%s", modID, installedName)
+								app.cacheModVersion(cacheKey, installedName, version, 0)
 							}
 							app.appendLog(fmt.Sprintf(app.messages["log_installed"], filepath.Base(p)))
 						})
@@ -749,6 +750,8 @@ func (app *App) buildUI() {
 					checks.RemoveMod(modName)
 					app.removeFromAllMods(modName)
 					app.refreshModList()
+					app.orderDirty = true
+					app.updateTableBorder()
 					app.appendLog(fmt.Sprintf(app.messages["log_deleted"], modName))
 				}
 			},
@@ -976,22 +979,24 @@ func (app *App) updateDescriptionForMod(name string) {
 	app.descInstalled.SetText(fmt.Sprintf(app.messages["installed_label"], app.formatDate(mod.ModTime, app.cfg.DateFormat)))
 
 	if app.descLocalVersion != nil {
-		var modID string
-		// Специальные ID для системных модов
+		var cacheKey string
 		switch mod.Name {
 		case "dmf":
-			modID = "8"
+			cacheKey = "8:dmf"
 		case "base":
-			modID = "19"
+			cacheKey = "19:base"
 		case "autopatch":
-			modID = "709"
+			cacheKey = "709:autopatch"
 		default:
 			if mod.URL != "" {
-				modID = fmt.Sprintf("%d", extractModIDFromURL(mod.URL))
+				modID := extractModIDFromURL(mod.URL)
+				if modID != 0 {
+					cacheKey = fmt.Sprintf("%d:%s", modID, mod.Name)
+				}
 			}
 		}
-		if modID != "" {
-			if info, ok := app.nexusVersionCache[modID]; ok && info.Version != "" {
+		if cacheKey != "" {
+			if info, ok := app.nexusVersionCache[cacheKey]; ok && info.Version != "" {
 				app.descLocalVersion.SetText(fmt.Sprintf(app.messages["nexus_local_version_label"], info.Version))
 			} else {
 				app.descLocalVersion.SetText(app.messages["nexus_local_version_unknown"])
@@ -1002,21 +1007,24 @@ func (app *App) updateDescriptionForMod(name string) {
 	}
 
 	if app.descLatestVersion != nil {
-		var modID string
+		var cacheKey string
 		switch mod.Name {
 		case "dmf":
-			modID = "8"
+			cacheKey = "8:dmf"
 		case "base":
-			modID = "19"
+			cacheKey = "19:base"
 		case "autopatch":
-			modID = "709"
+			cacheKey = "709:autopatch"
 		default:
 			if mod.URL != "" {
-				modID = fmt.Sprintf("%d", extractModIDFromURL(mod.URL))
+				modID := extractModIDFromURL(mod.URL)
+				if modID != 0 {
+					cacheKey = fmt.Sprintf("%d:%s", modID, mod.Name)
+				}
 			}
 		}
-		if modID != "" {
-			if latest, ok := app.nexusLatestVersions[modID]; ok {
+		if cacheKey != "" {
+			if latest, ok := app.nexusLatestVersions[cacheKey]; ok {
 				app.descLatestVersion.SetText(fmt.Sprintf(app.messages["nexus_latest_version_label"], latest))
 			} else {
 				app.descLatestVersion.SetText(app.messages["nexus_latest_version_unknown"])
@@ -1111,8 +1119,9 @@ func (app *App) enrichModFromNexus(mod *checks.ModInfo) {
 		if info.Author != "" {
 			mod.Author = info.Author
 		}
-		modIDStr := fmt.Sprintf("%d", extractModIDFromURL(mod.URL))
-		app.nexusLatestVersions[modIDStr] = info.Version
+		modID := extractModIDFromURL(mod.URL)
+		cacheKey := fmt.Sprintf("%d:%s", modID, mod.Name)
+		app.nexusLatestVersions[cacheKey] = info.Version
 		fyne.Do(func() {
 			if app.selectedModName == mod.Name {
 				app.updateDescriptionForMod(mod.Name)
@@ -1202,6 +1211,7 @@ func (app *App) filterModList() {
 			for i, m := range app.displayedMods {
 				if m.Name == app.selectedModName {
 					app.selectedModIndex.Store(int32(i))
+					app.modTable.Select(widget.TableCellID{Row: i, Col: 0})
 					break
 				}
 			}
@@ -1218,6 +1228,7 @@ func (app *App) filterModList() {
 		if app.counterLabel != nil {
 			app.counterLabel.SetText(fmt.Sprintf(app.messages["mods_counter"], len(app.displayedMods), len(app.allMods), activeCount))
 		}
+		app.forceRefreshTable()
 		return
 	}
 
@@ -1313,6 +1324,7 @@ func (app *App) setSelectedActive(active bool) {
 		app.orderDirty = true
 		app.updateTableBorder()
 		app.filterModList()
+		app.forceRefreshTable()
 	}
 }
 

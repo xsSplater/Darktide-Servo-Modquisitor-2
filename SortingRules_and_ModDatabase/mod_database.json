@@ -1,5 +1,5 @@
 {
-	"version": "0.9.7",
+	"version": "0.9.8",
 	"mod_database": [
 		{
 			"folder": "pickup_spawner",
@@ -4883,13 +4883,16 @@
 				"ru": "Эффекты опасности"
 			},
 			"description": {
-				"en": "Adjust Psyker peril sound and visual effect intensity separately. Also lets you disable various sound/visual effects related to peril gain.",
-				"ru": "Peril FX - Настройте интенсивность звуковых и визуальных эффектов опасности для псайкера отдельно. Также позволяет отключить различные звуковые/визуальные эффекты, связанные с ростом опасности."
+				"en": "OBSOLETE!",
+				"ru": "УСТАРЕЛ!"
 			},
 			"author": "LeicaSimile",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/379",
 			"github_url": "https://github.com/LeicaSimile/peril_fx",
-			"note": { "en": "", "ru": "" }
+			"note": {
+				"en": "It may cause crashes.",
+				"ru": "Может вызывать вылеты."
+			}
 		},
 		{
 			"folder": "red_weapons_at_home",
@@ -5634,10 +5637,7 @@
 			"author": "Alfthebigheaded",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/447",
 			"github_url": "",
-			"note": {
-				"en": "Required: Alf's Mod Settings Extensions.",
-				"ru": "Требуется: Alf's Mod Settings Extensions."
-			}
+			"note": { "en": "", "ru": "" }
 		},
 		{
 			"folder": "Nakedtide",
@@ -6494,6 +6494,78 @@
 			"note": {
 				"en": "Fix in the 'Darktide Modders' Discord.",
 				"ru": "Фикс в Дискорде «Darktide Modders»."
+			}
+		},
+		{
+			"folder": "servo_friend_example_addon",
+			"name": {
+				"en": "Servo Friend Example Hat Addon",
+				"ru": "Серводруг пример аддона шапок"
+			},
+			"description": {
+				"en": "This is an example of an addon for servo friend.",
+				"ru": "Servo Friend - Это пример аддона для cерводруга."
+			},
+			"author": "Grasmann",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/504",
+			"github_url": "https://github.com/grasmann/darktide-mods/tree/main/servo_friend",
+			"note": {
+				"en": "Fix in the 'Darktide Modders' Discord.",
+				"ru": "Фикс в Дискорде «Darktide Modders»."
+			}
+		},
+		{
+			"folder": "servo_friend_audio_server_plugin",
+			"name": {
+				"en": "Servo Friend AI Generated Voice Plugin",
+				"ru": "Серводруг - Аудио плагин"
+			},
+			"description": {
+				"en": "AI Generated Voice Plugin for servo friend.",
+				"ru": "Servo Friend - Плагин сгенерированного ИИ голоса для cерводруга."
+			},
+			"author": "Grasmann",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/504",
+			"github_url": "https://github.com/grasmann/darktide-mods/tree/main/servo_friend",
+			"note": {
+				"en": "Fix in the 'Darktide Modders' Discord.",
+				"ru": "Фикс в Дискорде «Darktide Modders»."
+			}
+		},
+		{
+			"folder": "servo_friend_plugin_hat_diadem",
+			"name": {
+				"en": "Servo Friend Hat Diadem Plugin",
+				"ru": "Серводруг - плагин диадема"
+			},
+			"description": {
+				"en": "Hat Diadem Plugin for servo friend.",
+				"ru": "Servo Friend - Плагин диадема для cерводруга."
+			},
+			"author": "Grasmann",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/504",
+			"github_url": "https://github.com/grasmann/darktide-mods/tree/main/servo_friend",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "servo_friend_plugin_hat_commissar",
+			"name": {
+				"en": "Servo Friend Commisar Hat Plugin",
+				"ru": "Серводруг - плагин фуражка комиссара"
+			},
+			"description": {
+				"en": "Commisar Hat Plugin for servo friend.",
+				"ru": "Servo Friend - Плагин фуражка комиссара для cерводруга."
+			},
+			"author": "Grasmann",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/504",
+			"github_url": "https://github.com/grasmann/darktide-mods/tree/main/servo_friend",
+			"note": {
+				"en": "",
+				"ru": ""
 			}
 		},
 		{
@@ -8307,13 +8379,16 @@
 				"ru": "Замена визуальных эффектов"
 			},
 			"description": {
-				"en": "Replaces certain effects that obscures vision and/or hurts performance. Has varying options for each effect, some are simply lesser versions of the same, others complete replacement. Removes Blight Spreads, Rampaging Enemies and Rotten Armor specific death explosion visuals as well.",
-				"ru": "VFX Swapper - Заменяет некоторые эффекты, которые ухудшают обзор и/или снижают производительность. Для каждого эффекта доступны различные варианты, некоторые из них являются просто упрощёнными версиями, другие — полной заменой. Также удаляет визуальные эффекты, характерные для эффектов «Распространение порчи», «Неистовые враги» и «Гнилая броня» при смерти."
+				"en": "OBSOLETE!",
+				"ru": "УСТАРЕЛ!"
 			},
 			"author": "tdopz and leerH",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/678",
 			"github_url": "",
-			"note": { "en": "", "ru": "" }
+			"note": {
+				"en": "It may cause crashes.",
+				"ru": "Может вызывать вылеты."
+			}
 		},
 		{
 			"folder": "zServo_Lexmechanicus",

@@ -51,7 +51,7 @@ func SetHeaderFunc(fn func(*os.File, string)) {
 	writeHeaderFunc = fn
 }
 
-// кеш кастомных порядков
+// Кэш кастомных порядков
 var cachedRussianOrder, cachedEnglishOrder []string
 
 var loadOrderOutputPath string
@@ -118,24 +118,8 @@ func CreateLoadOrderFromActive(activeMods []string, lang string) {
 			Dependent: mandatoryOrder[i+1], // Зависимый ПОСЛЕ
 		})
 	}
-	// for i := 1; i < len(mandatoryOrder); i++ {
-	//	allDeps = append(allDeps, ModDependency{
-	//		Dependent: mandatoryOrder[i-1],
-	//		Required:  mandatoryOrder[i],
-	//	})
-	// }
-
-	// if logFunc != nil {
-	// 	logFunc(fmt.Sprintf("Total deps for sorting: %d", len(allDeps)))
-	// }
-
 	sortedRest := topologicalSort(rest, allDeps)
 	finalOrder = append(finalOrder, sortedRest...)
-
-	// ДИАГНОСТИКА: потери на этапе rest (если что‑то не попало в sortedRest)
-	// if logFunc != nil {
-	//	logFunc(fmt.Sprintf("--- DEBUG: rest before sort: %d", len(rest)))
-	// }
 
 	file, _ := os.Create(loadOrderOutputPath)
 	if file != nil {
@@ -219,22 +203,6 @@ func topologicalSort(mods []string, deps []ModDependency) []string {
 			}
 		}
 	}
-
-	// ДИАГНОСТИКА: проверяем потери
-	// if logFunc != nil {
-	//	logFunc(fmt.Sprintf("--- DEBUG: topologicalSort: input=%d, output=%d", len(mods), len(result)))
-	//	if len(mods) != len(result) {
-	//		present := make(map[string]bool)
-	//		for _, m := range result {
-	//			present[m] = true
-	//		}
-	//		for _, m := range mods {
-	//			if !present[m] {
-	//				logFunc("  MISSING: " + m)
-	//			}
-	//		}
-	//	}
-	// }
 
 	return result
 }

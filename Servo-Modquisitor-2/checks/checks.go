@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	loadOrderFileName = "mod_load_order.txt"
+	FileNameLoadOrder = "mod_load_order.txt"
 	steamGuideEnURL   = "https://steamcommunity.com/sharedfiles/filedetails/?id=2953324027"
 	steamGuideRuURL   = "https://steamcommunity.com/sharedfiles/filedetails/?id=2950374474"
 )
@@ -316,7 +316,7 @@ type LoadOrderEntry struct {
 }
 
 func ReadLoadOrder() []LoadOrderEntry {
-	data, err := os.ReadFile(filepath.Join(modsDir, loadOrderFileName))
+	data, err := os.ReadFile(filepath.Join(modsDir, FileNameLoadOrder))
 	if err != nil {
 		return nil
 	}
@@ -341,7 +341,7 @@ func ReadLoadOrder() []LoadOrderEntry {
 }
 
 func WriteLoadOrder(entries []LoadOrderEntry) error {
-	f, err := os.Create(filepath.Join(modsDir, loadOrderFileName))
+	f, err := os.Create(filepath.Join(modsDir, FileNameLoadOrder))
 	if err != nil {
 		return err
 	}
@@ -510,7 +510,7 @@ func askMissing(folder, modAbbr, modName, nexusURL string, window fyne.Window) b
 }
 
 func EnsureModLoadOrder(window fyne.Window) {
-	path := filepath.Join(modsDir, loadOrderFileName)
+	path := filepath.Join(modsDir, FileNameLoadOrder)
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		appendLog((*messages)["window_error_dsc_mlo_mis"])
 		choice := showChoiceDialog(window, (*messages)["window_error_title"],

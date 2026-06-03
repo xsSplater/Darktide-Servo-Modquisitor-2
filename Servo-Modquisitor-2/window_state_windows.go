@@ -9,10 +9,9 @@ import (
 )
 
 var (
-	user32					= syscall.NewLazyDLL("user32.dll")
-	procFindWindowW			= user32.NewProc("FindWindowW")
-	procShowWindow			= user32.NewProc("ShowWindow")
-	procIsZoomed			= user32.NewProc("IsZoomed")
+	procFindWindowW = user32.NewProc("FindWindowW")
+	procShowWindow  = user32.NewProc("ShowWindow")
+	procIsZoomed    = user32.NewProc("IsZoomed")
 )
 
 const (

@@ -13,6 +13,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"sync/atomic"
 	"time"
 
@@ -39,6 +40,7 @@ type Config struct {
 	SkipSortFilesPrompt       bool   `json:"skip_sort_files_prompt"`
 	UpdateCheckFrequency      string `json:"update_check_frequency"`
 	ShowSystemMods            bool   `json:"show_system_mods"`
+	ShowModListAfterSort      bool   `json:"show_mod_list_after_sort"`
 	SuppressAMLWarning        bool   `json:"suppress_aml_warning"` // скрывать предупреждение об AML
 
 	// Nexus API
@@ -201,25 +203,30 @@ func (app *App) loadNexusVersionCache() {
 		// Пробуем старый формат (map[string]string) для миграции
 		var old map[string]string
 		if err2 := json.Unmarshal(data, &old); err2 == nil {
-			app.nexusVersionCache = make(map[string]ModVersionInfo)
+			raw = make(map[string]ModVersionInfo)
 			for k, v := range old {
-				// Пытаемся извлечь timestamp из строки
-				if ts, err := strconv.ParseInt(v, 10, 64); err == nil {
-					// Это уже timestamp, но версии нет - оставим пустую
-					app.nexusVersionCache[k] = ModVersionInfo{Timestamp: ts, Version: ""}
-				} else {
-					// Это старая строковая версия - timestamp нет
-					app.nexusVersionCache[k] = ModVersionInfo{Timestamp: 0, Version: v}
-				}
+				ts, _ := strconv.ParseInt(v, 10, 64)
+				raw[k] = ModVersionInfo{Timestamp: ts, Version: ""}
 			}
 		} else {
 			app.nexusVersionCache = make(map[string]ModVersionInfo)
+			return
 		}
-		return
 	}
-	app.nexusVersionCache = raw
-	if app.nexusVersionCache == nil {
-		app.nexusVersionCache = make(map[string]ModVersionInfo)
+
+	newCache := make(map[string]ModVersionInfo)
+	for key, info := range raw {
+		if !strings.Contains(key, ":") && info.Folder != "" {
+			// Старый ключ: преобразуем в "modID:folder"
+			newKey := key + ":" + info.Folder
+			newCache[newKey] = info
+		} else {
+			newCache[key] = info
+		}
+	}
+	app.nexusVersionCache = newCache
+	if len(newCache) > 0 {
+		app.saveNexusVersionCache() // сохраняем в новом формате
 	}
 }
 
@@ -268,6 +275,7 @@ func defaultConfig() *Config {
 		DateFormat:           "dd-mm-yyyy",
 		UpdateCheckFrequency: "every_start",
 		ShowSystemMods:       true,
+		ShowModListAfterSort: true,
 	}
 }
 

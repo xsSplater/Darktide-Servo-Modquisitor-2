@@ -11,7 +11,7 @@ import (
 // ───────────── Программа ─────────────────────────────────────────
 const (
 	AppName         = "Servo-Modquisitor-2"
-	AppVersion      = "1.1.1"
+	AppVersion      = "1.3.3"
 	AppID           = "com.xssplater.servo-modquisitor"
 	AppIcon         = "assets/icon.png"
 	СonfigFolderSMQ = "Servo-Modquisitor"
@@ -35,23 +35,26 @@ const (
 const (
 	// Файл проверки модов на несовместимости, устаревание, зависимости
 	FileNameMandatoryRules = "mandatory_obsolete_incompatible_dependencies.json"
-	FileNameLoadOrder      = "mod_load_order.txt"  // Файл список модов
-	FileNameModDatabase    = "mod_database.json"   // Файл базы модов
-	FileNameMessages       = "lang/messages.json"  // Файл сообщений
-	FileNameNexusVersions  = "nexus_versions.json" // Файл версий модов
-	FileNameConfig         = "config.json"         // Файл конфига
-	FileNameLog            = "app.log"             // Файл лога
+	FileNameModDatabase    = "mod_database.json"  // Файл базы модов
+	FileNameLoadOrder      = "mod_load_order.txt" // Файл список модов
+
+	FileNameMessages      = "lang/messages.json"  // Файл сообщений
+	FileNameNexusVersions = "nexus_versions.json" // Файл версий модов
+	FileNameConfig        = "config.json"         // Файл конфига
+	FileNameLog           = "app.log"             // Файл лога
 )
 
 // ───────────── Ссылки ────────────────────────────────────────────
 const (
-	GitHubRepoSMQ = "https://github.com/xsSplater/Darktide-Servo-Modquisitor-2"
-	gitHubRepoURL = "https://api.github.com/repos/xsSplater/Darktide-Servo-Modquisitor-2/releases/latest"
+	GitHubRepoSMQ     = "https://github.com/xsSplater/Darktide-Servo-Modquisitor-2"
+	GitHubReleaseAPI  = "https://api.github.com/repos/xsSplater/Darktide-Servo-Modquisitor-2/releases/latest"
+	GitHubDownloadURL = "https://github.com/xsSplater/Darktide-Servo-Modquisitor-2/releases/latest/download/servo-modquisitor-2.exe"
 
 	modDatabaseURL  = "https://raw.githubusercontent.com/xsSplater/Darktide-Servo-Modquisitor-2/main/SortingRules_and_ModDatabase/mod_database.json"
 	modMandatoryURL = "https://raw.githubusercontent.com/xsSplater/Darktide-Servo-Modquisitor-2/main/SortingRules_and_ModDatabase/mandatory_obsolete_incompatible_dependencies.json"
 
 	DarktideModDML = "https://www.nexusmods.com/warhammer40kdarktide/mods/19"
+	ServoMQModPage = "https://www.nexusmods.com/warhammer40kdarktide/mods/139"
 
 	DiscordDTModders = "https://discord.com/channels/1048312349867646996/1506507675976859679"
 	DiscordDTMy      = "https://discord.gg/BGZagw3xnz"
@@ -148,6 +151,11 @@ const (
 const (
 	DialogGradientWidth  = 400
 	DialogGradientHeight = 50
+)
+
+const (
+	MsgScrollSizeX = 666
+	MsgScrollSizeY = 250
 )
 
 const (

@@ -12,9 +12,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"syscall"
 	"time"
-	"unsafe"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
@@ -23,23 +21,6 @@ import (
 
 //go:embed lang/messages.json assets/CRT_BlackBG.jpg assets/Yellow_BG.jpg assets/Yellow_BG_button.jpg assets/Yellow_BG_col.jpg assets/icon.png assets/mechanicus.png
 var embeddedFiles embed.FS
-
-func isAlreadyRunning() bool {
-	kernel32 := syscall.NewLazyDLL("kernel32.dll")
-	createMutex := kernel32.NewProc("CreateMutexW")
-	// Глобальный мьютекс (префикс "Global\\")
-	mutexName, _ := syscall.UTF16PtrFromString("Global\\Servo-Modquisitor-Mutex")
-	ret, _, err := createMutex.Call(0, 1, uintptr(unsafe.Pointer(mutexName)))
-	if ret == 0 {
-		// Ошибка создания мьютекса - считаем, что он не существует, разрешаем запуск
-		return false
-	}
-	// Если мьютекс уже существовал, GetLastError() вернёт ERROR_ALREADY_EXISTS (183)
-	if err != nil && err.(syscall.Errno) == syscall.ERROR_ALREADY_EXISTS {
-		return true
-	}
-	return false
-}
 
 func main() {
 	// Проверяем, не передали ли нам nxm-ссылку при запуске
@@ -55,20 +36,14 @@ func main() {
 		// Если не удалось - это первый экземпляр, продолжаем обычный запуск
 	}
 
-	if isAlreadyRunning() {
-		// Инициализируем минимальное fyne-приложение, чтобы показать диалог
-		alreadyApp := app.NewWithID(AppID)
-		// Создаём пустое окно - оно не будет показано, но нужно как родитель для диалога
-		dummyWin := alreadyApp.NewWindow("")
-		dummyWin.SetCloseIntercept(func() { alreadyApp.Quit() })
-		// Показываем информационный диалог
-		dialog.ShowInformation(
-			"Already Running",
-			"Servo-Modquisitor is already running.\n\nPlease close the other instance before starting a new one.",
-			dummyWin,
-		)
-		// Завершаем приложение после закрытия диалога
-		os.Exit(0)
+	// Если запущены с флагом --updated, пропускаем проверку isAlreadyRunning
+	if len(os.Args) > 1 && os.Args[1] == "--updated" {
+		// ничего не делаем, продолжаем запуск
+	} else {
+		if isAlreadyRunning() {
+			showAlreadyRunningDialog()
+			os.Exit(0)
+		}
 	}
 
 	myApp := app.NewWithID(AppID)
@@ -88,11 +63,11 @@ func main() {
 			os.Remove(logPath)
 			f, err = os.OpenFile(logPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
 			if err != nil {
-				application.appendLog(fmt.Sprintf("Failed to recreate log after size limit: %v", err))
+				application.appendLog(fmt.Sprintf(application.messages["log_failed_to_recreate_log"], err))
 				application.logFile = nil
 			} else {
 				application.logFile = f
-				application.appendLog("Log file cleared (exceeded 200 KB limit)")
+				application.appendLog(application.messages["log_failed_to_recreate_log"])
 				application.appendLog(application.messages["log_started"])
 			}
 		} else {
@@ -236,10 +211,8 @@ func main() {
 	go application.ensureSortFiles()
 
 	if application.cfg.UpdateCheckFrequency != "never" && application.shouldCheckUpdates() {
-		go application.checkForUpdates()
+		go application.updateProgramFromGitHub()
 	}
-
-	// go application.blinkCheckSortIfNeeded()
 
 	// Проверка на AML и предупреждение пользователя (асинхронно)
 	application.amlDetected = checks.IsAMLInstalled(cfg.ModsPath)

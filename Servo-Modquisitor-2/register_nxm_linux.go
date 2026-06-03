@@ -1,3 +1,5 @@
+//go:build linux
+
 // register_nxm_linux.go
 package main
 

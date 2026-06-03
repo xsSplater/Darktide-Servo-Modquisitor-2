@@ -63,6 +63,17 @@ func (app *App) buildMainMenu() *fyne.MainMenu {
 		app.refreshModList()
 		app.mainWindow.SetMainMenu(app.buildMainMenu())
 	})
+	showListAfterSortLabel := app.messages["menu_show_list_after_sort"]
+	if app.cfg.ShowModListAfterSort {
+		showListAfterSortLabel = "✅ " + showListAfterSortLabel
+	} else {
+		showListAfterSortLabel = "❌ " + showListAfterSortLabel
+	}
+	showListAfterSortItem := fyne.NewMenuItem(showListAfterSortLabel, func() {
+		app.cfg.ShowModListAfterSort = !app.cfg.ShowModListAfterSort
+		saveConfig(app.cfg)
+		app.mainWindow.SetMainMenu(app.buildMainMenu())
+	})
 
 	// --- Меню Nexus ---
 	// Пункт входа/выхода
@@ -110,8 +121,8 @@ func (app *App) buildMainMenu() *fyne.MainMenu {
 	updateProgram := fyne.NewMenuItem(app.messages["menu_update_program"], func() {
 		go app.checkForProgramUpdate() // существующая функция открытия Nexus
 	})
-	updateProgramGitHub := fyne.NewMenuItem(app.messages["menu_update_program_github"], func() {
-		go app.checkForProgramUpdateGitHub()
+	updateProgramAuto := fyne.NewMenuItem(app.messages["menu_update_program_auto"], func() {
+		go app.updateProgramFromGitHub()
 	})
 	updateSortFiles := fyne.NewMenuItem(app.messages["menu_update_sort_files"], func() {
 		go app.updateSortFiles()
@@ -120,7 +131,7 @@ func (app *App) buildMainMenu() *fyne.MainMenu {
 	updatesMenu := fyne.NewMenu(app.messages["menu_updates"],
 		updateProgram,
 		fyne.NewMenuItemSeparator(),
-		updateProgramGitHub,
+		updateProgramAuto,
 		updateSortFiles,
 		fyne.NewMenuItemSeparator(),
 		periodicSub,
@@ -168,7 +179,9 @@ func (app *App) buildMainMenu() *fyne.MainMenu {
 		dateMenu,
 		fyne.NewMenuItemSeparator(),
 		forceEnglishItem,
+		showListAfterSortItem,
 		showSystemItem,
+		fyne.NewMenuItemSeparator(),
 	)
 
 	return fyne.NewMainMenu(settingsMenu, nexusMenu, updatesMenu, contactMenu)

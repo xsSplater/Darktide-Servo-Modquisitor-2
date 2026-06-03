@@ -120,7 +120,7 @@ func (app *App) showChoiceDialogAsync(parent fyne.Window, title, message string,
 		msgLabel := widget.NewLabel(message)
 		msgLabel.Wrapping = fyne.TextWrapWord
 		msgScroll := container.NewScroll(msgLabel)
-		msgScroll.SetMinSize(fyne.NewSize(666, 250))
+		msgScroll.SetMinSize(fyne.NewSize(MsgScrollSizeX, MsgScrollSizeY))
 		content := container.NewVBox(
 			headerContainer,
 			msgScroll,
@@ -275,7 +275,8 @@ func (app *App) showDownloadDialog(url, filename, modName string, fileInfo *File
 				os.Remove(dest)
 				if modID != "" {
 					// Сохраняем версию в кэш (используем installedVersion, которую мог ввести пользователь)
-					app.cacheModVersion(modID, installedName, installedVersion, fileInfo.UploadedTimestamp)
+					cacheKey := modID + ":" + installedName
+					app.cacheModVersion(cacheKey, installedName, installedVersion, fileInfo.UploadedTimestamp)
 				}
 				if installedName != "" {
 					app.selectModByName(installedName)
@@ -299,8 +300,9 @@ func (app *App) updateDML() {
 	}
 
 	modIDStr := fmt.Sprintf("%d", dmlModID)
+	cacheKey := "19:base"
 	var saved ModVersionInfo
-	if info, exists := app.nexusVersionCache[modIDStr]; exists {
+	if info, exists := app.nexusVersionCache[cacheKey]; exists {
 		saved = info
 	}
 	if saved.Timestamp != 0 && fileInfo.UploadedTimestamp <= saved.Timestamp {
@@ -345,7 +347,7 @@ func (app *App) showDMLDownloadDialog(url, filename string, fileInfo *FileInfo) 
 				app.appendLog(fmt.Sprintf(app.messages["dml_install_failed"], err))
 			} else {
 				if fileInfo != nil {
-					app.nexusVersionCache["19"] = ModVersionInfo{
+					app.nexusVersionCache["19:base"] = ModVersionInfo{
 						Timestamp: fileInfo.UploadedTimestamp,
 						Version:   fileInfo.Version,
 						Folder:    "Darktide Mod Loader",
@@ -401,10 +403,10 @@ func (app *App) handleNXMLink(nxmURL string) {
 			var directURL, filename string
 			var err error
 			if key != "" {
-				app.appendLog(app.messages["download_free_method"])
+				// app.appendLog(app.messages["download_free_method"])
 				directURL, filename, err = app.getFreeDownloadURL(modID, fileID, key, expires)
 			} else {
-				app.appendLog(app.messages["download_premium_method"])
+				// app.appendLog(app.messages["download_premium_method"])
 				directURL, filename, err = app.getPremiumDownloadURL(modID, fileID)
 			}
 			if err != nil {
@@ -504,7 +506,7 @@ func (app *App) showAutopatcherDownloadDialog(url, filename string, fileInfo *Fi
 				app.appendLog(fmt.Sprintf(app.messages["dml_install_failed"], err))
 			} else {
 				if fileInfo != nil {
-					app.nexusVersionCache["709"] = ModVersionInfo{
+					app.nexusVersionCache["709:autopatch"] = ModVersionInfo{
 						Timestamp: fileInfo.UploadedTimestamp,
 						Version:   fileInfo.Version,
 						Folder:    "Darktide Autopatch",
@@ -531,9 +533,10 @@ func (app *App) updateDMF() {
 		return
 	}
 
-	modIDStr := fmt.Sprintf("%d", dmfModID)
+	modIDStr := fmt.Sprintf("%d", dmfModID) // ← добавить эту строку
+	cacheKey := "8:dmf"
 	var saved ModVersionInfo
-	if info, exists := app.nexusVersionCache[modIDStr]; exists {
+	if info, exists := app.nexusVersionCache[cacheKey]; exists {
 		saved = info
 	}
 	if saved.Timestamp != 0 && fileInfo.UploadedTimestamp <= saved.Timestamp {
@@ -578,7 +581,7 @@ func (app *App) showDMFDownloadDialog(url, filename string, fileInfo *FileInfo) 
 				app.appendLog(fmt.Sprintf(app.messages["dml_install_failed"], err))
 			} else {
 				if fileInfo != nil {
-					app.nexusVersionCache["8"] = ModVersionInfo{
+					app.nexusVersionCache["8:dmf"] = ModVersionInfo{
 						Timestamp: fileInfo.UploadedTimestamp,
 						Version:   fileInfo.Version,
 						Folder:    "Darktide Mod Framework",

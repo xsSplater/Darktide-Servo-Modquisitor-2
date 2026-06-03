@@ -13,11 +13,11 @@ import (
 )
 
 type _CustomButtonRenderer struct {
-	btn		*CustomButton
-	shadow	*canvas.Rectangle // тень
-	bg		*canvas.Rectangle // основной фон
-	bgImage *canvas.Image	  // фоновое изображение (опционально)
-	text	*canvas.Text
+	btn     *CustomButton
+	shadow  *canvas.Rectangle // тень
+	bg      *canvas.Rectangle // основной фон
+	bgImage *canvas.Image     // фоновое изображение (опционально)
+	text    *canvas.Text
 }
 
 func (r *_CustomButtonRenderer) Layout(size fyne.Size) {
@@ -84,7 +84,6 @@ func (r *_CustomButtonRenderer) updateColors() {
 		return
 	}
 
-	// Если есть фоновое изображение
 	if r.bgImage != nil {
 		r.bg.FillColor = color.Transparent
 		r.bg.StrokeColor = th.Color(themes.ColorButtonStrokeImage, variant)
@@ -117,25 +116,25 @@ func (r *_CustomButtonRenderer) updateColors() {
 
 type CustomButton struct {
 	widget.BaseWidget
-	text	   string
+	text       string
 	OnTapped   func()
 	Importance widget.Importance
 
-	hovered	 bool
-	pressed	 bool
-	focused	 bool
+	hovered  bool
+	pressed  bool
+	focused  bool
 	disabled bool
 
-	OnMouseIn	 func()
-	OnMouseOut	 func()
+	OnMouseIn    func()
+	OnMouseOut   func()
 	OnMouseMoved func(*desktop.MouseEvent)
 
-	bgImage *canvas.Image // необязательное фоновое изображение
+	bgImage *canvas.Image
 }
 
 func NewCustomButton(label string, tapped func()) *CustomButton {
 	b := &CustomButton{
-		text:	  label,
+		text:     label,
 		OnTapped: tapped,
 	}
 	b.ExtendBaseWidget(b)
@@ -196,30 +195,32 @@ func (b *CustomButton) FocusLost() {
 }
 
 func (b *CustomButton) TypedKey(event *fyne.KeyEvent) {}
-func (b *CustomButton) TypedRune(r rune)			  {}
+func (b *CustomButton) TypedRune(r rune)              {}
 
 func (b *CustomButton) Disabled() bool { return b.disabled }
-func (b *CustomButton) Enable()		   { b.disabled = false; b.Refresh() }
-func (b *CustomButton) Disable()	   { b.disabled = true; b.Refresh() }
+func (b *CustomButton) Enable()        { b.disabled = false; b.Refresh() }
+func (b *CustomButton) Disable()       { b.disabled = true; b.Refresh() }
 
 func (b *CustomButton) CreateRenderer() fyne.WidgetRenderer {
+	th := fyne.CurrentApp().Settings().Theme()
+	variant := fyne.CurrentApp().Settings().ThemeVariant()
+
 	shadow := canvas.NewRectangle(color.NRGBA{R: 0, G: 0, B: 0, A: 100})
 	shadow.CornerRadius = 5
 
-	bg := canvas.NewRectangle(theme.ButtonColor())
+	bg := canvas.NewRectangle(th.Color(theme.ColorNameButton, variant))
 	bg.CornerRadius = 5
 
-	txt := canvas.NewText(b.text, theme.ForegroundColor())
+	txt := canvas.NewText(b.text, th.Color(theme.ColorNameForeground, variant))
 	txt.Alignment = fyne.TextAlignCenter
 	txt.TextStyle.Bold = true
 
 	renderer := &_CustomButtonRenderer{
-		btn:	b,
+		btn:    b,
 		shadow: shadow,
-		bg:		bg,
-		text:	txt,
+		bg:     bg,
+		text:   txt,
 	}
-	// Если у кнопки уже установлено изображение, передаём его в рендерер
 	if b.bgImage != nil {
 		renderer.bgImage = b.bgImage
 	}

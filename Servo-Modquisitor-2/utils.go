@@ -291,16 +291,53 @@ func (app *App) runAllChecks() {
 	}
 	app.appendLog(app.messages["done"])
 
-	// Финальное обновление UI и открытие файла
+	// Финальное обновление UI в зависимости от настройки
 	fyne.Do(func() {
-		app.refreshModList()
-		absPath, _ := filepath.Abs(filepath.Join(app.cfg.ModsPath, FileNameLoadOrder))
-		if _, err := os.Stat(absPath); err == nil {
-			go func() {
-				if err := openFileWithDefaultApp(absPath); err != nil {
-					app.appendLog(fmt.Sprintf(app.messages["log_failed_open_file"], err))
+		if app.cfg.ShowModListAfterSort {
+			app.refreshModList()
+			app.forceRefreshTable()
+
+			// Открыть файл mod_load_order.txt только если настройка включена
+			absPath, _ := filepath.Abs(filepath.Join(app.cfg.ModsPath, FileNameLoadOrder))
+			if _, err := os.Stat(absPath); err == nil {
+				go func() {
+					if err := openFileWithDefaultApp(absPath); err != nil {
+						app.appendLog(fmt.Sprintf(app.messages["log_failed_open_file"], err))
+					}
+				}()
+			}
+		} else {
+			// Тихое обновление данных без изменения выделения и прокрутки
+			savedMod := app.selectedModName
+			app.refreshModList()
+			if savedMod != "" {
+				for i, m := range app.displayedMods {
+					if m.Name == savedMod {
+						app.selectedModName = savedMod
+						app.selectedModIndex.Store(int32(i))
+						app.updateDescriptionForMod(savedMod)
+						break
+					}
 				}
-			}()
+				app.updateUpDownButtons()
+			}
 		}
 	})
+}
+
+func (app *App) forceRefreshTable() {
+	if app.modTable == nil {
+		return
+	}
+	app.modTable.Refresh()
+	// Принудительно обновляем контейнер, в котором находится таблица
+	if app.tableBorderContainer != nil {
+		app.tableBorderContainer.Refresh()
+	}
+	// Также обновляем заголовки (на случай, если ширина колонок изменилась)
+	if app.headerTable != nil {
+		app.headerTable.Refresh()
+	}
+	// Запрашиваем перерисовку всего окна
+	app.mainWindow.Canvas().Refresh(app.modTable)
 }
