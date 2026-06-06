@@ -623,24 +623,6 @@
 			}
 		},
 		{
-			"folder": "crosshair_remap",
-			"name": {
-				"en": "Crosshair Remap (Continued)",
-				"ru": "Переназначение прицела (Продолжение)"
-			},
-			"description": {
-				"en": "Allows players to change crosshairs per weapon type.\nIf the mod isn't working, you probably have an outdated version of 'Crosshair Remap'.\nDownload the new version, 'Crosshair Remap (Continued)'. The link in the card takes you to the correct page.",
-				"ru": "Crosshair Remap (Continued) - Позволяет игрокам менять прицел в зависимости от типа оружия.\nЕсли мод не работает, то у вас вероятно старая версия «Crosshair Remap», скачайте новую версию «Crosshair Remap (Continued)».\nСсылка в карточке ведёт на нужную страницу."
-			},
-			"author": "unifyh and deluxghost",
-			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/253",
-			"github_url": "https://github.com/deluxghost/darktide-mods/tree/main/crosshair_remap",
-			"note": {
-				"en": "Crosshair Remap (Continued) is a successor mod.",
-				"ru": "Crosshair Remap (Continued) - мод-наследник."
-			}
-		},
-		{
 			"folder": "Nothing New",
 			"name": {
 				"en": "Nothing New",
@@ -1895,7 +1877,7 @@
 			"note": { "en": "", "ru": "" }
 		},
 		{
-			"folder": "",
+			"folder": "ScoreboardAmmos",
 			"name": {
 				"en": "Scoreboard Ammunitions picked",
 				"ru": "Таблица результатов - Подобранные патроны"
@@ -2175,6 +2157,21 @@
 			"note": { "en": "", "ru": "" }
 		},
 		{
+			"folder": "ExampleLocalizationBundle",
+			"name": {
+				"en": "WTL - Example Localization Bundle",
+				"ru": "ЧЗЛ - Пример пакета локализации"
+			},
+			"description": {
+				"en": "This is an example file for localization bundle authors.",
+				"ru": "Это пример файла для авторов пакетов локализации."
+			},
+			"author": "deluxghost",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/163",
+			"github_url": "https://github.com/deluxghost/darktide-mods/tree/main/WhatTheLocalization",
+			"note": { "en": "", "ru": "" }
+		},
+		{
 			"folder": "ToggleHUD",
 			"name": {
 				"en": "Toggle HUD",
@@ -2272,21 +2269,6 @@
 				"en": "Introduced into the game.",
 				"ru": "Введено в игру."
 			}
-		},
-		{
-			"folder": "PewPew",
-			"name": {
-				"en": "PewPew (Continued)",
-				"ru": "ПиуПиу (Продолжение)"
-			},
-			"description": {
-				"en": "Change your ranged weapon's firing sound and/or the projectile it shoots.\nIf the mod isn't working, you probably have an outdated version of 'PewPew'.\nDownload the new version, 'PewPew (Continued)'. The link in the card takes you to the correct page.",
-				"ru": "PewPew - Изменяйте звук выстрела вашего дальнобойного оружия и/или тип выпускаемого им снаряда.\nЕсли мод не работает, то у вас вероятно старая версия «PewPew», скачайте новую версию «PewPew (Continued)».\nСсылка в карточке ведёт на нужную страницу."
-			},
-			"author": "tinybike - Backup158",
-			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/477",
-			"github_url": "https://github.com/Backup158/DarktidePewPewContinued",
-			"note": { "en": "", "ru": "" }
 		},
 		{
 			"folder": "ManyMoreTry",
@@ -2433,24 +2415,6 @@
 			}
 		},
 		{
-			"folder": "Jukebox",
-			"name": {
-				"en": "Jukebox (new)",
-				"ru": "Музыкальный автомат (новый)"
-			},
-			"description": {
-				"en": "OBSOLETE!",
-				"ru": "УСТАРЕЛ!"
-			},
-			"author": "SeventeenDucks",
-			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/269",
-			"github_url": "https://github.com/ronvoluted/darktide-mods/tree/main/Jukebox",
-			"note": {
-				"en": "Hasn't been updated in a while. May cause crashes.",
-				"ru": "Давно не обновляется. Может вызывать вылеты."
-			}
-		},
-		{
 			"folder": "Unspeakable",
 			"name": {
 				"en": "Unspeakable",
@@ -2496,24 +2460,6 @@
 			"note": {
 				"en": "Requred: Scoreboard.",
 				"ru": "Требуется: Scoreboard."
-			}
-		},
-		{
-			"folder": "Inventory2D",
-			"name": {
-				"en": "Inventory 2D",
-				"ru": "2D-инвентарь"
-			},
-			"description": {
-				"en": "Inventory2D - It makes your inventory a 2D grid with three items per row, and it does it pretty karking well if you ask me.",
-				"ru": "Inventory2D - Этот мод превращает ваш инвентарь в двухмерную сетку с тремя предметами в каждом ряду, и, на мой взгляд, делает это довольно неплохо."
-			},
-			"author": "Redbeardt",
-			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/188",
-			"github_url": "https://www.nexusmods.com/warhammer40kdarktide/mods/594",
-			"note": {
-				"en": "The mod hasn't been updated. Look for Blakrajder's fix on Nexus (The GitHub link on the right is a link to the fix).",
-				"ru": "Мод давно не обновляется. Фикс от Blakrajder ищите на Нексус (ссылка Гитхаб справа - это ссылка на фикс)."
 			}
 		},
 		{
@@ -2898,6 +2844,24 @@
 			}
 		},
 		{
+			"folder": "HeKnew",
+			"name": {
+				"en": "HeKnew",
+				"ru": "HeKnew"
+			},
+			"description": {
+				"en": "Very obvious audio hint that zealot's undying perk is activated.\nNow for the plasma explosion and all types of psyker's suicide as well!",
+				"ru": "Совершенно очевидный звуковой намёк на активацию способности «До самой смерти» у изувера.\nТеперь также работает с плазменными взрывами и всевозможными самоубийствами псайкеров!"
+			},
+			"author": "tuman18",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/224",
+			"github_url": "",
+			"note": {
+				"en": "Requred: Audio plugin.",
+				"ru": "Требуется: Audio плагин."
+			}
+		},
+		{
 			"folder": "Clang",
 			"name": {
 				"en": "Berserk '16 Clang SFX",
@@ -3065,21 +3029,6 @@
 			}
 		},
 		{
-			"folder": "ovenproof_scoreboard_plugin",
-			"name": {
-				"en": "Ovenproof's Scoreboard Plugin",
-				"ru": "Таблица результатов - Плагин Овенпруфа"
-			},
-			"description": {
-				"en": "Ovenproof's Scoreboard Plugin - Community Patch - Scoreboard plugin for detailed stats \nThe main mod will no longer be updated, so I'm linking to the community patch page here.\nIf the mod doesn't work, check the community patch page. ",
-				"ru": "Ovenproof's Scoreboard Plugin - Community Patch - Плагин для Таблицы результатов (Scoreboard), предоставляющий подробный обзор статистики.\nОсновной мод больше не будет обновляться, поэтому я здесь указываю страницу патча сообщества.\nЕсли мод не работает проверьте страницу патча сообщества."
-			},
-			"author": "OvenProofMars and community",
-			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/514",
-			"github_url": "https://github.com/Backup158/DarktideOvenproofScoreboardPluginPatch/tree/main/ovenproof_scoreboard_plugin",
-			"note": { "en": "", "ru": "" }
-		},
-		{
 			"folder": "DirectToHadron",
 			"name": {
 				"en": "Direct to Hadron",
@@ -3210,6 +3159,24 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/252",
 			"github_url": "",
 			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "crosshair_remap",
+			"name": {
+				"en": "Crosshair Remap (Continued)",
+				"ru": "Переназначение прицела (Продолжение)"
+			},
+			"description": {
+				"en": "Allows players to change crosshairs per weapon type.",
+				"ru": "Crosshair Remap (Continued) - Позволяет игрокам менять прицел в зависимости от типа оружия."
+			},
+			"author": "unifyh and deluxghost",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/253",
+			"github_url": "https://github.com/deluxghost/darktide-mods/tree/main/crosshair_remap",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
 		},
 		{
 			"folder": "InspectFromSocial",
@@ -3431,6 +3398,24 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/268",
 			"github_url": "https://github.com/Wobin/SpideySense",
 			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "Jukebox",
+			"name": {
+				"en": "Jukebox (new)",
+				"ru": "Музыкальный автомат (новый)"
+			},
+			"description": {
+				"en": "OBSOLETE!",
+				"ru": "УСТАРЕЛ!"
+			},
+			"author": "SeventeenDucks",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/269",
+			"github_url": "https://github.com/ronvoluted/darktide-mods/tree/main/Jukebox",
+			"note": {
+				"en": "Hasn't been updated in a while. May cause crashes.",
+				"ru": "Давно не обновляется. Может вызывать вылеты."
+			}
 		},
 		{
 			"folder": "CorrectMissionVotingInfo",
@@ -3781,24 +3766,6 @@
 			"note": { "en": "", "ru": "" }
 		},
 		{
-			"folder": "claim_all_penances",
-			"name": {
-				"en": "Claim All Penances",
-				"ru": "Забери все награды за раз"
-			},
-			"description": {
-				"en": "Claims commendations on entering Penances. Wintrack claim-all via command/keybind.",
-				"ru": "Claim All Penances - Забирает награды при входе в меню Искуплений. Вы можете забрать награды с помощью команды/сочетания клавиш."
-			},
-			"author": "Adspartan and Prowo",
-			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/676",
-			"github_url": "",
-			"note": {
-				"en": "The mod hasn't been updated in a while. Look for Prowo's fix on the Nexus (the Nexus link on the right is the link to the fix).",
-				"ru": "Мод давно не обновляется. Фикс от Prowo ищите на Нексус (ссылка Нексус справа - это ссылка на фикс)."
-			}
-		},
-		{
 			"folder": "limit_background_fps",
 			"name": {
 				"en": "Limit Background FPS",
@@ -3824,7 +3791,7 @@
 				"ru": "For the Drip - Мод для настройки снаряжения (изменения видны только вам)."
 			},
 			"author": "Adspartan",
-			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/306",
+			"url": "",
 			"github_url": "https://github.com/Adspartan/For_the_Drip",
 			"note": { "en": "", "ru": "" }
 		},
@@ -3840,7 +3807,7 @@
 			},
 			"author": "Adspartan",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/306",
-			"github_url": "",
+			"github_url": "https://github.com/Adspartan/For_the_Drip",
 			"note": {
 				"en": "Required: For the Drip.",
 				"ru": "Требуется: For the Drip."
@@ -3904,11 +3871,29 @@
 			"folder": "FenyaTitleZ",
 			"name": {
 				"en": "Fenya Titles - RU ONLY",
-				"ru": "Погоняла"
+				"ru": "Погоняла - Выживший в золотом дожде"
 			},
 			"description": {
 				"en": "Fenya Titles - RU ONLY - Just for fun! You've been thrown in jail, so sit down, make yourself a mug of chifir, and get yourself a title.",
-				"ru": "Fenya Titles - RU ONLY - Чисто по приколу! Тебя посадили в тюрячку, так что сядь, завари кружку чифиря и возьми себе погоняло."
+				"ru": "Fenya Titles - RU ONLY - Чисто по приколу! Тебя посадили в тюрячку, так что сядь, завари кружку чифиря и возьми себе погоняло.\nВыживший в золотом дожде."
+			},
+			"author": "xsSplater",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/311",
+			"github_url": "",
+			"note": {
+				"en": "Required: What The Localization.",
+				"ru": "Требуется: What The Localization."
+			}
+		},
+		{
+			"folder": "FenyaTitleZ",
+			"name": {
+				"en": "Fenya Titles - RU ONLY",
+				"ru": "Погоняла - Показушник"
+			},
+			"description": {
+				"en": "Fenya Titles - RU ONLY - Just for fun! You've been thrown in jail, so sit down, make yourself a mug of chifir, and get yourself a title.",
+				"ru": "Fenya Titles - RU ONLY - Чисто по приколу! Тебя посадили в тюрячку, так что сядь, завари кружку чифиря и возьми себе погоняло.\nПоказушник."
 			},
 			"author": "xsSplater",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/311",
@@ -4121,6 +4106,42 @@
 			}
 		},
 		{
+			"folder": "PsykerAneurysm",
+			"name": {
+				"en": "Psyker Aneurysm",
+				"ru": "Аневризма псайкера"
+			},
+			"description": {
+				"en": "Plays the brain fart aneurysm sound when the Psyker begins to go into Perils of the Warp at 100% and explodes, seperated into two sections: When the Perils starts and when you blow up.",
+				"ru": "Psyker Aneurysm - Воспроизводит звук «brain fart aneurysm», когда псайкер начинает погружаться в «Опасности варпа» при 100% опасности и взрывается. Разделён на две части: начало действия «Опасностей» и взрыв."
+			},
+			"author": "Dattebayo681",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/324",
+			"github_url": "",
+			"note": {
+				"en": "Requred: Audio plugin.",
+				"ru": "Требуется: Audio плагин."
+			}
+		},
+		{
+			"folder": "MarvCrit",
+			"name": {
+				"en": "Marv Crits",
+				"ru": "Криты Марва"
+			},
+			"description": {
+				"en": "OBSOLETE!",
+				"ru": "УСТАРЕЛ!"
+			},
+			"author": "Dattebayo681",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/325",
+			"github_url": "",
+			"note": {
+				"en": "Requred: Audio plugin.",
+				"ru": "Требуется: Audio плагин."
+			}
+		},
+		{
 			"folder": "MarvCrit",
 			"name": {
 				"en": "Marv Crits",
@@ -4150,24 +4171,6 @@
 			},
 			"author": "Sephirothphoenix",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/326",
-			"github_url": "",
-			"note": {
-				"en": "Hasn't been updated in a while. May cause crashes.",
-				"ru": "Давно не обновляется. Может вызывать вылеты."
-			}
-		},
-		{
-			"folder": "InventoryInspect",
-			"name": {
-				"en": "Inventory Inspect",
-				"ru": "Осмотр инвентаря"
-			},
-			"description": {
-				"en": "Inventory Inspect - LUA errors FIX and Players Widget Restoration - Conveniently inspect your party members from the inventory screen.\nMake sure you have installed the fix if the mod doesn't work.\nThe link on the Nexus page leads to the fix.",
-				"ru": "Inventory Inspect - исправление ошибок LUA и восстановление виджета игроков — Удобный осмотр членов вашей группы прямо с экрана инвентаря.\nУбедитесь, что вы установили фикс, если мод не работает.\nСсылка на страницу Nexus ведёт именно на фикс."
-			},
-			"author": "Illidra and MalkyCZE",
-			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/587",
 			"github_url": "",
 			"note": {
 				"en": "Hasn't been updated in a while. May cause crashes.",
@@ -4251,6 +4254,36 @@
 			"author": "Zombine",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/332",
 			"github_url": "https://github.com/zombine04/darktide-mods/tree/main/QuickKick",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "PsykerCriticalPerilQuiet",
+			"name": {
+				"en": "Quieter Psyker Critical Peril",
+				"ru": "Quieter Psyker Critical Peril"
+			},
+			"description": {
+				"en": "OBSOLETE!",
+				"ru": "УСТАРЕЛ!"
+			},
+			"author": "OrangeKing64",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/333",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "PsykerCriticalPerilQuiet",
+			"name": {
+				"en": "Quieter Psyker Critical Peril",
+				"ru": "Quieter Psyker Critical Peril"
+			},
+			"description": {
+				"en": "OBSOLETE!",
+				"ru": "УСТАРЕЛ!"
+			},
+			"author": "OrangeKing64",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/333",
+			"github_url": "",
 			"note": { "en": "", "ru": "" }
 		},
 		{
@@ -4522,26 +4555,6 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/351",
 			"github_url": "",
 			"note": { "en": "", "ru": "" }
-		},
-		{
-			"folder": "ScanHelper",
-			"name": {
-				"en": "Scan Helper",
-				"ru": "Помощник сканирования"
-			},
-			"description": {
-				"en": "Add a conspicuous mark to the object to be scanned.",
-				"ru": "ScanHelper - Добавляет заметную метку на сканируемый объект.",
-				"zh-hans": "给需要扫描的物体加个显眼的标记",
-				"zh-hant": "在待掃描物件上加入醒目的標記"
-			},
-			"author": "yinhaox and Saigofu",
-			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/657",
-			"github_url": "",
-			"note": {
-				"en": "Fix in the comments on the Nexus Mods.",
-				"ru": "Фикс в комментариях на Нексусе."
-			}
 		},
 		{
 			"folder": "ALWAYSBLOODYWEAPONS",
@@ -5027,6 +5040,42 @@
 			"name": {
 				"en": "Revert Renames",
 				"ru": "Отмена переименования"
+			},
+			"description": {
+				"en": "Reverts the weapon renames from the Unlocked and Loaded patch.",
+				"ru": "Revert Renames - Отменяет переименование оружия, внесённые в патче «Разблокировано и заряжено»."
+			},
+			"author": "Backup158",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/394",
+			"github_url": "https://github.com/Backup158/DarktideRenameRevert",
+			"note": {
+				"en": "Required: What The Localization.",
+				"ru": "Требуется: What The Localization."
+			}
+		},
+		{
+			"folder": "RevertRenamesUnlockedAndLoaded",
+			"name": {
+				"en": "Revert Renames - No Blanks",
+				"ru": "Отмена переименования - без пустых мест"
+			},
+			"description": {
+				"en": "Reverts the weapon renames from the Unlocked and Loaded patch.",
+				"ru": "Revert Renames - Отменяет переименование оружия, внесённые в патче «Разблокировано и заряжено»."
+			},
+			"author": "Backup158",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/394",
+			"github_url": "https://github.com/Backup158/DarktideRenameRevert",
+			"note": {
+				"en": "Required: What The Localization.",
+				"ru": "Требуется: What The Localization."
+			}
+		},
+		{
+			"folder": "RevertRenamesUnlockedAndLoaded",
+			"name": {
+				"en": "Revert Renames - Personal Picks",
+				"ru": "Отмена переименования - личные рекомендации"
 			},
 			"description": {
 				"en": "Reverts the weapon renames from the Unlocked and Loaded patch.",
@@ -6103,6 +6152,21 @@
 			}
 		},
 		{
+			"folder": "PewPew",
+			"name": {
+				"en": "PewPew (Continued)",
+				"ru": "ПиуПиу (Продолжение)"
+			},
+			"description": {
+				"en": "Change your ranged weapon's firing sound and/or the projectile it shoots.",
+				"ru": "PewPew - Изменяйте звук выстрела вашего дальнобойного оружия и/или тип выпускаемого им снаряда."
+			},
+			"author": "tinybike and Backup158",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/477",
+			"github_url": "https://github.com/Backup158/DarktidePewPewContinued",
+			"note": { "en": "", "ru": "" }
+		},
+		{
 			"folder": "testing_utilities",
 			"name": {
 				"en": "Testing Utilities (add buffs)",
@@ -6491,13 +6555,10 @@
 			"author": "Grasmann",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/504",
 			"github_url": "https://github.com/grasmann/darktide-mods/tree/main/servo_friend",
-			"note": {
-				"en": "Fix in the 'Darktide Modders' Discord.",
-				"ru": "Фикс в Дискорде «Darktide Modders»."
-			}
+			"note": { "en": "", "ru": "" }
 		},
 		{
-			"folder": "servo_friend_example_addon",
+			"folder": "servo_friend_plugin_hat_cables",
 			"name": {
 				"en": "Servo Friend Example Hat Addon",
 				"ru": "Серводруг пример аддона шапок"
@@ -6510,8 +6571,8 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/504",
 			"github_url": "https://github.com/grasmann/darktide-mods/tree/main/servo_friend",
 			"note": {
-				"en": "Fix in the 'Darktide Modders' Discord.",
-				"ru": "Фикс в Дискорде «Darktide Modders»."
+				"en": "Required: Servo Friend.",
+				"ru": "Требуется: Серводруг."
 			}
 		},
 		{
@@ -6528,44 +6589,8 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/504",
 			"github_url": "https://github.com/grasmann/darktide-mods/tree/main/servo_friend",
 			"note": {
-				"en": "Fix in the 'Darktide Modders' Discord.",
-				"ru": "Фикс в Дискорде «Darktide Modders»."
-			}
-		},
-		{
-			"folder": "servo_friend_plugin_hat_diadem",
-			"name": {
-				"en": "Servo Friend Hat Diadem Plugin",
-				"ru": "Серводруг - плагин диадема"
-			},
-			"description": {
-				"en": "Hat Diadem Plugin for servo friend.",
-				"ru": "Servo Friend - Плагин диадема для cерводруга."
-			},
-			"author": "Grasmann",
-			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/504",
-			"github_url": "https://github.com/grasmann/darktide-mods/tree/main/servo_friend",
-			"note": {
-				"en": "",
-				"ru": ""
-			}
-		},
-		{
-			"folder": "servo_friend_plugin_hat_commissar",
-			"name": {
-				"en": "Servo Friend Commisar Hat Plugin",
-				"ru": "Серводруг - плагин фуражка комиссара"
-			},
-			"description": {
-				"en": "Commisar Hat Plugin for servo friend.",
-				"ru": "Servo Friend - Плагин фуражка комиссара для cерводруга."
-			},
-			"author": "Grasmann",
-			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/504",
-			"github_url": "https://github.com/grasmann/darktide-mods/tree/main/servo_friend",
-			"note": {
-				"en": "",
-				"ru": ""
+				"en": "Required: Servo Friend and Darktide Local Server.",
+				"ru": "Требуется: Серводруги Darktide Local Server."
 			}
 		},
 		{
@@ -6675,6 +6700,21 @@
 			"author": "BoffeeH",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/511",
 			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "ovenproof_scoreboard_plugin",
+			"name": {
+				"en": "Ovenproof's Scoreboard Plugin",
+				"ru": "Таблица результатов - Плагин Овенпруфа"
+			},
+			"description": {
+				"en": "Ovenproof's Scoreboard Plugin - Community Patch - Scoreboard plugin for detailed stats \nThe main mod will no longer be updated, so I'm linking to the community patch page here.\nIf the mod doesn't work, check the community patch page. ",
+				"ru": "Ovenproof's Scoreboard Plugin - Community Patch - Плагин для Таблицы результатов (Scoreboard), предоставляющий подробный обзор статистики.\nОсновной мод больше не будет обновляться, поэтому я здесь указываю страницу патча сообщества.\nЕсли мод не работает проверьте страницу патча сообщества."
+			},
+			"author": "OvenProofMars and community",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/514",
+			"github_url": "https://github.com/Backup158/DarktideOvenproofScoreboardPluginPatch/tree/main/ovenproof_scoreboard_plugin",
 			"note": { "en": "", "ru": "" }
 		},
 		{
@@ -7463,6 +7503,24 @@
 			"note": { "en": "", "ru": "" }
 		},
 		{
+			"folder": "InventoryInspect",
+			"name": {
+				"en": "Inventory Inspect",
+				"ru": "Осмотр инвентаря"
+			},
+			"description": {
+				"en": "Inventory Inspect - LUA errors FIX and Players Widget Restoration - Conveniently inspect your party members from the inventory screen.\n\nMake sure you have installed the fix if the mod doesn't work.\nThe link on the Nexus page leads to the fix.",
+				"ru": "Inventory Inspect - исправление ошибок LUA и восстановление виджета игроков — Удобный осмотр членов вашей группы прямо с экрана инвентаря.\n\nУбедитесь, что вы установили фикс, если мод не работает.\nСсылка на страницу Nexus ведёт именно на фикс."
+			},
+			"author": "Illidra and MalkyCZE",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/587",
+			"github_url": "",
+			"note": {
+				"en": "Hasn't been updated in a while. May cause crashes.",
+				"ru": "Давно не обновляется. Может вызывать вылеты."
+			}
+		},
+		{
 			"folder": "Hound Zero",
 			"name": {
 				"en": "Hound Zero",
@@ -7536,6 +7594,21 @@
 			},
 			"author": "kara07CD",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/593",
+			"github_url": "",
+			"note": { "en": "", "ru": "" }
+		},
+		{
+			"folder": "Inventory2D",
+			"name": {
+				"en": "Inventory 2D",
+				"ru": "2D-инвентарь"
+			},
+			"description": {
+				"en": "Inventory2D - It makes your inventory a 2D grid with three items per row, and it does it pretty karking well if you ask me.",
+				"ru": "Inventory2D - Этот мод превращает ваш инвентарь в двухмерную сетку с тремя предметами в каждом ряду, и, на мой взгляд, делает это довольно неплохо."
+			},
+			"author": "Redbeardt and Blakrajder",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/594",
 			"github_url": "",
 			"note": { "en": "", "ru": "" }
 		},
@@ -8106,6 +8179,26 @@
 			"note": { "en": "", "ru": "" }
 		},
 		{
+			"folder": "ScanHelper",
+			"name": {
+				"en": "Scan Helper",
+				"ru": "Помощник сканирования"
+			},
+			"description": {
+				"en": "Add a conspicuous mark to the object to be scanned.",
+				"ru": "ScanHelper - Добавляет заметную метку на сканируемый объект.",
+				"zh-hans": "给需要扫描的物体加个显眼的标记",
+				"zh-hant": "在待掃描物件上加入醒目的標記"
+			},
+			"author": "yinhaox and Saigofu",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/657",
+			"github_url": "",
+			"note": {
+				"en": "Fix in the comments on the Nexus Mods.",
+				"ru": "Фикс в комментариях на Нексусе."
+			}
+		},
+		{
 			"folder": "FriendlyFireNotify",
 			"name": {
 				"en": "Friendly Fire Notify",
@@ -8358,6 +8451,24 @@
 			}
 		},
 		{
+			"folder": "claim_all_penances",
+			"name": {
+				"en": "Claim All Penances",
+				"ru": "Забери все награды за раз"
+			},
+			"description": {
+				"en": "Claims commendations on entering Penances. Wintrack claim-all via command/keybind.",
+				"ru": "Claim All Penances - Забирает награды при входе в меню Искуплений. Вы можете забрать награды с помощью команды/сочетания клавиш."
+			},
+			"author": "Adspartan and Prowo",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/676",
+			"github_url": "",
+			"note": {
+				"en": "The mod hasn't been updated in a while. Look for Prowo's fix on the Nexus (the Nexus link on the right is the link to the fix).",
+				"ru": "Мод давно не обновляется. Фикс от Prowo ищите на Нексус (ссылка Нексус справа - это ссылка на фикс)."
+			}
+		},
+		{
 			"folder": "ticking_barrels",
 			"name": {
 				"en": "Ticking Barrels",
@@ -8379,16 +8490,13 @@
 				"ru": "Замена визуальных эффектов"
 			},
 			"description": {
-				"en": "OBSOLETE!",
-				"ru": "УСТАРЕЛ!"
+				"en": "Replaces certain effects that obscures vision and/or hurts performance. Has varying options for each effect, some are simply lesser versions of the same, others complete replacement. Removes Blight Spreads, Rampaging Enemies and Rotten Armor specific death explosion visuals as well.",
+				"ru": "Заменяет некоторые эффекты, которые ухудшают обзор и/или снижают производительность. Для каждого эффекта доступны различные варианты, некоторые из них являются просто упрощёнными версиями, другие — полной заменой. Также удаляет визуальные эффекты, характерные для эффектов «Распространение порчи», «Неистовые враги» и «Гнилая броня» при смерти."
 			},
 			"author": "tdopz and leerH",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/678",
 			"github_url": "",
-			"note": {
-				"en": "It may cause crashes.",
-				"ru": "Может вызывать вылеты."
-			}
+			"note": { "en": "", "ru": "" }
 		},
 		{
 			"folder": "zServo_Lexmechanicus",
@@ -9582,6 +9690,42 @@
 			"note": {
 				"en": "",
 				"ru": ""
+			}
+		},
+		{
+			"folder": "servo_friend_plugin_hat_commissar",
+			"name": {
+				"en": "Servo Friend Commisar Hat Plugin",
+				"ru": "Серводруг плагин - фуражка комиссара"
+			},
+			"description": {
+				"en": "Adds a commissar/officer appearance option to player Servo Friend pets.",
+				"ru": "Servo Friend - Добавляет для питомца-серводруга шапку в виде фуражки коммисара/офицера."
+			},
+			"author": "GideonAriphael",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/889",
+			"github_url": "",
+			"note": {
+				"en": "Required: Servo Friend.",
+				"ru": "Требуется: Серводруг."
+			}
+		},
+		{
+			"folder": "servo_friend_plugin_hat_diadem",
+			"name": {
+				"en": "Servo Friend Hat Diadem Plugin",
+				"ru": "Серводруг плагин - диадема"
+			},
+			"description": {
+				"en": "Adds a religious candle/diadem appearance option to player Servo Friend pets.",
+				"ru": "Servo Friend - Добавляет для питомца-серводруга шапку в виде религиозной свечи/диадемы."
+			},
+			"author": "GideonAriphael",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/890",
+			"github_url": "",
+			"note": {
+				"en": "Required: Servo Friend.",
+				"ru": "Требуется: Серводруг."
 			}
 		},
 		{

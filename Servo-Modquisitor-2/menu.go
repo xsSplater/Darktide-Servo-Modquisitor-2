@@ -12,10 +12,32 @@ import (
 )
 
 func (app *App) buildMainMenu() *fyne.MainMenu {
-	langEng := fyne.NewMenuItem(app.messages["menu_lang_en"], func() { app.changeLanguage("en") })
-	langRu := fyne.NewMenuItem(app.messages["menu_lang_ru"], func() { app.changeLanguage("ru") })
+	// --- Меню выбора языка ---
+	// Список всех поддерживаемых языков
+	languageCodes := []string{
+		"en", "ru", "zh-hans", "zh-hant", "de", "fr", "ja", "ko", "it", "pl", "es", "pt-BR",
+	}
+	var langItems []*fyne.MenuItem
+	for _, code := range languageCodes {
+		// Ключ сообщения для названия языка (например "menu_lang_en")
+		msgKey := "menu_lang_" + code
+		label := app.messages[msgKey]
+		if label == "" {
+			label = code // fallback на код, если перевод отсутствует
+		}
+		if app.cfg.Language == code {
+			label = "✅ " + label
+		} else {
+			label = "❌ " + label
+		}
+		codeCopy := code
+		item := fyne.NewMenuItem(label, func() {
+			app.changeLanguage(codeCopy)
+		})
+		langItems = append(langItems, item)
+	}
 	langMenu := fyne.NewMenuItem(app.messages["menu_language"], nil)
-	langMenu.ChildMenu = fyne.NewMenu("", langEng, langRu)
+	langMenu.ChildMenu = fyne.NewMenu("", langItems...)
 
 	themeDark := fyne.NewMenuItem(app.messages["menu_theme_dark"], func() {
 		app.cfg.Theme = "dark"

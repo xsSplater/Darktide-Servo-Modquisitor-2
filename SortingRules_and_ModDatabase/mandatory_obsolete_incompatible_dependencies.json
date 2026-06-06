@@ -152,7 +152,7 @@
 		"ScoreboardDamage",
 		"settings_extension",
 		"sorted_mission_grid",
-"soulblaze_vfx_toggle",
+		"soulblaze_vfx_toggle",
 		"SpaceToContinue",
 		"SpectatorHUD",
 		"stimm_markers",
@@ -164,7 +164,6 @@
 		"TransparentShield",
 		"TruePeril",
 
-		"vfx_swapper",
 		"ViewModelTweaker",
 
 		"weapon_customization",
@@ -693,6 +692,9 @@
 				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/504"},
 		{"required": "servo_friend",
 			"dependent": "servo_friend_plugin_hat_diadem",
+				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/504"},
+		{"required": "servo_friend",
+			"dependent": "servo_friend_plugin_hat_commissar",
 				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/504"},
 
 		{"required": "visual_loadout_customization_community_patch",
