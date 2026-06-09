@@ -3,7 +3,7 @@ package main
 
 import (
 	"Servo-Modquisitor/checks"
-	"archive/zip"
+	"context"
 	"fmt"
 	"io"
 	"os"
@@ -16,8 +16,7 @@ import (
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/widget"
-	"github.com/bodgit/sevenzip"
-	"github.com/nwaples/rardecode/v2"
+	"github.com/mholt/archives"
 )
 
 func safeJoin(destDir, name string) (string, error) {
@@ -274,11 +273,15 @@ func (app *App) handleDrop(uris []fyne.URI) {
 						}
 						checks.AutoFixMalformed()
 						app.refreshModList()
+						app.selectAndScrollToMod(installedName)
 						// Попробуем найти modID по имени папки или извлечь из имени архива
 						modID, _, _ := extractVersionAndModIDFromFilename(p)
 						if modID != 0 && version != "" {
 							cacheKey := fmt.Sprintf("%d:%s", modID, installedName)
 							app.cacheModVersion(cacheKey, installedName, version, 0)
+						}
+						if modID != 0 {
+							go app.autoAddModToDatabase(modID, installedName)
 						}
 						app.orderDirty = true
 						app.updateTableBorder()
@@ -293,231 +296,82 @@ func (app *App) handleDrop(uris []fyne.URI) {
 }
 
 func (app *App) extractArchive(archivePath string) error {
-	ext := strings.ToLower(filepath.Ext(archivePath))
-	switch ext {
-	case ".zip":
-		return app.extractZip(archivePath)
-	case ".rar":
-		return app.extractRar(archivePath)
-	case ".7z":
-		return app.extract7z(archivePath)
-	default:
-		return fmt.Errorf(app.messages["error_uns_archive"], ext)
-	}
+	return app.extractArchiveTo(archivePath, app.cfg.ModsPath)
 }
 
-func (app *App) extractZip(path string) error {
-	r, err := zip.OpenReader(path)
-	if err != nil {
-		return err
-	}
-	defer r.Close()
-	destDir := app.cfg.ModsPath
-	for _, f := range r.File {
-		targetPath, err := safeJoin(destDir, f.Name)
-		if err != nil {
-			continue
-		}
-		if f.FileInfo().IsDir() {
-			os.MkdirAll(targetPath, 0755)
-			continue
-		}
-		os.MkdirAll(filepath.Dir(targetPath), 0755)
-		outFile, err := os.Create(targetPath)
-		if err != nil {
-			continue
-		}
-		rc, _ := f.Open()
-		if rc != nil {
-			io.Copy(outFile, rc)
-			rc.Close()
-		}
-		outFile.Close()
-	}
-	return nil
-}
-
-func (app *App) extractRar(path string) error {
-	f, err := os.Open(path)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-
-	rr, err := rardecode.NewReader(f)
-	if err != nil {
-		return err
-	}
-	destDir := app.cfg.ModsPath
-	for {
-		header, err := rr.Next()
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			return err
-		}
-		targetPath, err := safeJoin(destDir, header.Name)
-		if err != nil {
-			continue
-		}
-		if header.IsDir {
-			os.MkdirAll(targetPath, 0755)
-			continue
-		}
-		os.MkdirAll(filepath.Dir(targetPath), 0755)
-		outFile, err := os.Create(targetPath)
-		if err != nil {
-			continue
-		}
-		io.Copy(outFile, rr)
-		outFile.Close()
-	}
-	return nil
-}
-
-func (app *App) extract7z(path string) error {
-	r, err := sevenzip.OpenReader(path)
-	if err != nil {
-		return err
-	}
-	defer r.Close()
-
-	destDir := app.cfg.ModsPath
-	for _, f := range r.File {
-		targetPath, err := safeJoin(destDir, f.Name)
-		if err != nil {
-			continue
-		}
-		if f.FileInfo().IsDir() {
-			os.MkdirAll(targetPath, 0755)
-			continue
-		}
-		os.MkdirAll(filepath.Dir(targetPath), 0755)
-		outFile, err := os.Create(targetPath)
-		if err != nil {
-			continue
-		}
-		rc, err := f.Open()
-		if err != nil {
-			outFile.Close()
-			continue
-		}
-		io.Copy(outFile, rc)
-		rc.Close()
-		outFile.Close()
-	}
-	return nil
-}
-
+// extractArchiveTo распаковывает ZIP, RAR, 7z и другие архивы во временную папку,
+// затем копирует содержимое в destDir через copyPath.
 func (app *App) extractArchiveTo(archivePath, destDir string) error {
-	ext := strings.ToLower(filepath.Ext(archivePath))
-	switch ext {
-	case ".zip":
-		return app.extractZipTo(archivePath, destDir)
-	case ".rar":
-		return app.extractRarTo(archivePath, destDir)
-	case ".7z":
-		return app.extract7zTo(archivePath, destDir)
-	default:
-		return fmt.Errorf(app.messages["error_uns_archive"], ext)
-	}
-}
-
-func (app *App) extractZipTo(path, destDir string) error {
-	r, err := zip.OpenReader(path)
-	if err != nil {
-		return err
-	}
-	defer r.Close()
-	for _, f := range r.File {
-		targetPath, err := safeJoin(destDir, f.Name)
-		if err != nil {
-			continue
-		}
-		if f.FileInfo().IsDir() {
-			os.MkdirAll(targetPath, 0755)
-			continue
-		}
-		os.MkdirAll(filepath.Dir(targetPath), 0755)
-		outFile, _ := os.Create(targetPath)
-		rc, _ := f.Open()
-		if rc != nil {
-			io.Copy(outFile, rc)
-			rc.Close()
-		}
-		outFile.Close()
-	}
-	return nil
-}
-
-func (app *App) extractRarTo(path, destDir string) error {
-	f, err := os.Open(path)
+	f, err := os.Open(archivePath)
 	if err != nil {
 		return err
 	}
 	defer f.Close()
 
-	rr, err := rardecode.NewReader(f)
+	// Определяем формат архива по сигнатуре
+	format, _, err := archives.Identify(context.Background(), archivePath, f)
+	if err != nil {
+		return fmt.Errorf("unsupported archive format: %w", err)
+	}
+	extractor, ok := format.(archives.Extractor)
+	if !ok {
+		return fmt.Errorf("format does not support extraction")
+	}
+
+	// Возвращаем указатель в начало файла
+	if _, err := f.Seek(0, io.SeekStart); err != nil {
+		return err
+	}
+
+	// Создаём временную папку для безопасного извлечения
+	tmpDir, err := os.MkdirTemp("", "servo-extract-")
 	if err != nil {
 		return err
 	}
-	for {
-		header, err := rr.Next()
-		if err == io.EOF {
-			break
-		}
+	defer os.RemoveAll(tmpDir)
+
+	// Распаковываем во временную папку
+	err = extractor.Extract(context.Background(), f, func(ctx context.Context, fi archives.FileInfo) error {
+		// Защита от path traversal
+		targetPath, err := safeJoin(tmpDir, fi.NameInArchive)
 		if err != nil {
 			return err
 		}
-		targetPath, err := safeJoin(destDir, header.Name)
+		if fi.IsDir() {
+			return os.MkdirAll(targetPath, 0755)
+		}
+		// Создаём родительские каталоги
+		if err := os.MkdirAll(filepath.Dir(targetPath), 0755); err != nil {
+			return err
+		}
+		out, err := os.Create(targetPath)
 		if err != nil {
-			continue
+			return err
 		}
-		if header.IsDir {
-			os.MkdirAll(targetPath, 0755)
-			continue
-		}
-		os.MkdirAll(filepath.Dir(targetPath), 0755)
-		outFile, err := os.Create(targetPath)
+		defer out.Close()
+		rc, err := fi.Open()
 		if err != nil {
-			continue
+			return err
 		}
-		io.Copy(outFile, rr)
-		outFile.Close()
-	}
-	return nil
-}
-
-func (app *App) extract7zTo(path, destDir string) error {
-	r, err := sevenzip.OpenReader(path)
+		defer rc.Close()
+		_, err = io.Copy(out, rc)
+		return err
+	})
 	if err != nil {
 		return err
 	}
-	defer r.Close()
 
-	for _, f := range r.File {
-		targetPath, err := safeJoin(destDir, f.Name)
-		if err != nil {
-			continue
+	// Копируем содержимое временной папки в целевую директорию
+	entries, err := os.ReadDir(tmpDir)
+	if err != nil {
+		return err
+	}
+	for _, e := range entries {
+		src := filepath.Join(tmpDir, e.Name())
+		dst := filepath.Join(destDir, e.Name())
+		if err := copyPath(src, dst); err != nil {
+			return err
 		}
-		if f.FileInfo().IsDir() {
-			os.MkdirAll(targetPath, 0755)
-			continue
-		}
-		os.MkdirAll(filepath.Dir(targetPath), 0755)
-		outFile, err := os.Create(targetPath)
-		if err != nil {
-			continue
-		}
-		rc, err := f.Open()
-		if err != nil {
-			outFile.Close()
-			continue
-		}
-		io.Copy(outFile, rc)
-		rc.Close()
-		outFile.Close()
 	}
 	return nil
 }
@@ -855,14 +709,10 @@ func (app *App) updateModFromNexus(mod *checks.ModInfo) {
 
 	modIDStr := fmt.Sprintf("%d", modID) // ← оставь эту строку
 
-	fileInfo, err := app.getFileInfoByFolderPattern(modID, mod.Name)
+	fileInfo, err := app.getLatestFileInfoForMod(modID, mod.Name)
 	if err != nil {
-		// fallback на старый метод
-		fileInfo, err = app.getLatestFileInfo(modID)
-		if err != nil {
-			app.appendLog(fmt.Sprintf(app.messages["failed_get_latest_file_id"], err))
-			return
-		}
+		app.appendLog(fmt.Sprintf(app.messages["failed_get_latest_file_id"], err))
+		return
 	}
 
 	directURL, filename, err := app.getPremiumDownloadURL(modIDStr, fmt.Sprintf("%d", fileInfo.ID))
@@ -891,8 +741,8 @@ func (app *App) updateAllModsFromNexus() {
 		if modID == 0 {
 			continue
 		}
-		// Получаем актуальную информацию о последнем файле
-		fileInfo, err := app.getLatestFileInfo(modID)
+		// Получаем актуальную информацию о последнем файле, соответствующем папке
+		fileInfo, err := app.getLatestFileInfoForMod(modID, mod.Name)
 		if err != nil {
 			app.appendLog(fmt.Sprintf(app.messages["log_failed_to_check_update"], mod.Name, err))
 			continue
@@ -928,7 +778,7 @@ func (app *App) updateAllModsFromNexus() {
 	updatedCount := 0
 	for _, mod := range modsToUpdate {
 		app.appendLog(fmt.Sprintf(app.messages["updating_mod"], mod.Name))
-		app.updateModFromNexus(mod) // эта функция уже содержит проверку "already_latest"
+		app.updateModFromNexus(mod)
 		updatedCount++
 	}
 	app.appendLog(fmt.Sprintf(app.messages["update_all_finished"], updatedCount))
@@ -936,16 +786,63 @@ func (app *App) updateAllModsFromNexus() {
 
 // Удалить выбранные моды
 func (app *App) removeSelectedMods() {
-	for _, mod := range app.allMods {
-		if mod.Selected && !mod.IsSystem {
-			checks.RemoveMod(mod.Name)
-			app.appendLog(fmt.Sprintf(app.messages["log_deleted"], mod.Name))
+	var selectedNames []string
+	for _, m := range app.allMods {
+		if m.Selected && !m.IsSystem {
+			selectedNames = append(selectedNames, m.Name)
 		}
 	}
-	app.refreshModList()
+	if len(selectedNames) == 0 {
+		app.appendLog(app.messages["no_mods_selected"])
+		return
+	}
+
+	// Запоминаем первый выбранный мод (по displayedMods)
+	var firstSelectedName string
+	for _, m := range app.displayedMods {
+		if m.Selected {
+			firstSelectedName = m.Name
+			break
+		}
+	}
+
+	// Удаляем каждый мод
+	for _, name := range selectedNames {
+		checks.RemoveMod(name)
+		app.removeModFromData(name)
+	}
+
+	// Обновляем таблицу и счётчик
+	app.updateModCounter()
+	app.modTable.Length = func() (int, int) { return len(app.displayedMods), TableColumnCount }
+	app.modTable.Refresh()
 	app.orderDirty = true
 	app.updateTableBorder()
 	app.appendLog(app.messages["log_selected_mods_removed"])
+
+	// Восстанавливаем выделение
+	if len(app.displayedMods) > 0 {
+		found := false
+		if firstSelectedName != "" {
+			for i, m := range app.displayedMods {
+				if m.Name == firstSelectedName {
+					app.modTable.Select(widget.TableCellID{Row: i, Col: 0})
+					app.modTable.ScrollTo(widget.TableCellID{Row: i, Col: 0})
+					found = true
+					break
+				}
+			}
+		}
+		if !found {
+			app.modTable.Select(widget.TableCellID{Row: 0, Col: 0})
+			app.modTable.ScrollTo(widget.TableCellID{Row: 0, Col: 0})
+		}
+	} else {
+		app.selectedModName = ""
+		app.selectedModIndex.Store(-1)
+		app.updateDescriptionForMod("")
+		app.updateUpDownButtons()
+	}
 }
 
 // Удалить все моды
@@ -1039,7 +936,7 @@ func (app *App) updateAutopatcher() {
 		return
 	}
 
-	modIDStr := fmt.Sprintf("%d", autopatchModID) // ← добавить эту строку
+	modIDStr := fmt.Sprintf("%d", autopatchModID)
 	cacheKey := "709:autopatch"
 	var saved ModVersionInfo
 	if info, exists := app.nexusVersionCache[cacheKey]; exists {
@@ -1157,19 +1054,6 @@ func (app *App) promptUserForVersion(modName string) string {
 	return <-resultChan
 }
 
-// cacheModVersion сохраняет версию мода в кэш (без timestamp, если неизвестен)
-//
-//	func (app *App) cacheModVersion(modID string, folderName string, version string, timestamp int64) {
-//		if version == "" {
-//			return
-//		}
-//		app.nexusVersionCache[modID] = ModVersionInfo{
-//			Timestamp: timestamp,
-//			Version:   version,
-//			Folder:    folderName,
-//		}
-//		app.saveNexusVersionCache()
-//	}
 func (app *App) cacheModVersion(cacheKey, folderName, version string, timestamp int64) {
 	if version == "" {
 		return
@@ -1180,4 +1064,43 @@ func (app *App) cacheModVersion(cacheKey, folderName, version string, timestamp 
 		Folder:    folderName,
 	}
 	app.saveNexusVersionCache()
+}
+
+// removeModFromData удаляет мод из внутренних структур и возвращает индекс, на котором он находился в displayedMods
+func (app *App) removeModFromData(modName string) (indexInDisplayed int, found bool) {
+	// Удаляем из allMods
+	for i, m := range app.allMods {
+		if m.Name == modName {
+			app.allMods = append(app.allMods[:i], app.allMods[i+1:]...)
+			break
+		}
+	}
+	// Удаляем из displayedMods и запоминаем индекс
+	for i, m := range app.displayedMods {
+		if m.Name == modName {
+			indexInDisplayed = i
+			found = true
+			app.displayedMods = append(app.displayedMods[:i], app.displayedMods[i+1:]...)
+			break
+		}
+	}
+	// Если мод был выбран, сбрасываем выделение (оно будет восстановлено позже)
+	if app.selectedModName == modName {
+		app.selectedModName = ""
+		app.selectedModIndex.Store(-1)
+	}
+	return indexInDisplayed, found
+}
+
+func (app *App) updateModCounter() {
+	if app.counterLabel == nil {
+		return
+	}
+	activeCount := 0
+	for _, m := range app.displayedMods {
+		if m.Active {
+			activeCount++
+		}
+	}
+	app.counterLabel.SetText(fmt.Sprintf(app.messages["mods_counter"], len(app.displayedMods), len(app.allMods), activeCount))
 }

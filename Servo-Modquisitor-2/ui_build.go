@@ -709,6 +709,7 @@ func (app *App) buildUI() {
 							}
 							checks.AutoFixMalformed()
 							app.refreshModList()
+							app.selectAndScrollToMod(installedName)
 							modID, _, _ := extractVersionAndModIDFromFilename(p)
 							if modID != 0 && version != "" {
 								cacheKey := fmt.Sprintf("%d:%s", modID, installedName)
@@ -727,19 +728,32 @@ func (app *App) buildUI() {
 		fd.Show()
 	})
 	app.applyTooltip(app.btnInstall, "btn_install_tooltip")
+
+	// В обработчике btnRemove замените блок удаления на следующий:
 	app.btnRemove = NewCustomButton(app.messages["btn_remove"], func() {
 		if app.selectedModName == "" {
 			return
 		}
 		modName := app.selectedModName
 		mod := app.findModByName(modName)
-		if mod == nil {
-			return
-		}
-		if mod.IsSystem {
+		if mod == nil || mod.IsSystem {
 			app.appendLog(app.messages["log_cannot_delete_system"])
 			return
 		}
+
+		// Определяем, какой мод выделить после удаления (по индексу в displayedMods)
+		var nextModName string
+		for i, m := range app.displayedMods {
+			if m.Name == modName {
+				if i+1 < len(app.displayedMods) {
+					nextModName = app.displayedMods[i+1].Name
+				} else if i-1 >= 0 {
+					nextModName = app.displayedMods[i-1].Name
+				}
+				break
+			}
+		}
+
 		app.showConfirmDialog(
 			app.messages["confirm_delete_title"],
 			fmt.Sprintf(app.messages["confirm_delete_text"], mod.Name),
@@ -747,12 +761,43 @@ func (app *App) buildUI() {
 			"btn_no",
 			func(ok bool) {
 				if ok {
+					// Физически удаляем папку
 					checks.RemoveMod(modName)
-					app.removeFromAllMods(modName)
-					app.refreshModList()
+					// Удаляем из внутренних структур
+					oldIndex, _ := app.removeModFromData(modName)
+
+					// Обновляем счётчик и таблицу
+					app.updateModCounter()
+					app.modTable.Length = func() (int, int) { return len(app.displayedMods), TableColumnCount }
+					app.modTable.Refresh()
 					app.orderDirty = true
 					app.updateTableBorder()
 					app.appendLog(fmt.Sprintf(app.messages["log_deleted"], modName))
+
+					// Восстанавливаем выделение и прокрутку
+					if nextModName != "" {
+						for i, m := range app.displayedMods {
+							if m.Name == nextModName {
+								app.modTable.Select(widget.TableCellID{Row: i, Col: 0})
+								app.modTable.ScrollTo(widget.TableCellID{Row: i, Col: 0})
+								break
+							}
+						}
+					} else if len(app.displayedMods) > 0 {
+						newIndex := oldIndex
+						if newIndex >= len(app.displayedMods) {
+							newIndex = len(app.displayedMods) - 1
+						}
+						if newIndex >= 0 {
+							app.modTable.Select(widget.TableCellID{Row: newIndex, Col: 0})
+							app.modTable.ScrollTo(widget.TableCellID{Row: newIndex, Col: 0})
+						}
+					} else {
+						app.selectedModName = ""
+						app.selectedModIndex.Store(-1)
+						app.updateDescriptionForMod("")
+						app.updateUpDownButtons()
+					}
 				}
 			},
 		)
@@ -1102,26 +1147,35 @@ func (app *App) enrichModFromNexus(mod *checks.ModInfo) {
 		return
 	}
 	go func() {
-		defer func() {
-			if r := recover(); r != nil {
-			}
-		}()
-		info, err := app.FetchNexusModInfo(modID, app.getAuthToken())
+		defer func() { recover() }()
+		fileInfo, err := app.getLatestFileInfoForMod(modID, mod.Name)
 		if err != nil {
-			app.appendLog(fmt.Sprintf(app.messages["log_nexus_api_error"], mod.Name, err))
+			// просто логируем, не сохраняем ничего
+			app.appendLog(fmt.Sprintf("Cannot get file info for %s: %v", mod.Name, err))
 			return
 		}
-		mod.NexusVersion = info.Version
-		mod.NexusSummary = info.Summary
-		mod.NexusDownloads = info.Downloads
-		mod.NexusEndorsements = info.Endorsements
-		mod.NexusPictureURL = info.PictureURL
-		if info.Author != "" {
-			mod.Author = info.Author
-		}
-		modID := extractModIDFromURL(mod.URL)
 		cacheKey := fmt.Sprintf("%d:%s", modID, mod.Name)
-		app.nexusLatestVersions[cacheKey] = info.Version
+		app.nexusVersionCache[cacheKey] = ModVersionInfo{
+			Timestamp: fileInfo.UploadedTimestamp,
+			Version:   fileInfo.Version,
+			Folder:    mod.Name,
+		}
+		app.saveNexusVersionCache()
+		app.nexusLatestVersions[cacheKey] = fileInfo.Version
+		if fileInfo.FileName != "" {
+			entry := checks.GetModDBEntry(mod.Name)
+			if entry != nil && entry.NexusFilePattern == "" {
+				// Убираем расширение
+				pattern := fileInfo.FileName
+				if dot := strings.LastIndex(pattern, "."); dot != -1 {
+					pattern = pattern[:dot]
+				}
+				entry.NexusFilePattern = pattern
+				checks.UpdateModDBEntry(*entry)
+				checks.SaveModDatabase()
+				app.appendLog(fmt.Sprintf("Auto-saved file pattern for %s: %s", mod.Name, pattern))
+			}
+		}
 		fyne.Do(func() {
 			if app.selectedModName == mod.Name {
 				app.updateDescriptionForMod(mod.Name)
@@ -1303,10 +1357,20 @@ func (app *App) filterOptions() []string {
 	}
 }
 
+// Выделение всех модов, с учётом фильтра
 func (app *App) selectAllMods(selected bool) {
-	for i := range app.allMods {
-		app.allMods[i].Selected = selected
+	// Создаём карту имён модов, которые сейчас отображаются (с учётом фильтра и поиска)
+	visibleNames := make(map[string]bool)
+	for _, mod := range app.displayedMods {
+		visibleNames[mod.Name] = true
 	}
+	// Проходим по всем модам, но меняем только те, что видны
+	for i := range app.allMods {
+		if visibleNames[app.allMods[i].Name] {
+			app.allMods[i].Selected = selected
+		}
+	}
+	// Обновляем отображение таблицы, чтобы чекбоксы обновились
 	app.filterModList()
 }
 
@@ -1401,5 +1465,24 @@ func (app *App) scheduleEnrich(mod *checks.ModInfo) {
 	}
 	app.enrichDebounce = time.AfterFunc(1500*time.Millisecond, func() {
 		app.enrichModFromNexus(mod)
+	})
+}
+
+// selectAndScrollToMod выделяет мод в таблице и прокручивает к нему
+func (app *App) selectAndScrollToMod(modName string) {
+	if modName == "" {
+		return
+	}
+	// Небольшая задержка, чтобы таблица успела перестроиться после refreshModList()
+	time.AfterFunc(50*time.Millisecond, func() {
+		fyne.Do(func() {
+			for i, m := range app.displayedMods {
+				if m.Name == modName {
+					app.modTable.Select(widget.TableCellID{Row: i, Col: 0})
+					app.modTable.ScrollTo(widget.TableCellID{Row: i, Col: 0})
+					return
+				}
+			}
+		})
 	})
 }

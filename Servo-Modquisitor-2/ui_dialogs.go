@@ -279,7 +279,17 @@ func (app *App) showDownloadDialog(url, filename, modName string, fileInfo *File
 					app.cacheModVersion(cacheKey, installedName, installedVersion, fileInfo.UploadedTimestamp)
 				}
 				if installedName != "" {
-					app.selectModByName(installedName)
+					app.selectAndScrollToMod(installedName)
+				}
+				if modID != "" {
+					mid, err := strconv.Atoi(modID)
+					if err == nil {
+						var fn string
+						if fileInfo != nil {
+							fn = fileInfo.FileName
+						}
+						go app.autoAddModToDatabase(mid, installedName, fn)
+					}
 				}
 			}
 		})

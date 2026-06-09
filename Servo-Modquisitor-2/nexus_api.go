@@ -2,6 +2,7 @@
 package main
 
 import (
+	"Servo-Modquisitor/checks"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -9,6 +10,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"regexp"
 	"sort"
 	"strconv"
 	"strings"
@@ -37,7 +39,10 @@ type FileInfo struct {
 	ID                int
 	Version           string
 	UploadedTimestamp int64
+	FileName          string
 }
+
+var htmlTagRe = regexp.MustCompile(`<[^>]*>`)
 
 // FetchNexusModInfo получает информацию о моде по числовому ID.
 func (app *App) FetchNexusModInfo(modID int, apiKey string) (*NexusModInfo, error) {
@@ -148,7 +153,7 @@ func (app *App) checkNexusUpdates() {
 			continue
 		}
 
-		fileInfo, err := app.getLatestFileInfo(modID)
+		fileInfo, err := app.getLatestFileInfoForMod(modID, mod.Name)
 		if err != nil {
 			// Проверяем, не является ли ошибка 403 (мод недоступен)
 			errMsg := err.Error()
@@ -322,45 +327,6 @@ func (app *App) getFreeDownloadURL(modID, fileID, key, expires string) (string, 
 	return downloadURL, fileName, nil
 }
 
-// parseDownloadResponse общая обработка ответа от download_link.json
-func (app *App) parseDownloadResponse(resp *http.Response, err error) (string, string, error) {
-	if err != nil {
-		return "", "", err
-	}
-	defer resp.Body.Close()
-	respBody, _ := io.ReadAll(resp.Body)
-	snippet := string(respBody)
-	if len(snippet) > 500 {
-		snippet = snippet[:500] + "..."
-	}
-	app.appendLog(fmt.Sprintf("Download API response: %s", snippet))
-
-	if resp.StatusCode != http.StatusOK {
-		return "", "", fmt.Errorf("API error %d: %s", resp.StatusCode, snippet)
-	}
-
-	var mirrors []struct {
-		Name      string `json:"name"`
-		ShortName string `json:"short_name"`
-		URI       string `json:"URI"`
-	}
-	if err := json.Unmarshal(respBody, &mirrors); err != nil || len(mirrors) == 0 {
-		var single struct {
-			Name      string `json:"name"`
-			ShortName string `json:"short_name"`
-			URI       string `json:"URI"`
-		}
-		if err2 := json.Unmarshal(respBody, &single); err2 == nil && single.URI != "" {
-			mirrors = append(mirrors, single)
-		} else {
-			return "", "", fmt.Errorf("unexpected response format: %s", snippet)
-		}
-	}
-	downloadURL := mirrors[0].URI
-	fileName := extractFileNameFromURL(downloadURL)
-	return downloadURL, fileName, nil
-}
-
 // extractFileNameFromURL извлекает имя файла из последнего сегмента пути URL.
 func extractFileNameFromURL(rawURL string) string {
 	u, err := url.Parse(rawURL)
@@ -375,61 +341,11 @@ func extractFileNameFromURL(rawURL string) string {
 	return segments[len(segments)-1]
 }
 
-// getLatestFileID возвращает ID самого свежего файла мода через REST API
-func (app *App) getLatestFileID(modID int) (int, error) {
-	token := app.getAuthToken()
-	if token == "" {
-		return 0, fmt.Errorf("no authentication token")
-	}
-
-	url := fmt.Sprintf(NexusV1Files, modID)
-	req, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		return 0, err
-	}
-
-	if app.cfg.OAuthAccessToken != "" {
-		req.Header.Set("Authorization", "Bearer "+token)
-	} else {
-		req.Header.Set("apikey", token)
-	}
-	req.Header.Set("Application-Name", appName)
-	req.Header.Set("Application-Version", appVersion)
-	req.Header.Set("Referer", NexusMainURL)
-
-	client := &http.Client{Timeout: Timeout10Seconds}
-	resp, err := client.Do(req)
-	if err != nil {
-		return 0, err
-	}
-	defer resp.Body.Close()
-
-	body, _ := io.ReadAll(resp.Body)
-	if resp.StatusCode != http.StatusOK {
-		return 0, fmt.Errorf("HTTP %d: %s", resp.StatusCode, string(body))
-	}
-
-	var result struct {
-		Files []struct {
-			FileID int `json:"file_id"`
-		} `json:"files"`
-	}
-	if err := json.Unmarshal(body, &result); err != nil {
-		return 0, err
-	}
-	if len(result.Files) == 0 {
-		return 0, fmt.Errorf("no files found for mod %d", modID)
-	}
-	// Файлы приходят в порядке убывания даты (новые первыми)
-	return result.Files[0].FileID, nil
-}
-
 func (app *App) getLatestFileInfo(modID int) (*FileInfo, error) {
 	token := app.getAuthToken()
 	if token == "" {
 		return nil, fmt.Errorf("no authentication token")
 	}
-
 	url := fmt.Sprintf(NexusV1Files, modID)
 	req, _ := http.NewRequest("GET", url, nil)
 	if app.cfg.OAuthAccessToken != "" {
@@ -461,6 +377,7 @@ func (app *App) getLatestFileInfo(modID int) (*FileInfo, error) {
 			FileID            int    `json:"file_id"`
 			Version           string `json:"version"`
 			UploadedTimestamp int64  `json:"uploaded_timestamp"`
+			FileName          string `json:"file_name"` // важно!
 		} `json:"files"`
 	}
 	if err := json.Unmarshal(body, &result); err != nil {
@@ -479,6 +396,7 @@ func (app *App) getLatestFileInfo(modID int) (*FileInfo, error) {
 		ID:                newest.FileID,
 		Version:           newest.Version,
 		UploadedTimestamp: newest.UploadedTimestamp,
+		FileName:          newest.FileName,
 	}, nil
 }
 
@@ -517,6 +435,7 @@ func (app *App) getFileInfoByID(modID, fileID string) (*FileInfo, error) {
 		FileID            int    `json:"file_id"`
 		Version           string `json:"version"`
 		UploadedTimestamp int64  `json:"uploaded_timestamp"`
+		FileName          string `json:"file_name"`
 	}
 	if err := json.Unmarshal(body, &result); err != nil {
 		return nil, err
@@ -526,11 +445,10 @@ func (app *App) getFileInfoByID(modID, fileID string) (*FileInfo, error) {
 		ID:                result.FileID,
 		Version:           result.Version,
 		UploadedTimestamp: result.UploadedTimestamp,
+		FileName:          result.FileName,
 	}, nil
 }
 
-// getFileInfoByFolderPattern ищет файл мода, в имени которого содержится folderName.
-// Возвращает самый свежий подходящий файл (по uploaded_timestamp).
 func (app *App) getFileInfoByFolderPattern(modID int, folderName string) (*FileInfo, error) {
 	token := app.getAuthToken()
 	if token == "" {
@@ -569,6 +487,7 @@ func (app *App) getFileInfoByFolderPattern(modID int, folderName string) (*FileI
 			Version           string `json:"version"`
 			UploadedTimestamp int64  `json:"uploaded_timestamp"`
 			FileName          string `json:"file_name"`
+			Name              string `json:"name"`
 		} `json:"files"`
 	}
 	if err := json.Unmarshal(body, &result); err != nil {
@@ -578,51 +497,140 @@ func (app *App) getFileInfoByFolderPattern(modID int, folderName string) (*FileI
 		return nil, fmt.Errorf("no files found for mod %d", modID)
 	}
 
-	// Сортируем по убыванию timestamp (новые первыми)
+	// Определяем шаблон поиска: если в базе есть nexus_file_pattern - используем его, иначе имя папки
+	pattern := folderName
+	if p := checks.GetNexusFilePattern(folderName); p != "" {
+		pattern = p
+	}
+	normalizedPattern := strings.ToLower(strings.ReplaceAll(pattern, " ", "_"))
+
+	// Сортируем файлы по убыванию даты (новые первыми)
 	files := result.Files
 	sort.Slice(files, func(i, j int) bool {
 		return files[i].UploadedTimestamp > files[j].UploadedTimestamp
 	})
 
-	// Нормализуем folderName: заменяем пробелы на подчёркивания, разбиваем на части
-	normalizedFolder := strings.ToLower(strings.ReplaceAll(folderName, " ", "_"))
-	folderParts := strings.Split(normalizedFolder, "_")
-
 	for _, f := range files {
-		name := strings.ToLower(f.FileName)
-		if dot := strings.LastIndex(name, "."); dot != -1 {
-			name = name[:dot]
-		}
-		name = strings.ReplaceAll(name, " ", "_")
-
-		firstPart := name
-		if idx := strings.Index(name, "-"); idx != -1 {
-			firstPart = name[:idx]
-		}
-		firstParts := strings.Split(firstPart, "_")
-
-		if len(firstParts) == len(folderParts) {
-			match := true
-			for i := 0; i < len(folderParts); i++ {
-				if firstParts[i] != folderParts[i] {
-					match = false
-					break
-				}
-			}
-			if match {
-				return &FileInfo{
-					ID:                f.FileID,
-					Version:           f.Version,
-					UploadedTimestamp: f.UploadedTimestamp,
-				}, nil
-			}
+		fileNameLower := strings.ToLower(strings.ReplaceAll(f.FileName, " ", "_"))
+		if strings.Contains(fileNameLower, normalizedPattern) {
+			return &FileInfo{
+				ID:                f.FileID,
+				Version:           f.Version,
+				UploadedTimestamp: f.UploadedTimestamp,
+				FileName:          f.FileName,
+			}, nil
 		}
 	}
-	// Если точного совпадения не найдено - fallback на самый свежий файл
-	newest := files[0]
-	return &FileInfo{
-		ID:                newest.FileID,
-		Version:           newest.Version,
-		UploadedTimestamp: newest.UploadedTimestamp,
-	}, nil
+
+	return nil, fmt.Errorf("no file matching pattern '%s' for folder '%s'", pattern, folderName)
+}
+
+func (app *App) getLatestFileInfoForMod(modID int, folderName string) (*FileInfo, error) {
+	return app.getFileInfoByFolderPattern(modID, folderName)
+}
+
+func cleanDescription(desc string) string {
+	// заменяем различные варианты <br> на перевод строки
+	desc = strings.ReplaceAll(desc, "<br />", "\n")
+	desc = strings.ReplaceAll(desc, "<br/>", "\n")
+	desc = strings.ReplaceAll(desc, "<br>", "\n")
+	// удаляем оставшиеся HTML-теги
+	desc = htmlTagRe.ReplaceAllString(desc, "")
+	return strings.TrimSpace(desc)
+}
+
+// autoAddModToDatabase добавляет информацию о моде в базу mod_database.json,
+// если её там ещё нет, или дополняет отсутствующие поля.
+func (app *App) autoAddModToDatabase(modID int, folderName string, fileName ...string) {
+	// Проверяем, есть ли уже запись в памяти
+	existing := checks.GetModDBEntry(folderName)
+	needUpdate := existing == nil
+	if existing != nil {
+		// Проверяем, каких полей не хватает
+		if existing.Name == nil || checks.PickLocalized(existing.Name, "en") == "" ||
+			existing.Description == nil || checks.PickLocalized(existing.Description, "en") == "" ||
+			existing.Author == "" {
+			needUpdate = true
+		}
+	}
+	if !needUpdate {
+		return // всё уже есть
+	}
+
+	// Получаем данные с Nexus
+	info, err := app.FetchNexusModInfo(modID, app.getAuthToken())
+	if err != nil {
+		app.appendLog(fmt.Sprintf("Auto-add to database failed for %s: %v", folderName, err))
+		return
+	}
+
+	// Создаём или обновляем запись
+	var entry checks.ModDBEntry
+	if existing != nil {
+		entry = *existing // копируем существующие данные
+	} else {
+		entry = checks.ModDBEntry{
+			Folder: folderName,
+			URL:    fmt.Sprintf("https://www.nexusmods.com/warhammer40kdarktide/mods/%d", modID),
+		}
+	}
+	// Если передан fileName и в базе ещё нет nexus_file_pattern — заполняем
+	if len(fileName) > 0 && fileName[0] != "" {
+		if entry.NexusFilePattern == "" {
+			// Убираем расширение
+			pattern := fileName[0]
+			if dot := strings.LastIndex(pattern, "."); dot != -1 {
+				pattern = pattern[:dot]
+			}
+			entry.NexusFilePattern = pattern
+			app.appendLog(fmt.Sprintf("Auto-saved file pattern for %s: %s", folderName, pattern))
+		}
+	}
+	// Заполняем переводами
+	if entry.Name == nil {
+		entry.Name = make(map[string]string)
+	}
+	if entry.Description == nil {
+		entry.Description = make(map[string]string)
+	}
+	if entry.Note == nil {
+		entry.Note = make(map[string]string)
+	}
+	// Устанавливаем английские значения только если они пустые
+	if entry.Name["en"] == "" {
+		entry.Name["en"] = info.Name
+	}
+	if entry.Description["en"] == "" {
+		entry.Description["en"] = cleanDescription(info.Summary)
+	}
+	if entry.Author == "" {
+		entry.Author = info.Author
+	}
+	// Гарантируем наличие ключа "ru" (пустого)
+	if entry.Name["ru"] == "" {
+		entry.Name["ru"] = ""
+	}
+	if entry.Description["ru"] == "" {
+		entry.Description["ru"] = ""
+	}
+	// Гарантируем наличие ключа "en"
+	if _, ok := entry.Note["en"]; !ok {
+		entry.Note["en"] = ""
+	}
+	// Гарантируем наличие ключа "ru"
+	if _, ok := entry.Note["ru"]; !ok {
+		entry.Note["ru"] = ""
+	}
+
+	// Обновляем память и сохраняем
+	checks.UpdateModDBEntry(entry)
+	if err := checks.SaveModDatabase(); err != nil {
+		app.appendLog(fmt.Sprintf("Failed to save mod database: %v", err))
+	} else {
+		app.appendLog(fmt.Sprintf("Mod database updated for %s", folderName))
+		// Перечитываем базу, чтобы UI увидел изменения
+		app.modDatabase = checks.GetModDBList()
+		checks.SetModDatabase(app.modDatabase)
+		app.refreshModList()
+	}
 }

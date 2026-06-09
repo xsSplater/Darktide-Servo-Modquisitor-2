@@ -174,6 +174,27 @@ func (app *App) buildMainMenu() *fyne.MainMenu {
 	})
 	contactMenu := fyne.NewMenu(app.messages["menu_contact"], contactGitHub, contactDiscord, contactDiscordMy)
 
+	// Меню поддержки (Donate)
+	donateBoosty := fyne.NewMenuItem(app.messages["menu_boosty"], func() {
+		u, _ := url.Parse(DonateBoostyURL)
+		_ = app.myApp.OpenURL(u)
+	})
+	donateDonationAlerts := fyne.NewMenuItem(app.messages["menu_donationalerts"], func() {
+		u, _ := url.Parse(DonateDonationAlertsURL)
+		_ = app.myApp.OpenURL(u)
+	})
+	donateCard := fyne.NewMenuItem(app.messages["menu_card"], func() {
+		app.myApp.Clipboard().SetContent(DonateCardNumber)
+		app.tooltipStatus.Show(app.messages["card_copied_tip"])
+		app.tooltipStatus.HideAfterDelay()
+	})
+
+	donateMenu := fyne.NewMenu(app.messages["menu_donate"],
+		donateBoosty,
+		donateDonationAlerts,
+		donateCard,
+	)
+
 	// Show DMLoader and DMFramework
 	showSystemLabel := app.messages["setting_show_system_mods"]
 	if app.cfg.ShowSystemMods {
@@ -206,7 +227,7 @@ func (app *App) buildMainMenu() *fyne.MainMenu {
 		fyne.NewMenuItemSeparator(),
 	)
 
-	return fyne.NewMainMenu(settingsMenu, nexusMenu, updatesMenu, contactMenu)
+	return fyne.NewMainMenu(settingsMenu, nexusMenu, updatesMenu, contactMenu, donateMenu)
 }
 
 func (app *App) changeLanguage(lang string) {

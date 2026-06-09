@@ -4,6 +4,7 @@ package main
 import (
 	"Servo-Modquisitor/checks"
 	"Servo-Modquisitor/sorter"
+	"bufio"
 	"fmt"
 	"image"
 	"image/color"
@@ -12,8 +13,10 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/widget"
 )
 
 func (app *App) containsStr(slice []string, item string) bool {
@@ -270,7 +273,21 @@ func (app *App) runAllChecks() {
 	sorter.CreateLoadOrderFromActive(activeNames, app.cfg.Language)
 
 	// Дописываем неактивные моды, чтобы сохранить их состояние
+
 	loadOrderPath := filepath.Join(app.cfg.ModsPath, FileNameLoadOrder)
+	data, err := os.ReadFile(loadOrderPath)
+	if err == nil {
+		app.appendLogToFile("=== Final load order after sorting ===")
+		scanner := bufio.NewScanner(strings.NewReader(string(data)))
+		for scanner.Scan() {
+			line := scanner.Text()
+			app.appendLogToFile(line)
+		}
+		app.appendLogToFile("=== End of load order ===")
+	} else {
+		app.appendLogToFile(fmt.Sprintf("Failed to read load order file: %v", err))
+	}
+
 	f, err := os.OpenFile(loadOrderPath, os.O_APPEND|os.O_WRONLY, 0644)
 	if err == nil {
 		existing := make(map[string]bool)
@@ -291,13 +308,16 @@ func (app *App) runAllChecks() {
 	}
 	app.appendLog(app.messages["done"])
 
+	// Тихое обновление данных без изменения выделения и прокрутки
+	savedMod := app.selectedModName
+
 	// Финальное обновление UI в зависимости от настройки
 	fyne.Do(func() {
-		if app.cfg.ShowModListAfterSort {
-			app.refreshModList()
-			app.forceRefreshTable()
+		app.refreshModList()
+		app.forceRefreshTable()
 
-			// Открыть файл mod_load_order.txt только если настройка включена
+		if app.cfg.ShowModListAfterSort {
+			// Открыть файл (как было)
 			absPath, _ := filepath.Abs(filepath.Join(app.cfg.ModsPath, FileNameLoadOrder))
 			if _, err := os.Stat(absPath); err == nil {
 				go func() {
@@ -306,22 +326,10 @@ func (app *App) runAllChecks() {
 					}
 				}()
 			}
-		} else {
-			// Тихое обновление данных без изменения выделения и прокрутки
-			savedMod := app.selectedModName
-			app.refreshModList()
-			if savedMod != "" {
-				for i, m := range app.displayedMods {
-					if m.Name == savedMod {
-						app.selectedModName = savedMod
-						app.selectedModIndex.Store(int32(i))
-						app.updateDescriptionForMod(savedMod)
-						break
-					}
-				}
-				app.updateUpDownButtons()
-			}
 		}
+
+		// Восстанавливаем выделение в любом случае
+		app.restoreSelectedMod(savedMod)
 	})
 }
 
@@ -340,4 +348,37 @@ func (app *App) forceRefreshTable() {
 	}
 	// Запрашиваем перерисовку всего окна
 	app.mainWindow.Canvas().Refresh(app.modTable)
+}
+
+// restoreSelectedMod после обновления списка пытается выделить и прокрутить к ранее выбранному моду
+func (app *App) restoreSelectedMod(savedModName string) {
+	if savedModName == "" {
+		return
+	}
+	// Даём время таблице перестроиться после refreshModList()
+	time.AfterFunc(50*time.Millisecond, func() {
+		fyne.Do(func() {
+			for i, m := range app.displayedMods {
+				if m.Name == savedModName {
+					app.modTable.Select(widget.TableCellID{Row: i, Col: 0})
+					app.modTable.ScrollTo(widget.TableCellID{Row: i, Col: 0})
+					// updateDescriptionForMod вызовется автоматически через OnSelected
+					return
+				}
+			}
+			// Если мод не найден (например, был удалён), очищаем выделение
+			app.selectedModName = ""
+			app.selectedModIndex.Store(-1)
+			app.updateDescriptionForMod("")
+			app.updateUpDownButtons()
+		})
+	})
+}
+
+// appendLogToFile пишет сообщение только в файл лога (на английском), без вывода в консоль
+func (app *App) appendLogToFile(msg string) {
+	if app.logFile == nil {
+		return
+	}
+	fmt.Fprintln(app.logFile, time.Now().Format(LogTimeFormat), msg)
 }

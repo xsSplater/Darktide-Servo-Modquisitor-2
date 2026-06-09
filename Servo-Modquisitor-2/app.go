@@ -48,6 +48,9 @@ type Config struct {
 	OAuthAccessToken  string    `json:"oauth_access_token,omitempty"`
 	OAuthRefreshToken string    `json:"oauth_refresh_token,omitempty"`
 	OAuthExpiry       time.Time `json:"oauth_expiry,omitempty"`
+
+	// Размер файла лога в байтах
+	LogFileSizeLimit int64 `json:"log_file_size_limit"`
 }
 
 type ModVersionInfo struct {

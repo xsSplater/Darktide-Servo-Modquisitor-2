@@ -57,7 +57,7 @@ func main() {
 	f, err := os.OpenFile(logPath, os.O_CREATE|os.O_RDWR|os.O_APPEND, 0644)
 	if err == nil {
 		// Проверяем размер файла. Если больше 240 Кб - удаляем, чтобы не засорять систему.
-		if info, err := f.Stat(); err == nil && info.Size() > 240*1024 { // 1*1024*1024 = 1 МБ
+		if info, err := f.Stat(); err == nil && info.Size() > MaxLogFileSize {
 			f.Close()
 			// Удаляем старый файл и создаём новый пустой
 			os.Remove(logPath)
@@ -115,6 +115,7 @@ func main() {
 		func(modName string) bool {
 			return application.isModActive(modName)
 		},
+		func() { fyne.Do(application.refreshModList) },
 	)
 
 	sorter.SetFolderExistsFunc(checks.FolderExists)
@@ -150,6 +151,13 @@ func main() {
 		application.cfg.LastModDatabaseVersion = ""
 	}
 	checks.SetModDatabase(application.modDatabase)
+
+	// Пишем в лог версию проги и основных файлов
+	if application.logFile != nil {
+		fmt.Fprintf(application.logFile, "Program version: %s\n", AppVersion)
+		fmt.Fprintf(application.logFile, "mandatory_obsolete_incompatible_dependencies.json version: %s\n", checks.GetExternalVersion())
+		fmt.Fprintf(application.logFile, "mod_database.json version: %s\n", application.cfg.LastModDatabaseVersion)
+	}
 
 	sorter.LoadSortOrders()
 
@@ -233,7 +241,7 @@ func main() {
 				}
 			},
 			application.messages["btn_open_dml_page"],
-			application.messages["btn_yes"],
+			application.messages["btn_continue"],
 			application.messages["btn_dont_show_again"],
 		)
 	}
@@ -267,5 +275,27 @@ func main() {
 		}()
 		defer application.nxmListener.Close()
 	}
+	// Проверка наличия DML/DMF сразу после запуска
+	go func() {
+		time.Sleep(500 * time.Millisecond) // даём окну отрисоваться
+		fyne.Do(func() {
+			if !checks.FolderExists("base") {
+				application.appendLog(application.messages["log_warn_base_missing"])
+				dialog.ShowInformation(
+					application.messages["window_error_title"],
+					application.messages["missing_base_dml"],
+					application.mainWindow,
+				)
+			}
+			if !checks.FolderExists("dmf") {
+				application.appendLog(application.messages["dmf_missing"])
+				dialog.ShowInformation(
+					application.messages["window_error_title"],
+					application.messages["missing_dmf_dmf"],
+					application.mainWindow,
+				)
+			}
+		})
+	}()
 	application.mainWindow.ShowAndRun()
 }

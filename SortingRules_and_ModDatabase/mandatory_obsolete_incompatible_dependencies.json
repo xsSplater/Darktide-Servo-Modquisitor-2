@@ -1,5 +1,5 @@
 {
-	"version": "0.9.8",
+	"version": "0.9.9",
 
 	"mandatory_order": [
 		"LogMeIn",
@@ -95,8 +95,6 @@
 		"crosshairs_old_remap",
 		"CThruShields",
 		"CurioEvaluator",
-		"CustomCrit",
-		"CustomCrit1Sound",
 		"CustomResolutions",
 
 		"DarkCache",
@@ -109,7 +107,7 @@
 
 		"graphics_options",
 
-		"Height Changer",
+		"height_changer",
 		"heretical_idol_marker",
 
 		"IgnorePsykerGrenades",
@@ -122,12 +120,12 @@
 		"LessAnnoyingFx",
 
 		"material_markers",
-		"minimap",
 		"ModificationIconColor",
 		"MultipleKeybinds",
 		"MuteInBackground",
 		"MutePerilSounds",
 
+		"Nakedtide",
 		"no_chitchat",
 		"NoLetterbox",
 		"NoSkull",
@@ -174,6 +172,7 @@
 		"weapon_customization_plugin",
 		"weapon_customization_plugin_xsSythes",
 		"weapon_customization_syn_edits",
+		"what_are_you",
 		"which_book",
 		"WhichMissions",
 
@@ -256,6 +255,23 @@
 				"desc": {
 					"en": "🔴 Conflict:\nRadar  ⚔ Minimap.\nRadar includes Minimap functionality.",
 					"ru": "🔴 Конфликт:\nRadar  ⚔ Minimap.\nRadar содержит в себе функционал Minimap."}},
+
+		{"mod1": "CustomColorChat",
+			"mod2": "NoChatColours",
+				"desc": {
+					"en": "🔴 Conflict:\nCustom Color Chat  ⚔ No Chat Colours.\nMutually exclusive mods.",
+					"ru": "🔴 Конфликт:\nCustom Color Chat  ⚔ No Chat Colours.\nВзаимоисключающие моды."}},
+
+		{"mod1": "ChatGremlin",
+			"mod2": "CustomColorChat",
+				"desc": {
+					"en": "🔴 Conflict:\nChat Gremlin  ⚔ Custom Color Chat.\nMutually exclusive mods.",
+					"ru": "🔴 Конфликт:\nChat Gremlin  ⚔ Custom Color Chat.\nВзаимоисключающие моды."}},
+		{"mod1": "ChatGremlin",
+			"mod2": "NoChatColours",
+				"desc": {
+					"en": "🔴 Conflict:\nChat Gremlin  ⚔ No Chat Colours.\nMutually exclusive mods.",
+					"ru": "🔴 Конфликт:\nChat Gremlin  ⚔ No Chat Colours.\nВзаимоисключающие моды."}},
 
 		{"mod1": "Archivum Messelina",
 			"mod2": "ImprovedPenanceTracking",
@@ -488,6 +504,11 @@
 				"desc": {
 					"en": "Markers Improved AIO includes functionality of Stimms Pickup Icon.",
 					"ru": "Markers Improved AIO включает функциональность Stimms Pickup Icon."}},
+		{"mod1": "markers_aio",
+			"mod2": "CollectibleFinder",
+				"desc": {
+					"en": "Markers Improved AIO includes functionality of Collectible Finder.",
+					"ru": "Markers Improved AIO включает функциональность Collectible Finder."}},
 
 		{"mod1": "NumericUI",
 			"mod2": "RemoveTagSkulls",
@@ -528,7 +549,6 @@
 		{"required": "WhatTheLocalization",
 			"dependent": "RevertRenamesUnlockedAndLoaded",
 				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/163"},
-
 		{"required": "WhatTheLocalization",
 			"dependent": "UkrainianLocalization",
 				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/163"},
