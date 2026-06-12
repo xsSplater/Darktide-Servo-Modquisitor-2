@@ -1155,25 +1155,21 @@ func (app *App) enrichModFromNexus(mod *checks.ModInfo) {
 			return
 		}
 		cacheKey := fmt.Sprintf("%d:%s", modID, mod.Name)
-		app.nexusVersionCache[cacheKey] = ModVersionInfo{
-			Timestamp: fileInfo.UploadedTimestamp,
-			Version:   fileInfo.Version,
-			Folder:    mod.Name,
-		}
-		app.saveNexusVersionCache()
+		// app.nexusVersionCache[cacheKey] = ModVersionInfo{ // ЛОМАЕТ ОБНОВЛЕНИЯ И ПРОВЕРКИ
+		// 	Timestamp: fileInfo.UploadedTimestamp,
+		// 	Version:   fileInfo.Version,
+		// 	Folder:    mod.Name,
+		// }
+		// app.saveNexusVersionCache()
 		app.nexusLatestVersions[cacheKey] = fileInfo.Version
 		if fileInfo.FileName != "" {
 			entry := checks.GetModDBEntry(mod.Name)
 			if entry != nil && entry.NexusFilePattern == "" {
-				// Убираем расширение
-				pattern := fileInfo.FileName
-				if dot := strings.LastIndex(pattern, "."); dot != -1 {
-					pattern = pattern[:dot]
-				}
+				pattern := makeStablePattern(fileInfo.FileName, modID)
 				entry.NexusFilePattern = pattern
 				checks.UpdateModDBEntry(*entry)
 				checks.SaveModDatabase()
-				app.appendLog(fmt.Sprintf("Auto-saved file pattern for %s: %s", mod.Name, pattern))
+				app.appendLog(fmt.Sprintf("Auto-saved stable file pattern for %s: %s", mod.Name, pattern))
 			}
 		}
 		fyne.Do(func() {
@@ -1348,6 +1344,7 @@ func (app *App) filterModList() {
 	if app.counterLabel != nil {
 		app.counterLabel.SetText(fmt.Sprintf(app.messages["mods_counter"], len(app.displayedMods), len(app.allMods), activeCount))
 	}
+	app.forceRefreshTable()
 }
 
 func (app *App) filterOptions() []string {

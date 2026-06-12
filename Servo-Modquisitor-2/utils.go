@@ -382,3 +382,23 @@ func (app *App) appendLogToFile(msg string) {
 	}
 	fmt.Fprintln(app.logFile, time.Now().Format(LogTimeFormat), msg)
 }
+
+// makeStablePattern генерирует стабильный паттерн из имени файла и modID.
+// Ищет в имени файла подстроку "-<modID>" (с дефисом перед ID),
+// затем обрезает всё после ID (включая сам ID).
+// Если не находит, возвращает имя файла без расширения (запасной вариант).
+func makeStablePattern(fileName string, modID int) string {
+	// Удаляем расширение
+	base := fileName
+	if dot := strings.LastIndex(base, "."); dot != -1 {
+		base = base[:dot]
+	}
+	search := fmt.Sprintf("-%d", modID) // ищем "-881"
+	idx := strings.Index(base, search)
+	if idx != -1 {
+		// Берём всё до найденной подстроки (без ID)
+		return base[:idx+len(search)] // оставляем дефис и ID
+	}
+	// Если не нашли, возвращаем как есть
+	return base
+}

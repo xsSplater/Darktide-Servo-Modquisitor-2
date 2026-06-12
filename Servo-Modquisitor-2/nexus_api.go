@@ -577,15 +577,13 @@ func (app *App) autoAddModToDatabase(modID int, folderName string, fileName ...s
 	// Если передан fileName и в базе ещё нет nexus_file_pattern — заполняем
 	if len(fileName) > 0 && fileName[0] != "" {
 		if entry.NexusFilePattern == "" {
-			// Убираем расширение
-			pattern := fileName[0]
-			if dot := strings.LastIndex(pattern, "."); dot != -1 {
-				pattern = pattern[:dot]
-			}
+			// Вместо полного имени файла, сохраняем обрезанный стабильный паттерн
+			pattern := makeStablePattern(fileName[0], modID)
 			entry.NexusFilePattern = pattern
-			app.appendLog(fmt.Sprintf("Auto-saved file pattern for %s: %s", folderName, pattern))
+			app.appendLog(fmt.Sprintf("Auto-saved stable file pattern for %s: %s", folderName, pattern))
 		}
 	}
+
 	// Заполняем переводами
 	if entry.Name == nil {
 		entry.Name = make(map[string]string)

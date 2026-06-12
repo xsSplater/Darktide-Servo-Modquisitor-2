@@ -1,5 +1,5 @@
 {
-	"version": "0.9.9",
+	"version": "0.9.9.3",
 
 	"mandatory_order": [
 		"LogMeIn",
@@ -22,6 +22,11 @@
 
 		{"before": "true_level",
 			"after": "teammate_tracker"},
+
+		{"before": "true_level",
+			"after": "ColorSelection"},
+		{"before": "who_are_you",
+			"after": "ColorSelection"},
 
 		{"before": "ChatBlock",
 			"after": "guarantee_ability_activation"},

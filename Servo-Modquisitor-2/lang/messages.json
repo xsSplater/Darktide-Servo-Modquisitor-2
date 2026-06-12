@@ -3751,6 +3751,34 @@
 		"es": "🌚 Repositorio del programa [GitHub]",
 	 "pt-BR": "🌚 Repositório do programa [GitHub]"
 	},
+	"menu_guides": {
+		"en": "[ 🎥 Guides ]",
+		"ru": "[ 🎥 Гайды ]",
+   "zh-hans": "[ 🎥 指南 ]",
+   "zh-hant": "[ 🎥 指南 ]",
+		"de": "[ 🎥 Anleitungen ]",
+		"fr": "[ 🎥 Guides ]",
+		"ja": "[ 🎥 ガイド ]",
+		"ko": "[ 🎥 가이드 ]",
+		"it": "[ 🎥 Guide ]",
+		"pl": "[ 🎥 Poradniki ]",
+		"es": "[ 🎥 Guías ]",
+	 "pt-BR": "[ 🎥 Guias ]"
+	},
+	"menu_guides_video_hti": {
+		"en": "Install mods in under 4 minutes! | Subtitles on",
+		"ru": "Установите моды менее чем за 4 минуты! | Субтитры включены",
+   "zh-hans": "在4分钟内安装模组！ | 字幕已开启",
+   "zh-hant": "在4分鐘內安裝模組！ | 字幕已開啟",
+		"de": "Mods in unter 4 Minuten installieren! | Untertitel eingeschaltet",
+		"fr": "Installez des mods en moins de 4 minutes ! | Sous-titres activés",
+		"ja": "4分未満でMODをインストール！ | 字幕オン",
+		"ko": "4분 이내에 모드 설치! | 자막 켜짐",
+		"it": "Installa le mod in meno di 4 minuti! | Sottotitoli attivati",
+		"pl": "Zainstaluj mody w mniej niż 4 minuty! | Napisy włączone",
+		"es": "¡Instala mods en menos de 4 minutos! | Subtítulos activados",
+	 "pt-BR": "Instale mods em menos de 4 minutos! | Legendas ativadas"
+	},
 	"menu_language": {
 		"en": "😛 Language",
 		"ru": "😛 Язык",

@@ -174,6 +174,13 @@ func (app *App) buildMainMenu() *fyne.MainMenu {
 	})
 	contactMenu := fyne.NewMenu(app.messages["menu_contact"], contactGitHub, contactDiscord, contactDiscordMy)
 
+	// Guides
+	guidesItem := fyne.NewMenuItem(app.messages["menu_guides_video_hti"], func() {
+		u, _ := url.Parse(YouTubeGuideURL)
+		_ = app.myApp.OpenURL(u)
+	})
+	guidesMenu := fyne.NewMenu(app.messages["menu_guides"], guidesItem)
+
 	// Меню поддержки (Donate)
 	donateBoosty := fyne.NewMenuItem(app.messages["menu_boosty"], func() {
 		u, _ := url.Parse(DonateBoostyURL)
@@ -227,7 +234,8 @@ func (app *App) buildMainMenu() *fyne.MainMenu {
 		fyne.NewMenuItemSeparator(),
 	)
 
-	return fyne.NewMainMenu(settingsMenu, nexusMenu, updatesMenu, contactMenu, donateMenu)
+	// Строка меню
+	return fyne.NewMainMenu(settingsMenu, nexusMenu, updatesMenu, contactMenu, guidesMenu, donateMenu)
 }
 
 func (app *App) changeLanguage(lang string) {
