@@ -109,9 +109,21 @@ func (app *App) refreshModList() {
 					if other == regMods[i].Name {
 						other = pair.Mod2
 					}
-					// Только короткая запись в Note
-					regMods[i].Note = strings.TrimSpace(regMods[i].Note + app.messages["conflict_with"] + other)
-					break
+					if checks.FolderExists(other) {
+						// Определяем, на каком языке показывать имя конфликтующего мода
+						lang := app.cfg.Language
+						if app.cfg.ForceEnglishModNames {
+							lang = "en"
+						}
+						displayName := other
+						if entry := checks.GetModDBEntry(other); entry != nil {
+							if name := checks.PickLocalized(entry.Name, lang); name != "" {
+								displayName = name
+							}
+						}
+						regMods[i].Note = strings.TrimSpace(regMods[i].Note + app.messages["conflict_with"] + displayName)
+						break
+					}
 				}
 			}
 		}
@@ -599,100 +611,100 @@ func (app *App) InstallModFromArchive(archivePath string, activate bool, knownVe
 		return "", "", err
 	}
 
+	// Нормализуем структуру архива
+	if err := app.normalizeArchiveStructure(tmpDir); err != nil {
+		app.appendLog(fmt.Sprintf("Normalization failed: %v", err))
+		return "", "", err
+	}
+
 	entries, err := os.ReadDir(tmpDir)
 	if err != nil {
 		return "", "", err
 	}
 
-	// ========= СПЕЦИАЛЬНЫЙ ФИКС ДЛЯ МОДА pulsing_barrels =========
-	// Если в корне временной папки есть файл pulsing_barrels.mod, значит мод распакован без отдельной папки.
-	// Создаём папку pulsing_barrels и перемещаем туда всё содержимое.
-	hasModFile := false
+	// Копируем все папки (моды) из временной папки
+	var installedNames []string
 	for _, e := range entries {
-		if e.Name() == "pulsing_barrels.mod" {
-			hasModFile = true
-			break
+		if !e.IsDir() {
+			continue
 		}
-	}
-	if hasModFile {
-		modFolderName := "pulsing_barrels"
-		newModPath := filepath.Join(tmpDir, modFolderName)
-		if err := os.MkdirAll(newModPath, 0755); err == nil {
-			// Перемещаем все файлы и папки из tmpDir в новую подпапку
-			for _, e := range entries {
-				src := filepath.Join(tmpDir, e.Name())
-				dst := filepath.Join(newModPath, e.Name())
-				_ = os.Rename(src, dst)
-			}
-			// Обновляем список entries - теперь там должна быть одна папка
-			entries, err = os.ReadDir(tmpDir)
-			if err != nil {
-				return "", "", err
-			}
-			app.appendLog(app.messages["log_fix_pulsing_barrels"])
+		modName := e.Name()
+		// Защита от случайной установки системных папок
+		if modName == "base" || modName == "dmf" {
+			app.appendLog(fmt.Sprintf("Skipping system folder %s", modName))
+			continue
 		}
-	}
-	// ========= КОНЕЦ ФИКСА =========
-
-	for _, e := range entries {
-		if e.IsDir() {
-			modName := e.Name()
-			// ========= Фикс кривой папки hub_hotkey_menus-main =========
-			if modName == "hub_hotkey_menus-main" {
-				newName := "hub_hotkey_menus"
-				oldPath := filepath.Join(tmpDir, modName)
-				newPath := filepath.Join(tmpDir, newName)
-				if err := os.Rename(oldPath, newPath); err == nil {
-					app.appendLog(fmt.Sprintf(app.messages["log_fix_hub_hk_menus_temp"], modName, newName))
-					modName = newName
-				} else {
-					app.appendLog(fmt.Sprintf(app.messages["log_failed_fix_hub_hkm_temp"], modName, err))
-				}
-			}
-			// ========= КОНЕЦ ФИКСА =========
-			dest := filepath.Join(app.cfg.ModsPath, modName)
-			app.appendLog(fmt.Sprintf(app.messages["log_moving_folder"], modName, dest))
-			if err := app.copyFolder(filepath.Join(tmpDir, modName), dest); err != nil {
-				app.appendLog(fmt.Sprintf(app.messages["log_failed_copy"], err))
-				return "", "", err
-			}
-
-			// Определяем версию мода
-			version := knownVersion
-			if version == "" {
-				// Пытаемся извлечь из имени архива
-				_, extractedVersion, ok := extractVersionAndModIDFromFilename(archivePath)
-				if ok && extractedVersion != "" {
-					version = extractedVersion
-				} else {
-					// Спрашиваем у пользователя
-					version = app.promptUserForVersion(modName)
-				}
-			}
-
-			if !activate {
-				app.refreshModList()
-				for i := range app.allMods {
-					if app.allMods[i].Name == modName {
-						app.allMods[i].Active = false
-						break
-					}
-				}
-				app.filterModList()
-				app.orderDirty = true
-				app.updateTableBorder()
-				app.appendLog(fmt.Sprintf(app.messages["log_installed_inactive"], modName))
-				return modName, version, nil
+		// Фикс для hub_hotkey_menus-main
+		if modName == "hub_hotkey_menus-main" {
+			newName := "hub_hotkey_menus"
+			oldPath := filepath.Join(tmpDir, modName)
+			newPath := filepath.Join(tmpDir, newName)
+			if err := os.Rename(oldPath, newPath); err == nil {
+				app.appendLog(fmt.Sprintf(app.messages["log_fix_hub_hk_menus_temp"], modName, newName))
+				modName = newName
 			} else {
-				app.refreshModList()
-				app.orderDirty = true
-				app.updateTableBorder()
-				app.appendLog(fmt.Sprintf(app.messages["log_installed"], modName))
-				return modName, version, nil
+				app.appendLog(fmt.Sprintf(app.messages["log_failed_fix_hub_hkm_temp"], modName, err))
 			}
 		}
+		dest := filepath.Join(app.cfg.ModsPath, modName)
+		app.appendLog(fmt.Sprintf(app.messages["log_moving_folder"], modName, dest))
+		if err := app.copyFolder(filepath.Join(tmpDir, modName), dest); err != nil {
+			app.appendLog(fmt.Sprintf(app.messages["log_failed_copy"], err))
+			return "", "", err
+		}
+		installedNames = append(installedNames, modName)
 	}
-	return "", "", fmt.Errorf(app.messages["log_no_mod_folder_found"], err)
+
+	if len(installedNames) == 0 {
+		return "", "", fmt.Errorf(app.messages["log_no_mod_folder_found"], err)
+	}
+
+	installedName := installedNames[0] // для обратной совместимости возвращаем первый
+
+	// Определяем версию (только для первого мода)
+	version := knownVersion
+	if version == "" {
+		_, extractedVersion, _ := extractVersionAndModIDFromFilename(archivePath)
+		if extractedVersion != "" {
+			version = extractedVersion
+		} else {
+			version = app.promptUserForVersion(installedName)
+		}
+	}
+
+	// Обновляем UI
+	fyne.Do(func() {
+		app.refreshModList()
+		if activate {
+			// Активируем все установленные моды? По умолчанию включаем только первый
+			for i := range app.allMods {
+				if app.allMods[i].Name == installedName {
+					app.allMods[i].Active = true
+					break
+				}
+			}
+			app.orderDirty = true
+			app.updateTableBorder()
+			app.filterModList()
+			app.appendLog(fmt.Sprintf(app.messages["log_installed"], archivePath))
+		} else {
+			app.appendLog(fmt.Sprintf(app.messages["log_installed_inactive"], installedName))
+		}
+		app.selectAndScrollToMod(installedName)
+	})
+
+	// Кэшируем версию для первого мода
+	if modID, _, _ := extractVersionAndModIDFromFilename(archivePath); modID != 0 && version != "" {
+		cacheKey := fmt.Sprintf("%d:%s", modID, installedName)
+		app.cacheModVersion(cacheKey, installedName, version, 0)
+	}
+
+	// Автоматически добавляем в базу данных
+	if modID, _, _ := extractVersionAndModIDFromFilename(archivePath); modID != 0 {
+		go app.autoAddModToDatabase(modID, installedName)
+	}
+
+	return installedName, version, nil
 }
 
 // Обновление одного мода. Только для Premium-пользователей!
@@ -1103,4 +1115,117 @@ func (app *App) updateModCounter() {
 		}
 	}
 	app.counterLabel.SetText(fmt.Sprintf(app.messages["mods_counter"], len(app.displayedMods), len(app.allMods), activeCount))
+}
+
+// normalizeArchiveStructure исправляет типичные ошибки упаковки модов:
+// 1. Автор пошёл во все тяжкие и закинул даже папку mods в другую папку Folder/mods/ModName/, что даёт папку Folder в mods. Убираем всё до ModName/.
+// 2. Лишняя папка mods в архиве - mods/ModName, что даёт mods/mods/ModName в итоге. Поднимаем содержимое на уровень выше.
+// 3. Отсутствие корневой папки мода ModName/, что даёт папку "scripts" вместе с файлом "ModName.mod" в mods. Cоздаём папку по имени ".mod" файла и перемещает туда всё.
+func (app *App) normalizeArchiveStructure(tmpDir string) error {
+	// Этап 1: убираем внешние обёртки вида "Folder/mods/..."
+	for {
+		entries, err := os.ReadDir(tmpDir)
+		if err != nil {
+			break
+		}
+		if len(entries) != 1 || !entries[0].IsDir() {
+			break
+		}
+		outerDir := entries[0].Name()
+		outerPath := filepath.Join(tmpDir, outerDir)
+		innerEntries, err := os.ReadDir(outerPath)
+		if err != nil {
+			break
+		}
+		var modsPath string
+		for _, e := range innerEntries {
+			if e.IsDir() && strings.EqualFold(e.Name(), "mods") {
+				modsPath = filepath.Join(outerPath, e.Name())
+				break
+			}
+		}
+		if modsPath == "" {
+			break
+		}
+		// Перемещаем всё содержимое modsPath в tmpDir
+		subEntries, err := os.ReadDir(modsPath)
+		if err != nil {
+			break
+		}
+		for _, sub := range subEntries {
+			src := filepath.Join(modsPath, sub.Name())
+			dst := filepath.Join(tmpDir, sub.Name())
+			if err := os.Rename(src, dst); err != nil {
+				if err := copyPath(src, dst); err != nil {
+					return err
+				}
+				os.RemoveAll(src)
+			}
+		}
+		os.RemoveAll(outerPath)
+	}
+
+	// Этап 2: если в корне единственная папка "mods" - поднимаем её содержимое
+	entries, err := os.ReadDir(tmpDir)
+	if err != nil {
+		return err
+	}
+	if len(entries) == 1 && entries[0].IsDir() && strings.EqualFold(entries[0].Name(), "mods") {
+		modsDir := filepath.Join(tmpDir, entries[0].Name())
+		subEntries, err := os.ReadDir(modsDir)
+		if err != nil {
+			return err
+		}
+		for _, sub := range subEntries {
+			src := filepath.Join(modsDir, sub.Name())
+			dst := filepath.Join(tmpDir, sub.Name())
+			if err := os.Rename(src, dst); err != nil {
+				if err := copyPath(src, dst); err != nil {
+					return err
+				}
+				os.RemoveAll(src)
+			}
+		}
+		os.Remove(modsDir)
+		entries, err = os.ReadDir(tmpDir) // обновляем список
+		if err != nil {
+			return err
+		}
+	}
+
+	// Этап 3: если нет ни одной папки, но есть .mod файл - создаём папку мода и перемещаем всё в неё
+	hasFolder := false
+	var modFile string
+	for _, e := range entries {
+		if e.IsDir() {
+			hasFolder = true
+			break
+		}
+		if !e.IsDir() && strings.HasSuffix(strings.ToLower(e.Name()), ".mod") {
+			if modFile == "" {
+				modFile = e.Name()
+			}
+		}
+	}
+	if !hasFolder && modFile != "" {
+		modName := strings.TrimSuffix(modFile, ".mod")
+		newDir := filepath.Join(tmpDir, modName)
+		if err := os.Mkdir(newDir, 0755); err != nil {
+			return err
+		}
+		for _, e := range entries {
+			src := filepath.Join(tmpDir, e.Name())
+			dst := filepath.Join(newDir, e.Name())
+			if e.Name() == modName {
+				continue
+			}
+			if err := os.Rename(src, dst); err != nil {
+				if err := copyPath(src, dst); err != nil {
+					return err
+				}
+				os.RemoveAll(src)
+			}
+		}
+	}
+	return nil
 }

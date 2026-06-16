@@ -1122,6 +1122,10 @@ func (app *App) updateDescriptionForMod(name string) {
 				if other == mod.Name {
 					other = pair.Mod2
 				}
+				// Показываем только если второй мод реально установлен
+				if !checks.FolderExists(other) {
+					continue
+				}
 				desc := checks.GetIncompatibleDesc(pair.Mod1, pair.Mod2)
 				if desc != "" {
 					app.descConflict.SetText(desc)

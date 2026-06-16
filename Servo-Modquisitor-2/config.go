@@ -11,7 +11,7 @@ import (
 // ───────────── Программа ─────────────────────────────────────────
 const (
 	AppName         = "Servo-Modquisitor-2"
-	AppVersion      = "1.7.0"
+	AppVersion      = "1.7.5"
 	AppID           = "com.xssplater.servo-modquisitor"
 	AppIcon         = "assets/icon.png"
 	СonfigFolderSMQ = "Servo-Modquisitor"
@@ -130,7 +130,7 @@ const (
 
 const (
 	TableBackgroundImage   = "assets/mechanicus.png"
-	TableBackgroundOpacity = 0.98 // 1.00 - невидимый, 0 - видимый
+	TableBackgroundOpacity = 0.97 // 1.00 - невидимый, 0 - видимый
 )
 
 const (

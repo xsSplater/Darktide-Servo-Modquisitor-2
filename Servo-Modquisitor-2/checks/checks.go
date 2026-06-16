@@ -464,6 +464,7 @@ type IncompatiblePair struct {
 	Mod1 string            `json:"mod1"`
 	Mod2 string            `json:"mod2"`
 	Desc map[string]string `json:"desc"`
+	Type string            `json:"type,omitempty"` // "includes" (по умолчанию), "same", или пусто
 }
 type Dependency struct{ Dependent, Required, RequiredURL string }
 
@@ -916,14 +917,45 @@ func PickLocalized(tr map[string]string, lang string) string {
 }
 
 // GetIncompatibleDesc возвращает локализованное описание конфликта для пары модов.
+//
+//	func GetIncompatibleDesc(mod1, mod2 string) string {
+//		for _, pair := range IncompatiblePairs {
+//			if (pair.Mod1 == mod1 && pair.Mod2 == mod2) || (pair.Mod1 == mod2 && pair.Mod2 == mod1) {
+//				desc := PickLocalized(pair.Desc, currentLang)
+//
+//	if appendLog != nil {
+//		   appendLog(fmt.Sprintf("DEBUG: GetIncompatibleDesc found desc='%s'", desc))
+//	}
+//
+//				return desc
+//			}
+//		}
+//		return ""
+//	}
 func GetIncompatibleDesc(mod1, mod2 string) string {
 	for _, pair := range IncompatiblePairs {
 		if (pair.Mod1 == mod1 && pair.Mod2 == mod2) || (pair.Mod1 == mod2 && pair.Mod2 == mod1) {
-			desc := PickLocalized(pair.Desc, currentLang)
-			// if appendLog != nil {
-			//	   appendLog(fmt.Sprintf("DEBUG: GetIncompatibleDesc found desc='%s'", desc))
-			// }
-			return desc
+			// Если есть готовое описание - используем его
+			if pair.Desc != nil {
+				if desc := PickLocalized(pair.Desc, currentLang); desc != "" {
+					return desc
+				}
+			}
+			// Иначе генерируем по шаблону
+			name1 := getDisplayName(mod1, currentLang)
+			name2 := getDisplayName(mod2, currentLang)
+			// Выбираем шаблон в зависимости от типа конфликта
+			templateKey := "conflict_template_includes" // по умолчанию "includes functionality"
+			if pair.Type == "same" || pair.Type == "do_the_same" {
+				templateKey = "conflict_template_same"
+			}
+			if messages != nil {
+				if tmpl, ok := (*messages)[templateKey]; ok {
+					return strings.ReplaceAll(strings.ReplaceAll(tmpl, "{mod1}", name1), "{mod2}", name2)
+				}
+			}
+			// Fallback на английский, если сообщения нет
+			return fmt.Sprintf("🔴 Conflict:\n%s  ⚔ %s.\nThese mods conflict with each other.", name1, name2)
 		}
 	}
 	return ""
@@ -1057,4 +1089,14 @@ func FolderExistsWithTimeout(name string, timeout time.Duration) bool {
 		appendLog(fmt.Sprintf("Timeout checking %s, assuming missing", name))
 		return false
 	}
+}
+
+// getDisplayName возвращает читаемое имя мода на языке lang (с учётом ForceEnglish в будущем можно расширить, но здесь используем просто lang)
+func getDisplayName(folder string, lang string) string {
+	if entry, ok := modDBMap[strings.ToLower(folder)]; ok {
+		if name := PickLocalized(entry.Name, lang); name != "" {
+			return name
+		}
+	}
+	return folder // fallback на техническое имя
 }
