@@ -2,6 +2,7 @@
 package main
 
 import (
+	"Servo-Modquisitor/checks"
 	"fmt"
 	"image/color"
 	"net/url"
@@ -380,11 +381,14 @@ func (app *App) handleNXMLink(nxmURL string) {
 	}
 	app.lastNxmURL = nxmURL
 	app.lastNxmTime = now
+
 	u, err := url.Parse(nxmURL)
 	if err != nil {
-		// app.appendLog(app.messages["log_invalid_nmx_link"])
+		app.appendLog(app.messages["log_invalid_nxm_link"])
 		return
 	}
+
+	// Парсим modID и fileID из пути
 	segments := strings.Split(strings.Trim(u.Path, "/"), "/")
 	var modID, fileID string
 	for i := 0; i < len(segments)-1; i++ {
@@ -396,12 +400,14 @@ func (app *App) handleNXMLink(nxmURL string) {
 		}
 	}
 	if modID == "" || fileID == "" {
-		// app.appendLog(app.messages["log_invalid_nmx_link"])
+		app.appendLog(app.messages["log_invalid_nxm_link"])
 		return
 	}
+
 	key := u.Query().Get("key")
 	expires := u.Query().Get("expires")
 
+	// === Специальные обработчики для DML, DMF, автопатчера ===
 	if modID == "19" {
 		go func() {
 			var fileInfo *FileInfo
@@ -413,10 +419,8 @@ func (app *App) handleNXMLink(nxmURL string) {
 			var directURL, filename string
 			var err error
 			if key != "" {
-				// app.appendLog(app.messages["download_free_method"])
 				directURL, filename, err = app.getFreeDownloadURL(modID, fileID, key, expires)
 			} else {
-				// app.appendLog(app.messages["download_premium_method"])
 				directURL, filename, err = app.getPremiumDownloadURL(modID, fileID)
 			}
 			if err != nil {
@@ -441,10 +445,8 @@ func (app *App) handleNXMLink(nxmURL string) {
 			var directURL, filename string
 			var err error
 			if key != "" {
-				app.appendLog(app.messages["download_free_method"])
 				directURL, filename, err = app.getFreeDownloadURL(modID, fileID, key, expires)
 			} else {
-				app.appendLog(app.messages["download_premium_method"])
 				directURL, filename, err = app.getPremiumDownloadURL(modID, fileID)
 			}
 			if err != nil {
@@ -458,6 +460,28 @@ func (app *App) handleNXMLink(nxmURL string) {
 		return
 	}
 
+	// === Обработка мода 139 (программа и файлы сортировки) ===
+	if modID == "139" {
+		go func() {
+			var directURL, filename string
+			var err error
+			if key != "" {
+				directURL, filename, err = app.getFreeDownloadURL(modID, fileID, key, expires)
+			} else {
+				directURL, filename, err = app.getPremiumDownloadURL(modID, fileID)
+			}
+			if err != nil {
+				app.appendLog(fmt.Sprintf(app.messages["failed_get_download_link"], err))
+				return
+			}
+
+			// Всегда обрабатываем как специальный архив (определим тип по содержимому)
+			app.handleSpecialNXMArchive(directURL, filename)
+		}()
+		return
+	}
+
+	// === Обычные моды (не 19, 709, 139) ===
 	go func() {
 		var directURL, filename string
 		var err error
@@ -603,4 +627,135 @@ func (app *App) showDMFDownloadDialog(url, filename string, fileInfo *FileInfo) 
 			os.Remove(dest)
 		})
 	}()
+}
+
+// handleSpecialNXMArchive обрабатывает скачанный архив программы или правил (мод 139).
+func (app *App) handleSpecialNXMArchive(downloadURL, filename string) {
+	// Создаём временную папку
+	tmpDir, err := os.MkdirTemp("", "servo-special-")
+	if err != nil {
+		app.appendLog("Failed to create temp dir: " + err.Error())
+		return
+	}
+	defer os.RemoveAll(tmpDir)
+
+	archivePath := filepath.Join(tmpDir, filename)
+
+	// Скачиваем с прогресс-баром
+	app.appendLog("Downloading special archive: " + filename)
+	bar := widget.NewProgressBar()
+	bar.SetValue(0)
+	lbl := widget.NewLabel(fmt.Sprintf("Downloading: %s", filename))
+	content := container.NewVBox(lbl, bar)
+	dlg := dialog.NewCustom("Downloading", "Cancel", content, app.mainWindow)
+	dlg.Show()
+
+	err = app.DownloadFileWithProgress(downloadURL, archivePath, bar)
+	fyne.Do(func() { dlg.Hide() })
+	if err != nil {
+		app.appendLog("Download failed: " + err.Error())
+		return
+	}
+	app.appendLog("Download complete.")
+
+	// Распаковываем во временную папку
+	if err := app.extractArchiveTo(archivePath, tmpDir); err != nil {
+		app.appendLog("Extract failed: " + err.Error())
+		return
+	}
+	app.appendLog("Archive extracted.")
+
+	// Определяем тип архива по содержимому
+	isProgram := false
+	err = filepath.Walk(tmpDir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if !info.IsDir() && strings.HasSuffix(strings.ToLower(info.Name()), ".exe") {
+			isProgram = true
+			return filepath.SkipAll
+		}
+		return nil
+	})
+	if err != nil && err != filepath.SkipAll {
+		app.appendLog("Error scanning archive: " + err.Error())
+		return
+	}
+
+	if isProgram {
+		// === Обновление программы ===
+		// Ищем исполняемый файл (повторно, чтобы получить путь)
+		var exePath string
+		err = filepath.Walk(tmpDir, func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+			if !info.IsDir() && strings.HasSuffix(strings.ToLower(info.Name()), ".exe") {
+				exePath = path
+				return filepath.SkipAll
+			}
+			return nil
+		})
+		if err != nil || exePath == "" {
+			app.appendLog("No executable found in program archive")
+			return
+		}
+
+		// Сохраняем информацию об обновлении в кэш
+		app.nexusVersionCache[NexusCacheKeyProgram] = ModVersionInfo{
+			Timestamp: time.Now().Unix(),
+			Version:   "manual",
+			Folder:    "Program",
+		}
+		app.saveNexusVersionCache()
+
+		// Заменяем текущий exe и перезапускаем
+		currentExe, err := os.Executable()
+		if err != nil {
+			app.appendLog("Cannot locate current executable: " + err.Error())
+			return
+		}
+		app.appendLog("Replacing executable and restarting...")
+		replaceAndRestart(currentExe, exePath)
+	} else {
+		// === Обновление файлов сортировки ===
+		// Копируем mod_database.json и mandatory_obsolete_incompatible_dependencies.json
+		filesCopied := 0
+		for _, fname := range []string{FileNameModDatabase, FileNameMandatoryRules} {
+			src := filepath.Join(tmpDir, fname)
+			dst := filepath.Join(app.cfg.ModsPath, fname)
+			if _, err := os.Stat(src); err == nil {
+				if err := copyFile(src, dst); err != nil {
+					app.appendLog("Failed to copy " + fname + ": " + err.Error())
+					return
+				}
+				filesCopied++
+			} else {
+				app.appendLog("Warning: " + fname + " not found in archive")
+			}
+		}
+		if filesCopied == 0 {
+			app.appendLog("No sorting files found in archive")
+			return
+		}
+
+		// Обновляем кэш
+		app.nexusVersionCache[NexusCacheKeyRules] = ModVersionInfo{
+			Timestamp: time.Now().Unix(),
+			Version:   "manual",
+			Folder:    "Sorting Rules",
+		}
+		app.saveNexusVersionCache()
+
+		// Перезагружаем базы и обновляем UI
+		if err := app.loadModDatabase(FileNameModDatabase); err == nil {
+			checks.SetModDatabase(app.modDatabase)
+		}
+		if err := checks.LoadExternalLists(FileNameMandatoryRules); err == nil {
+			app.cfg.LastMandatoryRulesVersion = checks.GetExternalVersion()
+			saveConfig(app.cfg)
+		}
+		app.refreshModList()
+		app.appendLog("Sorting files updated successfully from Nexus download.")
+	}
 }

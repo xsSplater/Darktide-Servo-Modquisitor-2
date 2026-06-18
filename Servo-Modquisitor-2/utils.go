@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"image"
 	"image/color"
+	"io"
 	"math"
 	"os"
 	"os/exec"
@@ -401,4 +402,20 @@ func makeStablePattern(fileName string, modID int) string {
 	}
 	// Если не нашли, возвращаем как есть
 	return base
+}
+
+// copyFile копирует файл src в dst, перезаписывая существующий.
+func copyFile(src, dst string) error {
+	srcFile, err := os.Open(src)
+	if err != nil {
+		return err
+	}
+	defer srcFile.Close()
+	dstFile, err := os.Create(dst)
+	if err != nil {
+		return err
+	}
+	defer dstFile.Close()
+	_, err = io.Copy(dstFile, srcFile)
+	return err
 }

@@ -11,12 +11,23 @@ import (
 // ───────────── Программа ─────────────────────────────────────────
 const (
 	AppName         = "Servo-Modquisitor-2"
-	AppVersion      = "1.7.5"
+	AppVersion      = "1.8.0"
 	AppID           = "com.xssplater.servo-modquisitor"
 	AppIcon         = "assets/icon.png"
 	СonfigFolderSMQ = "Servo-Modquisitor"
 	DarktideAppID   = "1361210"
 	MaxLogFileSize  = 512 * 1024 // 512 Кб, 1*1024*1024 = 1 Мб
+
+	// Nexus мод для обновлений программы и файлов сортировки
+	NexusModIDForUpdates = 139
+
+	// Паттерны для поиска файлов на Nexus
+	NexusProgramArchivePattern = "Servo Modquisitor 2"      // имя архива с программой
+	NexusRulesArchivePattern   = "Mod DB And Sorting Rules" // имя архива с файлами сортировки
+
+	// Ключи для кэширования версий в nexus_versions.json
+	NexusCacheKeyProgram = "139:program"
+	NexusCacheKeyRules   = "139:rules"
 )
 
 // ───────────── Нексус ────────────────────────────────────────────
@@ -47,12 +58,8 @@ const (
 
 // ───────────── Ссылки ────────────────────────────────────────────
 const (
-	GitHubRepoSMQ     = "https://github.com/xsSplater/Darktide-Servo-Modquisitor-2"
-	GitHubReleaseAPI  = "https://api.github.com/repos/xsSplater/Darktide-Servo-Modquisitor-2/releases/latest"
-	GitHubDownloadURL = "https://github.com/xsSplater/Darktide-Servo-Modquisitor-2/releases/latest/download/servo-modquisitor-2.exe"
-
-	modDatabaseURL  = "https://raw.githubusercontent.com/xsSplater/Darktide-Servo-Modquisitor-2/main/SortingRules_and_ModDatabase/mod_database.json"
-	modMandatoryURL = "https://raw.githubusercontent.com/xsSplater/Darktide-Servo-Modquisitor-2/main/SortingRules_and_ModDatabase/mandatory_obsolete_incompatible_dependencies.json"
+	GitHubRepoSMQ    = "https://github.com/xsSplater/Darktide-Servo-Modquisitor-2"
+	GitHubReleaseAPI = "https://api.github.com/repos/xsSplater/Darktide-Servo-Modquisitor-2/releases/latest"
 
 	DarktideModDML = "https://www.nexusmods.com/warhammer40kdarktide/mods/19"
 	ServoMQModPage = "https://www.nexusmods.com/warhammer40kdarktide/mods/139"

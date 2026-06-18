@@ -218,10 +218,6 @@ func main() {
 
 	go application.ensureSortFiles()
 
-	if application.cfg.UpdateCheckFrequency != "never" && application.shouldCheckUpdates() {
-		go application.updateProgramFromGitHub()
-	}
-
 	// Проверка на AML и предупреждение пользователя (асинхронно)
 	application.amlDetected = checks.IsAMLInstalled(cfg.ModsPath)
 	if application.amlDetected && !cfg.SuppressAMLWarning {

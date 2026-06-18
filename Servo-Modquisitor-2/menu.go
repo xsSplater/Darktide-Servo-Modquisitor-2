@@ -137,26 +137,26 @@ func (app *App) buildMainMenu() *fyne.MainMenu {
 			app.appendLog(fmt.Sprintf(app.messages["log_update_check_frequency_set"], name))
 		}))
 	}
-	periodicSub := fyne.NewMenuItem(app.messages["menu_periodic_check"], nil)
-	periodicSub.ChildMenu = fyne.NewMenu("", freqItems...)
+	// periodicSub := fyne.NewMenuItem(app.messages["menu_periodic_check"], nil)
+	// periodicSub.ChildMenu = fyne.NewMenu("", freqItems...)
 
 	updateProgram := fyne.NewMenuItem(app.messages["menu_update_program"], func() {
 		go app.checkForProgramUpdate() // существующая функция открытия Nexus
 	})
-	updateProgramAuto := fyne.NewMenuItem(app.messages["menu_update_program_auto"], func() {
-		go app.updateProgramFromGitHub()
-	})
-	updateSortFiles := fyne.NewMenuItem(app.messages["menu_update_sort_files"], func() {
-		go app.updateSortFiles()
-	})
+	// updateProgramAuto := fyne.NewMenuItem(app.messages["menu_update_program_auto"], func() {
+	// 	go app.initiateProgramUpdate()
+	// })
+	// updateSortFiles := fyne.NewMenuItem(app.messages["menu_update_sort_files"], func() {
+	// 	go app.initiateSortFilesUpdate()
+	// })
 
 	updatesMenu := fyne.NewMenu(app.messages["menu_updates"],
 		updateProgram,
 		fyne.NewMenuItemSeparator(),
-		updateProgramAuto,
-		updateSortFiles,
-		fyne.NewMenuItemSeparator(),
-		periodicSub,
+		// updateProgramAuto,
+		// updateSortFiles,
+		// fyne.NewMenuItemSeparator(),
+		// periodicSub,
 	)
 
 	// Контакты
