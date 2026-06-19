@@ -2,6 +2,7 @@
 package main
 
 import (
+	"fmt"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -44,18 +45,18 @@ func (app *App) checkForProgramUpdate() {
 
 // initiateProgramUpdate - открывает страницу мода и предлагает скачать программу через Mod manager download.
 func (app *App) initiateProgramUpdate() {
-	app.appendLog("Opening Nexus mod page for program update...")
+	app.appendLog(app.messages["log_open_nexus_page"])
 	u, _ := url.Parse(ServoMQModPage)
 	_ = app.myApp.OpenURL(u)
-	app.appendLog("Please click 'Mod manager download' on the 'Servo Modquisitor 2.zip' file.")
+	app.appendLog(app.messages["log_please_click_smq_zip"])
 }
 
 // initiateSortFilesUpdate - открывает страницу мода и предлагает скачать файлы сортировки через Mod manager download.
 func (app *App) initiateSortFilesUpdate() {
-	app.appendLog("Opening Nexus mod page for sorting files update...")
+	app.appendLog(app.messages["log_open_nexus_page"])
 	u, _ := url.Parse(ServoMQModPage)
 	_ = app.myApp.OpenURL(u)
-	app.appendLog("Please click 'Mod manager download' on the 'Mod DB And Sorting Rules.zip' file.")
+	app.appendLog(app.messages["log_please_click_sort_zip"])
 }
 
 // ensureSortFiles - вызывается при старте, если файлы отсутствуют.
@@ -81,16 +82,16 @@ func (app *App) ensureSortFiles() {
 
 	choice := app.showChoiceDialog(app.mainWindow,
 		app.messages["sort_files_missing"],
-		"Sorting files are missing. Would you like to open the Nexus mod page to download them manually?",
+		app.messages["sort_files_missing_open_page"],
 		app.messages["yes"],
 		app.messages["skip"],
 		app.messages["download_skip_forever"],
 	)
 	switch choice {
 	case 0:
-		u, _ := url.Parse("https://www.nexusmods.com/warhammer40kdarktide/mods/139")
+		u, _ := url.Parse(ServoMQModPage)
 		_ = app.myApp.OpenURL(u)
-		app.appendLog("Please download 'Mod DB And Sorting Rules.zip' and install it manually via drag-and-drop or 'Install Mod' button.")
+		app.appendLog(app.messages["please_download_mod_db_install"])
 	case 2:
 		app.cfg.SkipSortFilesPrompt = true
 		saveConfig(app.cfg)
@@ -98,4 +99,60 @@ func (app *App) ensureSortFiles() {
 	case 1:
 		app.appendLog(app.messages["download_skipped"])
 	}
+}
+
+// checkSpecialUpdates проверяет наличие новых версий программы и файлов сортировки (мод 139).
+func (app *App) checkSpecialUpdates() {
+	// Проверяем, авторизован ли пользователь
+	if app.getAuthToken() == "" {
+		app.appendLog(app.messages["log_spec_update_not_logged"])
+		return
+	}
+
+	// Проверка программы
+	programFileInfo, err := app.getLatestFileInfoForMod(139, "Servo Modquisitor 2")
+	if err != nil {
+		app.logNexusError(err, "Program", app.messages["program_update_unavailable"])
+	} else if programFileInfo != nil {
+		if saved, ok := app.nexusVersionCache[NexusCacheKeyProgram]; ok {
+			if programFileInfo.UploadedTimestamp > saved.Timestamp {
+				app.appendLog(fmt.Sprintf(app.messages["log_new_program_version_available"],
+					programFileInfo.Version, saved.Version))
+			}
+		} else {
+			// Первая проверка — сохраняем информацию
+			app.nexusVersionCache[NexusCacheKeyProgram] = ModVersionInfo{
+				Timestamp: programFileInfo.UploadedTimestamp,
+				Version:   programFileInfo.Version,
+				Folder:    "Program",
+			}
+			app.saveNexusVersionCache()
+			app.appendLog(app.messages["log_version_cached_program"] + programFileInfo.Version)
+		}
+	}
+
+	// Проверка файлов сортировки
+	rulesFileInfo, err := app.getLatestFileInfoForMod(139, "Mod DB And Sorting Rules")
+	if err != nil {
+		app.logNexusError(err, "Rules", app.messages["rules_update_unavailable"])
+	} else if rulesFileInfo != nil {
+		if saved, ok := app.nexusVersionCache[NexusCacheKeyRules]; ok {
+			if rulesFileInfo.UploadedTimestamp > saved.Timestamp {
+				app.appendLog(fmt.Sprintf(app.messages["log_new_sorting_files_available"],
+					rulesFileInfo.Version, saved.Version))
+			}
+		} else {
+			app.nexusVersionCache[NexusCacheKeyRules] = ModVersionInfo{
+				Timestamp: rulesFileInfo.UploadedTimestamp,
+				Version:   rulesFileInfo.Version,
+				Folder:    "Sorting Rules",
+			}
+			app.saveNexusVersionCache()
+			app.appendLog(app.messages["log_version_cached_sort"] + rulesFileInfo.Version)
+		}
+	}
+
+	// Обновляем время последней проверки
+	app.cfg.LastUpdateCheck = time.Now().Format(time.RFC3339)
+	saveConfig(app.cfg)
 }

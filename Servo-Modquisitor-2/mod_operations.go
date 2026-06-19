@@ -11,6 +11,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
@@ -601,19 +602,19 @@ func (app *App) selectModByName(name string) {
 func (app *App) InstallModFromArchive(archivePath string, activate bool, knownVersion string) (string, string, error) {
 	tmpDir, err := os.MkdirTemp("", "servo-mod-")
 	if err != nil {
-		app.appendLog(fmt.Sprintf("Failed to create temp dir: %v", err))
+		app.appendLog(fmt.Sprintf(app.messages["log_update_failed_temp_dir"], err))
 		return "", "", err
 	}
 	defer os.RemoveAll(tmpDir)
 
 	if err := app.extractArchiveTo(archivePath, tmpDir); err != nil {
-		app.appendLog(fmt.Sprintf("Extract failed: %v", err))
+		app.appendLog(fmt.Sprintf(app.messages["log_extract_failed_v"], err))
 		return "", "", err
 	}
 
 	// Нормализуем структуру архива
 	if err := app.normalizeArchiveStructure(tmpDir); err != nil {
-		app.appendLog(fmt.Sprintf("Normalization failed: %v", err))
+		app.appendLog(fmt.Sprintf(app.messages["log_failed_normalize"], err))
 		return "", "", err
 	}
 
@@ -631,7 +632,7 @@ func (app *App) InstallModFromArchive(archivePath string, activate bool, knownVe
 		modName := e.Name()
 		// Защита от случайной установки системных папок
 		if modName == "base" || modName == "dmf" {
-			app.appendLog(fmt.Sprintf("Skipping system folder %s", modName))
+			app.appendLog(fmt.Sprintf(app.messages["log_skipping_sys_folder"], modName))
 			continue
 		}
 		// Фикс для hub_hotkey_menus-main
@@ -723,7 +724,7 @@ func (app *App) updateModFromNexus(mod *checks.ModInfo) {
 
 	fileInfo, err := app.getLatestFileInfoForMod(modID, mod.Name)
 	if err != nil {
-		app.appendLog(fmt.Sprintf(app.messages["failed_get_latest_file_id"], err))
+		app.logNexusError(err, mod.Name)
 		return
 	}
 
@@ -737,11 +738,13 @@ func (app *App) updateModFromNexus(mod *checks.ModInfo) {
 
 // Обновление всех модов (только те, у которых есть обновление). Только для Premium-пользователей!
 func (app *App) updateAllModsFromNexus() {
+	app.appendLog(app.messages["log_starting_batch_update"])
 	if app.getAuthToken() == "" {
 		app.appendLog(app.messages["nexus_api_key_missing"])
 		return
 	}
 
+	app.appendLog(app.messages["log_collecting_mods"])
 	// Сначала собираем список модов, для которых действительно есть обновление
 	var modsToUpdate []*checks.ModInfo
 	for i := range app.allMods {
@@ -756,7 +759,7 @@ func (app *App) updateAllModsFromNexus() {
 		// Получаем актуальную информацию о последнем файле, соответствующем папке
 		fileInfo, err := app.getLatestFileInfoForMod(modID, mod.Name)
 		if err != nil {
-			app.appendLog(fmt.Sprintf(app.messages["log_failed_to_check_update"], mod.Name, err))
+			app.logNexusError(err, mod.Name)
 			continue
 		}
 		cacheKey := fmt.Sprintf("%d:%s", modID, mod.Name)
@@ -792,6 +795,7 @@ func (app *App) updateAllModsFromNexus() {
 		app.appendLog(fmt.Sprintf(app.messages["updating_mod"], mod.Name))
 		app.updateModFromNexus(mod)
 		updatedCount++
+		time.Sleep(500 * time.Millisecond)
 	}
 	app.appendLog(fmt.Sprintf(app.messages["update_all_finished"], updatedCount))
 }

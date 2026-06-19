@@ -2,13 +2,13 @@
 	"FixedFileInfo": {
 		"FileVersion": {
 			"Major": 1,
-			"Minor": 8,
+			"Minor": 9,
 			"Patch": 0,
 			"Build": 0
 		},
 		"ProductVersion": {
 			"Major": 1,
-			"Minor": 8,
+			"Minor": 9,
 			"Patch": 0,
 			"Build": 0
 		},
@@ -19,7 +19,7 @@
 		"CompanyName": "xsSplater",
 		"FileDescription": "Servo-Modquisitor-2 - Darktide Mod Manager",
 		"InternalName": "Servo-Modquisitor-2.exe",
-		"LegalCopyright": "© xsSplater. Open source.",
+		"LegalCopyright": "© 2026. xsSplater. Open source.",
 		"OriginalFilename": "Servo-Modquisitor-2.exe",
 		"ProductName": "Servo-Modquisitor-2"
 	},

@@ -286,7 +286,7 @@ func (app *App) runAllChecks() {
 		}
 		app.appendLogToFile("=== End of load order ===")
 	} else {
-		app.appendLogToFile(fmt.Sprintf("Failed to read load order file: %v", err))
+		app.appendLogToFile(fmt.Sprintf(app.messages["log_failed_to_read_lo"], err))
 	}
 
 	f, err := os.OpenFile(loadOrderPath, os.O_APPEND|os.O_WRONLY, 0644)
@@ -418,4 +418,23 @@ func copyFile(src, dst string) error {
 	defer dstFile.Close()
 	_, err = io.Copy(dstFile, srcFile)
 	return err
+}
+
+// logNexusError логирует ошибку работы с Nexus.
+// Для 403 (Mod not available) выводит понятное сообщение.
+// Если передан customMsg, используется оно вместо стандартного.
+func (app *App) logNexusError(err error, modName string, customMsg ...string) {
+	if err == nil {
+		return
+	}
+	errMsg := err.Error()
+	if strings.Contains(errMsg, "403") && strings.Contains(errMsg, "Mod not available") {
+		if len(customMsg) > 0 && customMsg[0] != "" {
+			app.appendLog(customMsg[0])
+		} else {
+			app.appendLog(fmt.Sprintf(app.messages["log_error_mod_not_available"], modName))
+		}
+	} else {
+		app.appendLog(fmt.Sprintf("Failed to process %s: %v", modName, err))
+	}
 }

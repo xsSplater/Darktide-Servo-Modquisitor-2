@@ -11,7 +11,7 @@ import (
 // ───────────── Программа ─────────────────────────────────────────
 const (
 	AppName         = "Servo-Modquisitor-2"
-	AppVersion      = "1.8.0"
+	AppVersion      = "1.9.0"
 	AppID           = "com.xssplater.servo-modquisitor"
 	AppIcon         = "assets/icon.png"
 	СonfigFolderSMQ = "Servo-Modquisitor"
@@ -41,6 +41,7 @@ const (
 	NexusV1Files      = "https://api.nexusmods.com/v1/games/warhammer40kdarktide/mods/%d/files.json"
 	NexusV1Filess     = "https://api.nexusmods.com/v1/games/warhammer40kdarktide/mods/%s/files/%s.json"
 	NexusV1DownLink   = "https://api.nexusmods.com/v1/games/warhammer40kdarktide/mods/%s/files/%s/download_link.json"
+	NexusModIDLink    = "https://www.nexusmods.com/warhammer40kdarktide/mods/%d"
 )
 
 // ───────────── Файлы ─────────────────────────────────────────────

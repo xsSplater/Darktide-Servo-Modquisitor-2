@@ -155,13 +155,7 @@ func (app *App) checkNexusUpdates() {
 
 		fileInfo, err := app.getLatestFileInfoForMod(modID, mod.Name)
 		if err != nil {
-			// Проверяем, не является ли ошибка 403 (мод недоступен)
-			errMsg := err.Error()
-			if strings.Contains(errMsg, "403") || strings.Contains(errMsg, "Mod not available") {
-				app.appendLog(fmt.Sprintf(app.messages["log_error_mod_not_available"], mod.Name))
-			} else {
-				app.appendLog(fmt.Sprintf(app.messages["log_update_check_failed_for"], mod.Name, err))
-			}
+			app.logNexusError(err, mod.Name)
 			continue
 		}
 
@@ -201,6 +195,8 @@ func (app *App) checkNexusUpdates() {
 	} else {
 		app.appendLog(fmt.Sprintf(app.messages["updates_found_count"], updatesFound))
 	}
+	// Проверка обновлений программы и файлов сортировки
+	app.checkSpecialUpdates()
 	app.appendLog(app.messages["log_update_check_completed"])
 }
 
@@ -560,7 +556,7 @@ func (app *App) autoAddModToDatabase(modID int, folderName string, fileName ...s
 	// Получаем данные с Nexus
 	info, err := app.FetchNexusModInfo(modID, app.getAuthToken())
 	if err != nil {
-		app.appendLog(fmt.Sprintf("Auto-add to database failed for %s: %v", folderName, err))
+		app.logNexusError(err, folderName)
 		return
 	}
 
@@ -571,7 +567,7 @@ func (app *App) autoAddModToDatabase(modID int, folderName string, fileName ...s
 	} else {
 		entry = checks.ModDBEntry{
 			Folder: folderName,
-			URL:    fmt.Sprintf("https://www.nexusmods.com/warhammer40kdarktide/mods/%d", modID),
+			URL:    fmt.Sprintf(NexusModIDLink, modID),
 		}
 	}
 	// Если передан fileName и в базе ещё нет nexus_file_pattern — заполняем
@@ -580,7 +576,7 @@ func (app *App) autoAddModToDatabase(modID int, folderName string, fileName ...s
 			// Вместо полного имени файла, сохраняем обрезанный стабильный паттерн
 			pattern := makeStablePattern(fileName[0], modID)
 			entry.NexusFilePattern = pattern
-			app.appendLog(fmt.Sprintf("Auto-saved stable file pattern for %s: %s", folderName, pattern))
+			app.appendLog(fmt.Sprintf(app.messages["log_autosaved_stable_pattern"], folderName, pattern))
 		}
 	}
 
@@ -623,9 +619,9 @@ func (app *App) autoAddModToDatabase(modID int, folderName string, fileName ...s
 	// Обновляем память и сохраняем
 	checks.UpdateModDBEntry(entry)
 	if err := checks.SaveModDatabase(); err != nil {
-		app.appendLog(fmt.Sprintf("Failed to save mod database: %v", err))
+		app.appendLog(fmt.Sprintf(app.messages["log_failed_to_save_mod_db"], err))
 	} else {
-		app.appendLog(fmt.Sprintf("Mod database updated for %s", folderName))
+		app.appendLog(fmt.Sprintf(app.messages["log_mod_db_updated"], folderName))
 		// Перечитываем базу, чтобы UI увидел изменения
 		app.modDatabase = checks.GetModDBList()
 		checks.SetModDatabase(app.modDatabase)

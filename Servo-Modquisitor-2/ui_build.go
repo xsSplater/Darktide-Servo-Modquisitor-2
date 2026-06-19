@@ -866,7 +866,7 @@ func (app *App) buildUI() {
 	})
 	app.applyTooltip(app.btnUpdateMod, "btn_update_mod_premium_only")
 	app.btnUpdateAll = NewCustomButton(app.messages["btn_update_all"], func() {
-		app.updateAllModsFromNexus()
+		go app.updateAllModsFromNexus()
 	})
 	app.applyTooltip(app.btnUpdateAll, "btn_update_all_premium_only")
 	app.btnCheckUpdates = NewCustomButton(app.messages["btn_check_updates"], func() {
@@ -1155,16 +1155,10 @@ func (app *App) enrichModFromNexus(mod *checks.ModInfo) {
 		fileInfo, err := app.getLatestFileInfoForMod(modID, mod.Name)
 		if err != nil {
 			// просто логируем, не сохраняем ничего
-			app.appendLog(fmt.Sprintf("Cannot get file info for %s: %v", mod.Name, err))
+			app.appendLog(fmt.Sprintf(app.messages["log_cannot_get_file_info"], mod.Name, err))
 			return
 		}
 		cacheKey := fmt.Sprintf("%d:%s", modID, mod.Name)
-		// app.nexusVersionCache[cacheKey] = ModVersionInfo{ // ЛОМАЕТ ОБНОВЛЕНИЯ И ПРОВЕРКИ
-		// 	Timestamp: fileInfo.UploadedTimestamp,
-		// 	Version:   fileInfo.Version,
-		// 	Folder:    mod.Name,
-		// }
-		// app.saveNexusVersionCache()
 		app.nexusLatestVersions[cacheKey] = fileInfo.Version
 		if fileInfo.FileName != "" {
 			entry := checks.GetModDBEntry(mod.Name)
@@ -1173,7 +1167,7 @@ func (app *App) enrichModFromNexus(mod *checks.ModInfo) {
 				entry.NexusFilePattern = pattern
 				checks.UpdateModDBEntry(*entry)
 				checks.SaveModDatabase()
-				app.appendLog(fmt.Sprintf("Auto-saved stable file pattern for %s: %s", mod.Name, pattern))
+				app.appendLog(fmt.Sprintf(app.messages["log_autosaved_stable_pattern"], mod.Name, pattern))
 			}
 		}
 		fyne.Do(func() {

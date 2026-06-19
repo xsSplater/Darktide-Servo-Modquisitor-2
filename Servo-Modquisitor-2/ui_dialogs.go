@@ -460,11 +460,18 @@ func (app *App) handleNXMLink(nxmURL string) {
 		return
 	}
 
-	// === Обработка мода 139 (программа и файлы сортировки) ===
 	if modID == "139" {
 		go func() {
-			var directURL, filename string
+			// Получаем информацию о файле, если удастся (не критично)
+			var fileInfo *FileInfo
 			var err error
+			fileInfo, err = app.getFileInfoByID(modID, fileID)
+			if err != nil {
+				app.logNexusError(err, "Special Archive (Mod 139)")
+				return
+			}
+
+			var directURL, filename string
 			if key != "" {
 				directURL, filename, err = app.getFreeDownloadURL(modID, fileID, key, expires)
 			} else {
@@ -475,8 +482,7 @@ func (app *App) handleNXMLink(nxmURL string) {
 				return
 			}
 
-			// Всегда обрабатываем как специальный архив (определим тип по содержимому)
-			app.handleSpecialNXMArchive(directURL, filename)
+			app.handleSpecialNXMArchive(directURL, filename, fileInfo)
 		}()
 		return
 	}
@@ -567,7 +573,7 @@ func (app *App) updateDMF() {
 		return
 	}
 
-	modIDStr := fmt.Sprintf("%d", dmfModID) // ← добавить эту строку
+	modIDStr := fmt.Sprintf("%d", dmfModID)
 	cacheKey := "8:dmf"
 	var saved ModVersionInfo
 	if info, exists := app.nexusVersionCache[cacheKey]; exists {
@@ -610,7 +616,7 @@ func (app *App) showDMFDownloadDialog(url, filename string, fileInfo *FileInfo) 
 				os.Remove(dest)
 				return
 			}
-			app.appendLog(app.messages["installing_dml"]) // текст "Installing Darktide Mod Loader..." - можно оставить или заменить
+			app.appendLog(app.messages["installing_dml"])
 			if err := app.installDMLFromArchive(dest); err != nil {
 				app.appendLog(fmt.Sprintf(app.messages["dml_install_failed"], err))
 			} else {
@@ -630,11 +636,12 @@ func (app *App) showDMFDownloadDialog(url, filename string, fileInfo *FileInfo) 
 }
 
 // handleSpecialNXMArchive обрабатывает скачанный архив программы или правил (мод 139).
-func (app *App) handleSpecialNXMArchive(downloadURL, filename string) {
-	// Создаём временную папку
-	tmpDir, err := os.MkdirTemp("", "servo-special-")
-	if err != nil {
-		app.appendLog("Failed to create temp dir: " + err.Error())
+func (app *App) handleSpecialNXMArchive(downloadURL, filename string, fileInfo *FileInfo) {
+	// Создаём временную папку в папке mods (на том же диске, что и программа)
+	tmpDir := filepath.Join(app.cfg.ModsPath, "update_temp")
+	os.RemoveAll(tmpDir)
+	if err := os.MkdirAll(tmpDir, 0755); err != nil {
+		app.appendLog(app.messages["log_update_failed_temp"] + err.Error())
 		return
 	}
 	defer os.RemoveAll(tmpDir)
@@ -642,28 +649,28 @@ func (app *App) handleSpecialNXMArchive(downloadURL, filename string) {
 	archivePath := filepath.Join(tmpDir, filename)
 
 	// Скачиваем с прогресс-баром
-	app.appendLog("Downloading special archive: " + filename)
+	app.appendLog(app.messages["downloading"] + ": " + filename)
 	bar := widget.NewProgressBar()
 	bar.SetValue(0)
-	lbl := widget.NewLabel(fmt.Sprintf("Downloading: %s", filename))
+	lbl := widget.NewLabel(fmt.Sprintf(app.messages["downloading"], filename))
 	content := container.NewVBox(lbl, bar)
-	dlg := dialog.NewCustom("Downloading", "Cancel", content, app.mainWindow)
+	dlg := dialog.NewCustom(app.messages["downloading"], app.messages["btn_cancel"], content, app.mainWindow)
 	dlg.Show()
 
-	err = app.DownloadFileWithProgress(downloadURL, archivePath, bar)
+	err := app.DownloadFileWithProgress(downloadURL, archivePath, bar)
 	fyne.Do(func() { dlg.Hide() })
 	if err != nil {
-		app.appendLog("Download failed: " + err.Error())
+		app.appendLog(app.messages["download_failed_"] + err.Error())
 		return
 	}
-	app.appendLog("Download complete.")
+	app.appendLog(app.messages["download_complete_"])
 
 	// Распаковываем во временную папку
 	if err := app.extractArchiveTo(archivePath, tmpDir); err != nil {
-		app.appendLog("Extract failed: " + err.Error())
+		app.appendLog(app.messages["log_extract_failed"] + err.Error())
 		return
 	}
-	app.appendLog("Archive extracted.")
+	app.appendLog(app.messages["log_extract_success"])
 
 	// Определяем тип архива по содержимому
 	isProgram := false
@@ -678,71 +685,96 @@ func (app *App) handleSpecialNXMArchive(downloadURL, filename string) {
 		return nil
 	})
 	if err != nil && err != filepath.SkipAll {
-		app.appendLog("Error scanning archive: " + err.Error())
+		app.appendLog(app.messages["log_error_scanning_archive"] + err.Error())
 		return
 	}
 
 	if isProgram {
 		// === Обновление программы ===
-		// Ищем исполняемый файл (повторно, чтобы получить путь)
-		var exePath string
+		var newExePath string
 		err = filepath.Walk(tmpDir, func(path string, info os.FileInfo, err error) error {
 			if err != nil {
 				return err
 			}
 			if !info.IsDir() && strings.HasSuffix(strings.ToLower(info.Name()), ".exe") {
-				exePath = path
+				newExePath = path
 				return filepath.SkipAll
 			}
 			return nil
 		})
-		if err != nil || exePath == "" {
-			app.appendLog("No executable found in program archive")
+		if err != nil || newExePath == "" {
+			app.appendLog(app.messages["log_error_no_executable"])
 			return
 		}
 
-		// Сохраняем информацию об обновлении в кэш
+		// Сохраняем информацию об обновлении в кэш с версией из Nexus
+		version := "unknown"
+		if fileInfo != nil && fileInfo.Version != "" {
+			version = fileInfo.Version
+		}
+		timestamp := time.Now().Unix()
+		if fileInfo != nil && fileInfo.UploadedTimestamp > 0 {
+			timestamp = fileInfo.UploadedTimestamp
+		}
+
 		app.nexusVersionCache[NexusCacheKeyProgram] = ModVersionInfo{
-			Timestamp: time.Now().Unix(),
-			Version:   "manual",
+			Timestamp: timestamp,
+			Version:   version,
 			Folder:    "Program",
 		}
 		app.saveNexusVersionCache()
 
-		// Заменяем текущий exe и перезапускаем
+		// Копируем новый exe в папку с программой с именем .new
 		currentExe, err := os.Executable()
 		if err != nil {
-			app.appendLog("Cannot locate current executable: " + err.Error())
+			app.appendLog(app.messages["log_error_cannot_locate_exe"] + err.Error())
 			return
 		}
-		app.appendLog("Replacing executable and restarting...")
-		replaceAndRestart(currentExe, exePath)
+		newExeFinal := currentExe + ".new"
+		if err := copyFile(newExePath, newExeFinal); err != nil {
+			app.appendLog(app.messages["log_failed_to_copy_exe"] + err.Error())
+			return
+		}
+
+		// Удаляем временную папку (она больше не нужна)
+		os.RemoveAll(tmpDir)
+
+		app.appendLog(app.messages["log_new_exe_copied"])
+		replaceAndRestart(currentExe, newExeFinal)
 	} else {
 		// === Обновление файлов сортировки ===
-		// Копируем mod_database.json и mandatory_obsolete_incompatible_dependencies.json
 		filesCopied := 0
 		for _, fname := range []string{FileNameModDatabase, FileNameMandatoryRules} {
 			src := filepath.Join(tmpDir, fname)
 			dst := filepath.Join(app.cfg.ModsPath, fname)
 			if _, err := os.Stat(src); err == nil {
 				if err := copyFile(src, dst); err != nil {
-					app.appendLog("Failed to copy " + fname + ": " + err.Error())
+					app.appendLog(app.messages["log_failed_to_copy"] + fname + ": " + err.Error())
 					return
 				}
 				filesCopied++
 			} else {
-				app.appendLog("Warning: " + fname + " not found in archive")
+				app.appendLog(app.messages["log_warning_"] + fname + app.messages["log_not_found_in_archive"])
 			}
 		}
 		if filesCopied == 0 {
-			app.appendLog("No sorting files found in archive")
+			app.appendLog(app.messages["log_not_found_in_archive_sorting"])
 			return
 		}
 
-		// Обновляем кэш
+		// Сохраняем информацию об обновлении в кэш с версией из Nexus
+		version := "unknown"
+		if fileInfo != nil && fileInfo.Version != "" {
+			version = fileInfo.Version
+		}
+		timestamp := time.Now().Unix()
+		if fileInfo != nil && fileInfo.UploadedTimestamp > 0 {
+			timestamp = fileInfo.UploadedTimestamp
+		}
+
 		app.nexusVersionCache[NexusCacheKeyRules] = ModVersionInfo{
-			Timestamp: time.Now().Unix(),
-			Version:   "manual",
+			Timestamp: timestamp,
+			Version:   version,
 			Folder:    "Sorting Rules",
 		}
 		app.saveNexusVersionCache()
@@ -756,6 +788,6 @@ func (app *App) handleSpecialNXMArchive(downloadURL, filename string) {
 			saveConfig(app.cfg)
 		}
 		app.refreshModList()
-		app.appendLog("Sorting files updated successfully from Nexus download.")
+		app.appendLog(app.messages["log_sorting_files_updated_succ"])
 	}
 }
