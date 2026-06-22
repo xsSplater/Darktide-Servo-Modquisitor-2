@@ -1,5 +1,5 @@
 {
-	"version": "0.9.85",
+	"version": "0.9.87",
 	"mod_database": [
 		{
 			"folder": "for_the_drip",
@@ -1516,18 +1516,18 @@
 				"zh-hant": "玩家邊框輪廓"
 			},
 			"description": {
-				"de": "Ermöglicht das Umschalten visueller Hilfen zur Identifizierung anderer Spieler. Du kannst das standardmäßige Skelett-Hologramm, ein hervorgehobenes Mesh und eine Umrandung in beliebiger Kombination umschalten.",
-				"en": "Enables you to toggle visual aids for identifying other players. You can toggle the default skeleton-hologram, a highlighted mesh, and an outline, in any combination.",
-				"es": "Te permite activar ayudas visuales para identificar a otros jugadores. Puedes activar el holograma de esqueleto predeterminado, una malla resaltada y un contorno, en cualquier combinación.",
-				"fr": "Vous permet d'activer des aides visuelles pour identifier les autres joueurs. Vous pouvez activer l'holo-squelette par défaut, un maillage surligné et un contour, dans n'importe quelle combinaison.",
-				"it": "Ti permette di attivare ausili visivi per identificare altri giocatori. Puoi attivare l'ologramma scheletro predefinito, una mesh evidenziata e un contorno, in qualsiasi combinazione.",
-				"ja": "他のプレイヤーを識別するための視覚補助を切り替えることができます。デフォルトのスケルトンホログラム、ハイライトされたメッシュ、輪郭を任意の組み合わせで切り替えられます。",
-				"ko": "다른 플레이어를 식별하기 위한 시각적 보조 기능을 전환할 수 있습니다. 기본 해골 홀로그램, 강조 표시된 메시, 외곽선을 원하는 조합으로 전환할 수 있습니다.",
-				"pl": "Umożliwia włączenie pomocy wizualnych do identyfikacji innych graczy. Możesz włączyć domyślny hologram szkieletu, podświetloną siatkę i kontur w dowolnej kombinacji.",
-				"pt-BR": "Permite ativar ajudas visuais para identificar outros jogadores. Você pode ativar o holograma de esqueleto padrão, uma malha destacada e um contorno, em qualquer combinação.",
-				"ru": "Player Outlines - Позволяет вам опционально отображать стандартную скелет-голограмму, подсвеченный меш и контур в любой комбинации. Меш виден только сквозь стены, но контур виден всегда. Наслаждайтесь!",
-				"zh-hans": "你可以显示默认的玩家全息骨架、高亮模型、高亮轮廓或者以上任意组合。高亮模型只能隔墙显示，但轮廓始终可见。",
-				"zh-hant": "你可以顯示預設的玩家全息骨架、高亮模型、高亮輪廓或者以上任意組合。高亮模型只能隔牆顯示，但輪廓始終可見。"
+				"de": "VERALTET!",
+				"en": "OBSOLETE!",
+				"es": "¡OBSOLETO!",
+				"fr": "OBSOLÈTE !",
+				"it": "OBSOLETO!",
+				"ja": "廃止！",
+				"ko": "구식!",
+				"pl": "PRZESTARZAŁY!",
+				"pt-BR": "OBSOLETO!",
+				"ru": "УСТАРЕЛ!",
+				"zh-hans": "已过时！",
+				"zh-hant": "已過時！"
 			},
 			"author": "redbeardt",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/39",
@@ -2381,11 +2381,11 @@
 			}
 		},
 		{
-			"folder": "True Peril",
+			"folder": "TruePeril",
 			"nexus_file_pattern": "true",
 			"name": {
 				"de": "Wahre Gefahr",
-				"en": "TruePeril",
+				"en": "True Peril",
 				"es": "Verdadero peligro",
 				"fr": "Véritable péril",
 				"it": "Vero pericolo",
@@ -2430,10 +2430,10 @@
 			}
 		},
 		{
-			"folder": "KOREAN_ScoreboardExplosive",
-			"nexus_file_pattern": "scoreboard Explosive",
+			"folder": "KOREAN_scoreboard",
+			"nexus_file_pattern": "scoreboard",
 			"name": {
-				"en": "Scoreboard Explosive (ko-kr)"
+				"en": "Scoreboard (ko-kr)"
 			},
 			"description": {
 				"en": "스코어보드 모드 한글 번역판"
@@ -2457,10 +2457,10 @@
 			}
 		},
 		{
-			"folder": "KOREAN_scoreboard",
-			"nexus_file_pattern": "scoreboard",
+			"folder": "KOREAN_ScoreboardExplosive",
+			"nexus_file_pattern": "scoreboard Explosive",
 			"name": {
-				"en": "Scoreboard (ko-kr)"
+				"en": "Scoreboard Explosive (ko-kr)"
 			},
 			"description": {
 				"en": "스코어보드 모드 한글 번역판"
@@ -2511,10 +2511,10 @@
 			}
 		},
 		{
-			"folder": "KOREAN_scoreboard_enhanced_defense_plugin",
-			"nexus_file_pattern": "scoreboard enhanced defense plugin-65",
+			"folder": "KOREAN_ScoreboardAmmos",
+			"nexus_file_pattern": "scoreboard Ammunitions picked",
 			"name": {
-				"en": "Scoreboard Enhanced Defense Plugin (ko-kr)"
+				"en": "Scoreboard Ammunitions picked (ko-kr)"
 			},
 			"description": {
 				"en": "스코어보드 모드 한글 번역판"
@@ -2538,10 +2538,10 @@
 			}
 		},
 		{
-			"folder": "KOREAN_ScoreboardAmmos",
-			"nexus_file_pattern": "scoreboard Ammunitions picked",
+			"folder": "KOREAN_scoreboard_enhanced_defense_plugin",
+			"nexus_file_pattern": "scoreboard enhanced defense plugin-65",
 			"name": {
-				"en": "Scoreboard Ammunitions picked (ko-kr)"
+				"en": "Scoreboard Enhanced Defense Plugin (ko-kr)"
 			},
 			"description": {
 				"en": "스코어보드 모드 한글 번역판"
@@ -3758,18 +3758,18 @@
 				"zh-hant": "酷炫機器人"
 			},
 			"description": {
-				"de": "VERALTET!",
-				"en": "OBSOLETE!",
-				"es": "¡OBSOLETO!",
-				"fr": "OBSOLÈTE !",
-				"it": "OBSOLETO!",
-				"ja": "廃止！",
-				"ko": "구식!",
-				"pl": "PRZESTARZAŁY!",
-				"pt-BR": "OBSOLETO!",
-				"ru": "УСТАРЕЛ!",
-				"zh-hans": "已过时！",
-				"zh-hant": "已過時！"
+				"de": "Ersetzt die Sträflingskleidung der Bots durch vordefinierte oder zufällige Veteran-Kosmetik.\nHaben Sie genug von hässlichen Sträflings-Bots? Jetzt können Sie ihre Kleidung durch echte Ausrüstung ersetzen.",
+				"en": "Replaces bot prisoner garb with pre-defined or randomized Veteran cosmetics.\nAre you tired of ugly convict bots? Well now you can replace their clothes with real gear.",
+				"es": "Reemplaza la ropa de prisionero de los bots con cosméticos de Veterano predefinidos o aleatorios.\n¿Estás cansado de los bots convictos feos? Ahora puedes reemplazar su ropa con equipo real.",
+				"fr": "Remplace les vêtements de prisonnier des bots par des cosmétiques de Vétéran prédéfinis ou aléatoires.\nVous en avez marre des bots détenus laids ? Vous pouvez désormais remplacer leurs vêtements par du vrai équipement.",
+				"it": "Sostituisce l'abbigliamento da prigioniero dei bot con cosmetici da Veterano predefiniti o casuali.\nStanco dei brutti bot detenuti? Ora puoi sostituire i loro vestiti con equipaggiamento vero.",
+				"ja": "ボットの囚人服を、事前に設定されたまたはランダムなベテラン・コスメティックに置き換えます。\n醜い囚人ボットにうんざりしていませんか？今すぐ彼らの服を本物の装備に交換できます。",
+				"ko": "봇의 죄수 복장을 사전 정의 또는 무작위 베테랑 외형으로 교체합니다.\n못생긴 죄수 봇이 지겹나요? 이제 그들의 옷을 진짜 장비로 바꿀 수 있습니다.",
+				"pl": "Zastępuje odzież więzienną botów z góry określonymi lub losowymi kosmetykami Weterana.\nMasz dość brzydkich botów-skazańców? Teraz możesz zastąpić ich ubrania prawdziwym ekwipunkiem.",
+				"pt-BR": "Substitui as roupas de prisioneiro dos bots por cosméticos de Veterano predefinidos ou aleatórios.\nCansado dos bots condenados feios? Agora você pode substituir as roupas deles por equipamento real.",
+				"ru": "Заменяет одежду ботов-заключённых на заранее заданную или случайную косметику Ветерана.\nУстали от уродливых ботов-каторжников? Теперь вы можете заменить их одежду на настоящее снаряжение.",
+				"zh-hans": "将机器人的囚犯服装替换为预设或随机的老兵外观。\n厌倦了丑陋的囚犯机器人？现在你可以用真正的装备替换他们的衣服。",
+				"zh-hant": "將機器人的囚犯服裝替換為預設或隨機的老兵外觀。\n厭倦了醜陋的囚犯機器人？現在你可以用真正的裝備替換他們的衣服。"
 			},
 			"author": "Aussiemon",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/92",
@@ -4565,7 +4565,7 @@
 			"github_url": "https://github.com/deluxghost/darktide-mods/tree/main/ScoreboardExplosive",
 			"note": {
 				"de": "Erforderlich: Scoreboard.",
-				"en": "Requred: Scoreboard.",
+				"en": "Required: Scoreboard.",
 				"es": "Requerido: Scoreboard.",
 				"fr": "Requis : Scoreboard.",
 				"it": "Richiede: Scoreboard.",
@@ -5790,7 +5790,7 @@
 			"github_url": "",
 			"note": {
 				"de": "Erforderlich: Scoreboard.",
-				"en": "Requred: Scoreboard.",
+				"en": "Required: Scoreboard.",
 				"es": "Requerido: Scoreboard.",
 				"fr": "Requis : Scoreboard.",
 				"it": "Richiede: Scoreboard.",
@@ -7372,21 +7372,21 @@
 			}
 		},
 		{
-			"folder": "Jukebox",
+			"folder": "Jukebox_OLD",
 			"nexus_file_pattern": "jukebox",
 			"name": {
-				"de": "Jukestus Boxi (neu)",
-				"en": "Jukestus Boxi (new)",
-				"es": "Jukestus Boxi (nuevo)",
-				"fr": "Jukestus Boxi (nouveau)",
-				"it": "Jukestus Boxi (nuovo)",
-				"ja": "ジュークスタス・ボクシ (新)",
-				"ko": "주크스터스 복시 (신규)",
-				"pl": "Jukestus Boxi (nowy)",
-				"pt-BR": "Jukestus Boxi (novo)",
-				"ru": "Музыкальнус Автомати (новый)",
-				"zh-hans": "点唱机 (新版)",
-				"zh-hant": "點唱機 (新版)"
+				"de": "Jukestus Boxi (alt)",
+				"en": "Jukestus Boxi (old)",
+				"es": "Jukestus Boxi (antiguo)",
+				"fr": "Jukestus Boxi (ancien)",
+				"it": "Jukestus Boxi (vecchio)",
+				"ja": "ジュークスタス・ボクシ（旧）",
+				"ko": "주크스터스 복시 (구버전)",
+				"pl": "Jukestus Boxi (stary)",
+				"pt-BR": "Jukestus Boxi (antigo)",
+				"ru": "Музыкальнус Автомати (старый)",
+				"zh-hans": "点唱机（旧版）",
+				"zh-hant": "點唱機（舊版）"
 			},
 			"description": {
 				"de": "VERALTET!",
@@ -7421,21 +7421,21 @@
 			}
 		},
 		{
-			"folder": "Jukebox_OLD",
+			"folder": "Jukebox",
 			"nexus_file_pattern": "jukebox",
 			"name": {
-				"de": "Jukestus Boxi (alt)",
-				"en": "Jukestus Boxi (old)",
-				"es": "Jukestus Boxi (antiguo)",
-				"fr": "Jukestus Boxi (ancien)",
-				"it": "Jukestus Boxi (vecchio)",
-				"ja": "ジュークスタス・ボクシ（旧）",
-				"ko": "주크스터스 복시 (구버전)",
-				"pl": "Jukestus Boxi (stary)",
-				"pt-BR": "Jukestus Boxi (antigo)",
-				"ru": "Музыкальнус Автомати (старый)",
-				"zh-hans": "点唱机（旧版）",
-				"zh-hant": "點唱機（舊版）"
+				"de": "Jukestus Boxi (neu)",
+				"en": "Jukestus Boxi (new)",
+				"es": "Jukestus Boxi (nuevo)",
+				"fr": "Jukestus Boxi (nouveau)",
+				"it": "Jukestus Boxi (nuovo)",
+				"ja": "ジュークスタス・ボクシ (新)",
+				"ko": "주크스터스 복시 (신규)",
+				"pl": "Jukestus Boxi (nowy)",
+				"pt-BR": "Jukestus Boxi (novo)",
+				"ru": "Музыкальнус Автомати (новый)",
+				"zh-hans": "点唱机 (新版)",
+				"zh-hant": "點唱機 (新版)"
 			},
 			"description": {
 				"de": "VERALTET!",
@@ -7603,7 +7603,7 @@
 			"github_url": "",
 			"note": {
 				"de": "Erforderlich: Scoreboard.",
-				"en": "Requred: Scoreboard.",
+				"en": "Required: Scoreboard.",
 				"es": "Requerido: Scoreboard.",
 				"fr": "Requis : Scoreboard.",
 				"it": "Richiede: Scoreboard.",
@@ -7848,7 +7848,7 @@
 			"github_url": "https://github.com/ronvoluted/darktide-mods/tree/main/Audio",
 			"note": {
 				"de": "Erforderlich: Darktide Local Server.",
-				"en": "Requred: Darktide Local Server.",
+				"en": "Required: Darktide Local Server.",
 				"es": "Requerido: Darktide Local Server.",
 				"fr": "Requis : Darktide Local Server.",
 				"it": "Richiede: Darktide Local Server.",
@@ -8436,7 +8436,7 @@
 			"github_url": "",
 			"note": {
 				"de": "Erforderlich: Audio-Plugin. Fix in den Kommentaren auf Nexus Mods.",
-				"en": "Requred: Audio plugin. Fix in the comments on the Nexus Mods.",
+				"en": "Required: Audio plugin. Fix in the comments on the Nexus Mods.",
 				"es": "Requerido: Audio plugin. Corrección en los comentarios de Nexus Mods.",
 				"fr": "Requis : Audio plugin. Correctif dans les commentaires sur Nexus Mods.",
 				"it": "Richiede: Audio plugin. Correzione nei commenti su Nexus Mods.",
@@ -8485,7 +8485,7 @@
 			"github_url": "https://github.com/Wobin/Rock",
 			"note": {
 				"de": "Erforderlich: Audio-Plugin.",
-				"en": "Requred: Audio plugin.",
+				"en": "Required: Audio plugin.",
 				"es": "Requerido: Audio plugin.",
 				"fr": "Requis : Audio plugin.",
 				"it": "Richiede: Audio plugin.",
@@ -8681,7 +8681,7 @@
 			"github_url": "",
 			"note": {
 				"de": "Erforderlich: Audio-Plugin.",
-				"en": "Requred: Audio plugin.",
+				"en": "Required: Audio plugin.",
 				"es": "Requerido: Audio plugin.",
 				"fr": "Requis : Audio plugin.",
 				"it": "Richiede: Audio plugin.",
@@ -8730,7 +8730,7 @@
 			"github_url": "",
 			"note": {
 				"de": "Erforderlich: Audio-Plugin.",
-				"en": "Requred: Audio plugin.",
+				"en": "Required: Audio plugin.",
 				"es": "Requerido: Audio plugin.",
 				"fr": "Requis : Audio plugin.",
 				"it": "Richiede: Audio plugin.",
@@ -8779,7 +8779,7 @@
 			"github_url": "",
 			"note": {
 				"de": "Erforderlich: Audio-Plugin.",
-				"en": "Requred: Audio plugin.",
+				"en": "Required: Audio plugin.",
 				"es": "Requerido: Audio plugin.",
 				"fr": "Requis : Audio plugin.",
 				"it": "Richiede: Audio plugin.",
@@ -9220,7 +9220,7 @@
 			"github_url": "https://github.com/Backup158/DarktideOvenproofScoreboardPluginPatch/tree/main/ovenproof_scoreboard_plugin",
 			"note": {
 				"de": "Erforderlich: Scoreboard.",
-				"en": "Requred: Scoreboard.",
+				"en": "Required: Scoreboard.",
 				"es": "Requerido: Scoreboard.",
 				"fr": "Requis : Scoreboard.",
 				"it": "Richiede: Scoreboard.",
@@ -9932,18 +9932,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/257",
 			"github_url": "",
 			"note": {
-				"de": "",
-				"en": "",
-				"es": "",
-				"fr": "",
-				"it": "",
-				"ja": "",
-				"ko": "",
-				"pl": "",
-				"pt-BR": "",
-				"ru": "",
-				"zh-hans": "",
-				"zh-hant": ""
+				"de": "Erforderlich: Audio-Plugin.",
+				"en": "Required: Audio plugin.",
+				"es": "Requerido: Audio plugin.",
+				"fr": "Requis : Audio plugin.",
+				"it": "Richiede: Audio plugin.",
+				"ja": "必要条件: Audioプラグイン。",
+				"ko": "필요: Audio 플러그인.",
+				"pl": "Wymagane: Audio plugin.",
+				"pt-BR": "Requerido: Audio plugin.",
+				"ru": "Требуется: Audio плагин.",
+				"zh-hans": "需要：音频插件。",
+				"zh-hant": "需要：音訊插件。"
 			}
 		},
 		{
@@ -9982,7 +9982,7 @@
 			"github_url": "",
 			"note": {
 				"de": "Erforderlich: Scoreboard.",
-				"en": "Requred: Scoreboard.",
+				"en": "Required: Scoreboard.",
 				"es": "Requerido: Scoreboard.",
 				"fr": "Requis : Scoreboard.",
 				"it": "Richiede: Scoreboard.",
@@ -10080,7 +10080,7 @@
 			"github_url": "https://github.com/ronvoluted/darktide-mods/tree/main/ScrubsVermin",
 			"note": {
 				"de": "Erforderlich: Darktide Local Server.",
-				"en": "Requred: Darktide Local Server.",
+				"en": "Required: Darktide Local Server.",
 				"es": "Requerido: Darktide Local Server.",
 				"fr": "Requis : Darktide Local Server.",
 				"it": "Richiede: Darktide Local Server.",
@@ -11711,8 +11711,8 @@
 			}
 		},
 		{
-			"folder": "FenyaTitleZ_Dojd",
-			"nexus_file_pattern": "fenya titles dojd-311",
+			"folder": "FenyaTitleZ",
+			"nexus_file_pattern": "fenya titles pokazushnik-311",
 			"name": {
 				"de": "Fenya Titles - RU ONLY",
 				"en": "Fenya Titles - RU ONLY",
@@ -11760,8 +11760,8 @@
 			}
 		},
 		{
-			"folder": "FenyaTitleZ",
-			"nexus_file_pattern": "fenya titles pokazushnik-311",
+			"folder": "FenyaTitleZ_Dojd",
+			"nexus_file_pattern": "fenya titles dojd-311",
 			"name": {
 				"de": "Fenya Titles - RU ONLY",
 				"en": "Fenya Titles - RU ONLY",
@@ -11990,18 +11990,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/315",
 			"github_url": "",
 			"note": {
-				"de": "",
-				"en": "",
-				"es": "",
-				"fr": "",
-				"it": "",
-				"ja": "",
-				"ko": "",
-				"pl": "",
-				"pt-BR": "",
-				"ru": "",
-				"zh-hans": "",
-				"zh-hant": ""
+				"de": "Erforderlich: Audio-Plugin.",
+				"en": "Required: Audio plugin.",
+				"es": "Requerido: Audio plugin.",
+				"fr": "Requis : Audio plugin.",
+				"it": "Richiede: Audio plugin.",
+				"ja": "必要条件: Audioプラグイン。",
+				"ko": "필요: Audio 플러그인.",
+				"pl": "Wymagane: Audio plugin.",
+				"pt-BR": "Requerido: Audio plugin.",
+				"ru": "Требуется: Audio плагин.",
+				"zh-hans": "需要：音频插件。",
+				"zh-hant": "需要：音訊插件。"
 			}
 		},
 		{
@@ -12334,7 +12334,7 @@
 			"github_url": "",
 			"note": {
 				"de": "Erforderlich: Audio-Plugin.",
-				"en": "Requred: Audio plugin.",
+				"en": "Required: Audio plugin.",
 				"es": "Requerido: Audio plugin.",
 				"fr": "Requis : Audio plugin.",
 				"it": "Richiede: Audio plugin.",
@@ -12383,7 +12383,7 @@
 			"github_url": "",
 			"note": {
 				"de": "Erforderlich: Audio-Plugin.",
-				"en": "Requred: Audio plugin.",
+				"en": "Required: Audio plugin.",
 				"es": "Requerido: Audio plugin.",
 				"fr": "Requis : Audio plugin.",
 				"it": "Richiede: Audio plugin.",
@@ -12432,7 +12432,7 @@
 			"github_url": "",
 			"note": {
 				"de": "Erforderlich: Audio-Plugin.",
-				"en": "Requred: Audio plugin.",
+				"en": "Required: Audio plugin.",
 				"es": "Requerido: Audio plugin.",
 				"fr": "Requis : Audio plugin.",
 				"it": "Richiede: Audio plugin.",
@@ -12838,7 +12838,7 @@
 			}
 		},
 		{
-			"folder": "PsykerCriticalPerilQuiet_Super_Quiet",
+			"folder": "PsykerCriticalPerilQuiet_Mute",
 			"nexus_file_pattern": "quieter",
 			"name": {
 				"de": "Leiserer kritischer Gefahrenhinweis des Psykers",
@@ -12887,7 +12887,7 @@
 			}
 		},
 		{
-			"folder": "PsykerCriticalPerilQuiet_Mute",
+			"folder": "PsykerCriticalPerilQuiet_Super_Quiet",
 			"nexus_file_pattern": "quieter",
 			"name": {
 				"de": "Leiserer kritischer Gefahrenhinweis des Psykers",
@@ -13020,7 +13020,7 @@
 			"github_url": "",
 			"note": {
 				"de": "Erforderlich: Audio-Plugin.",
-				"en": "Requred: Audio plugin.",
+				"en": "Required: Audio plugin.",
 				"es": "Requerido: Audio plugin.",
 				"fr": "Requis : Audio plugin.",
 				"it": "Richiede: Audio plugin.",
@@ -13510,7 +13510,7 @@
 			"github_url": "https://github.com/tickbox/DarktideMods/tree/main/IMGONNAPUKE",
 			"note": {
 				"de": "Erforderlich: Audio-Plugin.",
-				"en": "Requred: Audio plugin.",
+				"en": "Required: Audio plugin.",
 				"es": "Requerido: Audio plugin.",
 				"fr": "Requis : Audio plugin.",
 				"it": "Richiede: Audio plugin.",
@@ -13559,7 +13559,7 @@
 			"github_url": "",
 			"note": {
 				"de": "Erforderlich: Audio-Plugin.",
-				"en": "Requred: Audio plugin.",
+				"en": "Required: Audio plugin.",
 				"es": "Requerido: Audio plugin.",
 				"fr": "Requis : Audio plugin.",
 				"it": "Richiede: Audio plugin.",
@@ -17444,21 +17444,70 @@
 			}
 		},
 		{
-			"folder": "___GamePlay Utilities",
-			"nexus_file_pattern": "___GamePlay Utilities-459",
+			"folder": "___Bug Fix",
+			"nexus_file_pattern": "___Bug Fix-459",
 			"name": {
-				"de": "Mod-Listen-Trennzeichen - GamePlay Utilities",
-				"en": "Mod List Dividers - GamePlay Utilities",
-				"es": "Separadores de lista de mods - GamePlay Utilities",
-				"fr": "Séparateurs de liste de mods - GamePlay Utilities",
-				"it": "Separatori della lista mod - _GamePlay Utilities",
-				"ja": "MODリスト区切り - GamePlay Utilities",
-				"ko": "모드 목록 구분선 - GamePlay Utilities",
-				"pl": "Separatory listy modów - GamePlay Utilities",
-				"pt-BR": "Separadores de lista de mods - GamePlay Utilities",
-				"ru": "Разделители списка модов - GamePlay Utilities",
-				"zh-hans": "模组列表分隔符 - GamePlay Utilities",
-				"zh-hant": "模組列表分隔符 - GamePlay Utilities"
+				"de": "Mod-Listen-Trennzeichen - Bug Fix",
+				"en": "Mod List Dividers - Bug Fix",
+				"es": "Separadores de lista de mods - Bug Fix",
+				"fr": "Séparateurs de liste de mods - Bug Fix",
+				"it": "Separatori della lista mod - Bug Fix",
+				"ja": "MODリスト区切り - Bug Fix",
+				"ko": "모드 목록 구분선 - Bug Fix",
+				"pl": "Separatory listy modów - Bug Fix",
+				"pt-BR": "Separadores de lista de mods - Bug Fix",
+				"ru": "Разделители списка модов - Bug Fix",
+				"zh-hans": "模组列表分隔符 - Bug Fix",
+				"zh-hant": "模組列表分隔符 - Bug Fix"
+			},
+			"description": {
+				"de": "Fügt einen Trenner zur linken Liste hinzu. Diese Mod hat keinen Einfluss auf das Spiel.",
+				"en": "This mod adds a divider to the left list. This mod has no effect on the game.",
+				"es": "Añade un separador a la lista izquierda. Este mod no tiene efecto en el juego.",
+				"fr": "Ajoute un séparateur à la liste de gauche. Ce mod n'a aucun effet sur le jeu.",
+				"it": "Aggiunge un separatore all'elenco di sinistra. Questa mod non ha alcun effetto sul gioco.",
+				"ja": "左側のリストに区切りを追加します。このMODはゲームに影響を与えません。",
+				"ko": "왼쪽 목록에 구분선을 추가합니다. 이 모드는 게임에 영향을 미치지 않습니다.",
+				"pl": "Dodaje separator do lewej listy. Ten mod nie ma wpływu na grę.",
+				"pt-BR": "Adiciona um separador à lista esquerda. Este mod não tem efeito no jogo.",
+				"ru": "Разделители списка модов - Добавляет разделитель в левый список. Этот мод не влияет на игру.",
+				"zh-hans": "在左侧列表中添加一个分隔符。此模组对游戏没有影响。",
+				"zh-hant": "在左側列表中添加一個分隔符。此模組對遊戲沒有影響。"
+			},
+			"author": "hgcl2",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/459",
+			"github_url": "",
+			"note": {
+				"de": "",
+				"en": "",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			}
+		},
+		{
+			"folder": "___GamePlay Improve",
+			"nexus_file_pattern": "___GamePlay Improve-459",
+			"name": {
+				"de": "Mod-Listen-Trennzeichen - GamePlay Improve",
+				"en": "Mod List Dividers - GamePlay Improve",
+				"es": "Separadores de lista de mods - GamePlay Improve",
+				"fr": "Séparateurs de liste de mods - GamePlay Improve",
+				"it": "Separatori della lista mod - GamePlay Improve",
+				"ja": "MODリスト区切り - GamePlay Improve",
+				"ko": "모드 목록 구분선 - GamePlay Improve",
+				"pl": "Separatory listy modów - GamePlay Improve",
+				"pt-BR": "Separadores de lista de mods - GamePlay Improve",
+				"ru": "Разделители списка модов - GamePlay Improve",
+				"zh-hans": "模组列表分隔符 - GamePlay Improve",
+				"zh-hant": "模組列表分隔符 - GamePlay Improve"
 			},
 			"description": {
 				"de": "Fügt einen Trenner zur linken Liste hinzu. Diese Mod hat keinen Einfluss auf das Spiel.",
@@ -17542,21 +17591,21 @@
 			}
 		},
 		{
-			"folder": "___System",
-			"nexus_file_pattern": "___System-459",
+			"folder": "___Game Tools",
+			"nexus_file_pattern": "___Game Tools-459",
 			"name": {
-				"de": "Mod-Listen-Trennzeichen - System",
-				"en": "Mod List Dividers - System",
-				"es": "Separadores de lista de mods - System",
-				"fr": "Séparateurs de liste de mods - System",
-				"it": "Separatori della lista mod - System",
-				"ja": "MODリスト区切り - System",
-				"ko": "모드 목록 구분선 - System",
-				"pl": "Separatory listy modów - System",
-				"pt-BR": "Separadores de lista de mods - System",
-				"ru": "Разделители списка модов - System",
-				"zh-hans": "模组列表分隔符 - System",
-				"zh-hant": "模組列表分隔符 - System"
+				"de": "Mod-Listen-Trennzeichen - Game Tools",
+				"en": "Mod List Dividers - Game Tools",
+				"es": "Separadores de lista de mods - Game Tools",
+				"fr": "Séparateurs de liste de mods - Game Tools",
+				"it": "Separatori della lista mod - Game Tools",
+				"ja": "MODリスト区切り - Game Tools",
+				"ko": "모드 목록 구분선 - Game Tools",
+				"pl": "Separatory listy modów - Game Tools",
+				"pt-BR": "Separadores de lista de mods - Game Tools",
+				"ru": "Разделители списка модов - Game Tools",
+				"zh-hans": "模组列表分隔符 - Game Tools",
+				"zh-hant": "模組列表分隔符 - Game Tools"
 			},
 			"description": {
 				"de": "Fügt einen Trenner zur linken Liste hinzu. Diese Mod hat keinen Einfluss auf das Spiel.",
@@ -17591,21 +17640,21 @@
 			}
 		},
 		{
-			"folder": "___Bug Fix",
-			"nexus_file_pattern": "___Bug Fix-459",
+			"folder": "___System",
+			"nexus_file_pattern": "___System-459",
 			"name": {
-				"de": "Mod-Listen-Trennzeichen - Bug Fix",
-				"en": "Mod List Dividers - Bug Fix",
-				"es": "Separadores de lista de mods - Bug Fix",
-				"fr": "Séparateurs de liste de mods - Bug Fix",
-				"it": "Separatori della lista mod - Bug Fix",
-				"ja": "MODリスト区切り - Bug Fix",
-				"ko": "모드 목록 구분선 - Bug Fix",
-				"pl": "Separatory listy modów - Bug Fix",
-				"pt-BR": "Separadores de lista de mods - Bug Fix",
-				"ru": "Разделители списка модов - Bug Fix",
-				"zh-hans": "模组列表分隔符 - Bug Fix",
-				"zh-hant": "模組列表分隔符 - Bug Fix"
+				"de": "Mod-Listen-Trennzeichen - System",
+				"en": "Mod List Dividers - System",
+				"es": "Separadores de lista de mods - System",
+				"fr": "Séparateurs de liste de mods - System",
+				"it": "Separatori della lista mod - System",
+				"ja": "MODリスト区切り - System",
+				"ko": "모드 목록 구분선 - System",
+				"pl": "Separatory listy modów - System",
+				"pt-BR": "Separadores de lista de mods - System",
+				"ru": "Разделители списка модов - System",
+				"zh-hans": "模组列表分隔符 - System",
+				"zh-hant": "模組列表分隔符 - System"
 			},
 			"description": {
 				"de": "Fügt einen Trenner zur linken Liste hinzu. Diese Mod hat keinen Einfluss auf das Spiel.",
@@ -17689,70 +17738,21 @@
 			}
 		},
 		{
-			"folder": "___Game Tools",
-			"nexus_file_pattern": "___Game Tools-459",
+			"folder": "___GamePlay Utilities",
+			"nexus_file_pattern": "___GamePlay Utilities-459",
 			"name": {
-				"de": "Mod-Listen-Trennzeichen - Game Tools",
-				"en": "Mod List Dividers - Game Tools",
-				"es": "Separadores de lista de mods - Game Tools",
-				"fr": "Séparateurs de liste de mods - Game Tools",
-				"it": "Separatori della lista mod - Game Tools",
-				"ja": "MODリスト区切り - Game Tools",
-				"ko": "모드 목록 구분선 - Game Tools",
-				"pl": "Separatory listy modów - Game Tools",
-				"pt-BR": "Separadores de lista de mods - Game Tools",
-				"ru": "Разделители списка модов - Game Tools",
-				"zh-hans": "模组列表分隔符 - Game Tools",
-				"zh-hant": "模組列表分隔符 - Game Tools"
-			},
-			"description": {
-				"de": "Fügt einen Trenner zur linken Liste hinzu. Diese Mod hat keinen Einfluss auf das Spiel.",
-				"en": "This mod adds a divider to the left list. This mod has no effect on the game.",
-				"es": "Añade un separador a la lista izquierda. Este mod no tiene efecto en el juego.",
-				"fr": "Ajoute un séparateur à la liste de gauche. Ce mod n'a aucun effet sur le jeu.",
-				"it": "Aggiunge un separatore all'elenco di sinistra. Questa mod non ha alcun effetto sul gioco.",
-				"ja": "左側のリストに区切りを追加します。このMODはゲームに影響を与えません。",
-				"ko": "왼쪽 목록에 구분선을 추가합니다. 이 모드는 게임에 영향을 미치지 않습니다.",
-				"pl": "Dodaje separator do lewej listy. Ten mod nie ma wpływu na grę.",
-				"pt-BR": "Adiciona um separador à lista esquerda. Este mod não tem efeito no jogo.",
-				"ru": "Разделители списка модов - Добавляет разделитель в левый список. Этот мод не влияет на игру.",
-				"zh-hans": "在左侧列表中添加一个分隔符。此模组对游戏没有影响。",
-				"zh-hant": "在左側列表中添加一個分隔符。此模組對遊戲沒有影響。"
-			},
-			"author": "hgcl2",
-			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/459",
-			"github_url": "",
-			"note": {
-				"de": "",
-				"en": "",
-				"es": "",
-				"fr": "",
-				"it": "",
-				"ja": "",
-				"ko": "",
-				"pl": "",
-				"pt-BR": "",
-				"ru": "",
-				"zh-hans": "",
-				"zh-hant": ""
-			}
-		},
-		{
-			"folder": "___GamePlay Improve",
-			"nexus_file_pattern": "___GamePlay Improve-459",
-			"name": {
-				"de": "Mod-Listen-Trennzeichen - GamePlay Improve",
-				"en": "Mod List Dividers - GamePlay Improve",
-				"es": "Separadores de lista de mods - GamePlay Improve",
-				"fr": "Séparateurs de liste de mods - GamePlay Improve",
-				"it": "Separatori della lista mod - GamePlay Improve",
-				"ja": "MODリスト区切り - GamePlay Improve",
-				"ko": "모드 목록 구분선 - GamePlay Improve",
-				"pl": "Separatory listy modów - GamePlay Improve",
-				"pt-BR": "Separadores de lista de mods - GamePlay Improve",
-				"ru": "Разделители списка модов - GamePlay Improve",
-				"zh-hans": "模组列表分隔符 - GamePlay Improve",
-				"zh-hant": "模組列表分隔符 - GamePlay Improve"
+				"de": "Mod-Listen-Trennzeichen - GamePlay Utilities",
+				"en": "Mod List Dividers - GamePlay Utilities",
+				"es": "Separadores de lista de mods - GamePlay Utilities",
+				"fr": "Séparateurs de liste de mods - GamePlay Utilities",
+				"it": "Separatori della lista mod - _GamePlay Utilities",
+				"ja": "MODリスト区切り - GamePlay Utilities",
+				"ko": "모드 목록 구분선 - GamePlay Utilities",
+				"pl": "Separatory listy modów - GamePlay Utilities",
+				"pt-BR": "Separadores de lista de mods - GamePlay Utilities",
+				"ru": "Разделители списка модов - GamePlay Utilities",
+				"zh-hans": "模组列表分隔符 - GamePlay Utilities",
+				"zh-hant": "模組列表分隔符 - GamePlay Utilities"
 			},
 			"description": {
 				"de": "Fügt einen Trenner zur linken Liste hinzu. Diese Mod hat keinen Einfluss auf das Spiel.",
@@ -18307,25 +18307,25 @@
 				"ru": ""
 			},
 			"description": {
-				"en": "Plays random parts of Turmion Kätilöt - U.S.C.H! when using Zealot Chorus ability",
+				"en": "Plays random parts of Turmion Kätilöt - U.S.C.H! when using Zealot Chorus ability.",
 				"ru": ""
 			},
 			"author": "The Redshirt",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/482",
 			"github_url": "",
 			"note": {
-				"de": "",
-				"en": "",
-				"es": "",
-				"fr": "",
-				"it": "",
-				"ja": "",
-				"ko": "",
-				"pl": "",
-				"pt-BR": "",
-				"ru": "",
-				"zh-hans": "",
-				"zh-hant": ""
+				"de": "Erforderlich: Audio-Plugin.",
+				"en": "Required: Audio plugin.",
+				"es": "Requerido: Audio plugin.",
+				"fr": "Requis : Audio plugin.",
+				"it": "Richiede: Audio plugin.",
+				"ja": "必要条件: Audioプラグイン。",
+				"ko": "필요: Audio 플러그인.",
+				"pl": "Wymagane: Audio plugin.",
+				"pt-BR": "Requerido: Audio plugin.",
+				"ru": "Требуется: Audio плагин.",
+				"zh-hans": "需要：音频插件。",
+				"zh-hant": "需要：音訊插件。"
 			}
 		},
 		{
@@ -18343,25 +18343,25 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/483",
 			"github_url": "",
 			"note": {
-				"de": "",
-				"en": "",
-				"es": "",
-				"fr": "",
-				"it": "",
-				"ja": "",
-				"ko": "",
-				"pl": "",
-				"pt-BR": "",
-				"ru": "",
-				"zh-hans": "",
-				"zh-hant": ""
+				"de": "Erforderlich: Audio-Plugin.",
+				"en": "Required: Audio plugin.",
+				"es": "Requerido: Audio plugin.",
+				"fr": "Requis : Audio plugin.",
+				"it": "Richiede: Audio plugin.",
+				"ja": "必要条件: Audioプラグイン。",
+				"ko": "필요: Audio 플러그인.",
+				"pl": "Wymagane: Audio plugin.",
+				"pt-BR": "Requerido: Audio plugin.",
+				"ru": "Требуется: Audio плагин.",
+				"zh-hans": "需要：音频插件。",
+				"zh-hant": "需要：音訊插件。"
 			}
 		},
 		{
 			"folder": "CustomCrit",
 			"nexus_file_pattern": "custom",
 			"name": {
-				"en": "Jerry's CustomCrit",
+				"en": "Jerry's Custom Crit",
 				"ru": ""
 			},
 			"description": {
@@ -18372,18 +18372,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/484",
 			"github_url": "",
 			"note": {
-				"de": "",
-				"en": "",
-				"es": "",
-				"fr": "",
-				"it": "",
-				"ja": "",
-				"ko": "",
-				"pl": "",
-				"pt-BR": "",
-				"ru": "",
-				"zh-hans": "",
-				"zh-hant": ""
+				"de": "Erforderlich: Audio-Plugin.",
+				"en": "Required: Audio plugin.",
+				"es": "Requerido: Audio plugin.",
+				"fr": "Requis : Audio plugin.",
+				"it": "Richiede: Audio plugin.",
+				"ja": "必要条件: Audioプラグイン。",
+				"ko": "필요: Audio 플러그인.",
+				"pl": "Wymagane: Audio plugin.",
+				"pt-BR": "Requerido: Audio plugin.",
+				"ru": "Требуется: Audio плагин.",
+				"zh-hans": "需要：音频插件。",
+				"zh-hant": "需要：音訊插件。"
 			}
 		},
 		{
@@ -18517,18 +18517,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/489",
 			"github_url": "",
 			"note": {
-				"de": "",
-				"en": "",
-				"es": "",
-				"fr": "",
-				"it": "",
-				"ja": "",
-				"ko": "",
-				"pl": "",
-				"pt-BR": "",
-				"ru": "",
-				"zh-hans": "",
-				"zh-hant": ""
+				"de": "Erforderlich: Audio-Plugin.",
+				"en": "Required: Audio plugin.",
+				"es": "Requerido: Audio plugin.",
+				"fr": "Requis : Audio plugin.",
+				"it": "Richiede: Audio plugin.",
+				"ja": "必要条件: Audioプラグイン。",
+				"ko": "필요: Audio 플러그인.",
+				"pl": "Wymagane: Audio plugin.",
+				"pt-BR": "Requerido: Audio plugin.",
+				"ru": "Требуется: Audio плагин.",
+				"zh-hans": "需要：音频插件。",
+				"zh-hant": "需要：音訊插件。"
 			}
 		},
 		{
@@ -18720,18 +18720,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/499",
 			"github_url": "",
 			"note": {
-				"de": "",
-				"en": "",
-				"es": "",
-				"fr": "",
-				"it": "",
-				"ja": "",
-				"ko": "",
-				"pl": "",
-				"pt-BR": "",
-				"ru": "",
-				"zh-hans": "",
-				"zh-hant": ""
+				"de": "Erforderlich: Audio-Plugin.",
+				"en": "Required: Audio plugin.",
+				"es": "Requerido: Audio plugin.",
+				"fr": "Requis : Audio plugin.",
+				"it": "Richiede: Audio plugin.",
+				"ja": "必要条件: Audioプラグイン。",
+				"ko": "필요: Audio 플러그인.",
+				"pl": "Wymagane: Audio plugin.",
+				"pt-BR": "Requerido: Audio plugin.",
+				"ru": "Требуется: Audio плагин.",
+				"zh-hans": "需要：音频插件。",
+				"zh-hant": "需要：音訊插件。"
 			}
 		},
 		{
@@ -18822,8 +18822,8 @@
 			}
 		},
 		{
-			"folder": "servo_friend_audio_server_plugin",
-			"nexus_file_pattern": "servo friend ai generated voice plugin-504",
+			"folder": "servo_friend_plugin_hat_cables",
+			"nexus_file_pattern": "servo friend example hat addon-504",
 			"name": {
 				"en": "Servo Friend",
 				"ru": ""
@@ -18851,8 +18851,8 @@
 			}
 		},
 		{
-			"folder": "servo_friend_plugin_hat_cables",
-			"nexus_file_pattern": "servo friend example hat addon-504",
+			"folder": "servo_friend_audio_server_plugin",
+			"nexus_file_pattern": "servo friend ai generated voice plugin-504",
 			"name": {
 				"en": "Servo Friend",
 				"ru": ""
@@ -19119,25 +19119,25 @@
 				"ru": ""
 			},
 			"description": {
-				"en": "This mod replaces in-game event triggers with narration clips from the Ancestor from Darkest Dungeon I and II",
+				"en": "This mod replaces in-game event triggers with narration clips from the Ancestor from Darkest Dungeon I and II.",
 				"ru": ""
 			},
 			"author": "Brunin",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/515",
 			"github_url": "",
 			"note": {
-				"de": "",
-				"en": "",
-				"es": "",
-				"fr": "",
-				"it": "",
-				"ja": "",
-				"ko": "",
-				"pl": "",
-				"pt-BR": "",
-				"ru": "",
-				"zh-hans": "",
-				"zh-hant": ""
+				"de": "Erforderlich: Audio-Plugin.",
+				"en": "Required: Audio plugin.",
+				"es": "Requerido: Audio plugin.",
+				"fr": "Requis : Audio plugin.",
+				"it": "Richiede: Audio plugin.",
+				"ja": "必要条件: Audioプラグイン。",
+				"ko": "필요: Audio 플러그인.",
+				"pl": "Wymagane: Audio plugin.",
+				"pt-BR": "Requerido: Audio plugin.",
+				"ru": "Требуется: Audio плагин.",
+				"zh-hans": "需要：音频插件。",
+				"zh-hant": "需要：音訊插件。"
 			}
 		},
 		{
@@ -19242,18 +19242,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/519",
 			"github_url": "",
 			"note": {
-				"de": "",
-				"en": "",
-				"es": "",
-				"fr": "",
-				"it": "",
-				"ja": "",
-				"ko": "",
-				"pl": "",
-				"pt-BR": "",
-				"ru": "",
-				"zh-hans": "",
-				"zh-hant": ""
+				"de": "Erforderlich: Audio-Plugin.",
+				"en": "Required: Audio plugin.",
+				"es": "Requerido: Audio plugin.",
+				"fr": "Requis : Audio plugin.",
+				"it": "Richiede: Audio plugin.",
+				"ja": "必要条件: Audioプラグイン。",
+				"ko": "필요: Audio 플러그인.",
+				"pl": "Wymagane: Audio plugin.",
+				"pt-BR": "Requerido: Audio plugin.",
+				"ru": "Требуется: Audio плагин.",
+				"zh-hans": "需要：音频插件。",
+				"zh-hant": "需要：音訊插件。"
 			}
 		},
 		{
@@ -19358,18 +19358,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/523",
 			"github_url": "",
 			"note": {
-				"de": "",
-				"en": "",
-				"es": "",
-				"fr": "",
-				"it": "",
-				"ja": "",
-				"ko": "",
-				"pl": "",
-				"pt-BR": "",
-				"ru": "",
-				"zh-hans": "",
-				"zh-hant": ""
+				"de": "Erforderlich: Audio-Plugin.",
+				"en": "Required: Audio plugin.",
+				"es": "Requerido: Audio plugin.",
+				"fr": "Requis : Audio plugin.",
+				"it": "Richiede: Audio plugin.",
+				"ja": "必要条件: Audioプラグイン。",
+				"ko": "필요: Audio 플러그인.",
+				"pl": "Wymagane: Audio plugin.",
+				"pt-BR": "Requerido: Audio plugin.",
+				"ru": "Требуется: Audio плагин.",
+				"zh-hans": "需要：音频插件。",
+				"zh-hant": "需要：音訊插件。"
 			}
 		},
 		{
@@ -19692,7 +19692,7 @@
 			}
 		},
 		{
-			"folder": "LessAnnoyingArbites",
+			"folder": "LessAnnoyingDogFootsteps",
 			"nexus_file_pattern": "less",
 			"name": {
 				"en": "LessAnnoyingArbites",
@@ -19721,7 +19721,7 @@
 			}
 		},
 		{
-			"folder": "LessAnnoyingDogFootsteps",
+			"folder": "LessAnnoyingArbites",
 			"nexus_file_pattern": "less",
 			"name": {
 				"en": "LessAnnoyingArbites",
@@ -19764,18 +19764,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/547",
 			"github_url": "",
 			"note": {
-				"de": "",
-				"en": "",
-				"es": "",
-				"fr": "",
-				"it": "",
-				"ja": "",
-				"ko": "",
-				"pl": "",
-				"pt-BR": "",
-				"ru": "",
-				"zh-hans": "",
-				"zh-hant": ""
+				"de": "Erforderlich: Audio-Plugin.",
+				"en": "Required: Audio plugin.",
+				"es": "Requerido: Audio plugin.",
+				"fr": "Requis : Audio plugin.",
+				"it": "Richiede: Audio plugin.",
+				"ja": "必要条件: Audioプラグイン。",
+				"ko": "필요: Audio 플러그인.",
+				"pl": "Wymagane: Audio plugin.",
+				"pt-BR": "Requerido: Audio plugin.",
+				"ru": "Требуется: Audio плагин.",
+				"zh-hans": "需要：音频插件。",
+				"zh-hant": "需要：音訊插件。"
 			}
 		},
 		{
@@ -19786,25 +19786,25 @@
 				"ru": ""
 			},
 			"description": {
-				"en": "If your Nuncia Aquila is too staid and boring for the party animal you are, this mod will bring some light and music to the darkness of Tertium",
+				"en": "If your Nuncia Aquila is too staid and boring for the party animal you are, this mod will bring some light and music to the darkness of Tertium.",
 				"ru": ""
 			},
 			"author": "Wobin",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/548",
 			"github_url": "",
 			"note": {
-				"de": "",
-				"en": "",
-				"es": "",
-				"fr": "",
-				"it": "",
-				"ja": "",
-				"ko": "",
-				"pl": "",
-				"pt-BR": "",
-				"ru": "",
-				"zh-hans": "",
-				"zh-hant": ""
+				"de": "Erforderlich: Audio-Plugin.",
+				"en": "Required: Audio plugin.",
+				"es": "Requerido: Audio plugin.",
+				"fr": "Requis : Audio plugin.",
+				"it": "Richiede: Audio plugin.",
+				"ja": "必要条件: Audioプラグイン。",
+				"ko": "필요: Audio 플러그인.",
+				"pl": "Wymagane: Audio plugin.",
+				"pt-BR": "Requerido: Audio plugin.",
+				"ru": "Требуется: Audio плагин.",
+				"zh-hans": "需要：音频插件。",
+				"zh-hant": "需要：音訊插件。"
 			}
 		},
 		{
@@ -20692,18 +20692,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/590",
 			"github_url": "",
 			"note": {
-				"de": "",
-				"en": "",
-				"es": "",
-				"fr": "",
-				"it": "",
-				"ja": "",
-				"ko": "",
-				"pl": "",
-				"pt-BR": "",
-				"ru": "",
-				"zh-hans": "",
-				"zh-hant": ""
+				"de": "Erforderlich: Audio-Plugin.",
+				"en": "Required: Audio plugin.",
+				"es": "Requerido: Audio plugin.",
+				"fr": "Requis : Audio plugin.",
+				"it": "Richiede: Audio plugin.",
+				"ja": "必要条件: Audioプラグイン。",
+				"ko": "필요: Audio 플러그인.",
+				"pl": "Wymagane: Audio plugin.",
+				"pt-BR": "Requerido: Audio plugin.",
+				"ru": "Требуется: Audio плагин.",
+				"zh-hans": "需要：音频插件。",
+				"zh-hant": "需要：音訊插件。"
 			}
 		},
 		{
@@ -22089,8 +22089,8 @@
 			}
 		},
 		{
-			"folder": "OrbEmitTest",
-			"nexus_file_pattern": "orb",
+			"folder": "MiniAudioExample",
+			"nexus_file_pattern": "mini",
 			"name": {
 				"en": "MiniAudioAddon",
 				"ru": ""
@@ -22176,8 +22176,8 @@
 			}
 		},
 		{
-			"folder": "MiniAudioExample",
-			"nexus_file_pattern": "mini",
+			"folder": "OrbEmitTest",
+			"nexus_file_pattern": "orb",
 			"name": {
 				"en": "MiniAudioAddon",
 				"ru": ""
@@ -22353,29 +22353,29 @@
 			"folder": "MuteImpacts",
 			"nexus_file_pattern": "mute",
 			"name": {
-				"en": "Silence Obnoxious Sounds (SOS) - Mute Impact SFX - Remove Sounds from Psyker Primary Fire - Plinking from No or Reduced Damage from Carapace Armor - Silence Left Click - Silence Pox Gas Coughs or Coughing",
+				"en": "Silence Obnoxious Sounds (SOS)",
 				"ru": ""
 			},
 			"description": {
-				"en": "Remove sounds from Psyker Primary Fire explosions, coughing from Pox gas, and the plinking from doing no or reduced Damage against Carapace or Flak Armor",
+				"en": "Mute Impact SFX - Remove Sounds from Psyker Primary Fire - Plinking from No or Reduced Damage from Carapace Armor - Silence Left Click - Silence Pox Gas Coughs or Coughing - Remove sounds from Psyker Primary Fire explosions, coughing from Pox gas, and the plinking from doing no or reduced Damage against Carapace or Flak Armor",
 				"ru": ""
 			},
 			"author": "Backup158",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/671",
 			"github_url": "",
 			"note": {
-				"de": "",
-				"en": "",
-				"es": "",
-				"fr": "",
-				"it": "",
-				"ja": "",
-				"ko": "",
-				"pl": "",
-				"pt-BR": "",
-				"ru": "",
-				"zh-hans": "",
-				"zh-hant": ""
+				"de": "Erforderlich: Audio-Plugin.",
+				"en": "Required: Audio plugin.",
+				"es": "Requerido: Audio plugin.",
+				"fr": "Requis : Audio plugin.",
+				"it": "Richiede: Audio plugin.",
+				"ja": "必要条件: Audioプラグイン。",
+				"ko": "필요: Audio 플러그인.",
+				"pl": "Wymagane: Audio plugin.",
+				"pt-BR": "Requerido: Audio plugin.",
+				"ru": "Требуется: Audio плагин.",
+				"zh-hans": "需要：音频插件。",
+				"zh-hant": "需要：音訊插件。"
 			}
 		},
 		{
@@ -22988,8 +22988,8 @@
 			}
 		},
 		{
-			"folder": "CrouchToggle",
-			"nexus_file_pattern": "crouch",
+			"folder": "TapToggle_HoldSprint",
+			"nexus_file_pattern": "tap",
 			"name": {
 				"en": "Tap 2 Toggle And Or Hold",
 				"ru": ""
@@ -23017,8 +23017,8 @@
 			}
 		},
 		{
-			"folder": "TapToggle_HoldSprint",
-			"nexus_file_pattern": "tap",
+			"folder": "CrouchToggle",
+			"nexus_file_pattern": "crouch",
 			"name": {
 				"en": "Tap 2 Toggle And Or Hold",
 				"ru": ""
@@ -23745,11 +23745,11 @@
 			"folder": "NoCorpses",
 			"nexus_file_pattern": "nocorpses",
 			"name": {
-				"en": "NoCorpses",
+				"en": "No Corpses",
 				"ru": ""
 			},
 			"description": {
-				"en": "尸体秒消失敌人死亡后立即移除尸体，保持战场干净，减少地上尸体堆积带来的性能消耗Instant Corpse CleanupEnemy corpses are removed immediately upon death to keep the battlefield clean and reduce performance impact from excessive bodies on the ground.",
+				"en": "Instant Corpse CleanupEnemy corpses are removed immediately upon death to keep the battlefield clean and reduce performance impact from excessive bodies on the ground.",
 				"ru": ""
 			},
 			"author": "wubaishijie",
@@ -23988,18 +23988,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/744",
 			"github_url": "",
 			"note": {
-				"de": "",
-				"en": "",
-				"es": "",
-				"fr": "",
-				"it": "",
-				"ja": "",
-				"ko": "",
-				"pl": "",
-				"pt-BR": "",
-				"ru": "",
-				"zh-hans": "",
-				"zh-hant": ""
+				"de": "Erforderlich: Audio-Plugin.",
+				"en": "Required: Audio plugin.",
+				"es": "Requerido: Audio plugin.",
+				"fr": "Requis : Audio plugin.",
+				"it": "Richiede: Audio plugin.",
+				"ja": "必要条件: Audioプラグイン。",
+				"ko": "필요: Audio 플러그인.",
+				"pl": "Wymagane: Audio plugin.",
+				"pt-BR": "Requerido: Audio plugin.",
+				"ru": "Требуется: Audio плагин.",
+				"zh-hans": "需要：音频插件。",
+				"zh-hant": "需要：音訊插件。"
 			}
 		},
 		{
@@ -24242,8 +24242,18 @@
 				"ru": ""
 			},
 			"description": {
-				"en": "/mmtget",
-				"ru": ""
+				"de": "VERALTET!",
+				"en": "OBSOLETE!",
+				"es": "¡OBSOLETO!",
+				"fr": "OBSOLÈTE !",
+				"it": "OBSOLETO!",
+				"ja": "廃止！",
+				"ko": "구식!",
+				"pl": "PRZESTARZAŁY!",
+				"pt-BR": "OBSOLETO!",
+				"ru": "УСТАРЕЛ!",
+				"zh-hans": "已过时！",
+				"zh-hant": "已過時！"
 			},
 			"author": "jcyl2023",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/759",
@@ -24329,7 +24339,7 @@
 				"ru": ""
 			},
 			"description": {
-				"en": "Shows  a grid in place of the expeditions menu, an alternative menu look",
+				"en": "Shows a grid in place of the expeditions menu, an alternative menu look",
 				"ru": ""
 			},
 			"author": "LAUR3HTE",
@@ -24384,10 +24394,10 @@
 			"nexus_file_pattern": "audible",
 			"name": {
 				"en": "Audible Time to Kill",
-				"ru": ""
+				"ru": "Озвученное Время убивать"
 			},
 			"description": {
-				"en": "Choose from a list of in-game sounds or custom sound file (Audio Plugin required) to play when Time to Kill recharges.",
+				"en": "Choose from a list of in-game sounds or custom sound file (Audio Plugin required) to play when Time to Kill recharges.\n\nIf you're using the Creature Spawner mod and have the Sound Muffler option enabled in the Psykhanium, enemy sounds will be muted. This means if you’ve set your Audible Time to Kill in-game sound to use Plague Ogryn or Chaos Spawn sounds (from the dropdown options), they will not play in the Psykhanium while Sound Muffler is active. The mod is still working—just disable Sound Muffler to hear the Audible Time to Kill in-game sound while testing.",
 				"ru": ""
 			},
 			"author": "demba",
@@ -24412,11 +24422,11 @@
 			"folder": "Compass Range Finder",
 			"nexus_file_pattern": "compass",
 			"name": {
-				"en": "Compass Range Finder - Distance to marked Expedition POI indicator",
+				"en": "Compass Range Finder",
 				"ru": ""
 			},
 			"description": {
-				"en": "Adds a distance to marked POI to the Expedition compass so you can judge which to move to next",
+				"en": "Distance to marked Expedition POI indicator - Adds a distance to marked POI to the Expedition compass so you can judge which to move to next",
 				"ru": ""
 			},
 			"author": "Wobin",
@@ -24503,7 +24513,7 @@
 				"ru": ""
 			},
 			"description": {
-				"en": "·这是一个简单的模组，可关闭“灵魂之火”（Warp Fire）debuff 的燃烧材质、燃烧音效，以及敌人身上的火焰特效。\n\n·This is a simple mod that disables the burning material effect, burning sound effect, and the flames on enemies caused by the “Warp Fire” debuff.",
+				"en": "This is a simple mod that disables the burning material effect, burning sound effect, and the flames on enemies caused by the 'Warp Fire' debuff.",
 				"ru": ""
 			},
 			"author": "wubaishijie",
@@ -24532,7 +24542,7 @@
 				"ru": ""
 			},
 			"description": {
-				"en": "Navigate directly to the Expeditions menu with a hotkey in the hub",
+				"en": "Navigate directly to the Expeditions menu with a hotkey in the hub.",
 				"ru": ""
 			},
 			"author": "Faith",
@@ -24557,7 +24567,7 @@
 			"folder": "TraversalAssist",
 			"nexus_file_pattern": "traversal",
 			"name": {
-				"en": "TraversalAssist",
+				"en": "Traversal Assist",
 				"ru": ""
 			},
 			"description": {
@@ -24626,18 +24636,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/782",
 			"github_url": "",
 			"note": {
-				"de": "",
-				"en": "",
-				"es": "",
-				"fr": "",
-				"it": "",
-				"ja": "",
-				"ko": "",
-				"pl": "",
-				"pt-BR": "",
-				"ru": "",
-				"zh-hans": "",
-				"zh-hant": ""
+				"de": "Erforderlich: Audio-Plugin.",
+				"en": "Required: Audio plugin.",
+				"es": "Requerido: Audio plugin.",
+				"fr": "Requis : Audio plugin.",
+				"it": "Richiede: Audio plugin.",
+				"ja": "必要条件: Audioプラグイン。",
+				"ko": "필요: Audio 플러그인.",
+				"pl": "Wymagane: Audio plugin.",
+				"pt-BR": "Requerido: Audio plugin.",
+				"ru": "Требуется: Audio плагин.",
+				"zh-hans": "需要：音频插件。",
+				"zh-hant": "需要：音訊插件。"
 			}
 		},
 		{
@@ -24645,10 +24655,10 @@
 			"nexus_file_pattern": "audible",
 			"name": {
 				"en": "Audible Retaliatory Defence",
-				"ru": ""
+				"ru": "Озвученная Активная оборона"
 			},
 			"description": {
-				"en": "Choose from a list of in-game sounds or custom sound file (Audio Plugin required) to play when Retaliatory Defence recharges.",
+				"en": "Choose from a list of in-game sounds or custom sound file (Audio Plugin required) to play when Retaliatory Defence recharges.\n\nIf you're using the Creature Spawner mod and have the Sound Muffler option enabled in the Psykhanium, enemy sounds will be muted. This means if you’ve set your Audible Retaliatory Defence in-game sound to use Plague Ogryn or Chaos Spawn sounds (from the dropdown options), they will not play in the Psykhanium while Sound Muffler is active. The mod is still working—just disable Sound Muffler to hear the Audible Retaliatory Defence in-game sound while testing.\n\nNote for Custom HUD/Better Buff Management Users:\nThis mod works by reading the HUD Icon for Retaliatory Defence, therefore if you are using any mods to hide the icon such as toggling the HUD OFF with Custom HUD or the Toggle Buff Bar option in Better Buff Management, the sounds from this mod will not play when the HUD Icon for Retaliatory Defence is hidden. I am still trying to find a workaround to this as I want the sounds to play while the HUD is toggled OFF/the buff icon is not present on your HUD but in the meantime... as long as the HUD Icon is present, this mod will work properly.",
 				"ru": ""
 			},
 			"author": "demba",
@@ -24677,7 +24687,7 @@
 				"ru": ""
 			},
 			"description": {
-				"en": "这是一个简单的模组，它可以关闭【腐化装甲】词条的特殊音效，替换成正常的攻击音效\n\nA simple Darktide mod that removes the special hit sound effects from the Havoc modifier \"Rotten Armour\" and restores the default hit sounds.",
+				"en": "A simple Darktide mod that removes the special hit sound effects from the Havoc modifier \"Rotten Armour\" and restores the default hit sounds.",
 				"ru": ""
 			},
 			"author": "wubaishijie",
@@ -24713,18 +24723,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/786",
 			"github_url": "",
 			"note": {
-				"de": "",
-				"en": "",
-				"es": "",
-				"fr": "",
-				"it": "",
-				"ja": "",
-				"ko": "",
-				"pl": "",
-				"pt-BR": "",
-				"ru": "",
-				"zh-hans": "",
-				"zh-hant": ""
+				"de": "Erforderlich: Audio-Plugin.",
+				"en": "Required: Audio plugin.",
+				"es": "Requerido: Audio plugin.",
+				"fr": "Requis : Audio plugin.",
+				"it": "Richiede: Audio plugin.",
+				"ja": "必要条件: Audioプラグイン。",
+				"ko": "필요: Audio 플러그인.",
+				"pl": "Wymagane: Audio plugin.",
+				"pt-BR": "Requerido: Audio plugin.",
+				"ru": "Требуется: Audio плагин.",
+				"zh-hans": "需要：音频插件。",
+				"zh-hant": "需要：音訊插件。"
 			}
 		},
 		{
@@ -24743,7 +24753,7 @@
 			"github_url": "",
 			"note": {
 				"de": "",
-				"en": "",
+				"en": "This mod currently conflicts with Perfect Indicator.",
 				"es": "",
 				"fr": "",
 				"it": "",
@@ -24751,7 +24761,7 @@
 				"ko": "",
 				"pl": "",
 				"pt-BR": "",
-				"ru": "",
+				"ru": "Этот мод временно конфликтует с модом Индикатор идеального удара (Perfect Indicator).",
 				"zh-hans": "",
 				"zh-hant": ""
 			}
@@ -24764,12 +24774,12 @@
 				"ru": ""
 			},
 			"description": {
-				"en": "Displays mission modifier information in the lobby screen.",
+				"en": "Displays mission modifier information in the lobby screen by using the Havoc modifier UI for normal missions and expeditions. Also displays the grid point name in the top-left for expeditions.",
 				"ru": ""
 			},
 			"author": "ItsAlxl",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/788",
-			"github_url": "",
+			"github_url": "https://github.com/ItsAlxl/darktide-mods/tree/main/LobbyModifierInfo",
 			"note": {
 				"de": "",
 				"en": "",
@@ -24798,7 +24808,7 @@
 			},
 			"author": "LucLeto",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/790",
-			"github_url": "",
+			"github_url": "https://github.com/LucLeto/darktide-mods-radar",
 			"note": {
 				"de": "",
 				"en": "",
@@ -24818,16 +24828,16 @@
 			"folder": "Extra Opportunities",
 			"nexus_file_pattern": "extra",
 			"name": {
-				"en": "Extra Opportunity - Adds the closest smaller POI to the Expedition Compass",
+				"en": "Extra Opportunity",
 				"ru": ""
 			},
 			"description": {
-				"en": "Hadron actually knows where the smaller points of interest are on the Expedition maps. This mod resurfaces them to the compass",
+				"en": "Adds the closest smaller POI to the Expedition Compass - Hadron actually knows where the smaller points of interest are on the Expedition maps. This mod resurfaces them to the compass",
 				"ru": ""
 			},
 			"author": "wobin",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/791",
-			"github_url": "",
+			"github_url": "https://github.com/Wobin/ExtraOpportunities",
 			"note": {
 				"de": "",
 				"en": "",
@@ -24847,7 +24857,7 @@
 			"folder": "AuspexHelper",
 			"nexus_file_pattern": "auspex",
 			"name": {
-				"en": "AuspexHelper - Enhanced (Minimap Colors and Chinese Translation)",
+				"en": "AuspexHelper - Enhanced",
 				"ru": ""
 			},
 			"description": {
@@ -24876,11 +24886,11 @@
 			"folder": "ZealotInvisibleTimer",
 			"nexus_file_pattern": "zealot",
 			"name": {
-				"en": "ZealotInvisibleTimer",
+				"en": "Zealot Invisible Timer",
 				"ru": ""
 			},
 			"description": {
-				"en": "Show a countdown timer of zealot's Invisible talent and flicker with the invisibility effect as the countdown nears its end.显示狂信隐身的倒计时，并在倒计时临近时闪烁隐身特效。",
+				"en": "Show a countdown timer of Zealot's Invisible talent and flicker with the invisibility effect as the countdown nears its end.",
 				"ru": ""
 			},
 			"author": "PaimonKawaii",
@@ -24905,8 +24915,8 @@
 			"folder": "HoldFire",
 			"nexus_file_pattern": "hold",
 			"name": {
-				"en": "HoldFire",
-				"ru": ""
+				"en": "Hold Fire",
+				"ru": "Не стреляй"
 			},
 			"description": {
 				"en": "Blocks ranged fire unless a selected enemy type is directly under your crosshair. Supports elites, specials, bosses, normal enemies, and destructibles, while preserving fire once a valid target is hovered.",
@@ -24914,7 +24924,7 @@
 			},
 			"author": "ImperialSkoom",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/797",
-			"github_url": "",
+			"github_url": "https://github.com/ImperialSkoom/Darktide-HoldFire",
 			"note": {
 				"de": "",
 				"en": "",
@@ -24963,11 +24973,11 @@
 			"folder": "SprintKnifeHeavy",
 			"nexus_file_pattern": "sprint",
 			"name": {
-				"en": "SprintKnifeHeavy",
+				"en": "Sprint Knife Heavy",
 				"ru": ""
 			},
 			"description": {
-				"en": "Chains heavy knife attacks while sprinting forward. Built for players who enjoy auto‑mods and want smoother combat knife movement in Darktide. (And yes, I know your primary input is bound to something else on Skitarius.)",
+				"en": "Chains heavy knife attacks while sprinting forward. Built for players who enjoy auto-mods and want smoother combat knife movement in Darktide. (And yes, I know your primary input is bound to something else on Skitarius.)",
 				"ru": ""
 			},
 			"author": "ImperialSkoom",
@@ -24993,7 +25003,7 @@
 			"nexus_file_pattern": "smooth",
 			"name": {
 				"en": "SmoothTide",
-				"ru": ""
+				"ru": "ПлавноТайд"
 			},
 			"description": {
 				"en": "SmoothTide is a dual-mode performance mod that lets you switch between:\n\nPerformance Mode → stabilizes FPS during heavy combat\nCinematic Mode → enhances visuals for a more immersive look\n\nYou can toggle modes with a hotkey or through settings, giving you full control over how the game feels moment to moment.",
@@ -25025,10 +25035,10 @@
 				"ru": ""
 			},
 			"description": {
-				"en": "Tracks peril over time during missions and displays a chart. Sessions are saved to %appdata%&#92;Fatshark&#92;Darktide&#92;peril_tracker for historical review.",
+				"en": "Tracks peril over time during missions and displays a chart. Sessions are saved to \"%Appdata\\Fatshark\\Darktide\\peril_tracker\" for historical review.",
 				"ru": ""
 			},
-			"author": "Six",
+			"author": "ThatOneSix",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/801",
 			"github_url": "",
 			"note": {
@@ -25108,7 +25118,7 @@
 			"folder": "SprintRelicHeavy",
 			"nexus_file_pattern": "sprint",
 			"name": {
-				"en": "SprintRelicHeavy",
+				"en": "Sprint Relic Heavy",
 				"ru": ""
 			},
 			"description": {
@@ -25166,7 +25176,7 @@
 			"folder": "CaponesPartyHUD",
 			"nexus_file_pattern": "capones",
 			"name": {
-				"en": "CaponesPartyHUD",
+				"en": "Capones Party HUD",
 				"ru": ""
 			},
 			"description": {
@@ -25199,12 +25209,12 @@
 				"ru": ""
 			},
 			"description": {
-				"en": "在敌人的攻击即将对你造成伤害时，显示轮廓线。这有助于完美格挡和闪避。\nShow the outline when an enemy's attack is about to hit you. This helps with perfect blocking and dodging.",
+				"en": "Show the outline when an enemy's attack is about to hit you. This helps with perfect blocking and dodging.",
 				"ru": ""
 			},
 			"author": "BlueGary",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/807",
-			"github_url": "",
+			"github_url": "https://github.com/BlueGary233/AttackerOutlines",
 			"note": {
 				"de": "",
 				"en": "",
@@ -25224,7 +25234,7 @@
 			"folder": "BabaYagaDualStubPistols",
 			"nexus_file_pattern": "baba",
 			"name": {
-				"en": "BabaYagaDualStubPistols",
+				"en": "Baba Yaga Dual Stub Pistols",
 				"ru": ""
 			},
 			"description": {
@@ -25282,7 +25292,7 @@
 			"folder": "HostileVitals",
 			"nexus_file_pattern": "hostile",
 			"name": {
-				"en": "HostileVitals",
+				"en": "Hostile Vitals",
 				"ru": ""
 			},
 			"description": {
@@ -25439,7 +25449,7 @@
 			"github_url": "",
 			"note": {
 				"de": "",
-				"en": "",
+				"en": "Warning! There are reports of issues related to desynchronization.",
 				"es": "",
 				"fr": "",
 				"it": "",
@@ -25447,7 +25457,7 @@
 				"ko": "",
 				"pl": "",
 				"pt-BR": "",
-				"ru": "",
+				"ru": "Внимание! Сообщают о проблемах связанных с десинхронизацией.",
 				"zh-hans": "",
 				"zh-hant": ""
 			}
@@ -25460,7 +25470,7 @@
 				"ru": ""
 			},
 			"description": {
-				"en": "Automatically skip post-mission \"incoming transmission\" cutscenes.",
+				"en": "Automatically skip post-mission \"Incoming transmission\" cutscenes.",
 				"ru": ""
 			},
 			"author": "xxBellatrix",
@@ -25485,7 +25495,7 @@
 			"folder": "DamageTracker",
 			"nexus_file_pattern": "damage",
 			"name": {
-				"en": "DamageTracker",
+				"en": "Damage Tracker",
 				"ru": ""
 			},
 			"description": {
@@ -25523,7 +25533,7 @@
 			},
 			"author": "LucLeto",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/820",
-			"github_url": "",
+			"github_url": "https://github.com/LucLeto/darktide-mods-icon-browser",
 			"note": {
 				"de": "",
 				"en": "",
@@ -25576,7 +25586,7 @@
 				"ru": ""
 			},
 			"description": {
-				"en": "Utility for mod authors. Exports the master items table.",
+				"en": "Utility for mod authors. Exports the master items table.\n\nChat commands:\n    - /export_master_items to export the file.",
 				"ru": ""
 			},
 			"author": "GideonAriphael",
@@ -25601,11 +25611,11 @@
 			"folder": "ErrorTracker",
 			"nexus_file_pattern": "error",
 			"name": {
-				"en": "ErrorTracker",
+				"en": "Error Tracker",
 				"ru": ""
 			},
 			"description": {
-				"en": "ErrorTracker is a crash diagnostics mod for Darktide that detects, logs, and helps identify which mods are causing issues.\nIt automatically captures Lua errors, tracks mod activity, and analyzes hard crashes to pinpoint the most likely culprit — so you can fix problems fast instead of guessing.",
+				"en": "Error Tracker is a crash diagnostics mod for Darktide that detects, logs, and helps identify which mods are causing issues.\nIt automatically captures Lua errors, tracks mod activity, and analyzes hard crashes to pinpoint the most likely culprit — so you can fix problems fast instead of guessing.",
 				"ru": ""
 			},
 			"author": "Capone",
@@ -25613,7 +25623,7 @@
 			"github_url": "",
 			"note": {
 				"de": "",
-				"en": "",
+				"en": "For it to work correctly, it must be at the very top of the mod list.",
 				"es": "",
 				"fr": "",
 				"it": "",
@@ -25621,7 +25631,7 @@
 				"ko": "",
 				"pl": "",
 				"pt-BR": "",
-				"ru": "",
+				"ru": "Для корректной работы он должен находиться в самом верху списка модов.",
 				"zh-hans": "",
 				"zh-hant": ""
 			}
@@ -25721,7 +25731,7 @@
 				"ru": ""
 			},
 			"description": {
-				"en": "Adds your and your allies\" Cyber-Mastiffs to the Valkyrie intro before the mission begins",
+				"en": "Adds your and your allies' Cyber-Mastiffs to the Valkyrie intro before the mission begins",
 				"ru": ""
 			},
 			"author": "leer",
@@ -25804,7 +25814,7 @@
 			"folder": "LowAmmoWarning",
 			"nexus_file_pattern": "low",
 			"name": {
-				"en": "LowAmmoWarning",
+				"en": "Low Ammo Warning",
 				"ru": ""
 			},
 			"description": {
@@ -25833,11 +25843,11 @@
 			"folder": "SprintVault",
 			"nexus_file_pattern": "sprint",
 			"name": {
-				"en": "SprintVault",
+				"en": "Sprint Vault",
 				"ru": ""
 			},
 			"description": {
-				"en": "Auto-Vault While Sprinting",
+				"en": "Auto-Vault While Sprinting.",
 				"ru": ""
 			},
 			"author": "AFKING1551",
@@ -25862,7 +25872,7 @@
 			"folder": "PlasmaBFG",
 			"nexus_file_pattern": "plasma",
 			"name": {
-				"en": "PlasmaBFG",
+				"en": "Plasma BFG",
 				"ru": ""
 			},
 			"description": {
@@ -25891,11 +25901,11 @@
 			"folder": "HavocGroupChat",
 			"nexus_file_pattern": "havoc",
 			"name": {
-				"en": "HavocGroupChat",
+				"en": "Havoc Group Chat",
 				"ru": ""
 			},
 			"description": {
-				"en": "修复浩劫找队界面不能聊天的问题。开房查看申请列表时，可以直接按回车打字\n\nFixes chat not opening in the Havoc group finder screen. When hosting and checking join requests, you can press Enter to type directly.",
+				"en": "Fixes chat not opening in the Havoc group finder screen. When hosting and checking join requests, you can press Enter to type directly.",
 				"ru": ""
 			},
 			"author": "wubaishijie",
@@ -25920,11 +25930,11 @@
 			"folder": "AutoBruntRoller",
 			"nexus_file_pattern": "auto",
 			"name": {
-				"en": "AutoBruntRoller",
-				"ru": ""
+				"en": "Auto Brunt Roller",
+				"ru": "Автозакупка у Бранта"
 			},
 			"description": {
-				"en": "自动购买布伦特军备库武器，并根据你设置的五维条件筛选目标武器。可选择保留或删除不合格武器，并支持自动收藏和自动圣化到满品质。\n\nAutomatically buys weapons from Brunt's Armoury and filters them by your selected base-stat targets. Can keep or delete unwanted rolls, with support f",
+				"en": "Automatically purchases weapons from the Brent Armory and filters target weapons based on your set five-dimensional criteria. You can choose to keep or delete unsuitable weapons, and it supports automatic collection and automatic sanctification to maximum quality.\n\nBefore using this mod:\nThis mod will spend your real in-game currency!\nBy using this mod, you accept the possibility of losing credits while rolling weapons. The mod is not responsible for any currency loss. Please make sure you are okay with that before using it.",
 				"ru": ""
 			},
 			"author": "wubaishijie",
@@ -25950,7 +25960,7 @@
 			"nexus_file_pattern": "wound",
 			"name": {
 				"en": "Wound Customizer",
-				"ru": ""
+				"ru": "Настройка ран"
 			},
 			"description": {
 				"en": "Customize wound colors to your liking. Supports additional coloring beyond vanilla.",
@@ -25982,7 +25992,7 @@
 				"ru": ""
 			},
 			"description": {
-				"en": "▼ Fixes the problem where the social page appears blank. ▲",
+				"en": "Fixes the problem where the social page appears blank.",
 				"ru": ""
 			},
 			"author": "xxBellatrix",
@@ -26106,7 +26116,7 @@
 			"github_url": "",
 			"note": {
 				"de": "",
-				"en": "",
+				"en": "Required: Icon Browser.",
 				"es": "",
 				"fr": "",
 				"it": "",
@@ -26114,7 +26124,7 @@
 				"ko": "",
 				"pl": "",
 				"pt-BR": "",
-				"ru": "",
+				"ru": "Требуется: Icon Browser.",
 				"zh-hans": "",
 				"zh-hant": ""
 			}
@@ -26330,15 +26340,15 @@
 				"ru": ""
 			},
 			"description": {
-				"en": "Shows equipment on the characters body.",
+				"en": "Shows equipment on characters body.\nCustomization menu to choose different positions.\nAllows for character models to be rotated in various menus.",
 				"ru": ""
 			},
 			"author": "Grasmann",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/852",
-			"github_url": "",
+			"github_url": "https://github.com/grasmann/darktide-mods/tree/main/visible_equipment",
 			"note": {
 				"de": "",
-				"en": "",
+				"en": "Required: MasterItems Community Patch.",
 				"es": "",
 				"fr": "",
 				"it": "",
@@ -26346,7 +26356,7 @@
 				"ko": "",
 				"pl": "",
 				"pt-BR": "",
-				"ru": "",
+				"ru": "Требуется: MasterItems Community Patch.",
 				"zh-hans": "",
 				"zh-hant": ""
 			}
@@ -26364,7 +26374,7 @@
 			},
 			"author": "Grasmann",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/853",
-			"github_url": "",
+			"github_url": "https://github.com/grasmann/darktide-mods/tree/main/visual_loadout_customization_community_patch",
 			"note": {
 				"de": "",
 				"en": "",
@@ -26384,19 +26394,19 @@
 			"folder": "visible_equipment_uwu",
 			"nexus_file_pattern": "visible",
 			"name": {
-				"en": "Uprooted with Umbrage (UwU) - Visible Equipment Plugin",
+				"en": "Uprooted with Umbrage (UwU)",
 				"ru": ""
 			},
 			"description": {
-				"en": "Adds weapon placements that I think are cool. Mostly tactical and shitposty.",
+				"en": "Visible Equipment Plugin - Adds weapon placements that I think are cool. Mostly tactical and shitposty.",
 				"ru": ""
 			},
 			"author": "backup158",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/854",
-			"github_url": "",
+			"github_url": "https://github.com/Backup158/Darktide_Visible_Equipment_UwU",
 			"note": {
 				"de": "",
-				"en": "",
+				"en": "Required: Visible Equipment.",
 				"es": "",
 				"fr": "",
 				"it": "",
@@ -26404,7 +26414,7 @@
 				"ko": "",
 				"pl": "",
 				"pt-BR": "",
-				"ru": "",
+				"ru": "Требуется: Visible Equipment.",
 				"zh-hans": "",
 				"zh-hant": ""
 			}
@@ -26533,7 +26543,7 @@
 				"ru": ""
 			},
 			"description": {
-				"en": "Enhance your Psyker gameplay experience by preventing accidental self-explosions when using warp weapons. 增强灵能角色的使用体验，阻止使用亚空间武器时发生超载自爆。",
+				"en": "Enhance your Psyker gameplay experience by preventing accidental self-explosions when using warp weapons.",
 				"ru": ""
 			},
 			"author": "Shui Yu",
@@ -26625,7 +26635,7 @@
 			},
 			"author": "Grasmann",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/862",
-			"github_url": "",
+			"github_url": "https://github.com/grasmann/darktide-mods/tree/main/unlock_ui_fps",
 			"note": {
 				"de": "",
 				"en": "",
@@ -26732,11 +26742,11 @@
 			"folder": "HavocButton",
 			"nexus_file_pattern": "havoc",
 			"name": {
-				"en": "HavocButton",
-				"ru": ""
+				"en": "Havoc Button",
+				"ru": "Кнопка Хавока"
 			},
 			"description": {
-				"en": "Adds a Start Havoc button to the Group Finder screen. Clicking it directly attempts to launch a Havoc mission for fast starts 在组队界面添加一个开始浩劫的按钮",
+				"en": "Adds a Start Havoc button to the Group Finder screen. Clicking it directly attempts to launch a Havoc mission for fast starts.",
 				"ru": ""
 			},
 			"author": "kernel574",
@@ -26790,11 +26800,11 @@
 			"folder": "LookBack",
 			"nexus_file_pattern": "lookback",
 			"name": {
-				"en": "LookBack",
+				"en": "Look Back",
 				"ru": ""
 			},
 			"description": {
-				"en": "yes, you heard correctly. we can look back.",
+				"en": "Press a key to look behind you while your character continues moving forward.",
 				"ru": ""
 			},
 			"author": "litool",
@@ -26849,11 +26859,31 @@
 			"nexus_file_pattern": "phantom",
 			"name": {
 				"en": "Phantom Arsenal",
-				"ru": ""
+				"ru": "Фантомный арсенал",
+				"fr": "Arsenal fantôme",
+				"zh-hant": "幻影武器庫",
+				"zh-hans": "幻影武器库",
+				"de": "Phantom-Arsenal",
+				"it": "Arsenale Fantasma",
+				"ja": "ファントムアーセナル",
+				"ko": "팬텀 아스널",
+				"pl": "Arsenał Widmowy",
+				"pt-BR": "Arsenal Fantasma",
+				"es": "Arsenal Fantasmal"
 			},
 			"description": {
 				"en": "Adjust visibility of primary, secondary, grenade and special items independently with optional conditions.",
-				"ru": ""
+				"ru": "Phantom Arsenal - Независимая настройка видимости основного и дополнительного оружия, а также гранат и специальных предметов с опциональными условиями.",
+				"fr": "Ajustez indépendamment la visibilité de vos armes principales, secondaires, grenades et objets spéciaux avec des conditions optionnelles.",
+				"zh-hant": "獨立調整主要、次要、手榴彈和特殊物品的可見度，可選條件觸發。",
+				"zh-hans": "独立调整主武器、副武器、手榴弹和特殊物品的可见度，可选条件触发。",
+				"de": "Passen Sie die Sichtbarkeit von Primär-, Sekundär-, Granaten- und Spezialwaffen unabhängig voneinander an, mit optionalen Bedingungen.",
+				"it": "Regola indipendentemente la visibilità di armi primarie, secondarie, granate e oggetti speciali con condizioni opzionali.",
+				"ja": "主要武器、副次武器、グレネード、特殊アイテムの透明度を個別に調整し、オプションの条件で切り替えられます。",
+				"ko": "주 무기, 보조 무기, 수류탄 및 특수 아이템의 가시성을 개별적으로 조정하며, 조건부 투명화를 설정할 수 있습니다.",
+				"pl": "Niezależnie dostosuj widoczność broni głównej, dodatkowej, granatów i przedmiotów specjalnych z opcjonalnymi warunkami.",
+				"pt-BR": "Ajuste independentemente a visibilidade de armas primárias, secundárias, granadas e itens especiais com condições opcionais.",
+				"es": "Ajusta independientemente la visibilidad de armas principales, secundarias, granadas y objetos especiales con condiciones opcionales."
 			},
 			"author": "xsSplater",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/871",
@@ -26874,19 +26904,48 @@
 			}
 		},
 		{
-			"folder": "Exceeds Payload",
-			"nexus_file_pattern": "exceeds",
+			"folder": "scoreboard-ii",
+			"nexus_file_pattern": "scoreboard",
 			"name": {
-				"en": "Exceeds Payload - More Realistic Ogryn Transport - Valkyrie Edition",
+				"en": "Scoreboard II",
 				"ru": ""
 			},
 			"description": {
-				"en": "Adds some reality to transporting Ogryn in Valkyries",
+				"en": "If you ain't first, you're last. Let's face it, mostly we want to know who is doing the damage. Scoreboard II is a quick and easy approach to seeing some stats for missions.",
+				"ru": ""
+			},
+			"author": "u84n",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/872",
+			"github_url": "",
+			"note": {
+				"de": "",
+				"en": "",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			}
+		},
+		{
+			"folder": "Exceeds Payload",
+			"nexus_file_pattern": "exceeds",
+			"name": {
+				"en": "Exceeds Payload",
+				"ru": ""
+			},
+			"description": {
+				"en": "More Realistic Ogryn Transport - Valkyrie Edition - Adds some reality to transporting Ogryn in Valkyries.",
 				"ru": ""
 			},
 			"author": "wobin",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/873",
-			"github_url": "",
+			"github_url": "https://github.com/Wobin/Exceeds-Payload",
 			"note": {
 				"de": "",
 				"en": "",
@@ -26913,22 +26972,22 @@
 				"en": "A simple mod to inspect parts of the Darktide UI. Mostly for modders.",
 				"ru": ""
 			},
-			"author": "ikinone",
+			"author": "u84n",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/874",
 			"github_url": "",
 			"note": {
-				"de": "",
-				"en": "",
-				"es": "",
-				"fr": "",
-				"it": "",
-				"ja": "",
-				"ko": "",
-				"pl": "",
-				"pt-BR": "",
-				"ru": "",
-				"zh-hans": "",
-				"zh-hant": ""
+				"de": "Diese Mod ist hauptsächlich für Modder gedacht.",
+				"en": "This mod is primarily intended for modders.",
+				"es": "Este mod está destinado principalmente a modders.",
+				"fr": "Ce mod est principalement destiné aux modeurs.",
+				"it": "Questa mod è pensata principalmente per i modder.",
+				"ja": "このMODは主にMOD作成者を対象としています。",
+				"ko": "이 모드는 주로 모더를 대상으로 합니다.",
+				"pl": "Ten mod jest przeznaczony głównie dla modderów.",
+				"pt-BR": "Este mod é destinado principalmente a modders.",
+				"ru": "Modding Tools - Этот мод предназначен в первую очередь для моддеров.",
+				"zh-hans": "此模组主要为模组制作者设计。",
+				"zh-hant": "此模組主要為模組製作者設計。"
 			}
 		},
 		{
@@ -27051,7 +27110,7 @@
 			"folder": "RoadToVictory",
 			"nexus_file_pattern": "roadtovictory",
 			"name": {
-				"en": "RoadToVictory",
+				"en": "Road To Victory",
 				"ru": ""
 			},
 			"description": {
@@ -27080,16 +27139,16 @@
 			"folder": "Lantern of the Omnissiah",
 			"nexus_file_pattern": "lantern",
 			"name": {
-				"en": "Lantern of the Omnissiah - Import builds from Gameslantern directly into a loadout",
+				"en": "Lantern of the Omnissiah",
 				"ru": ""
 			},
 			"description": {
-				"en": "Reads Gameslantern build URLs from the clipboard to import directly into a new loadout and adds tooltips for the recommended weapons",
+				"en": "Import builds from Gameslantern directly into a loadout - Reads Gameslantern build URLs from the clipboard to import directly into a new loadout and adds tooltips for the recommended weapons.",
 				"ru": ""
 			},
 			"author": "Wobin",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/882",
-			"github_url": "",
+			"github_url": "https://github.com/Wobin/Lantern-of-the-Omnissiah",
 			"note": {
 				"de": "",
 				"en": "",
@@ -27281,13 +27340,13 @@
 		},
 		{
 			"folder": "servo_friend_plugin_hat_commissar",
-			"nexus_file_pattern": "servo friend plugin hat commissar-889",
+			"nexus_file_pattern": "servo",
 			"name": {
 				"en": "Servo Friend Hat Plugin - Commissar",
 				"ru": ""
 			},
 			"description": {
-				"en": "Adds a commissar/officer appearance option to player Servo Friend pets",
+				"en": "Adds a commissar/officer appearance option to player Servo Friend pets.",
 				"ru": ""
 			},
 			"author": "GideonAriphael",
@@ -27295,7 +27354,7 @@
 			"github_url": "",
 			"note": {
 				"de": "",
-				"en": "",
+				"en": "Required: Servo Friend.",
 				"es": "",
 				"fr": "",
 				"it": "",
@@ -27303,20 +27362,20 @@
 				"ko": "",
 				"pl": "",
 				"pt-BR": "",
-				"ru": "",
+				"ru": "Требуется: Servo Friend.",
 				"zh-hans": "",
 				"zh-hant": ""
 			}
 		},
 		{
 			"folder": "servo_friend_plugin_hat_diadem",
-			"nexus_file_pattern": "servo friend plugin hat diadem-890",
+			"nexus_file_pattern": "servo",
 			"name": {
 				"en": "Servo Friend Hat Plugin - Diadem",
 				"ru": ""
 			},
 			"description": {
-				"en": "Adds a religious candle/diadem appearance option to player Servo Friend pets",
+				"en": "Adds a religious candle/diadem appearance option to player Servo Friend pets.",
 				"ru": ""
 			},
 			"author": "GideonAriphael",
@@ -27324,7 +27383,7 @@
 			"github_url": "",
 			"note": {
 				"de": "",
-				"en": "",
+				"en": "Required: Servo Friend.",
 				"es": "",
 				"fr": "",
 				"it": "",
@@ -27332,7 +27391,7 @@
 				"ko": "",
 				"pl": "",
 				"pt-BR": "",
-				"ru": "",
+				"ru": "Требуется: Servo Friend.",
 				"zh-hans": "",
 				"zh-hant": ""
 			}
@@ -27370,7 +27429,7 @@
 			"folder": "simple_scoreboard",
 			"nexus_file_pattern": "simple",
 			"name": {
-				"en": "SimpleScoreboard",
+				"en": "Simple Scoreboard",
 				"ru": ""
 			},
 			"description": {
@@ -27397,13 +27456,13 @@
 		},
 		{
 			"folder": "KhaosDamageMeter",
-			"nexus_file_pattern": "khaosdamagemeter",
+			"nexus_file_pattern": "khaos",
 			"name": {
 				"en": "Khaos damage meter",
 				"ru": ""
 			},
 			"description": {
-				"en": "I love damage meters, scoreboards are cool but I wanna see whats happening moment to moment, so I made a mod for darktide and will probably start uploading more as I go for other games I also put a old school styled graph in which can just be toggled as I know some want their scoreboard fater",
+				"en": "I love damage meters, scoreboards are cool but I wanna see whats happening moment to moment, so I made a mod for darktide and will probably start uploading more as I go for other games I also put a old school styled graph in which can just be toggled as I know some want their scoreboard fater.",
 				"ru": ""
 			},
 			"author": "ilovedpsmeters",
@@ -27428,7 +27487,7 @@
 			"folder": "NoBrainer",
 			"nexus_file_pattern": "nobrainer",
 			"name": {
-				"en": "NoBrainer - Solves all puzzles and minigames automatically",
+				"en": "No Brainer",
 				"ru": ""
 			},
 			"description": {
@@ -27515,7 +27574,7 @@
 			"folder": "FullAuto_TWEAK",
 			"nexus_file_pattern": "fullauto",
 			"name": {
-				"en": "FullAutoTweak"
+				"en": "Full Auto Tweak"
 			},
 			"description": {
 				"en": "Double fire fix for FullAuto mod by ItsAlxls."
@@ -27658,16 +27717,16 @@
 			"folder": "Vox Scribe",
 			"nexus_file_pattern": "vox",
 			"name": {
-				"en": "Vox Scribe - Single line chat copy",
+				"en": "Vox Scribe",
 				"ru": ""
 			},
 			"description": {
-				"en": "Copies single lines from the chat window to the clipboard with a mouseclick",
+				"en": "Copies single lines from the chat window to the clipboard with a mouse click.",
 				"ru": ""
 			},
 			"author": "wobin",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/905",
-			"github_url": "",
+			"github_url": "https://github.com/Wobin/Vox-Scribe",
 			"note": {
 				"de": "",
 				"en": "",
@@ -27687,7 +27746,7 @@
 			"folder": "ShortFavText",
 			"nexus_file_pattern": "short",
 			"name": {
-				"en": "ShortFavText",
+				"en": "Short Fav Text",
 				"ru": ""
 			},
 			"description": {
@@ -27710,7 +27769,7 @@
 				"ru": ""
 			},
 			"description": {
-				"en": "Shows your mission wins by class in a clear colour-coded chart.",
+				"en": "Shows your mission wins by class in a clear colour-coded chart.\n\nWinning adds the /wins command, which opens a scoreboard showing mission wins across your account.",
 				"ru": ""
 			},
 			"author": "xxBellatrix",
@@ -27725,11 +27784,11 @@
 			"folder": "PartyFinderFilter",
 			"nexus_file_pattern": "party",
 			"name": {
-				"en": "PartyFinderFilter",
+				"en": "Party Finder Filter",
 				"ru": ""
 			},
 			"description": {
-				"en": "Tired of useless classes in ur party finder for Havoc? U can auto-decline any class now, u will not even see em. Insta-decline. I created that mode to never see hive scum and arbitres again 8)",
+				"en": "Tired of useless classes in ur party finder for Havoc? You can auto-decline any class now, you will not even see em. Insta-decline. I created that mod to never see Hive Scum and Arbitres again.",
 				"ru": ""
 			},
 			"author": "Rikara",
@@ -27744,7 +27803,7 @@
 			"folder": "PartyFinderTalentFilter",
 			"nexus_file_pattern": "party",
 			"name": {
-				"en": "PartyFinderTalentFilter",
+				"en": "Party Finder Talent Filter",
 				"ru": ""
 			},
 			"description": {
@@ -27763,11 +27822,11 @@
 			"folder": "current_havoc",
 			"nexus_file_pattern": "current",
 			"name": {
-				"en": "CurrentHavoc",
+				"en": "Current Havoc",
 				"ru": ""
 			},
 			"description": {
-				"en": "This mod shows u real havoc. Your real havoc, and other players real havoc. Not highest achived this week, but lvl that u can host right now. And how many attempts left until derank",
+				"en": "This mod shows you real havoc level. Your real havoc level, and other players real havoc level. Not highest achived this week, but level that you can host right now. And how many attempts left until derank.",
 				"ru": ""
 			},
 			"author": "Artem228337",
@@ -27786,7 +27845,7 @@
 				"ru": ""
 			},
 			"description": {
-				"en": "Game has blacklist for 50 players. Dat mod allows u to add player to blacklist without limits. Also u can add notes to blocked players why u blocked them. Additionaly u can open all blocked players menu by pressing f6.",
+				"en": "Game has blacklist for 50 players. This mod allows you to add player to blacklist without limits. Also you can add notes to blocked players why you blocked them. Additionaly you can open all blocked players menu by pressing F6.",
 				"ru": ""
 			},
 			"author": "Artem228337",
@@ -27801,11 +27860,11 @@
 			"folder": "Online_Leaderboard",
 			"nexus_file_pattern": "online",
 			"name": {
-				"en": "Online_Leaderboard",
+				"en": "Online Leaderboard",
 				"ru": ""
 			},
 			"description": {
-				"en": "Online havoc leaderboard. In future maybe not only havoc40/auric. Sends ur results to compare em to others online. At http://77.239.127.193/",
+				"en": "Online havoc leaderboard. In future maybe not only Havoc 40/Auric. Sends your results to compare em to others online. At https://77-239-127-193.sslip.io/",
 				"ru": ""
 			},
 			"author": "Artem228337",
@@ -27862,7 +27921,7 @@
 				"ru": ""
 			},
 			"description": {
-				"en": "Highlights certain disablers and bursters when they are targeting YOU",
+				"en": "Highlights certain disablers and bursters when they are targeting YOU.",
 				"ru": ""
 			},
 			"author": "tdopz",
@@ -27897,11 +27956,31 @@
 			"nexus_file_pattern": "extended",
 			"name": {
 				"en": "Extended Weapon Customization - xsScythe",
-				"ru": ""
+				"ru": "Расширенная настройка оружия - Косы",
+				"fr": "Personnalisation d'armes étendue - xsScythe",
+				"zh-hant": "擴展武器自定義 - xsScythe",
+				"zh-hans": "扩展武器自定义 - xsScythe",
+				"de": "Erweiterte Waffenanpassung - xsScythe",
+				"it": "Personalizzazione armi estesa - xsScythe",
+				"ja": "拡張武器カスタマイズ - xsScythe",
+				"ko": "확장 무기 커스터마이즈 - xsScythe",
+				"pl": "Rozszerzona personalizacja broni - xsScythe",
+				"pt-BR": "Personalização de armas estendida - xsScythe",
+				"es": "Personalización de armas extendida - xsScythe"
 			},
 			"description": {
-				"en": "A plugin for the Extended Weapon Customization mod. Adds \"heads\" in the form of various blades to Psyker staves, transforming the staff into a scythe. Let the harvest begin!",
-				"ru": ""
+				"en": "Adds several types of melee blades to your weapon customizations, transforming staves into scythes. Let the harvest begin!",
+				"ru": "Extended Weapon Customization - xsScythe - Добавляет в настройки оружия несколько видов клинков ближнего боя, превращая посохи в косы. Да начнётся жатва!",
+				"fr": "Ajoute plusieurs types de lames de mêlée à vos personnalisations d'armes, transformant les bâtons en faux. Que la moisson commence !",
+				"zh-hant": "在武器自定義中添加多種近戰刀刃，將法杖變成鐮刀。收割開始！",
+				"zh-hans": "在武器自定义中添加多种近战刀刃，将法杖变成镰刀。收割开始！",
+				"de": "Fügt Ihren Waffenanpassungen verschiedene Arten von Nahkampfklingen hinzu und verwandelt Stäbe in Sens. Die Ernte kann beginnen!",
+				"it": "Aggiunge diversi tipi di lame da mischia alle personalizzazioni delle armi, trasformando i bastoni in falci. Inizia la mietitura!",
+				"ja": "武器カスタマイズに複数の近接武器の刃を追加し、スタッフを鎌に変えます。収穫を始めましょう！",
+				"ko": "무기 커스터마이즈에 여러 종류의 근접 무기 칼날을 추가하여 스태프를 낫으로 변환합니다. 수확을 시작하세요!",
+				"pl": "Dodaje kilka rodzajów ostrzy do walki wręcz do personalizacji broni, przekształcając kostury w kosy. Niech żniwa się rozpoczną!",
+				"pt-BR": "Adiciona vários tipos de lâminas corpo a corpo às suas personalizações de armas, transformando cajados em foices. Que a colheita comece!",
+				"es": "Añade varios tipos de hojas de melé a tus personalizaciones de armas, transformando bastones en guadañas. ¡Que comience la cosecha!"
 			},
 			"author": "xsSplater",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/918",
@@ -27919,7 +27998,7 @@
 				"ru": ""
 			},
 			"description": {
-				"en": "Fixes incorrect client-side grenade regeneration cooldown timers for Veteran Demolition Stockpile and Arbites Lone Wolf talents. 修复回雷技能本地计时器与实际手雷冷却不符的问题。",
+				"en": "Fixes incorrect client-side grenade regeneration cooldown timers for Veteran Demolition Stockpile and Arbites Lone Wolf talents.",
 				"ru": ""
 			},
 			"author": "shui_yu",
@@ -27995,7 +28074,7 @@
 				"ru": ""
 			},
 			"description": {
-				"en": "Uses your equipped weapon in mission end stances instead of default skins",
+				"en": "Uses your equipped weapon in mission end stances instead of default skins.",
 				"ru": ""
 			},
 			"author": "GideonAriphael",
@@ -28014,7 +28093,7 @@
 				"ru": ""
 			},
 			"description": {
-				"en": "Details the current Havoc assignment details for everyone in the group running the mod",
+				"en": "Details the current Havoc assignment details for everyone in the group running the mod.",
 				"ru": ""
 			},
 			"author": "wobin",
@@ -28052,7 +28131,7 @@
 				"ru": ""
 			},
 			"description": {
-				"en": "Tired of -30 fps from support psyker with flame staff? Dat mod allows u to remove flame staff visual, burning visual from mobs, shield visual(only cicrcle on the floor stays) + 10-40 fps per fight.",
+				"en": "Tired of -30 fps from support psyker with flame staff? This mod allows you to remove flame staff visual, burning visual from mobs, shield visual(only cicrcle on the floor stays) + 10-40 fps per fight.",
 				"ru": ""
 			},
 			"author": "Artem228337",
@@ -28071,7 +28150,7 @@
 				"ru": ""
 			},
 			"description": {
-				"en": "Wanna always same FPS like u just started the game after 3 maps or 3 hrs ingame on havoc 40. And Forget about memory crashes? To not see cleasing menu toggle Show \"Overlay off\" in FPS Doctor mod menu. Hold ur memory stable like at start of the game 8). Brand new mod that clean ur lua_heap memory in real time. Not every n OR xx min.",
+				"en": "Wanna always same FPS like you just started the game after 3 maps or 3 hrs ingame on havoc 40. And Forget about memory crashes? To not see cleasing menu toggle Show \"Overlay off\" in FPS Doctor mod menu. Hold your memory stable like at start of the game 8). Brand new mod that clean your lua_heap memory in real time. Not every n OR xx min.",
 				"ru": ""
 			},
 			"author": "Artem228337",

@@ -3,7 +3,9 @@ package main
 
 import (
 	"Servo-Modquisitor/checks"
+	"Servo-Modquisitor/sorter"
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -286,19 +288,24 @@ func (app *App) handleDrop(uris []fyne.URI) {
 						}
 						checks.AutoFixMalformed()
 						app.refreshModList()
-						app.selectAndScrollToMod(installedName)
-						// Попробуем найти modID по имени папки или извлечь из имени архива
-						modID, _, _ := extractVersionAndModIDFromFilename(p)
-						if modID != 0 && version != "" {
-							cacheKey := fmt.Sprintf("%d:%s", modID, installedName)
-							app.cacheModVersion(cacheKey, installedName, version, 0)
+						if installedName != "" {
+							app.selectAndScrollToMod(installedName)
+							// Попробуем найти modID по имени папки или извлечь из имени архива
+							modID, _, _ := extractVersionAndModIDFromFilename(p)
+							if modID != 0 && version != "" {
+								cacheKey := fmt.Sprintf("%d:%s", modID, installedName)
+								app.cacheModVersion(cacheKey, installedName, version, 0)
+							}
+							if modID != 0 {
+								go app.autoAddModToDatabase(modID, installedName)
+							}
+							app.orderDirty = true
+							app.updateTableBorder()
+							app.appendLog(fmt.Sprintf(app.messages["log_installed"], filepath.Base(p)))
+						} else {
+							// Это был архив с сортировочными файлами
+							app.appendLog("Sorting files updated from dropped archive.")
 						}
-						if modID != 0 {
-							go app.autoAddModToDatabase(modID, installedName)
-						}
-						app.orderDirty = true
-						app.updateTableBorder()
-						app.appendLog(fmt.Sprintf(app.messages["log_installed"], filepath.Base(p)))
 					})
 				}(path)
 			} else {
@@ -618,6 +625,62 @@ func (app *App) InstallModFromArchive(archivePath string, activate bool, knownVe
 		return "", "", err
 	}
 
+	// Проверяем, не является ли архив сортировочным (mod_database.json и/или mandatory_obsolete_incompatible_dependencies.json)
+	entries, err := os.ReadDir(tmpDir)
+	if err != nil {
+		return "", "", err
+	}
+	var hasModDatabase, hasMandatory bool
+	for _, e := range entries {
+		if !e.IsDir() && e.Name() == FileNameModDatabase {
+			hasModDatabase = true
+		}
+		if !e.IsDir() && e.Name() == FileNameMandatoryRules {
+			hasMandatory = true
+		}
+	}
+	if hasModDatabase || hasMandatory {
+		// Это архив сортировки, обновляем файлы
+		if hasModDatabase {
+			src := filepath.Join(tmpDir, FileNameModDatabase)
+			dst := filepath.Join(app.cfg.ModsPath, FileNameModDatabase)
+			if err := copyFile(src, dst); err != nil {
+				app.appendLog("Failed to copy " + FileNameModDatabase + ": " + err.Error())
+				return "", "", err
+			}
+			app.appendLog(FileNameModDatabase + " updated.")
+		}
+		if hasMandatory {
+			src := filepath.Join(tmpDir, FileNameMandatoryRules)
+			dst := filepath.Join(app.cfg.ModsPath, FileNameMandatoryRules)
+			if err := copyFile(src, dst); err != nil {
+				app.appendLog("Failed to copy " + FileNameMandatoryRules + ": " + err.Error())
+				return "", "", err
+			}
+			app.appendLog(FileNameMandatoryRules + " updated.")
+		}
+		// Перезагружаем базы
+		if err := app.loadModDatabase(FileNameModDatabase); err == nil {
+			checks.SetModDatabase(app.modDatabase)
+		}
+		if err := checks.LoadExternalLists(FileNameMandatoryRules); err == nil {
+			app.cfg.LastMandatoryRulesVersion = checks.GetExternalVersion()
+			saveConfig(app.cfg)
+		}
+		// Обновляем сортировщик
+		sorter.SetMandatoryOrder(checks.MandatoryOrder)
+		sorter.SetDependencies(convertDeps(checks.Dependencies))
+		var sorterRules []sorter.LoadOrderRule
+		for _, r := range checks.LoadOrderRules {
+			sorterRules = append(sorterRules, sorter.LoadOrderRule{Before: r.Before, After: r.After})
+		}
+		sorter.SetLoadOrderRules(sorterRules)
+		// Обновляем UI
+		app.refreshModList()
+		app.appendLog(app.messages["log_sorting_files_updated_succ"])
+		return "", "", nil // возвращаем пустые значения, так как это не мод
+	}
+
 	// Объявляем переменную для хранения имён установленных модов
 	var installedNames []string
 
@@ -658,8 +721,8 @@ func (app *App) InstallModFromArchive(archivePath string, activate bool, knownVe
 		}
 	}
 
-	// Получаем список оставшихся папок (обычные моды)
-	entries, err := os.ReadDir(tmpDir)
+	// Получаем список оставшихся папок (обычные моды) — ПРИСВАИВАНИЕ, без объявления
+	entries, err = os.ReadDir(tmpDir)
 	if err != nil {
 		return "", "", err
 	}
@@ -701,7 +764,8 @@ func (app *App) InstallModFromArchive(archivePath string, activate bool, knownVe
 	}
 
 	if len(installedNames) == 0 {
-		return "", "", fmt.Errorf(app.messages["log_no_mod_folder_found"], err)
+		// Используем errors.New, так как в сообщении нет плейсхолдеров
+		return "", "", errors.New(app.messages["log_no_mod_folder_found"])
 	}
 
 	installedName := installedNames[0] // для обратной совместимости возвращаем первый
