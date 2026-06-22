@@ -1,5 +1,5 @@
 {
-	"version": "0.9.75",
+	"version": "0.9.85",
 
 	"mandatory_order": [
 		"LogMeIn",
@@ -151,6 +151,7 @@
 	"incompatible_pairs": [
 		{ "mod1": "Archivum Messelina",		"mod2": "ImprovedPenanceTracking" },
 		{ "mod1": "AttackerOutlines",		"mod2": "threat_detector",		"type": "same" },
+		{ "mod1": "AutoBackup",				"mod2": "Swagger",				"type": "same" },
 		{ "mod1": "AutoLoot",				"mod2": "auto_rations" },
 		{ "mod1": "AutoMark",				"mod2": "AutoPing",				"type": "same" },
 		{ "mod1": "AutoMark",				"mod2": "AutoTag",				"type": "same" },
@@ -304,6 +305,9 @@
 		},
 		{ "mod1": "enemies_improved",		"mod2": "outline_colours" },
 		{ "mod1": "enemies_improved",		"mod2": "threat_detector" },
+		{ "mod1": "flame_fx_reducer",		"mod2": "i_wanna_see" },
+		{ "mod1": "FpsDoctor",				"mod2": "MemLeakFix" },
+		{ "mod1": "FpsDoctor",				"mod2": "SMOG",					"type": "same" },
 		{ "mod1": "hideprompts",			"mod2": "HideYoKeybinds" },
 		{ "mod1": "hybrid_sprint",			"mod2": "StickySprint" },
 		{ "mod1": "KeepSwinging",			"mod2": "AutoSwing",			"type": "same" },
@@ -315,6 +319,7 @@
 		{ "mod1": "markers_aio",			"mod2": "FoundYa" },
 		{ "mod1": "markers_aio",			"mod2": "Ration Pack" },
 		{ "mod1": "markers_aio",			"mod2": "StimmsPickupIcon" },
+		{ "mod1": "MemLeakFix",				"mod2": "MemLeakFixNoHUD" },
 		{ "mod1": "MenuUIHider",			"mod2": "InventoryHider" },
 		{ "mod1": "NumericUI",				"mod2": "RemoveTagSkulls" },
 		{ "mod1": "Radar",					"mod2": "minimap" },

@@ -618,18 +618,62 @@ func (app *App) InstallModFromArchive(archivePath string, activate bool, knownVe
 		return "", "", err
 	}
 
+	// Объявляем переменную для хранения имён установленных модов
+	var installedNames []string
+
+	// Обработка специальных папок binaries и mods
+	if app.gameRoot != "" {
+		// Копируем binaries в корень игры
+		binariesSrc := filepath.Join(tmpDir, "binaries")
+		if info, err := os.Stat(binariesSrc); err == nil && info.IsDir() {
+			binariesDst := filepath.Join(app.gameRoot, "binaries")
+			app.appendLog(fmt.Sprintf("Copying binaries to game root: %s -> %s", binariesSrc, binariesDst))
+			if err := copyPath(binariesSrc, binariesDst); err != nil {
+				app.appendLog(fmt.Sprintf("Failed to copy binaries: %v", err))
+			} else {
+				app.appendLog("Binaries installed successfully.")
+			}
+		}
+
+		// Копируем содержимое mods в папку mods программы
+		modsSrc := filepath.Join(tmpDir, "mods")
+		if info, err := os.Stat(modsSrc); err == nil && info.IsDir() {
+			entries, err := os.ReadDir(modsSrc)
+			if err == nil {
+				for _, e := range entries {
+					if e.IsDir() {
+						src := filepath.Join(modsSrc, e.Name())
+						dst := filepath.Join(app.cfg.ModsPath, e.Name())
+						app.appendLog(fmt.Sprintf("Copying mod folder: %s -> %s", src, dst))
+						if err := copyPath(src, dst); err != nil {
+							app.appendLog(fmt.Sprintf("Failed to copy mod %s: %v", e.Name(), err))
+						} else {
+							installedNames = append(installedNames, e.Name())
+						}
+					}
+				}
+			}
+			// Удаляем папку mods, чтобы она не была скопирована как обычный мод ниже
+			os.RemoveAll(modsSrc)
+		}
+	}
+
+	// Получаем список оставшихся папок (обычные моды)
 	entries, err := os.ReadDir(tmpDir)
 	if err != nil {
 		return "", "", err
 	}
 
 	// Копируем все папки (моды) из временной папки
-	var installedNames []string
 	for _, e := range entries {
 		if !e.IsDir() {
 			continue
 		}
 		modName := e.Name()
+		// Пропускаем уже обработанные папки
+		if modName == "binaries" || modName == "mods" {
+			continue
+		}
 		// Защита от случайной установки системных папок
 		if modName == "base" || modName == "dmf" {
 			app.appendLog(fmt.Sprintf(app.messages["log_skipping_sys_folder"], modName))

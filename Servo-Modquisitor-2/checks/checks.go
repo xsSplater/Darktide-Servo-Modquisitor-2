@@ -1011,6 +1011,10 @@ func SaveModDatabase() error {
 	if modDBMap == nil {
 		return fmt.Errorf("mod database is empty")
 	}
+	// Если записей меньше 5 — скорее всего, база повреждена, не сохраняем
+	if len(modDBMap) < 5 {
+		return fmt.Errorf("mod database has only %d entries, refusing to save (possible data loss)", len(modDBMap))
+	}
 	type modDatabaseFile struct {
 		Version string       `json:"version"`
 		Mods    []ModDBEntry `json:"mod_database"`
@@ -1025,7 +1029,7 @@ func SaveModDatabase() error {
 
 	var buf bytes.Buffer
 	encoder := json.NewEncoder(&buf)
-	encoder.SetEscapeHTML(false) // <-- отключаем экранирование <, >, &
+	encoder.SetEscapeHTML(false) // отключаем экранирование <, >, &
 	encoder.SetIndent("", "\t")
 	err := encoder.Encode(modDatabaseFile{Version: externalVersion, Mods: mods})
 	if err != nil {

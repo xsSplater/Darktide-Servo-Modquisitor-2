@@ -538,6 +538,10 @@ func cleanDescription(desc string) string {
 // autoAddModToDatabase добавляет информацию о моде в базу mod_database.json,
 // если её там ещё нет, или дополняет отсутствующие поля.
 func (app *App) autoAddModToDatabase(modID int, folderName string, fileName ...string) {
+	// Игнорируем системные папки, которые не являются модами
+	if folderName == "binaries" || folderName == "bundle" || folderName == "tools" || folderName == "mods" {
+		return
+	}
 	// Проверяем, есть ли уже запись в памяти
 	existing := checks.GetModDBEntry(folderName)
 	needUpdate := existing == nil
