@@ -678,7 +678,9 @@ func (app *App) InstallModFromArchive(archivePath string, activate bool, knownVe
 		// Обновляем UI
 		app.refreshModList()
 		app.appendLog(app.messages["log_sorting_files_updated_succ"])
-		return "", "", nil // возвращаем пустые значения, так как это не мод
+		// Синхронизируем кэш версий с обновлёнными локальными файлами
+		app.syncVersionCache()
+		return "", "", nil
 	}
 
 	// Объявляем переменную для хранения имён установленных модов

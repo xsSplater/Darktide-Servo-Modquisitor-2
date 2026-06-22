@@ -152,6 +152,9 @@ func main() {
 	}
 	checks.SetModDatabase(application.modDatabase)
 
+	// Синхронизируем кэш версий с локальными файлами
+	application.syncVersionCache()
+
 	// Пишем в лог версию проги и основных файлов
 	if application.logFile != nil {
 		fmt.Fprintf(application.logFile, "Program version: %s\n", AppVersion)

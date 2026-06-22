@@ -294,6 +294,46 @@ func saveConfig(c *Config) {
 	}
 }
 
+// syncVersionCache синхронизирует кэш версий с локальными файлами,
+// чтобы избежать ложных уведомлений об обновлении.
+func (app *App) syncVersionCache() {
+	// --- Программа ---
+	exePath, err := os.Executable()
+	if err == nil {
+		if info, err := os.Stat(exePath); err == nil {
+			ts := info.ModTime().Unix()
+			// Обновляем кэш программы, если версия отличается или ключа нет
+			if saved, ok := app.nexusVersionCache[NexusCacheKeyProgram]; !ok || saved.Version != AppVersion {
+				app.nexusVersionCache[NexusCacheKeyProgram] = ModVersionInfo{
+					Timestamp: ts,
+					Version:   AppVersion,
+					Folder:    "Program",
+				}
+				app.saveNexusVersionCache()
+				app.appendLog("Program version cached: " + AppVersion)
+			}
+		}
+	}
+
+	// --- Файлы сортировки (используем версию из mod_database.json) ---
+	dbVersion := app.cfg.LastModDatabaseVersion
+	if dbVersion != "" {
+		dbPath := filepath.Join(app.cfg.ModsPath, FileNameModDatabase)
+		if info, err := os.Stat(dbPath); err == nil {
+			ts := info.ModTime().Unix()
+			if saved, ok := app.nexusVersionCache[NexusCacheKeyRules]; !ok || saved.Version != dbVersion {
+				app.nexusVersionCache[NexusCacheKeyRules] = ModVersionInfo{
+					Timestamp: ts,
+					Version:   dbVersion,
+					Folder:    "Sorting Rules",
+				}
+				app.saveNexusVersionCache()
+				app.appendLog("Sorting files version cached: " + dbVersion)
+			}
+		}
+	}
+}
+
 func (app *App) loadLanguage(lang string) error {
 	data, err := embeddedFiles.ReadFile(FileNameMessages)
 	if err != nil {
