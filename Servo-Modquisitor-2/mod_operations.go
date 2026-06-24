@@ -680,6 +680,7 @@ func (app *App) InstallModFromArchive(archivePath string, activate bool, knownVe
 		app.appendLog(app.messages["log_sorting_files_updated_succ"])
 		// Синхронизируем кэш версий с обновлёнными локальными файлами
 		app.syncVersionCache()
+		app.logVersions()
 		return "", "", nil
 	}
 
@@ -740,10 +741,10 @@ func (app *App) InstallModFromArchive(archivePath string, activate bool, knownVe
 			continue
 		}
 		// Защита от случайной установки системных папок
-		if modName == "base" || modName == "dmf" {
-			app.appendLog(fmt.Sprintf(app.messages["log_skipping_sys_folder"], modName))
-			continue
-		}
+		// if modName == "base" || modName == "dmf" {
+		// 	app.appendLog(fmt.Sprintf(app.messages["log_skipping_sys_folder"], modName))
+		// 	continue
+		// }
 		// Фикс для hub_hotkey_menus-main
 		if modName == "hub_hotkey_menus-main" {
 			newName := "hub_hotkey_menus"
@@ -774,13 +775,19 @@ func (app *App) InstallModFromArchive(archivePath string, activate bool, knownVe
 
 	// Определяем версию (только для первого мода)
 	version := knownVersion
+	var modID int
 	if version == "" {
-		_, extractedVersion, _ := extractVersionAndModIDFromFilename(archivePath)
-		if extractedVersion != "" {
+		var extractedVersion string
+		var ok bool
+		modID, extractedVersion, ok = extractVersionAndModIDFromFilename(archivePath)
+		if ok && extractedVersion != "" {
 			version = extractedVersion
 		} else {
 			version = app.promptUserForVersion(installedName)
 		}
+	} else {
+		// даже если версия известна, попытаемся извлечь modID для базы данных
+		modID, _, _ = extractVersionAndModIDFromFilename(archivePath)
 	}
 
 	// Обновляем UI
@@ -805,13 +812,30 @@ func (app *App) InstallModFromArchive(archivePath string, activate bool, knownVe
 	})
 
 	// Кэшируем версию для первого мода
-	if modID, _, _ := extractVersionAndModIDFromFilename(archivePath); modID != 0 && version != "" {
-		cacheKey := fmt.Sprintf("%d:%s", modID, installedName)
-		app.cacheModVersion(cacheKey, installedName, version, 0)
+	if version != "" {
+		var cacheKey string
+		switch installedName {
+		case "base":
+			cacheKey = "19:base"
+		case "dmf":
+			cacheKey = "8:dmf"
+		default:
+			if modID != 0 { // используем уже имеющийся modID
+				cacheKey = fmt.Sprintf("%d:%s", modID, installedName)
+			}
+		}
+		if cacheKey != "" {
+			app.cacheModVersion(cacheKey, installedName, version, 0)
+		}
+	}
+
+	// Синхронизируем кэш версий с локальными файлами (особенно для правил)
+	if installedName == "base" || installedName == "dmf" {
+		app.syncVersionCache()
 	}
 
 	// Автоматически добавляем в базу данных
-	if modID, _, _ := extractVersionAndModIDFromFilename(archivePath); modID != 0 {
+	if modID != 0 {
 		go app.autoAddModToDatabase(modID, installedName)
 	}
 

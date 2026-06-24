@@ -466,3 +466,10 @@ func (app *App) isModActive(name string) bool {
 	mod := app.findModByName(name)
 	return mod != nil && mod.Active
 }
+
+// logVersions выводит в GUI-лог текущие версии программы и файлов сортировки.
+func (app *App) logVersions() {
+	app.appendLog(fmt.Sprintf("Program version: %s", AppVersion))
+	app.appendLog(fmt.Sprintf("mandatory_obsolete_incompatible_dependencies.json version: %s", checks.GetExternalVersion()))
+	app.appendLog(fmt.Sprintf("mod_database.json version: %s", app.cfg.LastModDatabaseVersion))
+}

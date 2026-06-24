@@ -1152,14 +1152,23 @@ func (app *App) enrichModFromNexus(mod *checks.ModInfo) {
 	}
 	go func() {
 		defer func() { recover() }()
-		fileInfo, err := app.getLatestFileInfoForMod(modID, mod.Name)
+		var fileInfo *FileInfo
+		var err error
+		// Для системных модов (base, dmf) используем getLatestFileInfo (без паттерна)
+		if mod.Name == "base" || mod.Name == "dmf" {
+			// app.appendLog("DEBUG: Using getLatestFileInfo for " + mod.Name)
+			fileInfo, err = app.getLatestFileInfo(modID)
+		} else {
+			// app.appendLog("DEBUG: Using getLatestFileInfoForMod for " + mod.Name)
+			fileInfo, err = app.getLatestFileInfoForMod(modID, mod.Name)
+		}
 		if err != nil {
-			// просто логируем, не сохраняем ничего
 			app.appendLog(fmt.Sprintf(app.messages["log_cannot_get_file_info"], mod.Name, err))
 			return
 		}
 		cacheKey := fmt.Sprintf("%d:%s", modID, mod.Name)
 		app.nexusLatestVersions[cacheKey] = fileInfo.Version
+		// app.appendLog(fmt.Sprintf("DEBUG: %s latest version = %s", mod.Name, fileInfo.Version))
 		if fileInfo.FileName != "" {
 			entry := checks.GetModDBEntry(mod.Name)
 			if entry != nil && entry.NexusFilePattern == "" {
