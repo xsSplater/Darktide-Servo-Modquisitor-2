@@ -92,7 +92,7 @@ func (t ForcedDarkTheme) Color(name fyne.ThemeColorName, variant fyne.ThemeVaria
 	case theme.ColorNameHeaderBackground:
 		return color.NRGBA{R: 50, G: 50, B: 55, A: 255} // было 40,40,44
 
-	// ================== ИНПУТ =======================
+	// ================== ВВОД ========================
 	case theme.ColorNameInputBorder:
 		return color.NRGBA{R: 190, G: 255, B: 110, A: 255}
 
@@ -106,31 +106,39 @@ func (t ForcedDarkTheme) Color(name fyne.ThemeColorName, variant fyne.ThemeVaria
 	case ColorStatusObsolete:
 		return color.NRGBA{R: 180, G: 180, B: 0, A: 255}
 	case ColorStatusMandatory:
-		return color.NRGBA{R: 0, G: 180, B: 0, A: 255}
+		return color.NRGBA{R: 250, G: 120, B: 120, A: 255}
 	case ColorStatusActive:
 		return color.NRGBA{R: 100, G: 200, B: 100, A: 255}
 	case ColorStatusInactive:
 		return color.NRGBA{R: 140, G: 140, B: 140, A: 255}
 	case ColorStatusVortex:
 		return color.NRGBA{R: 100, G: 200, B: 255, A: 255}
+	case ColorStatusMissing:
+		return color.NRGBA{R: 255, G: 100, B: 100, A: 255} // красный
+	case ColorStatusSymlink:
+		return color.NRGBA{R: 255, G: 110, B: 255, A: 255} // фиолетовый
+	case ColorStatusManual:
+		return color.NRGBA{R: 20, G: 155, B: 250, A: 255} //
+	case ColorStatusNexus:
+		return color.NRGBA{R: 255, G: 200, B: 80, A: 255} // золотистый
 
 	// ──────────────── Таблица ────────────────
 	case ColorTableRowEven:
-		return color.NRGBA{R: 38, G: 38, B: 42, A: 155}
+		return color.NRGBA{R: 38, G: 38, B: 42, A: 155} // Цвет основной строки
 	case ColorTableRowOdd:
-		return color.NRGBA{R: 34, G: 34, B: 38, A: 5}
+		return color.NRGBA{R: 34, G: 34, B: 38, A: 5} // ?
 	case ColorTableRowSelected:
-		return color.NRGBA{R: 60, G: 160, B: 30, A: 80}
+		return color.NRGBA{R: 60, G: 160, B: 30, A: 80} // Выделенная строка
 	case ColorTableRowConflict:
 		return color.NRGBA{R: 80, G: 40, B: 0, A: 120}
 	case ColorTableBorderDirty:
 		return color.NRGBA{R: 200, G: 100, B: 0, A: 255}
 	case ColorTableHeaderBg:
-		return color.NRGBA{R: 20, G: 20, B: 20, A: 255}
+		return color.NRGBA{R: 20, G: 20, B: 20, A: 255} // Заголовок таблицы
 	case ColorSystemTableBg:
-		return color.NRGBA{R: 20, G: 20, B: 20, A: 150}
+		return color.NRGBA{R: 20, G: 20, B: 20, A: 150} // ?
 
-		// ──────────────── Консоль ────────────────
+	// ──────────────── Консоль ────────────────
 	case ColorConsoleText:
 		return color.NRGBA{R: 192, G: 255, B: 26, A: 255}
 	case ColorCRTScreenFill:
@@ -140,7 +148,7 @@ func (t ForcedDarkTheme) Color(name fyne.ThemeColorName, variant fyne.ThemeVaria
 	case ColorCRTHeaderBg:
 		return color.NRGBA{R: 10, G: 10, B: 10, A: 175}
 
-		// ──────────────── Панели/карточки ────────
+	// ──────────────── Панели/карточки ────────
 	case ColorDescCardStroke:
 		return color.NRGBA{R: 0, G: 0, B: 0, A: 155}
 	case ColorDescCardBg:

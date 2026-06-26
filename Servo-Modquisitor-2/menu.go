@@ -233,7 +233,6 @@ func (app *App) buildMainMenu() *fyne.MainMenu {
 		showSystemItem,
 		fyne.NewMenuItemSeparator(),
 	)
-
 	// Строка меню
 	return fyne.NewMainMenu(settingsMenu, nexusMenu, updatesMenu, contactMenu, guidesMenu, donateMenu)
 }
@@ -351,6 +350,11 @@ func (app *App) changeLanguage(lang string) {
 	if app.btnUpdateAll != nil {
 		app.btnUpdateAll.SetText(app.messages["btn_update_all"])
 	}
+
+	if app.btnEditVersion != nil {
+		app.btnEditVersion.SetText(app.messages["btn_edit_version"])
+	}
+	app.applyTooltip(app.btnEditVersion, "btn_edit_version_tooltip")
 
 	// Обновляем заголовок консоли
 	if app.logHeaderText != nil {

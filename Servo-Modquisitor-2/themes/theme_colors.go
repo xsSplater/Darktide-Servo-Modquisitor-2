@@ -22,6 +22,10 @@ const (
 	ColorTableBorderDirty = "color-table-border-dirty"
 	ColorTableHeaderBg    = "color-table-header-bg"
 	ColorSystemTableBg    = "color-system-table-bg"
+	ColorStatusMissing    = "color-status-missing"
+	ColorStatusSymlink    = "color-status-symlink"
+	ColorStatusManual     = "color-status-manual"
+	ColorStatusNexus      = "color-status-nexus"
 
 	// CRT-консоль
 	ColorConsoleText     = "color-console-text"

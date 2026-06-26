@@ -438,3 +438,13 @@ func (app *App) logNexusError(err error, modName string, customMsg ...string) {
 		app.appendLog(fmt.Sprintf("Failed to process %s: %v", modName, err))
 	}
 }
+
+// isSymlinkFolder проверяет, является ли папка мода симлинком.
+func (app *App) isSymlinkFolder(modName string) bool {
+	modPath := filepath.Join(app.cfg.ModsPath, modName)
+	info, err := os.Lstat(modPath)
+	if err != nil {
+		return false
+	}
+	return info.Mode()&os.ModeSymlink != 0
+}

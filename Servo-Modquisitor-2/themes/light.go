@@ -72,11 +72,11 @@ func (t ForcedLightTheme) Color(name fyne.ThemeColorName, variant fyne.ThemeVari
 	case theme.ColorNameHeaderBackground:
 		return color.NRGBA{R: 227, G: 227, B: 234, A: 255}
 
-	// ================== ИНПУТ =======================
+	// ================== ВВОД ========================
 	case theme.ColorNameInputBorder:
 		return color.NRGBA{R: 180, G: 180, B: 190, A: 255}
 
-	// Статусы (яркость снижена для светлого фона)
+	// ──────────────── Статусы ────────────────
 	case ColorStatusSystem:
 		return color.NRGBA{R: 20, G: 100, B: 180, A: 255}
 	case ColorStatusBroken:
@@ -93,8 +93,16 @@ func (t ForcedLightTheme) Color(name fyne.ThemeColorName, variant fyne.ThemeVari
 		return color.NRGBA{R: 140, G: 140, B: 145, A: 255}
 	case ColorStatusVortex:
 		return color.NRGBA{R: 100, G: 200, B: 255, A: 255}
+	case ColorStatusMissing:
+		return color.NRGBA{R: 200, G: 50, B: 50, A: 255} // красный
+	case ColorStatusSymlink:
+		return color.NRGBA{R: 200, G: 150, B: 255, A: 255} // фиолетовый
+	case ColorStatusManual:
+		return color.NRGBA{R: 255, G: 200, B: 100, A: 255} //
+	case ColorStatusNexus:
+		return color.NRGBA{R: 255, G: 200, B: 80, A: 255} // золотистый
 
-	// Таблица
+	// ──────────────── Таблица ────────────────
 	case ColorTableRowEven:
 		return color.NRGBA{R: 250, G: 250, B: 252, A: 255}
 	case ColorTableRowOdd:
@@ -110,7 +118,7 @@ func (t ForcedLightTheme) Color(name fyne.ThemeColorName, variant fyne.ThemeVari
 	case ColorSystemTableBg:
 		return color.NRGBA{R: 235, G: 235, B: 240, A: 200}
 
-		// Консоль
+	// ──────────────── Консоль ────────────────
 	case ColorConsoleText:
 		return color.NRGBA{R: 192, G: 255, B: 26, A: 255}
 	case ColorCRTScreenFill:
@@ -120,7 +128,7 @@ func (t ForcedLightTheme) Color(name fyne.ThemeColorName, variant fyne.ThemeVari
 	case ColorCRTHeaderBg:
 		return color.NRGBA{R: 245, G: 245, B: 248, A: 200}
 
-		// Панели
+	// ──────────────── Панели/карточки ────────
 	case ColorDescCardStroke:
 		return color.NRGBA{R: 0, G: 0, B: 0, A: 40}
 	case ColorDescCardBg:
@@ -132,7 +140,7 @@ func (t ForcedLightTheme) Color(name fyne.ThemeColorName, variant fyne.ThemeVari
 	case ColorTipBg:
 		return color.NRGBA{R: 245, G: 245, B: 248, A: 230}
 
-	// Кастомные кнопки
+	// ──────────────── Кастомные кнопки ───────
 	case ColorButtonShadow:
 		return color.NRGBA{R: 0, G: 0, B: 0, A: 25}
 	case ColorButtonShadowDisabled:

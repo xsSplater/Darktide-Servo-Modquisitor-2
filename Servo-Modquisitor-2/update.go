@@ -145,20 +145,14 @@ func (app *App) checkSpecialUpdates() {
 		app.logNexusError(err, "Program", app.messages["program_update_unavailable"])
 	} else if programFileInfo != nil {
 		if saved, ok := app.nexusVersionCache[NexusCacheKeyProgram]; ok {
-			// Сравниваем семантически: если версия на Nexus больше локальной
+			// сравниваем, но не обновляем кэш
 			if compareVersions(programFileInfo.Version, saved.Version) > 0 {
 				app.appendLog(fmt.Sprintf(app.messages["log_new_program_version_available"],
 					programFileInfo.Version, saved.Version))
 			}
 		} else {
-			// Первая проверка — сохраняем информацию
-			app.nexusVersionCache[NexusCacheKeyProgram] = ModVersionInfo{
-				Timestamp: programFileInfo.UploadedTimestamp,
-				Version:   programFileInfo.Version,
-				Folder:    "Program",
-			}
-			app.saveNexusVersionCache()
-			app.appendLog(app.messages["log_version_cached_program"] + programFileInfo.Version)
+			// Просто пропускаем, не создаём запись
+			app.appendLog(app.messages["log_program_not_cached"])
 		}
 	}
 
@@ -173,13 +167,8 @@ func (app *App) checkSpecialUpdates() {
 					rulesFileInfo.Version, saved.Version))
 			}
 		} else {
-			app.nexusVersionCache[NexusCacheKeyRules] = ModVersionInfo{
-				Timestamp: rulesFileInfo.UploadedTimestamp,
-				Version:   rulesFileInfo.Version,
-				Folder:    "Sorting Rules",
-			}
-			app.saveNexusVersionCache()
-			app.appendLog(app.messages["log_version_cached_sort"] + rulesFileInfo.Version)
+			// Просто пропускаем, не создаём запись
+			app.appendLog(app.messages["log_sorting_rules_not_cached"])
 		}
 	}
 

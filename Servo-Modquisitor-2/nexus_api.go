@@ -153,6 +153,13 @@ func (app *App) checkNexusUpdates() {
 			continue
 		}
 
+		// Проверка на симлинк - НЕ ищем обновления для них!
+		if app.isSymlinkFolder(mod.Name) {
+			app.appendLog(fmt.Sprintf(app.messages["log_skipping_update_check_symlink"], mod.Name))
+			processed++
+			continue
+		}
+
 		fileInfo, err := app.getLatestFileInfoForMod(modID, mod.Name)
 		if err != nil {
 			app.logNexusError(err, mod.Name)
@@ -161,30 +168,27 @@ func (app *App) checkNexusUpdates() {
 
 		modIDStr := fmt.Sprintf("%d", modID)
 		cacheKey := modIDStr + ":" + mod.Name
-		var saved ModVersionInfo
-		if info, exists := app.nexusVersionCache[cacheKey]; exists {
-			saved = info
-		}
+		saved, exists := app.nexusVersionCache[cacheKey]
 
-		// Если нет сохранённой информации (первый запуск) - сохраняем текущую и не считаем обновлением
-		if saved.Timestamp == 0 {
-			app.nexusVersionCache[cacheKey] = ModVersionInfo{
-				Timestamp: fileInfo.UploadedTimestamp,
-				Version:   fileInfo.Version,
-				Folder:    mod.Name,
-			}
-			app.saveNexusVersionCache()
+		// Если нет записи в кэше - пропускаем (не создаём автоматически)
+		if !exists {
 			processed++
 			continue
 		}
 
+		// Если мод установлен вручную - пропускаем проверку
+		if saved.Source == "manual" {
+			processed++
+			continue
+		}
+
+		// Сравниваем timestamp для модов с source == "nexus"
 		if fileInfo.UploadedTimestamp > saved.Timestamp {
 			app.appendLog(fmt.Sprintf(app.messages["log_update_available"], mod.Name, saved.Version, fileInfo.Version))
 			updatesFound++
 		}
 
 		processed++
-		// Логируем прогресс каждые 10 модов (не чаще, чтобы не засорять лог)
 		if processed%10 == 0 {
 			app.appendLog(fmt.Sprintf(app.messages["log_mods_checked_progress"], processed, total))
 		}
@@ -195,7 +199,6 @@ func (app *App) checkNexusUpdates() {
 	} else {
 		app.appendLog(fmt.Sprintf(app.messages["updates_found_count"], updatesFound))
 	}
-	// Проверка обновлений программы и файлов сортировки
 	app.checkSpecialUpdates()
 	app.appendLog(app.messages["log_update_check_completed"])
 }

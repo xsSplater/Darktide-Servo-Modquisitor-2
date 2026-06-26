@@ -51,12 +51,17 @@ type Config struct {
 
 	// Размер файла лога в байтах
 	LogFileSizeLimit int64 `json:"log_file_size_limit"`
+
+	// Настройки отображения статуса в таблице
+	StatusRowSpacing float32 `json:"status_row_spacing"` // отступ между строками в пикселях
+	StatusFontSize   float32 `json:"status_font_size"`   // размер шрифта для статуса
 }
 
 type ModVersionInfo struct {
 	Timestamp int64  `json:"timestamp"`
 	Version   string `json:"version"`
-	Folder    string `json:"folder"` // Название папки мода в nexus_versions.json
+	Folder    string `json:"folder"`           // Название папки мода в nexus_versions.json
+	Source    string `json:"source,omitempty"` // "nexus" или "manual"
 }
 
 type App struct {
@@ -117,6 +122,7 @@ type App struct {
 	btnUpdateAll        *CustomButton
 	btnUpdateMod        *CustomButton
 	btnCheckUpdates     *CustomButton
+	btnEditVersion      *CustomButton
 	searchClearBtn      *CustomButton
 
 	// Nexus API
@@ -209,7 +215,7 @@ func (app *App) loadNexusVersionCache() {
 			raw = make(map[string]ModVersionInfo)
 			for k, v := range old {
 				ts, _ := strconv.ParseInt(v, 10, 64)
-				raw[k] = ModVersionInfo{Timestamp: ts, Version: ""}
+				raw[k] = ModVersionInfo{Timestamp: ts, Version: "", Folder: "", Source: "nexus"}
 			}
 		} else {
 			app.nexusVersionCache = make(map[string]ModVersionInfo)
@@ -219,8 +225,10 @@ func (app *App) loadNexusVersionCache() {
 
 	newCache := make(map[string]ModVersionInfo)
 	for key, info := range raw {
+		if info.Source == "" {
+			info.Source = "nexus" // обратная совместимость
+		}
 		if !strings.Contains(key, ":") && info.Folder != "" {
-			// Старый ключ: преобразуем в "modID:folder"
 			newKey := key + ":" + info.Folder
 			newCache[newKey] = info
 		} else {
@@ -229,7 +237,7 @@ func (app *App) loadNexusVersionCache() {
 	}
 	app.nexusVersionCache = newCache
 	if len(newCache) > 0 {
-		app.saveNexusVersionCache() // сохраняем в новом формате
+		app.saveNexusVersionCache()
 	}
 }
 
@@ -308,9 +316,10 @@ func (app *App) syncVersionCache() {
 					Timestamp: ts,
 					Version:   AppVersion,
 					Folder:    "Program",
+					Source:    "nexus",
 				}
 				app.saveNexusVersionCache()
-				app.appendLog("Program version cached: " + AppVersion)
+				app.appendLog(app.messages["log_version_cached_program"] + AppVersion)
 			}
 		}
 	}
@@ -326,9 +335,10 @@ func (app *App) syncVersionCache() {
 					Timestamp: ts,
 					Version:   dbVersion,
 					Folder:    "Sorting Rules",
+					Source:    "nexus",
 				}
 				app.saveNexusVersionCache()
-				app.appendLog("Sorting files version cached: " + dbVersion)
+				app.appendLog(app.messages["log_version_cached_sort"] + dbVersion)
 			}
 		}
 	}

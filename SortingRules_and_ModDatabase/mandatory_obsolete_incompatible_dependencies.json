@@ -1,5 +1,5 @@
 {
-	"version": "0.9.87",
+	"version": "0.9.95",
 
 	"mandatory_order": [
 		"ErrorTracker",
@@ -10,6 +10,7 @@
 		"animation_events",
 		"DarktideLocalServer",
 		"Audio",
+		"SimpleAudio",
 		"master_item_community_patch",
 		"visual_loadout_customization_community_patch",
 		"Alfs_DMF_Extensions",
@@ -37,6 +38,7 @@
 		{"before": "MultiBind",						"after": "guarantee_weapon_swap"},
 		{"before": "MultiBind",						"after": "hybrid_sprint"},
 		{"before": "no_chitchat",					"after": "LessAnnoyingPing"},
+		{"before": "NumericUI",						"after": "SkitariiUIFix"},
 		{"before": "RecolorStimms",					"after": "DivisionHUD"},
 		{"before": "Skitarius",						"after": "guarantee_ability_activation"},
 		{"before": "Skitarius",						"after": "guarantee_special_action"},
@@ -147,7 +149,6 @@
 		"weapon_customization_plugin",
 		"weapon_customization_plugin_xsSythes",
 		"weapon_customization_syn_edits",
-		"what_are_you",
 		"which_book",
 		"WhichMissions",
 		"x_Enhanced_RU_Localization",
@@ -329,6 +330,7 @@
 			}
 		},
 		{ "mod1": "enemies_improved",		"mod2": "outline_colours" },
+		{ "mod1": "extra_keybindings",		"mod2": "MultiBind",			"type": "same" },
 		{ "mod1": "flame_fx_reducer",		"mod2": "i_wanna_see" },
 		{ "mod1": "FpsDoctor",				"mod2": "MemLeakFix" },
 		{ "mod1": "FpsDoctor",				"mod2": "SMOG",					"type": "same" },
@@ -349,6 +351,7 @@
 		{ "mod1": "markers_aio",			"mod2": "StimmsPickupIcon" },
 		{ "mod1": "MemLeakFix",				"mod2": "MemLeakFixNoHUD" },
 		{ "mod1": "MenuUIHider",			"mod2": "InventoryHider" },
+		{ "mod1": "modular_menu_buttons",	"mod2": "hub_shortcuts",		"type": "same" },
 		{ "mod1": "NumericUI",				"mod2": "RemoveTagSkulls" },
 		{ "mod1": "Radar",					"mod2": "minimap" },
 		{ "mod1": "ReorderChars",			"mod2": "CharacterMenuReorder",	"type": "same" },
@@ -365,6 +368,7 @@
 		{ "mod1": "SprintVault",			"mod2": "TraversalAssist" },
 		{ "mod1": "stamina_dodge_bars",		"mod2": "ColorMyStamina" },
 		{ "mod1": "stamina_dodge_bars",		"mod2": "show_remaining_dodges" },
+		{ "mod1": "stamina_dodge_bars",		"mod2": "StaminaVis" },
 		{ "mod1": "Targeter",				"mod2": "crosshair_remap" },
 		{ "mod1": "teammate_tracker",		"mod2": "Do I Know You" },
 		{ "mod1": "ToggleHUD",				"mod2": "NoneHUD",				"type": "same" },
@@ -461,8 +465,8 @@
 		{"required": "crosshairs_fix",
 			"dependent": "crosshairs_old_remap",
 				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/36"},
-		{"required": "coherence_hud",
-			"dependent": "IconBrowser",
+		{"required": "IconBrowser",
+			"dependent": "coherence_hud",
 				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/820"},
 
 		{"required": "DarktideLocalServer",
@@ -565,6 +569,10 @@
 		{"required": "servo_friend",
 			"dependent": "servo_friend_plugin_hat_commissar",
 				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/504"},
+
+		{"required": "SimpleAudio",
+			"dependent": "M1GalvanicRifle",
+				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/929"},
 
 		{"required": "SoloPlay",
 			"dependent": "BetterBots",

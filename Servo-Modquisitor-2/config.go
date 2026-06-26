@@ -11,15 +11,14 @@ import (
 // ───────────── Программа ─────────────────────────────────────────
 const (
 	AppName         = "Servo-Modquisitor-2"
-	AppVersion      = "1.9.8"
+	AppVersion      = "2.0.0"
 	AppID           = "com.xssplater.servo-modquisitor"
 	AppIcon         = "assets/icon.png"
 	СonfigFolderSMQ = "Servo-Modquisitor"
 	DarktideAppID   = "1361210"
 	MaxLogFileSize  = 512 * 1024 // 512 Кб, 1*1024*1024 = 1 Мб
 
-	// Nexus мод для обновлений программы и файлов сортировки
-	NexusModIDForUpdates = 139
+	NexusModIDForUpdates = 139 // Nexus ID SMQ для обновлений программы и файлов сортировки
 
 	// Паттерны для поиска файлов на Nexus
 	NexusProgramArchivePattern = "Servo Modquisitor 2"      // имя архива с программой
@@ -28,6 +27,9 @@ const (
 	// Ключи для кэширования версий в nexus_versions.json
 	NexusCacheKeyProgram = "139:program"
 	NexusCacheKeyRules   = "139:rules"
+
+	SourceNexus  = "nexus"
+	SourceManual = "manual"
 )
 
 // ───────────── Нексус ────────────────────────────────────────────
@@ -75,14 +77,14 @@ const (
 const (
 	DonateBoostyURL         = "https://boosty.to/xssplater/donate"
 	DonateDonationAlertsURL = "https://www.donationalerts.com/r/xssplater"
-	DonateCardNumber        = "2204 1201 2138 5716"
+	DonateCardNumber        = "2204 1201 2138 5716" // Карта Мир
 )
 
 // ───────────── Сетевой слушатель и аргументы ─────────────────────
 const (
 	NXMProtocol     = "tcp"
-	NXMAddress      = "localhost:31338" // порт для приёма nxm-ссылок
-	OAuthListenAddr = "localhost:31337" // порт для OAuth-колбэка (не менять!)
+	NXMAddress      = "localhost:31338" // Порт для приёма nxm-ссылок
+	OAuthListenAddr = "localhost:31337" // Порт для OAuth-колбэка (не менять!)
 	NXMCommLine     = "--nxm"
 )
 
@@ -111,17 +113,15 @@ const (
 const (
 	ConsoleWidth  float32 = 500
 	ConsoleHeight float32 = 300
-)
 
-const (
 	ConsoleBackgroundImage = "assets/CRT_BlackBG.jpg"
 	ConsoleGradientOpacity = 0.4 // 1.00 - невидимый, 0 - видимый
 )
 
 // ───────────── Таблица ───────────────────────────────────────────
-const TableColumnCount = 7
-
 const (
+	TableColumnCount = 7
+
 	ColCheckboxWidth float32 = 30
 	ColSelectWidth   float32 = 30
 	ColNumberWidth   float32 = 40
@@ -129,19 +129,18 @@ const (
 	ColDateWidth     float32 = 100
 	ColStatusWidth   float32 = 120
 	ColNoteWidth     float32 = 510
-)
 
-const (
 	TableRowHeight    = 6
 	SystemTableHeight = 75
+
+	StatusRowSpacing = -2 // отступ между строками в пикселях (0 — без отступа)
+	StatusFontSize   = 11 // размер шрифта для дополнительного статуса (основной будет на 2 больше)
 )
 
 const (
 	TableBackgroundImage   = "assets/mechanicus.png"
 	TableBackgroundOpacity = 0.97 // 1.00 - невидимый, 0 - видимый
-)
 
-const (
 	HeaderBackgroundImage = "assets/Yellow_BG.jpg"
 	ButtonBackgroundImage = "assets/Yellow_BG_button.jpg"
 	ColBackgroundImage    = "assets/Yellow_BG_col.jpg"
@@ -154,29 +153,19 @@ const (
 	DialogTypeInfo  DialogType = iota // зелёный
 	DialogTypeWarn                    // красный
 	DialogTypeError                   // красный
-)
 
-const (
 	FileDialogWidth  float32 = 800
 	FileDialogHeight float32 = 600
-)
 
-const (
 	DialogMinWidth  float32 = 400
 	DialogMinHeight float32 = 300
-)
 
-const (
 	DialogGradientWidth  = 400
 	DialogGradientHeight = 50
-)
 
-const (
 	MsgScrollSizeX = 666
 	MsgScrollSizeY = 250
-)
 
-const (
 	DialogButtonMinWidth float32 = 120
 	DialogButtonHeight   float32 = 36
 )

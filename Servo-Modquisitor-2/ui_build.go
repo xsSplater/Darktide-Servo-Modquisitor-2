@@ -27,6 +27,52 @@ func createTableRow(height float32) fyne.CanvasObject {
 	return container.NewStack(spacer, lbl)
 }
 
+// VBoxWithSpacing — вертикальный layout с заданным отступом между элементами.
+type VBoxWithSpacing struct {
+	Spacing float32
+}
+
+func (v VBoxWithSpacing) Layout(objects []fyne.CanvasObject, size fyne.Size) {
+	if len(objects) == 0 {
+		return
+	}
+	// Вычисляем общую высоту всех объектов
+	var totalHeight float32
+	for _, obj := range objects {
+		totalHeight += obj.MinSize().Height
+	}
+	totalHeight += v.Spacing * float32(len(objects)-1)
+
+	// Если общая высота меньше размера контейнера — центрируем по вертикали
+	y := (size.Height - totalHeight) / 2
+	if y < 0 {
+		y = 0
+	}
+	for _, obj := range objects {
+		minSize := obj.MinSize()
+		obj.Resize(fyne.NewSize(size.Width, minSize.Height))
+		obj.Move(fyne.NewPos(0, y))
+		y += minSize.Height + v.Spacing
+	}
+}
+
+func (v VBoxWithSpacing) MinSize(objects []fyne.CanvasObject) fyne.Size {
+	if len(objects) == 0 {
+		return fyne.NewSize(0, 0)
+	}
+	var maxWidth float32
+	var totalHeight float32
+	for _, obj := range objects {
+		min := obj.MinSize()
+		if min.Width > maxWidth {
+			maxWidth = min.Width
+		}
+		totalHeight += min.Height
+	}
+	totalHeight += v.Spacing * float32(len(objects)-1)
+	return fyne.NewSize(maxWidth, totalHeight)
+}
+
 func (app *App) buildUI() {
 	// Лог
 	app.logWindow = widget.NewRichText(
@@ -183,6 +229,17 @@ func (app *App) buildUI() {
 		)
 	})
 	app.applyTooltip(app.removeSelectedBtn, "btn_remove_selected_tooltip")
+	app.btnEditVersion = NewCustomButton(app.messages["btn_edit_version"], func() {
+		if app.selectedModName == "" {
+			return
+		}
+		mod := app.findModByName(app.selectedModName)
+		if mod == nil {
+			return
+		}
+		app.showEditVersionDialog(mod)
+	})
+	app.applyTooltip(app.btnEditVersion, "btn_edit_version_tooltip")
 
 	// Основные кнопки
 	app.btnUp = NewCustomButton(app.messages["btn_up"], func() { app.moveSelected(-1) })
@@ -276,7 +333,7 @@ func (app *App) buildUI() {
 	moveToGroup := container.NewHBox(app.moveLabel, app.moveToEntry)
 	navigationGroup := container.NewHBox(app.btnUp, app.btnDown, app.moveToTopBtn, app.moveToBottomBtn, app.removeSelectedBtn, app.removeAllBtn)
 	selectGroup := container.NewHBox(app.selectAllBtn, app.deselectAllBtn, app.enableSelectedBtn, app.disableSelectedBtn)
-	allModsGroup := container.NewHBox(app.enableAllBtn, app.disableAllBtn)
+	allModsGroup := container.NewHBox(app.enableAllBtn, app.disableAllBtn, app.btnEditVersion)
 
 	row1 := container.NewHBox(moveToGroup, navigationGroup)
 	row2 := container.NewHBox(selectGroup, allModsGroup)
@@ -379,9 +436,51 @@ func (app *App) buildUI() {
 			dateStr := app.formatDate(mod.ModTime, app.cfg.DateFormat)
 			cont.Add(widget.NewLabel(dateStr))
 		case 5:
-			statusStr := app.messages["status_system"]
-			statusText := canvas.NewText(statusStr, th.Color(themes.ColorStatusSystem, variant))
-			cont.Add(statusText)
+			var subStatusText string
+			var subStatusColor color.Color
+
+			// Основной статус - "framework"
+			mainStatusText := app.messages["status_system"]
+			mainStatusColor := th.Color(themes.ColorStatusSystem, variant)
+
+			// Дополнительный статус
+			switch {
+			case mod.MissingFolder:
+				subStatusText = app.messages["status_missing_folder"]
+				subStatusColor = th.Color(themes.ColorStatusMissing, variant)
+			case mod.VortexDeployed:
+				subStatusText = app.messages["status_vortex"]
+				subStatusColor = th.Color(themes.ColorStatusVortex, variant)
+			case mod.IsSymlink:
+				subStatusText = app.messages["status_symlink"]
+				subStatusColor = th.Color(themes.ColorStatusSymlink, variant)
+			case mod.Source == "manual":
+				subStatusText = app.messages["status_manual"]
+				subStatusColor = th.Color(themes.ColorStatusManual, variant)
+			case mod.Source == "nexus":
+				subStatusText = app.messages["status_nexus"]
+				subStatusColor = th.Color(themes.ColorStatusNexus, variant)
+			default:
+				subStatusText = ""
+			}
+
+			mainLabel := canvas.NewText(mainStatusText, mainStatusColor)
+			mainLabel.TextSize = StatusFontSize + 2
+			mainLabel.Alignment = fyne.TextAlignCenter
+			mainLabel.TextStyle = fyne.TextStyle{Bold: true}
+
+			subLabel := canvas.NewText(subStatusText, subStatusColor)
+			subLabel.TextSize = StatusFontSize
+			subLabel.Alignment = fyne.TextAlignCenter
+
+			if subStatusText == "" {
+				cont.Add(mainLabel)
+			} else {
+				// Используем кастомный layout с точным отступом
+				statusBox := container.NewWithoutLayout(mainLabel, subLabel)
+				statusBox.Layout = &VBoxWithSpacing{Spacing: StatusRowSpacing}
+				cont.Add(statusBox)
+			}
 		case 6:
 			noteLabel := widget.NewLabel(mod.Note)
 			noteLabel.Wrapping = fyne.TextWrapWord
@@ -494,6 +593,9 @@ func (app *App) buildUI() {
 			if !mod.IsSystem {
 				check := widget.NewCheck("", nil)
 				check.SetChecked(mod.Active)
+				if mod.MissingFolder {
+					check.Disable() // блокируем, если папки нет
+				}
 				check.OnChanged = func(b bool) {
 					app.toggleModActive(mod.Name, b)
 					app.modTable.Select(widget.TableCellID{Row: id.Row, Col: 0})
@@ -524,37 +626,74 @@ func (app *App) buildUI() {
 			dateText.Alignment = fyne.TextAlignCenter
 			cont.Add(dateText)
 		case 5:
-			var statusStr string
-			var clr color.Color
-			switch {
-			case mod.VortexDeployed:
-				statusStr = app.messages["status_vortex"]
-				clr = th.Color(themes.ColorStatusVortex, variant)
-			case mod.IsSystem:
-				statusStr = app.messages["status_system"]
-				clr = th.Color(themes.ColorStatusSystem, variant)
-			case mod.Broken:
-				statusStr = app.messages["desc_broken"]
-				clr = th.Color(themes.ColorStatusBroken, variant)
-			case mod.Incompatible:
-				statusStr = app.messages["desc_conflict"]
-				clr = th.Color(themes.ColorStatusConflict, variant)
-			case mod.Obsolete:
-				statusStr = app.messages["desc_obsolete"]
-				clr = th.Color(themes.ColorStatusObsolete, variant)
-			case mod.Mandatory && mod.Active:
-				statusStr = app.messages["status_mandatory"]
-				clr = th.Color(themes.ColorStatusMandatory, variant)
-			case mod.Active:
-				statusStr = app.messages["status_active"]
-				clr = th.Color(themes.ColorStatusActive, variant)
-			default:
-				statusStr = app.messages["status_inactive"]
-				clr = th.Color(themes.ColorStatusInactive, variant)
+			var mainStatusText string
+			var mainStatusColor color.Color
+			var subStatusText string
+			var subStatusColor color.Color
+
+			// Основной статус (active/inactive)
+			if mod.Active {
+				mainStatusText = app.messages["status_active"]
+				mainStatusColor = th.Color(themes.ColorStatusActive, variant)
+			} else {
+				mainStatusText = app.messages["status_inactive"]
+				mainStatusColor = th.Color(themes.ColorStatusInactive, variant)
 			}
-			statusText := canvas.NewText(statusStr, clr)
-			statusText.Alignment = fyne.TextAlignCenter
-			cont.Add(statusText)
+
+			// Дополнительный статус
+			switch {
+			case mod.MissingFolder:
+				subStatusText = app.messages["status_missing_folder"]
+				subStatusColor = th.Color(themes.ColorStatusMissing, variant)
+			case mod.VortexDeployed:
+				subStatusText = app.messages["status_vortex"]
+				subStatusColor = th.Color(themes.ColorStatusVortex, variant)
+			case mod.IsSymlink:
+				subStatusText = app.messages["status_symlink"]
+				subStatusColor = th.Color(themes.ColorStatusSymlink, variant)
+			case mod.IsSystem:
+				subStatusText = app.messages["status_system"]
+				subStatusColor = th.Color(themes.ColorStatusSystem, variant)
+			case mod.Broken:
+				subStatusText = app.messages["desc_broken"]
+				subStatusColor = th.Color(themes.ColorStatusBroken, variant)
+			case mod.Incompatible:
+				subStatusText = app.messages["desc_conflict"]
+				subStatusColor = th.Color(themes.ColorStatusConflict, variant)
+			case mod.Obsolete:
+				subStatusText = app.messages["desc_obsolete"]
+				subStatusColor = th.Color(themes.ColorStatusObsolete, variant)
+			case mod.Mandatory && mod.Active:
+				subStatusText = app.messages["status_mandatory"]
+				subStatusColor = th.Color(themes.ColorStatusMandatory, variant)
+			case mod.Source == "manual":
+				subStatusText = app.messages["status_manual"]
+				subStatusColor = th.Color(themes.ColorStatusManual, variant)
+			case mod.Source == "nexus":
+				subStatusText = app.messages["status_nexus"]
+				subStatusColor = th.Color(themes.ColorStatusNexus, variant)
+			default:
+				subStatusText = ""
+			}
+
+			// Создаём вертикальный контейнер
+			mainLabel := canvas.NewText(mainStatusText, mainStatusColor)
+			mainLabel.TextSize = StatusFontSize + 2
+			mainLabel.Alignment = fyne.TextAlignCenter
+			mainLabel.TextStyle = fyne.TextStyle{Bold: true}
+
+			subLabel := canvas.NewText(subStatusText, subStatusColor)
+			subLabel.TextSize = StatusFontSize
+			subLabel.Alignment = fyne.TextAlignCenter
+
+			if subStatusText == "" {
+				cont.Add(mainLabel)
+			} else {
+				// Используем кастомный layout с точным отступом
+				statusBox := container.NewWithoutLayout(mainLabel, subLabel)
+				statusBox.Layout = &VBoxWithSpacing{Spacing: StatusRowSpacing}
+				cont.Add(statusBox)
+			}
 		case 6:
 			noteLabel := widget.NewLabel(mod.Note)
 			noteLabel.Wrapping = fyne.TextWrapOff
@@ -638,7 +777,7 @@ func (app *App) buildUI() {
 	app.descTitle = canvas.NewText(app.messages["select_mod"], th.Color(theme.ColorNameForeground, variant))
 	app.descTitle.TextSize = theme.TextSize() + 2
 	app.descTitle.TextStyle = fyne.TextStyle{Bold: true}
-	app.descAuthor = widget.NewLabel("—")
+	app.descAuthor = widget.NewLabel("-")
 	app.descInstalled = widget.NewLabel("")
 	app.descBody = widget.NewLabel(app.messages["desc_placeholder"])
 	app.descBody.Wrapping = fyne.TextWrapWord
@@ -701,7 +840,7 @@ func (app *App) buildUI() {
 				if strings.HasSuffix(strings.ToLower(path), ".zip") {
 					// Запускаем установку в отдельной горутине, чтобы не блокировать UI
 					go func(p string) {
-						installedName, version, err := app.InstallModFromArchive(p, true, "")
+						installedName, _, err := app.InstallModFromArchive(p, true, "")
 						fyne.Do(func() {
 							if err != nil {
 								app.appendLog(fmt.Sprintf(app.messages["log_extract_error"], err))
@@ -710,11 +849,7 @@ func (app *App) buildUI() {
 							checks.AutoFixMalformed()
 							app.refreshModList()
 							app.selectAndScrollToMod(installedName)
-							modID, _, _ := extractVersionAndModIDFromFilename(p)
-							if modID != 0 && version != "" {
-								cacheKey := fmt.Sprintf("%d:%s", modID, installedName)
-								app.cacheModVersion(cacheKey, installedName, version, 0)
-							}
+
 							app.appendLog(fmt.Sprintf(app.messages["log_installed"], filepath.Base(p)))
 						})
 					}(path)
@@ -952,7 +1087,7 @@ func (app *App) refreshThemeColors() {
 		app.btnLaunchNormal, app.btnLaunchNoLauncher,
 		app.moveToTopBtn, app.moveToBottomBtn,
 		app.selectAllBtn, app.deselectAllBtn, app.enableSelectedBtn,
-		app.disableSelectedBtn, app.enableAllBtn, app.disableAllBtn,
+		app.disableSelectedBtn, app.enableAllBtn, app.disableAllBtn, app.btnEditVersion,
 		app.manageBtn, app.searchClearBtn, app.removeAllBtn, app.removeSelectedBtn,
 	} {
 		if btn != nil {
@@ -1000,7 +1135,7 @@ func (app *App) updateDescriptionForMod(name string) {
 	if name == "" {
 		app.descTitle.Text = app.messages["select_mod"]
 		app.descTitle.Refresh()
-		app.descAuthor.SetText("—")
+		app.descAuthor.SetText("-")
 		app.descURL.SetURL(nil)
 		app.descURL.SetText("")
 		app.descBody.SetText(app.messages["desc_placeholder"])
@@ -1080,6 +1215,9 @@ func (app *App) updateDescriptionForMod(name string) {
 	}
 
 	desc := strings.TrimSpace(mod.Description)
+	if mod.MissingFolder {
+		desc = app.messages["desc_missing"] + desc
+	}
 	if desc == "" || desc == "{" || desc == "}" || desc == "[]" || desc == "()" {
 		desc = app.messages["desc_placeholder"]
 	}
@@ -1146,6 +1284,10 @@ func (app *App) enrichModFromNexus(mod *checks.ModInfo) {
 	if app.getAuthToken() == "" || mod.URL == "" {
 		return
 	}
+	// Проверка на симлинк - не добавляем описания
+	// if app.isSymlinkFolder(mod.Name) {
+	// 	return
+	// }
 	modID := extractModIDFromURL(mod.URL)
 	if modID == 0 {
 		return
@@ -1295,6 +1437,7 @@ func (app *App) filterModList() {
 		app.messages["filter_inactive"]: func(m checks.ModInfo) bool { return !m.Active },
 		app.messages["filter_obsolete"]: func(m checks.ModInfo) bool { return m.Obsolete },
 		app.messages["filter_conflict"]: func(m checks.ModInfo) bool { return m.Incompatible },
+		app.messages["filter_missing"]:  func(m checks.ModInfo) bool { return m.MissingFolder },
 	}
 	filter := app.filterSelect.Selected
 	if filter == "" {
@@ -1356,8 +1499,12 @@ func (app *App) filterModList() {
 
 func (app *App) filterOptions() []string {
 	return []string{
-		app.messages["filter_all"], app.messages["filter_active"], app.messages["filter_inactive"],
-		app.messages["filter_obsolete"], app.messages["filter_conflict"],
+		app.messages["filter_all"],
+		app.messages["filter_active"],
+		app.messages["filter_inactive"],
+		app.messages["filter_obsolete"],
+		app.messages["filter_conflict"],
+		app.messages["filter_missing"],
 	}
 }
 

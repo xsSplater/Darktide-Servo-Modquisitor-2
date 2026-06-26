@@ -92,7 +92,21 @@ func FolderExists(name string) bool {
 	return info != nil && info.IsDir()
 }
 
-func RemoveMod(name string) { os.RemoveAll(filepath.Join(modsDir, name)) }
+func RemoveMod(name string) {
+	path := filepath.Join(modsDir, name)
+	// Проверяем, является ли запись симлинком
+	info, err := os.Lstat(path)
+	if err != nil {
+		return
+	}
+	if info.Mode()&os.ModeSymlink != 0 {
+		// Это симлинк - удаляем только ссылку (безопасно)
+		os.Remove(path)
+	} else {
+		// Обычная папка - удаляем рекурсивно
+		os.RemoveAll(path)
+	}
+}
 
 func ListModFolders() []string {
 	var folders []string
@@ -104,8 +118,18 @@ func ListModFolders() []string {
 		return folders
 	}
 	for _, e := range entries {
+		// Обычная папка
 		if e.IsDir() {
 			folders = append(folders, e.Name())
+			continue
+		}
+		// Символическая ссылка или junction point
+		if e.Type()&os.ModeSymlink != 0 {
+			// Проверяем, куда ведёт ссылка
+			info, err := os.Stat(filepath.Join(modsDir, e.Name()))
+			if err == nil && info.IsDir() {
+				folders = append(folders, e.Name())
+			}
 		}
 	}
 	return folders
@@ -133,6 +157,9 @@ type ModInfo struct {
 	NexusDownloads    int
 	NexusEndorsements int
 	NexusPictureURL   string
+	IsSymlink         bool   // true, если папка является симлинком
+	MissingFolder     bool   // true, если папка отсутствует, но мод есть в списке
+	Source            string // "nexus" или "manual"
 }
 
 type ModDBEntry struct {
@@ -149,6 +176,48 @@ type ModDBEntry struct {
 func GetModsInfo(lang string, forceEnglish bool) []ModInfo {
 	folders := ListModFolders()
 	var mods []ModInfo
+
+	// --- 1. Добавляем виртуальные моды (из mod_load_order.txt) ---
+	loadOrderEntries := ReadLoadOrder()
+	if loadOrderEntries != nil {
+		existing := make(map[string]bool)
+		for _, name := range folders {
+			existing[name] = true
+		}
+		for _, entry := range loadOrderEntries {
+			if existing[entry.Name] {
+				continue
+			}
+			if entry.Name == "base" || entry.Name == "dmf" {
+				continue
+			}
+			mod := ModInfo{
+				Name:          entry.Name,
+				Active:        entry.Active,
+				MissingFolder: true,
+				ModTime:       time.Time{},
+			}
+			if db, ok := modDBMap[strings.ToLower(entry.Name)]; ok && db.Folder != "" {
+				mod.Author = db.Author
+				mod.URL = db.URL
+				mod.GitHubURL = db.GitHubURL
+				mod.Description = PickLocalized(db.Description, lang)
+				mod.Note = PickLocalized(db.Note, lang)
+				if forceEnglish {
+					if enName := PickLocalized(db.Name, "en"); enName != "" {
+						mod.DisplayName = enName
+					}
+				} else {
+					if dn := PickLocalized(db.Name, lang); dn != "" {
+						mod.DisplayName = dn
+					}
+				}
+			}
+			mods = append(mods, mod)
+		}
+	}
+
+	// --- 2. Реальные папки ---
 	for _, name := range folders {
 		fullPath := filepath.Join(modsDir, name)
 		fi, err := os.Stat(fullPath)
@@ -234,7 +303,6 @@ func GetModsInfo(lang string, forceEnglish bool) []ModInfo {
 				// Теперь проверяем .mod файл уже с учётом возможного переименования
 				if !fileExists(modFilePath) && !foundLua {
 					mod.Broken = true
-					// Если нет .mod и нет Lua - значит мод точно сломан
 				} else {
 					mod.Broken = false
 				}
@@ -275,13 +343,13 @@ func GetModsInfo(lang string, forceEnglish bool) []ModInfo {
 		}
 		mods = append(mods, mod)
 	}
+
 	// Проверяем автопатчер
 	if _, err := os.Stat(filepath.Join(modsDir, "..", "binaries", "plugins", "_dt_mod_autopatch.dll")); err == nil {
 		mod := ModInfo{
 			Name:     "autopatch",
 			IsSystem: true,
 			Active:   false,
-			// Описание и прочее будет подтянуто ниже из modDBMap
 		}
 		dllPath := filepath.Join(modsDir, "..", "binaries", "plugins", "_dt_mod_autopatch.dll")
 		mod.ModTime = getModTimeFromFile(dllPath)
@@ -320,6 +388,10 @@ func getModTimeFromFile(path string) time.Time {
 // в имя этого .mod файла (без расширения) и возвращает новое имя папки.
 // Если переименование не удалось или условий нет - возвращает пустую строку.
 func tryFixMismatchedModFolder(folderPath, currentName string) string {
+	// Пропускаем папки, которые отключены по именованию
+	if isDisabledByNaming(currentName) {
+		return ""
+	}
 	entries, err := os.ReadDir(folderPath)
 	if err != nil {
 		return ""
@@ -400,7 +472,15 @@ func ReadLoadOrder() []LoadOrderEntry {
 	scanner := bufio.NewScanner(strings.NewReader(string(data)))
 	for scanner.Scan() {
 		line := strings.TrimSpace(scanner.Text())
-		if line == "" || (strings.HasPrefix(line, "--") && !strings.HasPrefix(line, "-- ")) {
+		if line == "" {
+			continue
+		}
+		// Пропускаем заголовок программы (начинается с "-- ▒")
+		if strings.HasPrefix(line, "-- ▒") {
+			continue
+		}
+		// Комментарий: строка начинается с "--" и НЕ с "-- " (т.е. без пробела после дефисов)
+		if strings.HasPrefix(line, "--") && !strings.HasPrefix(line, "-- ") {
 			continue
 		}
 		active := true
@@ -409,9 +489,22 @@ func ReadLoadOrder() []LoadOrderEntry {
 			active = false
 			name = strings.TrimPrefix(line, "-- ")
 		}
-		if name != "" && name != "base" && name != "dmf" {
-			entries = append(entries, LoadOrderEntry{Name: name, Active: active})
+		if name == "" || name == "base" || name == "dmf" {
+			continue
 		}
+		// Проверяем, что имя содержит хотя бы одну букву или цифру,
+		// чтобы отсеять комментарии вида "################################################################"
+		hasValidChar := false
+		for _, ch := range name {
+			if (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9') {
+				hasValidChar = true
+				break
+			}
+		}
+		if !hasValidChar {
+			continue
+		}
+		entries = append(entries, LoadOrderEntry{Name: name, Active: active})
 	}
 	return entries
 }

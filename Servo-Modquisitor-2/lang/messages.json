@@ -447,6 +447,34 @@
 		"es": "Descargando",
 	 "pt-BR": "Baixando"
 	},
+	"btn_edit_version": {
+		"en": "Edit version",
+		"ru": "Изменить версию",
+   "zh-hans": "编辑版本",
+   "zh-hant": "編輯版本",
+		"de": "Version bearbeiten",
+		"fr": "Modifier la version",
+		"ja": "バージョンを編集",
+		"ko": "버전 편집",
+		"it": "Modifica versione",
+		"pl": "Edytuj wersję",
+		"es": "Editar versión",
+	 "pt-BR": "Editar versão"
+	},
+	"btn_edit_version_tooltip": {
+		"en": "Manually change the version of this mod (useful if auto-detected version is wrong).",
+		"ru": "Вручную изменить версию этого мода (полезно, если автоматически определённая версия неверна).",
+   "zh-hans": "手动更改此模组的版本（如果自动检测到的版本不正确，则此选项很有用）。",
+   "zh-hant": "手動更改此模組的版本（如果自動偵測到的版本不正確，則此選項很有用）。",
+		"de": "Manuell die Version dieses Mods ändern (nützlich, wenn die automatisch erkannte Version falsch ist).",
+		"fr": "Modifier manuellement la version de ce mod (utile si la version détectée automatiquement est incorrecte).",
+		"ja": "このMODのバージョンを手動で変更します（自動検出されたバージョンが間違っている場合に便利です）。",
+		"ko": "이 모드의 버전을 수동으로 변경합니다(자동으로 감지된 버전이 잘못된 경우 유용합니다).",
+		"it": "Modifica manualmente la versione di questo mod (utile se la versione rilevata automaticamente è errata).",
+		"pl": "Ręcznie zmień wersję tego moda (przydatne, jeśli automatycznie wykryta wersja jest błędna).",
+		"es": "Cambiar manualmente la versión de este mod (útil si la versión detectada automáticamente es incorrecta).",
+	 "pt-BR": "Alterar manualmente a versão deste mod (útil se a versão detectada automaticamente estiver incorreta)."
+	},
 	"btn_enable_all_mods": {
 		"en": "Enable All Mods",
 		"ru": "Включить все моды",
@@ -1231,6 +1259,34 @@
 		"es": " ✔ Sí  ",
 	 "pt-BR": " ✔ Sim  "
 	},
+	"cache_cleaned_title": {
+		"en": "Cache cleaned",
+		"ru": "Кэш очищен",
+   "zh-hans": "缓存已清理",
+   "zh-hant": "快取已清理",
+		"de": "Cache geleert",
+		"fr": "Cache vidé",
+		"ja": "キャッシュをクリアしました",
+		"ko": "캐시 정리됨",
+		"it": "Cache pulita",
+		"pl": "Pamięć podręczna wyczyszczona",
+		"es": "Caché limpiada",
+	 "pt-BR": "Cache limpo"
+	},
+	"cache_cleaned_message": {
+		"en": "Removed entries for missing mods. %d entries remain.",
+		"ru": "Удалены записи для отсутствующих модов. Осталось %d записей.",
+   "zh-hans": "已删除缺失模组的条目。剩余 %d 条。",
+   "zh-hant": "已刪除缺失模組的條目。剩餘 %d 條。",
+		"de": "Einträge für fehlende Mods entfernt. %d Einträge verbleiben.",
+		"fr": "Entrées pour les mods manquants supprimées. %d entrées restantes.",
+		"ja": "見つからないMODのエントリを削除しました。%d 件残っています。",
+		"ko": "누락된 모드의 항목을 제거했습니다. %d개 항목이 남아 있습니다.",
+		"it": "Rimosse voci per mod mancanti. Rimangono %d voci.",
+		"pl": "Usunięto wpisy dla brakujących modów. Pozostało %d wpisów.",
+		"es": "Eliminadas entradas para mods faltantes. Quedan %d entradas.",
+	 "pt-BR": "Removidas entradas para mods ausentes. %d entradas restantes."
+	},
 	"cannot_extract_mod_id": {
 		"en": "Cannot extract mod ID from URL: %s",
 		"ru": "Не удалось извлечь ID мода из ссылки: %s",
@@ -1651,6 +1707,20 @@
 		"es": "⚔ conflicto",
 	 "pt-BR": "⚔ conflito"
 	},
+	"desc_missing": {
+		"en": "⚠️ This mod is listed in the load order but the folder is missing.\nFollow the link above and install the mod or remove it from the list to avoid errors in the game.\n\n",
+		"ru": "⚠️ Этот мод указан в списке загрузки, но папка отсутствует.\nПройдите по ссылке выше и установите мод или удалите его из списка, чтобы в игре не было ошибок.\n\n",
+   "zh-hans": "⚠️ 此模组在加载顺序中列出，但文件夹缺失。\n请点击上面的链接安装模组，或将其从列表中移除，以避免游戏中出现错误。\n\n",
+   "zh-hant": "⚠️ 此模組在載入順序中列出，但資料夾缺失。\n請點擊上面的連結安裝模組，或將其從清單中移除，以避免遊戲中出現錯誤。\n\n",
+		"de": "⚠️ Dieser Mod ist in der Ladereihenfolge aufgeführt, aber der Ordner fehlt.\nFolgen Sie dem obigen Link und installieren Sie den Mod oder entfernen Sie ihn aus der Liste, um Fehler im Spiel zu vermeiden.\n\n",
+		"fr": "⚠️ Ce mod est répertorié dans l'ordre de chargement mais le dossier est manquant.\nSuivez le lien ci-dessus pour installer le mod ou supprimez-le de la liste pour éviter des erreurs dans le jeu.\n\n",
+		"ja": "⚠️ このMODはロード順にリストされていますが、フォルダーが見つかりません。\n上のリンクからMODをインストールするか、リストから削除して、ゲーム内でエラーが発生しないようにしてください。\n\n",
+		"ko": "⚠️ 이 모드는 로드 순서에 나열되어 있지만 폴더가 없습니다.\n위 링크를 따라 모드를 설치하거나 목록에서 제거하여 게임에서 오류가 발생하지 않도록 하세요.\n\n",
+		"it": "⚠️ Questo mod è elencato nell'ordine di caricamento ma la cartella è mancante.\nSegui il link sopra per installare il mod o rimuoverlo dall'elenco per evitare errori nel gioco.\n\n",
+		"pl": "⚠️ Ten mod znajduje się na liście kolejności ładowania, ale brakuje folderu.\nKliknij powyższy link, aby zainstalować mod, lub usuń go z listy, aby uniknąć błędów w grze.\n\n",
+		"es": "⚠️ Este mod está en la lista de orden de carga pero falta la carpeta.\nSiga el enlace de arriba para instalar el mod o elimínelo de la lista para evitar errores en el juego.\n\n",
+	 "pt-BR": "⚠️ Este mod está listado na ordem de carregamento, mas a pasta está ausente.\nSiga o link acima para instalar o mod ou remova-o da lista para evitar erros no jogo.\n\n"
+	},
 	"desc_obsolete": {
 		"en": "☠ Obsolete",
 		"ru": "☠ Устаревший",
@@ -1692,6 +1762,34 @@
 		"pl": "Brak folderu DMF!",
 		"es": "¡Falta la carpeta DMF!",
 	 "pt-BR": "Pasta DMF ausente!"
+	},
+	"dma_install_failed": {
+		"en": "DMA installation failed: %v",
+		"ru": "Ошибка установки DMA: %v",
+   "zh-hans": "DMA 安装失败：%v",
+   "zh-hant": "DMA 安裝失敗：%v",
+		"de": "DMA-Installation fehlgeschlagen: %v",
+		"fr": "Échec de l'installation de DMA : %v",
+		"ja": "DMAのインストールに失敗しました: %v",
+		"ko": "DMA 설치 실패: %v",
+		"it": "Installazione DMA fallita: %v",
+		"pl": "Instalacja DMA nie powiodła się: %v",
+		"es": "Error en la instalación de DMA: %v",
+	 "pt-BR": "Falha na instalação do DMA: %v"
+	},
+	"dmf_install_failed": {
+		"en": "DMF installation failed: %v",
+		"ru": "Ошибка установки DMF: %v",
+   "zh-hans": "DMF 安装失败：%v",
+   "zh-hant": "DMF 安裝失敗：%v",
+		"de": "DMF-Installation fehlgeschlagen: %v",
+		"fr": "Échec de l'installation de DMF : %v",
+		"ja": "DMFのインストールに失敗しました: %v",
+		"ko": "DMF 설치 실패: %v",
+		"it": "Installazione DMF fallita: %v",
+		"pl": "Instalacja DMF nie powiodła się: %v",
+		"es": "Error en la instalación de DMF: %v",
+	 "pt-BR": "Falha na instalação do DMF: %v"
 	},
 	"dml_install_failed": {
 		"en": "DML installation failed: %v",
@@ -1903,6 +2001,20 @@
 		"es": "Descargando: %s",
 	 "pt-BR": "Baixando: %s"
 	},
+	"downloading_dmf": {
+		"en": "Downloading DMF: %s",
+		"ru": "Загрузка DMF: %s",
+   "zh-hans": "正在下载 DMF：%s",
+   "zh-hant": "正在下載 DMF：%s",
+		"de": "Lade DMF herunter: %s",
+		"fr": "Téléchargement de DMF : %s",
+		"ja": "DMFをダウンロード中: %s",
+		"ko": "DMF 다운로드 중: %s",
+		"it": "Download DMF in corso: %s",
+		"pl": "Pobieranie DMF: %s",
+		"es": "Descargando DMF: %s",
+	 "pt-BR": "Baixando DMF: %s"
+	},
 	"downloading_dml": {
 		"en": "Downloading DML: %s",
 		"ru": "Загрузка DML: %s",
@@ -1930,6 +2042,20 @@
 		"pl": "Pobieranie aktualizacji...",
 		"es": "Descargando actualización...",
 	 "pt-BR": "Baixando atualização..."
+	},
+	"edit_version_current": {
+		"en": "Current version of '%s': %s",
+		"ru": "Текущая версия '%s': %s",
+   "zh-hans": "%s 的当前版本：%s",
+   "zh-hant": "「%s」的目前版本：%s",
+		"de": "Aktuelle Version von '%s': %s",
+		"fr": "Version actuelle de '%s' : %s",
+		"ja": "「%s」の現在のバージョン：%s",
+		"ko": "'%s'의 현재 버전: %s",
+		"it": "Versione corrente di '%s': %s",
+		"pl": "Obecna wersja '%s': %s",
+		"es": "Versión actual de '%s': %s",
+	 "pt-BR": "Versão atual de '%s': %s"
 	},
 	"empty_folder_message": {
 		"en": "The following folders are empty:",
@@ -2098,6 +2224,20 @@
 		"pl": "Filtr:",
 		"es": "Filtro:",
 	 "pt-BR": "Filtro:"
+	},
+	"filter_missing": {
+		"en": "📁 Missing folder",
+		"ru": "📁 Нет папки мода",
+   "zh-hans": "📁 文件夹缺失",
+   "zh-hant": "📁 資料夾缺失",
+		"de": "📁 Ordner fehlt",
+		"fr": "📁 Dossier manquant",
+		"ja": "📁 フォルダなし",
+		"ko": "📁 폴더 누락됨",
+		"it": "📁 Cartella mancante",
+		"pl": "📁 Brakuje folderu",
+		"es": "📁 Falta la carpeta",
+	 "pt-BR": "📁 Pasta ausente"
 	},
 	"filter_obsolete": {
 		"en": "☠ Obsolete",
@@ -2393,6 +2533,20 @@
 		"es": "Instalando Autopatcher...",
 	 "pt-BR": "Instalando Autopatcher..."
 	},
+	"installing_dmf": {
+		"en": "Installing Darktide Mod Framework...",
+		"ru": "Установка Darktide Mod Framework...",
+   "zh-hans": "正在安装 Darktide Mod Framework...",
+   "zh-hant": "正在安裝 Darktide Mod Framework...",
+		"de": "Darktide Mod Framework wird installiert...",
+		"fr": "Installation de Darktide Mod Framework...",
+		"ja": "Darktide Mod Frameworkをインストール中...",
+		"ko": "Darktide Mod Framework 설치 중...",
+		"it": "Installazione di Darktide Mod Framework in corso...",
+		"pl": "Instalowanie Darktide Mod Framework...",
+		"es": "Instalando Darktide Mod Framework...",
+	 "pt-BR": "Instalando o Darktide Mod Framework..."
+	},
 	"installing_dml": {
 		"en": "Installing Darktide Mod Loader...",
 		"ru": "Установка Darktide Mod Loader...",
@@ -2494,7 +2648,7 @@
 	"linux_wine_not_found": {
 		"en": "Wine/Proton not found. Please install Wine and ensure it's in PATH, or launch normally without 'Skip launcher': %v",
 		"ru": "Wine/Proton не найден. Установите Wine и убедитесь, что он в PATH, либо запустите обычным способом: %v",
-   "zh-hans": "未找到 Wine/Proton。请安装 Wine 并确保其在 PATH 中，或正常启动（不使用“跳过启动器”）：%v",
+   "zh-hans": "未找到 Wine/Proton。请安装 Wine 并确保其在 PATH 中，或正常启动（不使用\"跳过启动器\"）：%v",
    "zh-hant": "未找到 Wine/Proton。請安裝 Wine 並確保其在 PATH 中，或正常啟動（不使用「跳過啟動器」）：%v",
 		"de": "Wine/Proton nicht gefunden. Bitte installieren Sie Wine und stellen Sie sicher, dass es im PATH ist, oder starten Sie normal ohne 'Launcher überspringen': %v",
 		"fr": "Wine/Proton introuvable. Veuillez installer Wine et assurez-vous qu'il est dans le PATH, ou lancez normalement sans 'Ignorer le lanceur' : %v",
@@ -2561,6 +2715,20 @@
 		"es": " (Parche BAT)",
 	 "pt-BR": " (Patcher BAT)"
 	},
+	"log_autopatcher_manual": {
+		"en": "Autopatcher was installed manually, skipping auto-update.",
+		"ru": "Автопатчер установлен вручную, пропускаем автоматическое обновление.",
+   "zh-hans": "自动补丁已手动安装，跳过自动更新。",
+   "zh-hant": "自動補丁已手動安裝，跳過自動更新。",
+		"de": "Autopatcher wurde manuell installiert, automatisches Update wird übersprungen.",
+		"fr": "L'autopatcheur a été installé manuellement, mise à jour automatique ignorée.",
+		"ja": "オートパッチャーは手動でインストールされています。自動アップデートをスキップします。",
+		"ko": "자동 패처가 수동으로 설치되었습니다. 자동 업데이트를 건너뜁니다.",
+		"it": "L'autopatch è stato installato manualmente, aggiornamento automatico saltato.",
+		"pl": "Autopatch został zainstalowany ręcznie, pomijam automatyczną aktualizację.",
+		"es": "El autoparche se instaló manualmente, se omite la actualización automática.",
+	 "pt-BR": "O autopatch foi instalado manualmente, atualização automática ignorada."
+	},
 	"log_autosaved_stable_pattern": {
 		"en": "Auto-saved stable file pattern for %s: %s",
 		"ru": "Автоматически сохранённый стабильный шаблон для %s: %s",
@@ -2589,6 +2757,34 @@
 		"es": "Se han eliminado todos los mods.",
 	 "pt-BR": "Todos os mods foram removidos."
 	},
+	"log_binaries_installed_success": {
+		"en": "Binaries installed successfully.",
+		"ru": "Бинарные файлы успешно установлены.",
+   "zh-hans": "二进制文件已成功安装。",
+   "zh-hant": "二進位檔案已成功安裝。",
+		"de": "Binärdateien wurden erfolgreich installiert.",
+		"fr": "Fichiers binaires installés avec succès.",
+		"ja": "バイナリファイルが正常にインストールされました。",
+		"ko": "바이너리 파일이 성공적으로 설치되었습니다.",
+		"it": "File binari installati con successo.",
+		"pl": "Pliki binarne zostały pomyślnie zainstalowane.",
+		"es": "Archivos binarios instalados correctamente.",
+	 "pt-BR": "Arquivos binários instalados com sucesso."
+	},
+	"log_cache_cleaned": {
+		"en": "Removed %d obsolete entries from version cache.",
+		"ru": "Удалено %d устаревших записей из кэша версий.",
+   "zh-hans": "从版本缓存中删除了 %d 条过时条目。",
+   "zh-hant": "從版本快取中刪除了 %d 條過時條目。",
+		"de": "%d veraltete Einträge aus dem Versionscache entfernt.",
+		"fr": "%d entrées obsolètes supprimées du cache des versions.",
+		"ja": "バージョンキャッシュから %d 件の古いエントリを削除しました。",
+		"ko": "버전 캐시에서 %d개의 오래된 항목을 제거했습니다.",
+		"it": "Rimosse %d voci obsolete dalla cache delle versioni.",
+		"pl": "Usunięto %d przestarzałych wpisów z pamięci podręcznej wersji.",
+		"es": "Se eliminaron %d entradas obsoletas de la caché de versiones.",
+	 "pt-BR": "Removidas %d entradas obsoletas do cache de versões."
+	},
 	"log_cannot_delete_system": {
 		"en": "Unable to delete base or dmf folders.",
 		"ru": "Невозможно удалить папки base или dmf.",
@@ -2603,6 +2799,20 @@
 		"es": "No se pueden eliminar las carpetas base o dmf.",
 	 "pt-BR": "Não é possível excluir as pastas base ou dmf."
 	},
+	"log_cannot_determine_cache_key": {
+		"en": "Cannot determine cache key for this mod.",
+		"ru": "Не удаётся определить ключ кэша для этого мода.",
+   "zh-hans": "无法确定此模组的缓存键。",
+   "zh-hant": "無法確定此模組的快取鍵。",
+		"de": "Cache-Schlüssel für diesen Mod kann nicht bestimmt werden.",
+		"fr": "Impossible de déterminer la clé de cache pour ce mod.",
+		"ja": "このMODのキャッシュキーを特定できません。",
+		"ko": "이 모드의 캐시 키를 확인할 수 없습니다.",
+		"it": "Impossibile determinare la chiave cache per questo mod.",
+		"pl": "Nie można określić klucza pamięci podręcznej dla tego moda.",
+		"es": "No se puede determinar la clave de caché para este mod.",
+	 "pt-BR": "Não é possível determinar a chave de cache para este mod."
+	},
 	"log_cannot_get_file_info": {
 		"en": "Cannot get file info for %s: %v",
 		"ru": "Не удаётся получить информацию о файле для %s: %v",
@@ -2616,6 +2826,20 @@
 		"pl": "Nie można uzyskać informacji o pliku dla %s: %v",
 		"es": "No se puede obtener información del archivo para %s: %v",
 	 "pt-BR": "Não foi possível obter informações do arquivo para %s: %v"
+	},
+	"log_cannot_version_empty": {
+		"en": "Version cannot be empty.",
+		"ru": "Версия не может быть пустой.",
+   "zh-hans": "版本不能为空。",
+   "zh-hant": "版本不能為空。",
+		"de": "Die Version darf nicht leer sein.",
+		"fr": "La version ne peut pas être vide.",
+		"ja": "バージョンは空にできません。",
+		"ko": "버전은 비워둘 수 없습니다.",
+		"it": "La versione non può essere vuota.",
+		"pl": "Wersja nie może być pusta.",
+		"es": "La versión no puede estar vacía.",
+	 "pt-BR": "A versão não pode estar vazia."
 	},
 	"log_checking_updates": {
 		"en": "🔍 Checking for updates...",
@@ -2770,6 +2994,34 @@
 		"pl": "Darktide Mod Framework zaktualizowany pomyślnie.",
 		"es": "Darktide Mod Framework actualizado correctamente.",
 	 "pt-BR": "Darktide Mod Framework atualizado com sucesso."
+	},
+	"log_dmf_installed_manual": {
+		"en": "DMF was installed manually, skipping auto-update.",
+		"ru": "DMF был установлен вручную, пропускаем автоматическое обновление.",
+   "zh-hans": "DMF 已手动安装，跳过自动更新。",
+   "zh-hant": "DMF 已手動安裝，跳過自動更新。",
+		"de": "DMF wurde manuell installiert, automatisches Update wird übersprungen.",
+		"fr": "DMF a été installé manuellement, mise à jour automatique ignorée.",
+		"ja": "DMFは手動でインストールされています。自動アップデートをスキップします。",
+		"ko": "DMF이 수동으로 설치되었습니다. 자동 업데이트를 건너뜁니다.",
+		"it": "DMF è stato installato manualmente, aggiornamento automatico saltato.",
+		"pl": "DMF został zainstalowany ręcznie, pomijam automatyczną aktualizację.",
+		"es": "DMF se instaló manualmente, se omite la actualización automática.",
+	 "pt-BR": "O DMF foi instalado manualmente, atualização automática ignorada."
+	},
+	"log_dml_installed_manual": {
+		"en": "DML was installed manually, skipping auto-update.",
+		"ru": "DML был установлен вручную, пропускаем автоматическое обновление.",
+   "zh-hans": "DML 已手动安装，跳过自动更新。",
+   "zh-hant": "DML 已手動安裝，跳過自動更新。",
+		"de": "DML wurde manuell installiert, automatisches Update wird übersprungen.",
+		"fr": "DML a été installé manuellement, mise à jour automatique ignorée.",
+		"ja": "DMLは手動でインストールされています。自動アップデートをスキップします。",
+		"ko": "DML이 수동으로 설치되었습니다. 자동 업데이트를 건너뜁니다.",
+		"it": "DML è stato installato manualmente, aggiornamento automatico saltato.",
+		"pl": "DML został zainstalowany ręcznie, pomijam automatyczną aktualizację.",
+		"es": "DML se instaló manualmente, se omite la actualización automática.",
+	 "pt-BR": "O DML foi instalado manualmente, atualização automática ignorada."
 	},
 	"log_error_drop": {
 		"en": "Error getting information about the dragged object: %v",
@@ -3050,6 +3302,20 @@
 		"pl": "Nie udało się sprawdzić aktualizacji plików sortowania: ",
 		"es": "Error al comprobar la actualización de los archivos de ordenamiento: ",
 	 "pt-BR": "Falha ao verificar atualização dos arquivos de classificação: "
+	},
+	"log_failed_to_copy_": {
+		"en": "Failed to copy ",
+		"ru": "Не удалось скопировать ",
+   "zh-hans": "复制失败",
+   "zh-hant": "複製失敗",
+		"de": "Kopieren fehlgeschlagen ",
+		"fr": "Échec de la copie ",
+		"ja": "コピーに失敗しました",
+		"ko": "복사 실패 ",
+		"it": "Copia fallita ",
+		"pl": "Kopiowanie nieudane ",
+		"es": "Error al copiar ",
+	 "pt-BR": "Falha ao copiar "
 	},
 	"log_failed_to_copy": {
 		"en": "Failed to copy: ",
@@ -3448,7 +3714,7 @@
 		"ru": "⬆ Доступна новая версия программы: %s (текущая: %s). Используйте «Быстро обновить программу» из меню.",
    "zh-hans": "⬆ 有新版本程序可用：%s（当前：%s）。请使用菜单中的「快速更新程序」。",
    "zh-hant": "⬆ 有新版本程式可用：%s（目前：%s）。請使用選單中的「快速更新程式」。",
-		"de": "⬆ Neue Programmversion verfügbar: %s (aktuell: %s). Verwenden Sie „Programm schnell aktualisieren“ aus dem Menü.",
+		"de": "⬆ Neue Programmversion verfügbar: %s (aktuell: %s). Verwenden Sie \"Programm schnell aktualisieren\" aus dem Menü.",
 		"fr": "⬆ Nouvelle version du programme disponible : %s (actuelle : %s). Utilisez « Mettre à jour rapidement le programme » dans le menu.",
 		"ja": "⬆ 新しいプログラムバージョンが利用可能です：%s（現在：%s）。メニューの「プログラムをクイック更新」を使用してください。",
 		"ko": "⬆ 새 프로그램 버전 사용 가능: %s (현재: %s). 메뉴에서 '프로그램 빠른 업데이트'를 사용하세요.",
@@ -3462,7 +3728,7 @@
 		"ru": "⬆ Доступна новая версия файлов сортировки: %s (текущая: %s). Используйте «Обновить файлы сортировки» из меню.",
    "zh-hans": "⬆ 有新的排序文件版本可用：%s（当前：%s）。请使用菜单中的「快速更新排序文件」。",
    "zh-hant": "⬆ 有新的排序檔案版本可用：%s（目前：%s）。請使用選單中的「快速更新排序檔案」。",
-		"de": "⬆ Neue Version der Sortierdateien verfügbar: %s (aktuell: %s). Verwenden Sie „Sortierdateien schnell aktualisieren“ aus dem Menü.",
+		"de": "⬆ Neue Version der Sortierdateien verfügbar: %s (aktuell: %s). Verwenden Sie \"Sortierdateien schnell aktualisieren\" aus dem Menü.",
 		"fr": "⬆ Nouvelle version des fichiers de tri disponible : %s (actuelle : %s). Utilisez « Mettre à jour rapidement les fichiers de tri » dans le menu.",
 		"ja": "⬆ 新しいソートファイルバージョンが利用可能です：%s（現在：%s）。メニューの「ソートファイルをクイック更新」を使用してください。",
 		"ko": "⬆ 새 정렬 파일 버전 사용 가능: %s (현재: %s). 메뉴에서 '정렬 파일 빠른 업데이트'를 사용하세요.",
@@ -3653,6 +3919,48 @@
 		"es": "Omitiendo carpeta del sistema %s",
 	 "pt-BR": "Pulando pasta do sistema %s"
 	},
+	"log_skipping_update_symlink": {
+		"en": "Skipping update for %s: folder is a symlink",
+		"ru": "Пропускаем обновление для %s: папка является симлинком",
+   "zh-hans": "跳过 %s 的更新：文件夹是符号链接",
+   "zh-hant": "跳過 %s 的更新：資料夾是符號連結",
+		"de": "Update für %s übersprungen: Ordner ist ein Symlink",
+		"fr": "Mise à jour ignorée pour %s : le dossier est un lien symbolique",
+		"ja": "%s のアップデートをスキップ：フォルダはシンボリックリンクです",
+		"ko": "%s 업데이트 건너뜀: 폴더가 심볼릭 링크입니다",
+		"it": "Aggiornamento saltato per %s: la cartella è un link simbolico",
+		"pl": "Pomijanie aktualizacji dla %s: folder jest dowiązaniem symbolicznym",
+		"es": "Actualización omitida para %s: la carpeta es un enlace simbólico",
+	 "pt-BR": "Atualização ignorada para %s: a pasta é um link simbólico"
+	},
+	"log_skipping_update_symlink_skipped": {
+		"en": "'%s' is a symlink, update skipped",
+		"ru": "'%s' является симлинком, обновление пропущено",
+   "zh-hans": "%s 是符号链接，已跳过更新",
+   "zh-hant": "「%s」是符號連結，已跳過更新",
+		"de": "'%s' ist ein Symlink, Update übersprungen",
+		"fr": "'%s' est un lien symbolique, mise à jour ignorée",
+		"ja": "「%s」はシンボリックリンクです。アップデートをスキップしました",
+		"ko": "'%s'은(는) 심볼릭 링크입니다. 업데이트를 건너뜁니다.",
+		"it": "'%s' è un link simbolico, aggiornamento saltato",
+		"pl": "'%s' jest dowiązaniem symbolicznym, aktualizacja pominięta",
+		"es": "'%s' es un enlace simbólico, actualización omitida",
+	 "pt-BR": "'%s' é um link simbólico, atualização ignorada"
+	},
+	"log_skipping_update_check_symlink": {
+		"en": "Skipping update check for %s: folder is a symlink",
+		"ru": "Пропускаем проверку обновлений для %s: папка является симлинком",
+   "zh-hans": "跳过 %s 的更新检查：文件夹是符号链接",
+   "zh-hant": "跳過 %s 的更新檢查：資料夾是符號連結",
+		"de": "Update-Prüfung für %s übersprungen: Ordner ist ein Symlink",
+		"fr": "Vérification de mise à jour ignorée pour %s : le dossier est un lien symbolique",
+		"ja": "%s の更新チェックをスキップ：フォルダはシンボリックリンクです",
+		"ko": "%s 업데이트 확인 건너뜀: 폴더가 심볼릭 링크입니다",
+		"it": "Controllo aggiornamenti saltato per %s: la cartella è un link simbolico",
+		"pl": "Pomijanie sprawdzania aktualizacji dla %s: folder jest dowiązaniem symbolicznym",
+		"es": "Verificación de actualización omitida para %s: la carpeta es un enlace simbólico",
+	 "pt-BR": "Verificação de atualização ignorada para %s: a pasta é um link simbólico"
+	},
 	"log_spec_update_not_logged": {
 		"en": "Skipping special updates check: not logged in to Nexus",
 		"ru": "Пропускаем проверку специальных обновлений: не выполнена авторизация на Nexus",
@@ -3667,6 +3975,20 @@
 		"es": "Omitiendo verificación de actualizaciones especiales: no iniciada sesión en Nexus",
 	 "pt-BR": "Pulando verificação de atualizações especiais: não logado no Nexus"
 	},
+	"log_sorting_files_updated_manual": {
+		"en": "Sorting files updated from dropped archive.",
+		"ru": "Файлы сортировки обновлены из перетащенного архива.",
+   "zh-hans": "排序文件已通过拖放的压缩包更新。",
+   "zh-hant": "排序檔案已透過拖放的壓縮包更新。",
+		"de": "Sortierdateien aus dem abgelegten Archiv aktualisiert.",
+		"fr": "Fichiers de tri mis à jour à partir de l'archive déposée.",
+		"ja": "ドロップされたアーカイブからソートファイルを更新しました。",
+		"ko": "드롭된 아카이브에서 정렬 파일을 업데이트했습니다.",
+		"it": "File di ordinamento aggiornati dall'archivio trascinato.",
+		"pl": "Pliki sortowania zaktualizowane z upuszczonego archiwum.",
+		"es": "Archivos de ordenamiento actualizados desde el archivo soltado.",
+	 "pt-BR": "Arquivos de classificação atualizados a partir do arquivo arrastado."
+	},
 	"log_sorting_files_updated_succ": {
 		"en": "Sorting files updated successfully from Nexus download.",
 		"ru": "Файлы сортировки успешно обновлены из загрузки с Nexus.",
@@ -3680,6 +4002,34 @@
 		"pl": "Pliki sortowania zostały pomyślnie zaktualizowane z pobrania z Nexus.",
 		"es": "Los archivos de ordenamiento se actualizaron correctamente desde la descarga de Nexus.",
 	 "pt-BR": "Os arquivos de classificação foram atualizados com sucesso do download do Nexus."
+	},
+	"log_sorting_rules_not_cached": {
+		"en": "Sorting rules version not cached yet, skipping comparison.",
+		"ru": "Версия правил сортировки ещё не кэширована, пропускаем сравнение.",
+   "zh-hans": "排序规则版本尚未缓存，跳过比较。",
+   "zh-hant": "排序規則版本尚未快取，跳過比較。",
+		"de": "Sortierregeln-Version noch nicht zwischengespeichert, Vergleich übersprungen.",
+		"fr": "Version des règles de tri non encore mise en cache, comparaison ignorée.",
+		"ja": "ソートルールのバージョンがキャッシュされていません。比較をスキップします。",
+		"ko": "정렬 규칙 버전이 아직 캐시되지 않았습니다. 비교를 건너뜁니다.",
+		"it": "Versione delle regole di ordinamento non ancora nella cache, confronto saltato.",
+		"pl": "Wersja reguł sortowania nie jest jeszcze przechowywana w pamięci podręcznej, pomijam porównanie.",
+		"es": "La versión de las reglas de ordenamiento aún no está en caché, se omite la comparación.",
+	 "pt-BR": "Versão das regras de classificação ainda não armazenada em cache, comparação ignorada."
+	},
+	"log_program_not_cached": {
+		"en": "Program version not cached yet, skipping comparison.",
+		"ru": "Версия программы ещё не кэширована, пропускаем сравнение.",
+   "zh-hans": "程序版本尚未缓存，跳过比较。",
+   "zh-hant": "程式版本尚未快取，跳過比較。",
+		"de": "Programmversion noch nicht zwischengespeichert, Vergleich übersprungen.",
+		"fr": "Version du programme pas encore mise en cache, comparaison ignorée.",
+		"ja": "プログラムバージョンがキャッシュされていません。比較をスキップします。",
+		"ko": "프로그램 버전이 아직 캐시되지 않았습니다. 비교를 건너뜁니다.",
+		"it": "Versione del programma non ancora nella cache, confronto saltato.",
+		"pl": "Wersja programu nie jest jeszcze przechowywana w pamięci podręcznej, pomijam porównanie.",
+		"es": "La versión del programa aún no está en caché, se omite la comparación.",
+	 "pt-BR": "Versão do programa ainda não armazenada em cache, comparação ignorada."
 	},
 	"log_start": {
 		"en": "Starting diagnostics...",
@@ -3891,6 +4241,20 @@
 		"es": "Error al crear el directorio temporal: %v",
 	 "pt-BR": "Falha ao criar diretório temporário: %v"
 	},
+	"log_updated": {
+		"en": " updated.",
+		"ru": " обновлён.",
+   "zh-hans": " 已更新。",
+   "zh-hant": " 已更新。",
+		"de": " aktualisiert.",
+		"fr": " mis à jour.",
+		"ja": " 更新されました。",
+		"ko": " 업데이트됨.",
+		"it": " aggiornato.",
+		"pl": " zaktualizowany.",
+		"es": " actualizado.",
+	 "pt-BR": " atualizado."
+	},
 	"log_version_cached_program": {
 		"en": "Program version cached: ",
 		"ru": "Версия программы кэширована: ",
@@ -3919,10 +4283,24 @@
 		"es": "Versión de los archivos de ordenamiento almacenada en caché: ",
 	 "pt-BR": "Versão dos arquivos de classificação em cache: "
 	},
+	"log_version_for_updated_to": {
+		"en": "Version for '%s' updated to %s",
+		"ru": "Версия для '%s' обновлена до %s",
+   "zh-hans": "%s 的版本已更新为 %s",
+   "zh-hant": "「%s」的版本已更新為 %s",
+		"de": "Version für '%s' aktualisiert auf %s",
+		"fr": "Version de '%s' mise à jour vers %s",
+		"ja": "「%s」のバージョンを %s に更新しました",
+		"ko": "'%s'의 버전이 %s(으)로 업데이트되었습니다.",
+		"it": "Versione di '%s' aggiornata a %s",
+		"pl": "Wersja dla '%s' zaktualizowana do %s",
+		"es": "Versión de '%s' actualizada a %s",
+	 "pt-BR": "Versão de '%s' atualizada para %s"
+	},
 	"log_warn_base_missing": {
 		"en": "⚠ 'BASE' folder not found!",
 		"ru": "⚠ Папка «BASE» не найдена!",
-   "zh-hans": "⚠ 未找到“BASE”文件夹!",
+   "zh-hans": "⚠ 未找到「BASE」文件夹!",
    "zh-hant": "⚠ 未找到「BASE」資料夾!",
 		"de": "⚠ 'BASE'-Ordner nicht gefunden!",
 		"fr": "⚠ Dossier 'BASE' introuvable !",
@@ -4016,6 +4394,20 @@
 		"pl": "Nieprawidłowy: %s",
 		"es": "Malformado: %s",
 	 "pt-BR": "Malformado: %s"
+	},
+	"manual_mod_update_warning": {
+		"en": "Mod '%s' was installed manually. Updating will replace it with the Nexus version. Continue?",
+		"ru": "Мод '%s' был установлен вручную. Обновление заменит его на версию с Nexus. Продолжить?",
+   "zh-hans": "模组 %s 是手动安装的。更新将用 Nexus 版本替换它。继续？",
+   "zh-hant": "模組 %s 是手動安裝的。更新將用 Nexus 版本替換它。繼續？",
+		"de": "Mod '%s' wurde manuell installiert. Das Update wird es durch die Nexus-Version ersetzen. Fortfahren?",
+		"fr": "Le mod '%s' a été installé manuellement. La mise à jour le remplacera par la version Nexus. Continuer ?",
+		"ja": "Mod 「%s」は手動でインストールされています。アップデートするとNexus版に置き換えられます。続行しますか？",
+		"ko": "모드 '%s'이(가) 수동으로 설치되었습니다. 업데이트하면 Nexus 버전으로 대체됩니다. 계속하시겠습니까?",
+		"it": "Il mod '%s' è stato installato manualmente. L'aggiornamento lo sostituirà con la versione Nexus. Continuare?",
+		"pl": "Mod '%s' został zainstalowany ręcznie. Aktualizacja zastąpi go wersją z Nexus. Kontynuować?",
+		"es": "El mod '%s' se instaló manualmente. La actualización lo reemplazará con la versión de Nexus. ¿Continuar?",
+	 "pt-BR": "O mod '%s' foi instalado manualmente. A atualização o substituirá pela versão do Nexus. Continuar?"
 	},
 	"menu_boosty": {
 		"en": "Boosty",
@@ -4184,6 +4576,20 @@
 		"pl": "Donationalerts",
 		"es": "Donationalerts",
 	 "pt-BR": "Donationalerts"
+	},
+	"menu_clean_cache": {
+		"en": "Clean version cache",
+		"ru": "Очистить кэш версий",
+   "zh-hans": "清理版本缓存",
+   "zh-hant": "清理版本快取",
+		"de": "Versionscache leeren",
+		"fr": "Vider le cache des versions",
+		"ja": "バージョンキャッシュをクリア",
+		"ko": "버전 캐시 정리",
+		"it": "Pulisci cache versioni",
+		"pl": "Wyczyść pamięć podręczną wersji",
+		"es": "Limpiar caché de versiones",
+	 "pt-BR": "Limpar cache de versões"
 	},
 	"menu_github": {
 		"en": "🌚 Program repository [Github]",
@@ -4476,7 +4882,7 @@
 	"missing_base_dml": {
 		"en": "The 'BASE' folder was not found!\n\nEither the program was installed in the wrong folder,\nor you haven't installed any mods yet,\nor you accidentally deleted this folder.\n\nReinstall the 'Darktide Mod Loader' mod.",
 		"ru": "Папка «BASE» не найдена!\n\nЕсли программа установлена не в папку «MODS», переместите её туда.\n\nЕсли вы не устанавливали ещё моды или нечаянно удалили эту папку, то установите мод «Darktide Mod Loader».",
-   "zh-hans": "未找到“BASE”文件夹！\n\n如果程序未安装在“MODS”文件夹中，请将其移动到那里。\n\n如果您尚未安装任何模组，或不小心删除了此文件夹，请安装“Darktide Mod Loader”模组。",
+   "zh-hans": "未找到\"BASE\"文件夹！\n\n如果程序未安装在\"MODS\"文件夹中，请将其移动到那里。\n\n如果您尚未安装任何模组，或不小心删除了此文件夹，请安装\"Darktide Mod Loader\"模组。",
    "zh-hant": "未找到「BASE」資料夾！\n\n如果程式未安裝在「MODS」資料夾中，請將其移動到那裡。\n\n如果您尚未安裝任何模組，或不小心刪除了此資料夾，請安裝「Darktide Mod Loader」模組。",
 		"de": "Der Ordner 'BASE' wurde nicht gefunden!\n\nWenn das Programm nicht im Ordner 'MODS' installiert ist, verschieben Sie es dorthin.\n\nWenn Sie noch keine Mods installiert haben oder diesen Ordner versehentlich gelöscht haben, installieren Sie die Mod 'Darktide Mod Loader'.",
 		"fr": "Dossier 'BASE' introuvable !\n\nSi le programme n'est pas installé dans le dossier 'MODS', déplacez-le là-bas.\n\nSi vous n'avez installé aucun mod ou si vous avez accidentellement supprimé ce dossier, installez le mod 'Darktide Mod Loader'.",
@@ -4490,7 +4896,7 @@
 	"missing_dmf_dmf": {
 		"en": "The 'DMF' folder was not found!\n\nEither the program was installed in the wrong folder,\nor you haven't installed any mods yet,\nor you accidentally deleted this folder.\n\nInstall the 'Darktide Mod Framework' mod.",
 		"ru": "Папка «DMF» не найдена!\n\nЕсли программа установлена не в папку «MODS», переместите её туда.\n\nЕсли вы не устанавливали ещё моды или нечаянно удалили эту папку, то установите мод «Darktide Mod Framework».",
-   "zh-hans": "未找到“DMF”文件夹！\n\n如果程序未安装在“MODS”文件夹中，请将其移动到那里。\n\n如果您尚未安装任何模组，或不小心删除了此文件夹，请安装“Darktide Mod Framework”模组。",
+   "zh-hans": "未找到\"DMF\"文件夹！\n\n如果程序未安装在\"MODS\"文件夹中，请将其移动到那里。\n\n如果您尚未安装任何模组，或不小心删除了此文件夹，请安装\"Darktide Mod Framework\"模组。",
    "zh-hant": "未找到「DMF」資料夾！\n\n如果程式未安裝在「MODS」資料夾中，請將其移動到那裡。\n\n如果您尚未安裝任何模組，或不小心刪除了此資料夾，請安裝「Darktide Mod Framework」模組。",
 		"de": "Der Ordner 'DMF' wurde nicht gefunden!\n\nWenn das Programm nicht im Ordner 'MODS' installiert ist, verschieben Sie es dorthin.\n\nWenn Sie noch keine Mods installiert haben oder diesen Ordner versehentlich gelöscht haben, installieren Sie die Mod 'Darktide Mod Framework'.",
 		"fr": "Dossier 'DMF' introuvable !\n\nSi le programme n'est pas installé dans le dossier 'MODS', déplacez-le là-bas.\n\nSi vous n'avez installé aucun mod ou si vous avez accidentellement supprimé ce dossier, installez le mod 'Darktide Mod Framework'.",
@@ -5271,7 +5677,7 @@
 		"es": "Orden guardado al salir.",
 	 "pt-BR": "Ordem salva ao sair."
 	},
-	"placeholder_mod_verion": {
+	"placeholder_mod_version": {
 		"en": "for example, 1.0.0 or 26.04.12",
 		"ru": "например, 1.0.0 или 26.04.12",
    "zh-hans": "例如 1.0.0 或 26.04.12",
@@ -5553,7 +5959,7 @@
 	},
 	"status_inactive": {
 		"en": "❌ inactive",
-		"ru": "❌ отключён",
+		"ru": "❌ неактивен",
    "zh-hans": "❌ 未激活",
    "zh-hant": "❌ 未啟用",
 		"de": "❌ inaktiv",
@@ -5566,18 +5972,74 @@
 	 "pt-BR": "❌ inativo"
 	},
 	"status_mandatory": {
-		"en": "‼ active",
-		"ru": "‼ активен",
-   "zh-hans": "‼ 活跃",
-   "zh-hant": "‼ 活躍",
-		"de": "‼ aktiv",
-		"fr": "‼ actif",
-		"ja": "‼ アクティブ",
-		"ko": "‼ 활성",
-		"it": "‼ attiva",
-		"pl": "‼ aktywny",
-		"es": "‼ activo",
-	 "pt-BR": "‼ ativo"
+		"en": "📌 top",
+		"ru": "📌 наверху",
+   "zh-hans": "📌 置顶",
+   "zh-hant": "📌 置頂",
+		"de": "📌 oben",
+		"fr": "📌 haut",
+		"ja": "📌 上部",
+		"ko": "📌 상단",
+		"it": "📌 sopra",
+		"pl": "📌 góra",
+		"es": "📌 arriba",
+	 "pt-BR": "📌 topo"
+	},
+	"status_manual": {
+		"en": "🖐🏻 manual",
+		"ru": "🖐🏻 вручную",
+   "zh-hans": "🖐🏻 手动",
+   "zh-hant": "🖐🏻 手動",
+		"de": "🖐🏻 manuell",
+		"fr": "🖐🏻 manuel",
+		"ja": "🖐🏻 手動",
+		"ko": "🖐🏻 수동",
+		"it": "🖐🏻 manuale",
+		"pl": "🖐🏻 ręcznie",
+		"es": "🖐🏻 manual",
+	 "pt-BR": "🖐🏻 manual"
+	},
+	"status_nexus": {
+		"en": "🤖 nexus",
+		"ru": "🤖 nexus",
+   "zh-hans": "🤖 nexus",
+   "zh-hant": "🤖 nexus",
+		"de": "🤖 nexus",
+		"fr": "🤖 nexus",
+		"ja": "🤖 nexus",
+		"ko": "🤖 nexus",
+		"it": "🤖 nexus",
+		"pl": "🤖 nexus",
+		"es": "🤖 nexus",
+	 "pt-BR": "🤖 nexus"
+	},
+	"status_missing_folder": {
+		"en": "📁 missing folder",
+		"ru": "📁 нет папки",
+   "zh-hans": "📁 文件夹缺失",
+   "zh-hant": "📁 資料夾缺失",
+		"de": "📁 Ordner fehlt",
+		"fr": "📁 dossier manquant",
+		"ja": "📁 フォルダなし",
+		"ko": "📁 폴더 누락됨",
+		"it": "📁 cartella mancante",
+		"pl": "📁 brakuje folderu",
+		"es": "📁 falta la carpeta",
+	 "pt-BR": "📁 pasta ausente"
+	},
+	"status_symlink": {
+		"en": "🔗 symlink",
+		"ru": "🔗 симлинк",
+   "zh-hans": "🔗 软链接",
+   "zh-hant": "🔗 軟連結",
+		"de": "🔗 Symlink",
+		"fr": "🔗 symlink",
+		"ja": "🔗 シムリンク",
+		"ko": "🔗 심링크",
+		"it": "🔗 symlink",
+		"pl": "🔗 symlink",
+		"es": "🔗 symlink",
+	 "pt-BR": "🔗 symlink"
 	},
 	"status_system": {
 		"en": "🏗 framework",
@@ -6037,7 +6499,7 @@
 	"load_order_header_rule4": {
 		"en": "-- ▒▓4. DO NOT list the \"BASE\" or \"DMF\" folders or you will get an error in▓▓▓▓▓▓▒",
 		"ru": "-- ▒▓4. НЕ НУЖНО вносить в список папки «BASE» или «DMF» или вы получите ошибку▓▓▒",
-   "zh-hans": "-- ▒▓4. 不要在列表中包含“BASE”或“DMF”文件夹，否则游戏会出错!▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒",
+   "zh-hans": "-- ▒▓4. 不要在列表中包含\"BASE\"或\"DMF\"文件夹，否则游戏会出错!▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒",
    "zh-hant": "-- ▒▓4. 不要在列表中包含「BASE」或「DMF」資料夾，否則遊戲會出錯!▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒",
 		"de": "-- ▒▓4. Fügen Sie NICHT die Ordner \"BASE\" oder \"DMF\" in die Liste ein, sonst▓▓▓▓▓▒",
 		"fr": "-- ▒▓4. NE listez PAS les dossiers \"BASE\" ou \"DMF\" sinon vous obtiendrez une▓▓▓▓▓▒",
@@ -6065,7 +6527,7 @@
 	"load_order_header_rule5": {
 		"en": "-- ▒▓5. If any mod got 'lost' during sorting and wasn't added to the list,▓▓▓▓▓▓▓▒",
 		"ru": "-- ▒▓5. Если какой-то мод не попал в список, обязательно сообщите мне об этом▓▓▓▓▒",
-   "zh-hans": "-- ▒▓5. 如果有任何模组在排序时“丢失”并未添加到列表中，▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒",
+   "zh-hans": "-- ▒▓5. 如果有任何模组在排序时\"丢失\"并未添加到列表中，▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒",
    "zh-hant": "-- ▒▓5. 如果有任何模組在排序時「遺失」並未添加到列表中，▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒",
 		"de": "-- ▒▓5. Wenn ein Mod beim Sortieren \"verloren\" ging und nicht zur Liste▓▓▓▓▓▓▓▓▓▓▒",
 		"fr": "-- ▒▓5. Si un mod s'est \"perdu\" lors du tri et n'a pas été ajouté à la liste,▓▓▓▓▒",

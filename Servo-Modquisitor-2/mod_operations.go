@@ -36,7 +36,7 @@ func safeJoin(destDir, name string) (string, error) {
 }
 
 func (app *App) refreshModList() {
-	// --- Фикс для существующей кривой папки hub_hotkey_menus-main ---
+	// Фикс для существующей кривой папки hub_hotkey_menus-main
 	wrongFolder := filepath.Join(app.cfg.ModsPath, "hub_hotkey_menus-main")
 	correctFolder := filepath.Join(app.cfg.ModsPath, "hub_hotkey_menus")
 	if info, err := os.Stat(wrongFolder); err == nil && info.IsDir() {
@@ -46,13 +46,10 @@ func (app *App) refreshModList() {
 			} else {
 				app.appendLog(fmt.Sprintf(app.messages["log_failed_fix_hub_hk_menus"], err))
 			}
-			// } else {
-			// Обе папки есть - удаляем неправильную
-			// os.RemoveAll(wrongFolder)
-			// app.appendLog("Removed duplicate hub_hotkey_menus-main")
 		}
 	}
-	// --- конец фикса ---
+	// Конец фикса hub_hotkey_menus-main
+
 	mods := checks.GetModsInfo(app.cfg.Language, app.cfg.ForceEnglishModNames)
 
 	var sysMods, regMods []checks.ModInfo
@@ -99,6 +96,7 @@ func (app *App) refreshModList() {
 		})
 	}
 
+	// Цикл для обработки обычных модов (regMods)
 	for i := range regMods {
 		regMods[i].Obsolete = app.containsStr(checks.ObsoleteMods, regMods[i].Name)
 		regMods[i].Mandatory = checks.IsMandatoryMod(regMods[i].Name)
@@ -113,7 +111,6 @@ func (app *App) refreshModList() {
 						other = pair.Mod2
 					}
 					if checks.FolderExists(other) {
-						// Определяем, на каком языке показывать имя конфликтующего мода
 						lang := app.cfg.Language
 						if app.cfg.ForceEnglishModNames {
 							lang = "en"
@@ -130,8 +127,89 @@ func (app *App) refreshModList() {
 				}
 			}
 		}
+
+		// Проверка на симлинк для обычных модов
+		modPath := filepath.Join(app.cfg.ModsPath, regMods[i].Name)
+		info, err := os.Lstat(modPath)
+		if err == nil && info.Mode()&os.ModeSymlink != 0 {
+			regMods[i].IsSymlink = true
+		} else {
+			regMods[i].IsSymlink = false
+		}
+
+		// Определяем Source для обычных модов
+		var cacheKey string
+		switch regMods[i].Name {
+		case "dmf":
+			cacheKey = "8:dmf"
+		case "base":
+			cacheKey = "19:base"
+		case "autopatch":
+			cacheKey = "709:autopatch"
+		default:
+			if regMods[i].URL != "" {
+				modID := extractModIDFromURL(regMods[i].URL)
+				if modID != 0 {
+					cacheKey = fmt.Sprintf("%d:%s", modID, regMods[i].Name)
+				}
+			}
+		}
+		if cacheKey != "" {
+			if info, ok := app.nexusVersionCache[cacheKey]; ok {
+				regMods[i].Source = info.Source
+			} else {
+				regMods[i].Source = "manual"
+			}
+		} else {
+			regMods[i].Source = "manual"
+		}
 	}
 
+	// Заполняем IsSymlink и Source для системных модов
+	for i := range sysMods {
+		modPath := filepath.Join(app.cfg.ModsPath, sysMods[i].Name)
+		info, err := os.Lstat(modPath)
+		if err == nil && info.Mode()&os.ModeSymlink != 0 {
+			sysMods[i].IsSymlink = true
+		} else {
+			sysMods[i].IsSymlink = false
+		}
+
+		var cacheKey string
+		switch sysMods[i].Name {
+		case "dmf":
+			cacheKey = "8:dmf"
+		case "base":
+			cacheKey = "19:base"
+		case "autopatch":
+			cacheKey = "709:autopatch"
+		default:
+			if sysMods[i].URL != "" {
+				modID := extractModIDFromURL(sysMods[i].URL)
+				if modID != 0 {
+					cacheKey = fmt.Sprintf("%d:%s", modID, sysMods[i].Name)
+				}
+			}
+		}
+		if cacheKey != "" {
+			if info, ok := app.nexusVersionCache[cacheKey]; ok {
+				sysMods[i].Source = info.Source
+			} else {
+				sysMods[i].Source = "manual"
+			}
+		} else {
+			sysMods[i].Source = "manual"
+		}
+	}
+
+	// Цикл для MissingFolder
+	for i := range regMods {
+		if regMods[i].MissingFolder {
+			regMods[i].Active = false
+		}
+	}
+
+	// Восстановление выделения
 	if app.selectedModName != "" {
 		exists := false
 		for _, m := range regMods {
@@ -145,6 +223,7 @@ func (app *App) refreshModList() {
 		}
 	}
 
+	// AML
 	wasAML := app.amlDetected
 	app.amlDetected = checks.IsAMLInstalled(app.cfg.ModsPath)
 	if wasAML != app.amlDetected {
@@ -280,7 +359,7 @@ func (app *App) handleDrop(uris []fyne.URI) {
 			ext := strings.ToLower(filepath.Ext(path))
 			if ext == ".zip" || ext == ".rar" || ext == ".7z" {
 				go func(p string) {
-					installedName, version, err := app.InstallModFromArchive(p, true, "")
+					installedName, _, err := app.InstallModFromArchive(p, true, "")
 					fyne.Do(func() {
 						if err != nil {
 							app.appendLog(fmt.Sprintf(app.messages["log_extract_error"], err))
@@ -290,12 +369,8 @@ func (app *App) handleDrop(uris []fyne.URI) {
 						app.refreshModList()
 						if installedName != "" {
 							app.selectAndScrollToMod(installedName)
-							// Попробуем найти modID по имени папки или извлечь из имени архива
+							// Попробуем извлечь modID из имени файла для автодобавления в базу
 							modID, _, _ := extractVersionAndModIDFromFilename(p)
-							if modID != 0 && version != "" {
-								cacheKey := fmt.Sprintf("%d:%s", modID, installedName)
-								app.cacheModVersion(cacheKey, installedName, version, 0)
-							}
 							if modID != 0 {
 								go app.autoAddModToDatabase(modID, installedName)
 							}
@@ -304,7 +379,7 @@ func (app *App) handleDrop(uris []fyne.URI) {
 							app.appendLog(fmt.Sprintf(app.messages["log_installed"], filepath.Base(p)))
 						} else {
 							// Это был архив с сортировочными файлами
-							app.appendLog("Sorting files updated from dropped archive.")
+							app.appendLog(app.messages["log_sorting_files_updated_manual"])
 						}
 					})
 				}(path)
@@ -645,16 +720,16 @@ func (app *App) InstallModFromArchive(archivePath string, activate bool, knownVe
 			src := filepath.Join(tmpDir, FileNameModDatabase)
 			dst := filepath.Join(app.cfg.ModsPath, FileNameModDatabase)
 			if err := copyFile(src, dst); err != nil {
-				app.appendLog("Failed to copy " + FileNameModDatabase + ": " + err.Error())
+				app.appendLog(app.messages["log_failed_to_copy_"] + FileNameModDatabase + ": " + err.Error())
 				return "", "", err
 			}
-			app.appendLog(FileNameModDatabase + " updated.")
+			app.appendLog(FileNameModDatabase + app.messages["log_updated"])
 		}
 		if hasMandatory {
 			src := filepath.Join(tmpDir, FileNameMandatoryRules)
 			dst := filepath.Join(app.cfg.ModsPath, FileNameMandatoryRules)
 			if err := copyFile(src, dst); err != nil {
-				app.appendLog("Failed to copy " + FileNameMandatoryRules + ": " + err.Error())
+				app.appendLog(app.messages["log_failed_to_copy_"] + FileNameMandatoryRules + ": " + err.Error())
 				return "", "", err
 			}
 			app.appendLog(FileNameMandatoryRules + " updated.")
@@ -697,7 +772,7 @@ func (app *App) InstallModFromArchive(archivePath string, activate bool, knownVe
 			if err := copyPath(binariesSrc, binariesDst); err != nil {
 				app.appendLog(fmt.Sprintf("Failed to copy binaries: %v", err))
 			} else {
-				app.appendLog("Binaries installed successfully.")
+				app.appendLog(app.messages["log_binaries_installed_success"])
 			}
 		}
 
@@ -773,21 +848,25 @@ func (app *App) InstallModFromArchive(archivePath string, activate bool, knownVe
 
 	installedName := installedNames[0] // для обратной совместимости возвращаем первый
 
-	// Определяем версию (только для первого мода)
+	// Сначала попытаемся получить modID из базы данных по имени папки
+	modID := 0
+	if entry := checks.GetModDBEntry(installedName); entry != nil && entry.URL != "" {
+		modID = extractModIDFromURL(entry.URL)
+	}
+
+	// Определяем версию
 	version := knownVersion
-	var modID int
 	if version == "" {
-		var extractedVersion string
-		var ok bool
-		modID, extractedVersion, ok = extractVersionAndModIDFromFilename(archivePath)
-		if ok && extractedVersion != "" {
-			version = extractedVersion
-		} else {
-			version = app.promptUserForVersion(installedName)
+		// Всегда спрашиваем пользователя, если версия не передана
+		version = app.promptUserForVersion(installedName)
+	}
+
+	// Если modID всё ещё 0, пробуем извлечь из имени файла (запасной вариант)
+	if modID == 0 {
+		idFromFile, _, _ := extractVersionAndModIDFromFilename(archivePath)
+		if idFromFile != 0 {
+			modID = idFromFile
 		}
-	} else {
-		// даже если версия известна, попытаемся извлечь modID для базы данных
-		modID, _, _ = extractVersionAndModIDFromFilename(archivePath)
 	}
 
 	// Обновляем UI
@@ -811,22 +890,10 @@ func (app *App) InstallModFromArchive(archivePath string, activate bool, knownVe
 		app.selectAndScrollToMod(installedName)
 	})
 
-	// Кэшируем версию для первого мода
-	if version != "" {
-		var cacheKey string
-		switch installedName {
-		case "base":
-			cacheKey = "19:base"
-		case "dmf":
-			cacheKey = "8:dmf"
-		default:
-			if modID != 0 { // используем уже имеющийся modID
-				cacheKey = fmt.Sprintf("%d:%s", modID, installedName)
-			}
-		}
-		if cacheKey != "" {
-			app.cacheModVersion(cacheKey, installedName, version, 0)
-		}
+	// Кэшируем версию для первого мода, если есть modID и версия
+	if version != "" && modID != 0 {
+		cacheKey := fmt.Sprintf("%d:%s", modID, installedName)
+		app.cacheModVersion(cacheKey, installedName, version, 0, "manual")
 	}
 
 	// Синхронизируем кэш версий с локальными файлами (особенно для правил)
@@ -854,7 +921,33 @@ func (app *App) updateModFromNexus(mod *checks.ModInfo) {
 		return
 	}
 
-	modIDStr := fmt.Sprintf("%d", modID) // ← оставь эту строку
+	// Проверяем, является ли папка симлинком
+	modPath := filepath.Join(app.cfg.ModsPath, mod.Name)
+	info, err := os.Lstat(modPath)
+	if err == nil && info.Mode()&os.ModeSymlink != 0 {
+		app.appendLog(fmt.Sprintf(app.messages["log_skipping_update_symlink"], mod.Name))
+		app.tooltipStatus.Show(fmt.Sprintf(app.messages["log_skipping_update_symlink_skipped"], mod.Name))
+		app.tooltipStatus.HideAfterDelay()
+		return
+	}
+
+	modIDStr := fmt.Sprintf("%d", modID)
+	cacheKey := modIDStr + ":" + mod.Name
+	saved, exists := app.nexusVersionCache[cacheKey]
+
+	// Если мод установлен вручную - предупреждаем
+	if exists && saved.Source == "manual" {
+		choice := app.showChoiceDialog(
+			app.mainWindow,
+			app.messages["warning_title"],
+			fmt.Sprintf(app.messages["manual_mod_update_warning"], mod.Name),
+			app.messages["btn_continue"],
+			app.messages["btn_cancel"],
+		)
+		if choice != 0 {
+			return
+		}
+	}
 
 	fileInfo, err := app.getLatestFileInfoForMod(modID, mod.Name)
 	if err != nil {
@@ -890,6 +983,14 @@ func (app *App) updateAllModsFromNexus() {
 		if modID == 0 {
 			continue
 		}
+
+		// Проверяем, является ли папка симлинком
+		modPath := filepath.Join(app.cfg.ModsPath, mod.Name)
+		info, err := os.Lstat(modPath)
+		if err == nil && info.Mode()&os.ModeSymlink != 0 {
+			app.appendLog(fmt.Sprintf("Skipping %s: folder is a symlink", mod.Name))
+			continue
+		}
 		// Получаем актуальную информацию о последнем файле, соответствующем папке
 		fileInfo, err := app.getLatestFileInfoForMod(modID, mod.Name)
 		if err != nil {
@@ -900,6 +1001,13 @@ func (app *App) updateAllModsFromNexus() {
 		var saved ModVersionInfo
 		if info, exists := app.nexusVersionCache[cacheKey]; exists {
 			saved = info
+		} else {
+			// Нет записи в кэше — считаем мод установленным вручную
+			saved.Source = "manual"
+		}
+		// Если Source не задан или "manual" — пропускаем
+		if saved.Source == "" || saved.Source == "manual" {
+			continue
 		}
 		if saved.Timestamp == 0 || fileInfo.UploadedTimestamp > saved.Timestamp {
 			modsToUpdate = append(modsToUpdate, mod)
@@ -1092,6 +1200,11 @@ func (app *App) updateAutopatcher() {
 	if info, exists := app.nexusVersionCache[cacheKey]; exists {
 		saved = info
 	}
+	// Если установлен вручную, пропускаем автоматическое обновление
+	if saved.Source == "manual" {
+		app.appendLog(app.messages["log_autopatcher_manual"])
+		return
+	}
 	if saved.Timestamp != 0 && fileInfo.UploadedTimestamp <= saved.Timestamp {
 		app.appendLog(fmt.Sprintf(app.messages["already_latest"], "Autopatcher", fileInfo.Version))
 		return
@@ -1181,7 +1294,7 @@ func (app *App) promptUserForVersion(modName string) string {
 	resultChan := make(chan string, 1)
 	fyne.Do(func() {
 		entry := widget.NewEntry()
-		entry.SetPlaceHolder(app.messages["placeholder_mod_verion"])
+		entry.SetPlaceHolder(app.messages["placeholder_mod_version"])
 		var dlg dialog.Dialog
 		content := container.NewVBox(
 			widget.NewLabel(fmt.Sprintf(app.messages["failed_get_mod_version"], modName)),
@@ -1204,14 +1317,18 @@ func (app *App) promptUserForVersion(modName string) string {
 	return <-resultChan
 }
 
-func (app *App) cacheModVersion(cacheKey, folderName, version string, timestamp int64) {
+func (app *App) cacheModVersion(cacheKey, folderName, version string, timestamp int64, source string) {
 	if version == "" {
 		return
+	}
+	if source == "" {
+		source = "manual" // безопасное значение по умолчанию
 	}
 	app.nexusVersionCache[cacheKey] = ModVersionInfo{
 		Timestamp: timestamp,
 		Version:   version,
 		Folder:    folderName,
+		Source:    source,
 	}
 	app.saveNexusVersionCache()
 }
