@@ -63,7 +63,6 @@ func (app *App) showAMLConfigWindow() {
 	var displayed []checks.AMLModConfig // filtered + sorted view of configs
 	edit := &amlEdit{}
 	selectedFolder := "" // track selection by folder (indices change on filter/sort)
-	listSel := [3]int{-1, -1, -1}
 
 	// left-list filter state
 	searchText := ""
@@ -137,13 +136,8 @@ func (app *App) showAMLConfigWindow() {
 	var remBtns [3]*CustomButton
 
 	addEntry := func(idx int, name string) {
-		if name == "" || name == edit.folder {
+		if name == "" || name == edit.folder || app.containsStr(edit.lists[idx], name) {
 			return
-		}
-		for _, e := range edit.lists[idx] {
-			if e == name {
-				return // already present
-			}
 		}
 		edit.lists[idx] = append(edit.lists[idx], name)
 		sectionLists[idx].Refresh()
@@ -156,7 +150,6 @@ func (app *App) showAMLConfigWindow() {
 			}
 		}
 		edit.lists[idx] = out
-		listSel[idx] = -1
 		sectionLists[idx].UnselectAll()
 		sectionLists[idx].Refresh()
 	}
@@ -261,12 +254,6 @@ func (app *App) showAMLConfigWindow() {
 				}
 			},
 		)
-		lst.OnSelected = func(id widget.ListItemID) { listSel[idx] = int(id) }
-		lst.OnUnselected = func(id widget.ListItemID) {
-			if listSel[idx] == int(id) {
-				listSel[idx] = -1
-			}
-		}
 		sectionLists[idx] = lst
 
 		addBtns[idx] = NewCustomButton(app.messages["aml_btn_add"], func() { openPicker(idx) })
@@ -281,7 +268,6 @@ func (app *App) showAMLConfigWindow() {
 		edit.lists[0] = append([]string{}, c.LoadAfter...)
 		edit.lists[1] = append([]string{}, c.LoadBefore...)
 		edit.lists[2] = append([]string{}, c.Require...)
-		listSel = [3]int{-1, -1, -1}
 
 		editorTitle.SetText(c.Folder)
 		ver := c.Version

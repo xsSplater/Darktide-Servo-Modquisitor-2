@@ -27,6 +27,7 @@
 package checks
 
 import (
+	"errors"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -58,6 +59,16 @@ func findModFile(folder string) string {
 	if fileExists(primary) {
 		return primary
 	}
+	if name := findSingleModFile(dir); name != "" {
+		return filepath.Join(dir, name)
+	}
+	return ""
+}
+
+// findSingleModFile returns the file name of the single "*.mod" file directly
+// inside dir, or "" if there is none or more than one (ambiguous). Shared with
+// tryFixMismatchedModFolder in checks.go.
+func findSingleModFile(dir string) string {
 	entries, err := os.ReadDir(dir)
 	if err != nil {
 		return ""
@@ -68,7 +79,7 @@ func findModFile(folder string) string {
 			if found != "" {
 				return "" // ambiguous: more than one .mod file
 			}
-			found = filepath.Join(dir, e.Name())
+			found = e.Name()
 		}
 	}
 	return found
@@ -116,11 +127,11 @@ func ReadAMLConfig(folder string) AMLModConfig {
 func ListAMLConfigs() []AMLModConfig {
 	var out []AMLModConfig
 	for _, f := range ListModFolders() {
-		path := findModFile(f)
-		if path == "" {
-			continue
+		cfg := ReadAMLConfig(f)
+		if cfg.ParseErr == "no_modfile" {
+			continue // not a mod with a .mod file (e.g. base/dmf)
 		}
-		out = append(out, ReadAMLConfig(f))
+		out = append(out, cfg)
 	}
 	return out
 }
@@ -135,7 +146,7 @@ func WriteAMLConfig(cfg AMLModConfig) error {
 		path = findModFile(cfg.Folder)
 	}
 	if path == "" {
-		return &amlError{"no_modfile"}
+		return errors.New("aml: no_modfile")
 	}
 	data, err := os.ReadFile(path)
 	if err != nil {
@@ -158,7 +169,7 @@ func WriteAMLConfig(cfg AMLModConfig) error {
 	}
 
 	if !luaBracesBalanced(working) {
-		return &amlError{"unbalanced_result"}
+		return errors.New("aml: unbalanced_result")
 	}
 
 	// Back up the original (overwrite any previous backup).
@@ -178,11 +189,11 @@ func WriteAMLConfig(cfg AMLModConfig) error {
 func applyArrayKey(content, key string, items []string) (string, error) {
 	open, ok := findLuaOuterBrace(content)
 	if !ok {
-		return content, &amlError{"no_table"}
+		return content, errors.New("aml: no_table")
 	}
 	closeIdx, ok := matchLuaBrace(content, open)
 	if !ok {
-		return content, &amlError{"unbalanced"}
+		return content, errors.New("aml: unbalanced")
 	}
 
 	keyStart, valStart, found := findLuaTopLevelKey(content, open, closeIdx, key)
@@ -195,7 +206,7 @@ func applyArrayKey(content, key string, items []string) (string, error) {
 		}
 		valClose, ok := matchLuaBrace(content, valStart)
 		if !ok {
-			return content, &amlError{"unbalanced"}
+			return content, errors.New("aml: unbalanced")
 		}
 		valEnd := valClose + 1 // just past the closing '}' (any trailing comma stays)
 		return content[:keyStart] + serialized + content[valEnd:], nil
@@ -572,9 +583,3 @@ func luaBracesBalanced(content string) bool {
 	}
 	return depth == 0
 }
-
-// amlError is a small error type with a stable code, so callers/tests can match
-// on the reason without string fragility.
-type amlError struct{ Code string }
-
-func (e *amlError) Error() string { return "aml: " + e.Code }
