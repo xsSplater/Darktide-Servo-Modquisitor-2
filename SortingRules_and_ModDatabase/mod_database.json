@@ -2430,6 +2430,60 @@
 			}
 		},
 		{
+			"folder": "KOREAN_scoreboard",
+			"nexus_file_pattern": "scoreboard",
+			"name": {
+				"en": "Scoreboard (ko-kr)"
+			},
+			"description": {
+				"en": "스코어보드 모드 한글 번역판"
+			},
+			"author": "hgcl2",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/65",
+			"github_url": "",
+			"note": {
+				"de": "",
+				"en": "",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			}
+		},
+		{
+			"folder": "KOREAN_ScoreboardAmmos",
+			"nexus_file_pattern": "scoreboard Ammunitions picked",
+			"name": {
+				"en": "Scoreboard Ammunitions picked (ko-kr)"
+			},
+			"description": {
+				"en": "스코어보드 모드 한글 번역판"
+			},
+			"author": "hgcl2",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/65",
+			"github_url": "",
+			"note": {
+				"de": "",
+				"en": "",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			}
+		},
+		{
 			"folder": "KOREAN_ScoreboardDamage",
 			"nexus_file_pattern": "scoreboard Damage",
 			"name": {
@@ -2488,60 +2542,6 @@
 			"nexus_file_pattern": "scoreboard Explosive",
 			"name": {
 				"en": "Scoreboard Explosive (ko-kr)"
-			},
-			"description": {
-				"en": "스코어보드 모드 한글 번역판"
-			},
-			"author": "hgcl2",
-			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/65",
-			"github_url": "",
-			"note": {
-				"de": "",
-				"en": "",
-				"es": "",
-				"fr": "",
-				"it": "",
-				"ja": "",
-				"ko": "",
-				"pl": "",
-				"pt-BR": "",
-				"ru": "",
-				"zh-hans": "",
-				"zh-hant": ""
-			}
-		},
-		{
-			"folder": "KOREAN_scoreboard",
-			"nexus_file_pattern": "scoreboard",
-			"name": {
-				"en": "Scoreboard (ko-kr)"
-			},
-			"description": {
-				"en": "스코어보드 모드 한글 번역판"
-			},
-			"author": "hgcl2",
-			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/65",
-			"github_url": "",
-			"note": {
-				"de": "",
-				"en": "",
-				"es": "",
-				"fr": "",
-				"it": "",
-				"ja": "",
-				"ko": "",
-				"pl": "",
-				"pt-BR": "",
-				"ru": "",
-				"zh-hans": "",
-				"zh-hant": ""
-			}
-		},
-		{
-			"folder": "KOREAN_ScoreboardAmmos",
-			"nexus_file_pattern": "scoreboard Ammunitions picked",
-			"name": {
-				"en": "Scoreboard Ammunitions picked (ko-kr)"
 			},
 			"description": {
 				"en": "스코어보드 모드 한글 번역판"
@@ -6539,55 +6539,6 @@
 			}
 		},
 		{
-			"folder": "ExampleLocalizationBundle",
-			"nexus_file_pattern": "examplelocalizationbundle-163",
-			"name": {
-				"de": "Beispiel-Lokalisierungsbündel",
-				"en": "Example Localization Bundle",
-				"es": "Paquete de localización de ejemplo",
-				"fr": "Exemple de bundle de localisation",
-				"it": "Esempio di bundle di localizzazione",
-				"ja": "ローカライゼーションバンドルの例",
-				"ko": "로컬라이제이션 번들 예시",
-				"pl": "Przykładowy pakiet lokalizacyjny",
-				"pt-BR": "Pacote de localização de exemplo",
-				"ru": "Пример пакета локализации",
-				"zh-hans": "示例本地化捆绑包",
-				"zh-hant": "示例本地化捆綁包"
-			},
-			"description": {
-				"de": "Dies ist eine Beispieldatei für Autoren von Lokalisierungsbündeln.",
-				"en": "This is an example file for localization bundle authors.",
-				"es": "Este es un archivo de ejemplo para los autores de paquetes de localización.",
-				"fr": "Ceci est un exemple de fichier pour les auteurs de bundles de localisation.",
-				"it": "Questo è un file di esempio per gli autori di bundle di localizzazione.",
-				"ja": "これはローカライゼーションバンドルの作成者向けのサンプルファイルです。",
-				"ko": "이것은 로컬라이제이션 번들 작성자를 위한 예제 파일입니다.",
-				"pl": "To jest przykładowy plik dla autorów pakietów lokalizacyjnych.",
-				"pt-BR": "Este é um arquivo de exemplo para autores de pacotes de localização.",
-				"ru": "Это пример файла для авторов пакетов локализации.",
-				"zh-hans": "这是一个供本地化捆绑包作者使用的示例文件。",
-				"zh-hant": "這是一個供本地化捆綁包作者使用的示例檔案。"
-			},
-			"author": "deluxghost",
-			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/163",
-			"github_url": "https://github.com/deluxghost/darktide-mods/tree/main/WhatTheLocalization",
-			"note": {
-				"de": "",
-				"en": "",
-				"es": "",
-				"fr": "",
-				"it": "",
-				"ja": "",
-				"ko": "",
-				"pl": "",
-				"pt-BR": "",
-				"ru": "",
-				"zh-hans": "",
-				"zh-hant": ""
-			}
-		},
-		{
 			"folder": "WhatTheLocalization",
 			"nexus_file_pattern": "whatthelocalization-163",
 			"name": {
@@ -6617,6 +6568,55 @@
 				"ru": "What The Localization - Созданный сообществом фреймворк для исправления локализации и инструмент отладки.",
 				"zh-hans": "一个社区驱动的本地化修复框架和调试工具。",
 				"zh-hant": "一個社群驅動的本地化修復框架和除錯工具。"
+			},
+			"author": "deluxghost",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/163",
+			"github_url": "https://github.com/deluxghost/darktide-mods/tree/main/WhatTheLocalization",
+			"note": {
+				"de": "",
+				"en": "",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			}
+		},
+		{
+			"folder": "ExampleLocalizationBundle",
+			"nexus_file_pattern": "examplelocalizationbundle-163",
+			"name": {
+				"de": "Beispiel-Lokalisierungsbündel",
+				"en": "Example Localization Bundle",
+				"es": "Paquete de localización de ejemplo",
+				"fr": "Exemple de bundle de localisation",
+				"it": "Esempio di bundle di localizzazione",
+				"ja": "ローカライゼーションバンドルの例",
+				"ko": "로컬라이제이션 번들 예시",
+				"pl": "Przykładowy pakiet lokalizacyjny",
+				"pt-BR": "Pacote de localização de exemplo",
+				"ru": "Пример пакета локализации",
+				"zh-hans": "示例本地化捆绑包",
+				"zh-hant": "示例本地化捆綁包"
+			},
+			"description": {
+				"de": "Dies ist eine Beispieldatei für Autoren von Lokalisierungsbündeln.",
+				"en": "This is an example file for localization bundle authors.",
+				"es": "Este es un archivo de ejemplo para los autores de paquetes de localización.",
+				"fr": "Ceci est un exemple de fichier pour les auteurs de bundles de localisation.",
+				"it": "Questo è un file di esempio per gli autori di bundle di localizzazione.",
+				"ja": "これはローカライゼーションバンドルの作成者向けのサンプルファイルです。",
+				"ko": "이것은 로컬라이제이션 번들 작성자를 위한 예제 파일입니다.",
+				"pl": "To jest przykładowy plik dla autorów pakietów lokalizacyjnych.",
+				"pt-BR": "Este é um arquivo de exemplo para autores de pacotes de localização.",
+				"ru": "Это пример файла для авторов пакетов локализации.",
+				"zh-hans": "这是一个供本地化捆绑包作者使用的示例文件。",
+				"zh-hant": "這是一個供本地化捆綁包作者使用的示例檔案。"
 			},
 			"author": "deluxghost",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/163",
@@ -7372,21 +7372,21 @@
 			}
 		},
 		{
-			"folder": "Jukebox",
+			"folder": "Jukebox_OLD",
 			"nexus_file_pattern": "jukebox",
 			"name": {
-				"de": "Jukestus Boxi (neu)",
-				"en": "Jukestus Boxi (new)",
-				"es": "Jukestus Boxi (nuevo)",
-				"fr": "Jukestus Boxi (nouveau)",
-				"it": "Jukestus Boxi (nuovo)",
-				"ja": "ジュークスタス・ボクシ (新)",
-				"ko": "주크스터스 복시 (신규)",
-				"pl": "Jukestus Boxi (nowy)",
-				"pt-BR": "Jukestus Boxi (novo)",
-				"ru": "Музыкальнус Автомати (новый)",
-				"zh-hans": "点唱机 (新版)",
-				"zh-hant": "點唱機 (新版)"
+				"de": "Jukestus Boxi (alt)",
+				"en": "Jukestus Boxi (old)",
+				"es": "Jukestus Boxi (antiguo)",
+				"fr": "Jukestus Boxi (ancien)",
+				"it": "Jukestus Boxi (vecchio)",
+				"ja": "ジュークスタス・ボクシ（旧）",
+				"ko": "주크스터스 복시 (구버전)",
+				"pl": "Jukestus Boxi (stary)",
+				"pt-BR": "Jukestus Boxi (antigo)",
+				"ru": "Музыкальнус Автомати (старый)",
+				"zh-hans": "点唱机（旧版）",
+				"zh-hant": "點唱機（舊版）"
 			},
 			"description": {
 				"de": "VERALTET!",
@@ -7421,21 +7421,21 @@
 			}
 		},
 		{
-			"folder": "Jukebox_OLD",
+			"folder": "Jukebox",
 			"nexus_file_pattern": "jukebox",
 			"name": {
-				"de": "Jukestus Boxi (alt)",
-				"en": "Jukestus Boxi (old)",
-				"es": "Jukestus Boxi (antiguo)",
-				"fr": "Jukestus Boxi (ancien)",
-				"it": "Jukestus Boxi (vecchio)",
-				"ja": "ジュークスタス・ボクシ（旧）",
-				"ko": "주크스터스 복시 (구버전)",
-				"pl": "Jukestus Boxi (stary)",
-				"pt-BR": "Jukestus Boxi (antigo)",
-				"ru": "Музыкальнус Автомати (старый)",
-				"zh-hans": "点唱机（旧版）",
-				"zh-hant": "點唱機（舊版）"
+				"de": "Jukestus Boxi (neu)",
+				"en": "Jukestus Boxi (new)",
+				"es": "Jukestus Boxi (nuevo)",
+				"fr": "Jukestus Boxi (nouveau)",
+				"it": "Jukestus Boxi (nuovo)",
+				"ja": "ジュークスタス・ボクシ (新)",
+				"ko": "주크스터스 복시 (신규)",
+				"pl": "Jukestus Boxi (nowy)",
+				"pt-BR": "Jukestus Boxi (novo)",
+				"ru": "Музыкальнус Автомати (новый)",
+				"zh-hans": "点唱机 (新版)",
+				"zh-hant": "點唱機 (新版)"
 			},
 			"description": {
 				"de": "VERALTET!",
@@ -10682,55 +10682,6 @@
 			}
 		},
 		{
-			"folder": "extended_weapon_customization",
-			"nexus_file_pattern": "extended weapon customization-277",
-			"name": {
-				"de": "Erweiterte Waffenanpassung",
-				"en": "Extended Weapon Customization",
-				"es": "Personalización de armas extendida",
-				"fr": "Personnalisation avancée des armes",
-				"it": "Personalizzazione armi estesa",
-				"ja": "拡張武器カスタマイズ",
-				"ko": "확장 무기 커스터마이즈",
-				"pl": "Rozszerzone dostosowywanie broni",
-				"pt-BR": "Personalização de armas estendida",
-				"ru": "Расширенная настройка оружия",
-				"zh-hans": "扩展武器定制",
-				"zh-hant": "擴展武器定製"
-			},
-			"description": {
-				"de": "Waffenanpassung, Taschenlampen, Visiere, Zielfernrohre, Ausrüstung auf dem Rücken. Fügt verschiedene Arten von QoL- und Immersionsverbesserungen hinzu. Und noch viele weitere Sachen.",
-				"en": "Weapon customization, flashlights, sights, scopes, equipment on back. Adds different kinds of qol and immersion things.And a bunch more stuff.",
-				"es": "Personalización de armas, linternas, miras, visores, equipo en la espalda. Añade varios tipos de mejoras de calidad de vida e inmersión. Y muchas otras cosas.",
-				"fr": "Personnalisation des armes, lampes de poche, viseurs, lunettes, équipement sur le dos. Ajoute différents types d'améliorations de qualité de vie et d'immersion. Et bien d'autres choses.",
-				"it": "Personalizzazione delle armi, torce, mirini, cannocchiali, equipaggiamento sulla schiena. Aggiunge vari tipi di miglioramenti QoL e di immersione. E molte altre cose.",
-				"ja": "武器のカスタマイズ、懐中電灯、サイト、スコープ、背中の装備。さまざまなQoLと没入感の向上を追加します。その他にも多数の機能があります。",
-				"ko": "무기 커스터마이즈, 손전등, 조준경, 스코프, 등 장비. 다양한 QoL 및 몰입감 향상 기능을 추가합니다. 그 외에도 많은 것들이 있습니다.",
-				"pl": "Dostosowywanie broni, latarki, celowniki, lunety, wyposażenie na plecach. Dodaje różne rodzaje ulepszeń jakości życia i immersji. I wiele innych rzeczy.",
-				"pt-BR": "Personalização de armas, lanternas, miras, lunetas, equipamento nas costas. Adiciona vários tipos de melhorias de qualidade de vida e imersão. E muitas outras coisas.",
-				"ru": "Extended Weapon Customization - Настройка оружия, фонарики, прицелы, оптические прицелы, экипировка на спину. Добавляет различные улучшения качества жизни и погружения. И многое другое.",
-				"zh-hans": "武器定制、手电筒、准星、瞄准镜、背部装备。添加各种生活质量改进和沉浸感增强。还有很多其他内容。",
-				"zh-hant": "武器定製、手電筒、準星、瞄準鏡、背部裝備。添加各種生活品質改進和沉浸感增強。還有很多其他內容。"
-			},
-			"author": "grasmann",
-			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/277",
-			"github_url": "https://github.com/grasmann/darktide-mods/tree/main/extended_weapon_customization",
-			"note": {
-				"de": "Erforderlich: MasterItems Community Patch und Visual Loadout Customization Community Patch.",
-				"en": "Required: MasterItems Community Patch and Visual Loadout Customization Community Patch.",
-				"es": "Requerido: MasterItems Community Patch y Visual Loadout Customization Community Patch.",
-				"fr": "Requis : MasterItems Community Patch et Visual Loadout Customization Community Patch.",
-				"it": "Richiede: MasterItems Community Patch e Visual Loadout Customization Community Patch.",
-				"ja": "必要条件: MasterItems Community Patch と Visual Loadout Customization Community Patch。",
-				"ko": "필요: MasterItems Community Patch 및 Visual Loadout Customization Community Patch.",
-				"pl": "Wymagane: MasterItems Community Patch i Visual Loadout Customization Community Patch.",
-				"pt-BR": "Requerido: MasterItems Community Patch e Visual Loadout Customization Community Patch.",
-				"ru": "Требуется: MasterItems Community Patch и Visual Loadout Customization Community Patch.",
-				"zh-hans": "需要：MasterItems Community Patch 和 Visual Loadout Customization Community Patch。",
-				"zh-hant": "需要：MasterItems Community Patch 和 Visual Loadout Customization Community Patch。"
-			}
-		},
-		{
 			"folder": "extended_weapon_customization_base_additions",
 			"nexus_file_pattern": "extended weapon customization base additions-277",
 			"name": {
@@ -10777,6 +10728,55 @@
 				"ru": "Требуется: Extended Weapon Customization.",
 				"zh-hans": "需要：Extended Weapon Customization。",
 				"zh-hant": "需要：Extended Weapon Customization。"
+			}
+		},
+		{
+			"folder": "extended_weapon_customization",
+			"nexus_file_pattern": "extended weapon customization-277",
+			"name": {
+				"de": "Erweiterte Waffenanpassung",
+				"en": "Extended Weapon Customization",
+				"es": "Personalización de armas extendida",
+				"fr": "Personnalisation avancée des armes",
+				"it": "Personalizzazione armi estesa",
+				"ja": "拡張武器カスタマイズ",
+				"ko": "확장 무기 커스터마이즈",
+				"pl": "Rozszerzone dostosowywanie broni",
+				"pt-BR": "Personalização de armas estendida",
+				"ru": "Расширенная настройка оружия",
+				"zh-hans": "扩展武器定制",
+				"zh-hant": "擴展武器定製"
+			},
+			"description": {
+				"de": "Waffenanpassung, Taschenlampen, Visiere, Zielfernrohre, Ausrüstung auf dem Rücken. Fügt verschiedene Arten von QoL- und Immersionsverbesserungen hinzu. Und noch viele weitere Sachen.",
+				"en": "Weapon customization, flashlights, sights, scopes, equipment on back. Adds different kinds of qol and immersion things.And a bunch more stuff.",
+				"es": "Personalización de armas, linternas, miras, visores, equipo en la espalda. Añade varios tipos de mejoras de calidad de vida e inmersión. Y muchas otras cosas.",
+				"fr": "Personnalisation des armes, lampes de poche, viseurs, lunettes, équipement sur le dos. Ajoute différents types d'améliorations de qualité de vie et d'immersion. Et bien d'autres choses.",
+				"it": "Personalizzazione delle armi, torce, mirini, cannocchiali, equipaggiamento sulla schiena. Aggiunge vari tipi di miglioramenti QoL e di immersione. E molte altre cose.",
+				"ja": "武器のカスタマイズ、懐中電灯、サイト、スコープ、背中の装備。さまざまなQoLと没入感の向上を追加します。その他にも多数の機能があります。",
+				"ko": "무기 커스터마이즈, 손전등, 조준경, 스코프, 등 장비. 다양한 QoL 및 몰입감 향상 기능을 추가합니다. 그 외에도 많은 것들이 있습니다.",
+				"pl": "Dostosowywanie broni, latarki, celowniki, lunety, wyposażenie na plecach. Dodaje różne rodzaje ulepszeń jakości życia i immersji. I wiele innych rzeczy.",
+				"pt-BR": "Personalização de armas, lanternas, miras, lunetas, equipamento nas costas. Adiciona vários tipos de melhorias de qualidade de vida e imersão. E muitas outras coisas.",
+				"ru": "Extended Weapon Customization - Настройка оружия, фонарики, прицелы, оптические прицелы, экипировка на спину. Добавляет различные улучшения качества жизни и погружения. И многое другое.",
+				"zh-hans": "武器定制、手电筒、准星、瞄准镜、背部装备。添加各种生活质量改进和沉浸感增强。还有很多其他内容。",
+				"zh-hant": "武器定製、手電筒、準星、瞄準鏡、背部裝備。添加各種生活品質改進和沉浸感增強。還有很多其他內容。"
+			},
+			"author": "grasmann",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/277",
+			"github_url": "https://github.com/grasmann/darktide-mods/tree/main/extended_weapon_customization",
+			"note": {
+				"de": "Erforderlich: MasterItems Community Patch und Visual Loadout Customization Community Patch.",
+				"en": "Required: MasterItems Community Patch and Visual Loadout Customization Community Patch.",
+				"es": "Requerido: MasterItems Community Patch y Visual Loadout Customization Community Patch.",
+				"fr": "Requis : MasterItems Community Patch et Visual Loadout Customization Community Patch.",
+				"it": "Richiede: MasterItems Community Patch e Visual Loadout Customization Community Patch.",
+				"ja": "必要条件: MasterItems Community Patch と Visual Loadout Customization Community Patch。",
+				"ko": "필요: MasterItems Community Patch 및 Visual Loadout Customization Community Patch.",
+				"pl": "Wymagane: MasterItems Community Patch i Visual Loadout Customization Community Patch.",
+				"pt-BR": "Requerido: MasterItems Community Patch e Visual Loadout Customization Community Patch.",
+				"ru": "Требуется: MasterItems Community Patch и Visual Loadout Customization Community Patch.",
+				"zh-hans": "需要：MasterItems Community Patch 和 Visual Loadout Customization Community Patch。",
+				"zh-hant": "需要：MasterItems Community Patch 和 Visual Loadout Customization Community Patch。"
 			}
 		},
 		{
@@ -12789,7 +12789,7 @@
 			}
 		},
 		{
-			"folder": "PsykerCriticalPerilQuiet",
+			"folder": "PsykerCriticalPerilQuiet_Super_Quiet",
 			"nexus_file_pattern": "quieter",
 			"name": {
 				"de": "Leiserer kritischer Gefahrenhinweis des Psykers",
@@ -12838,7 +12838,7 @@
 			}
 		},
 		{
-			"folder": "PsykerCriticalPerilQuiet_Super_Quiet",
+			"folder": "PsykerCriticalPerilQuiet",
 			"nexus_file_pattern": "quieter",
 			"name": {
 				"de": "Leiserer kritischer Gefahrenhinweis des Psykers",
@@ -17493,21 +17493,21 @@
 			}
 		},
 		{
-			"folder": "___HUD",
-			"nexus_file_pattern": "___HUD-459",
+			"folder": "___GamePlay Improve",
+			"nexus_file_pattern": "___GamePlay Improve-459",
 			"name": {
-				"de": "Mod-Listen-Trennzeichen - HUD",
-				"en": "Mod List Dividers - HUD",
-				"es": "Separadores de lista de mods - HUD",
-				"fr": "Séparateurs de liste de mods - HUD",
-				"it": "Separatori della lista mod - HUD",
-				"ja": "MODリスト区切り - HUD",
-				"ko": "모드 목록 구분선 - HUD",
-				"pl": "Separatory listy modów - HUD",
-				"pt-BR": "Separadores de lista de mods - HUD",
-				"ru": "Разделители списка модов - HUD",
-				"zh-hans": "模组列表分隔符 - HUD",
-				"zh-hant": "模組列表分隔符 - HUD"
+				"de": "Mod-Listen-Trennzeichen - GamePlay Improve",
+				"en": "Mod List Dividers - GamePlay Improve",
+				"es": "Separadores de lista de mods - GamePlay Improve",
+				"fr": "Séparateurs de liste de mods - GamePlay Improve",
+				"it": "Separatori della lista mod - GamePlay Improve",
+				"ja": "MODリスト区切り - GamePlay Improve",
+				"ko": "모드 목록 구분선 - GamePlay Improve",
+				"pl": "Separatory listy modów - GamePlay Improve",
+				"pt-BR": "Separadores de lista de mods - GamePlay Improve",
+				"ru": "Разделители списка модов - GamePlay Improve",
+				"zh-hans": "模组列表分隔符 - GamePlay Improve",
+				"zh-hant": "模組列表分隔符 - GamePlay Improve"
 			},
 			"description": {
 				"de": "Fügt einen Trenner zur linken Liste hinzu. Diese Mod hat keinen Einfluss auf das Spiel.",
@@ -17591,21 +17591,70 @@
 			}
 		},
 		{
-			"folder": "___Bug Fix",
-			"nexus_file_pattern": "___Bug Fix-459",
+			"folder": "___Game Tools",
+			"nexus_file_pattern": "___Game Tools-459",
 			"name": {
-				"de": "Mod-Listen-Trennzeichen - Bug Fix",
-				"en": "Mod List Dividers - Bug Fix",
-				"es": "Separadores de lista de mods - Bug Fix",
-				"fr": "Séparateurs de liste de mods - Bug Fix",
-				"it": "Separatori della lista mod - Bug Fix",
-				"ja": "MODリスト区切り - Bug Fix",
-				"ko": "모드 목록 구분선 - Bug Fix",
-				"pl": "Separatory listy modów - Bug Fix",
-				"pt-BR": "Separadores de lista de mods - Bug Fix",
-				"ru": "Разделители списка модов - Bug Fix",
-				"zh-hans": "模组列表分隔符 - Bug Fix",
-				"zh-hant": "模組列表分隔符 - Bug Fix"
+				"de": "Mod-Listen-Trennzeichen - Game Tools",
+				"en": "Mod List Dividers - Game Tools",
+				"es": "Separadores de lista de mods - Game Tools",
+				"fr": "Séparateurs de liste de mods - Game Tools",
+				"it": "Separatori della lista mod - Game Tools",
+				"ja": "MODリスト区切り - Game Tools",
+				"ko": "모드 목록 구분선 - Game Tools",
+				"pl": "Separatory listy modów - Game Tools",
+				"pt-BR": "Separadores de lista de mods - Game Tools",
+				"ru": "Разделители списка модов - Game Tools",
+				"zh-hans": "模组列表分隔符 - Game Tools",
+				"zh-hant": "模組列表分隔符 - Game Tools"
+			},
+			"description": {
+				"de": "Fügt einen Trenner zur linken Liste hinzu. Diese Mod hat keinen Einfluss auf das Spiel.",
+				"en": "This mod adds a divider to the left list. This mod has no effect on the game.",
+				"es": "Añade un separador a la lista izquierda. Este mod no tiene efecto en el juego.",
+				"fr": "Ajoute un séparateur à la liste de gauche. Ce mod n'a aucun effet sur le jeu.",
+				"it": "Aggiunge un separatore all'elenco di sinistra. Questa mod non ha alcun effetto sul gioco.",
+				"ja": "左側のリストに区切りを追加します。このMODはゲームに影響を与えません。",
+				"ko": "왼쪽 목록에 구분선을 추가합니다. 이 모드는 게임에 영향을 미치지 않습니다.",
+				"pl": "Dodaje separator do lewej listy. Ten mod nie ma wpływu na grę.",
+				"pt-BR": "Adiciona um separador à lista esquerda. Este mod não tem efeito no jogo.",
+				"ru": "Разделители списка модов - Добавляет разделитель в левый список. Этот мод не влияет на игру.",
+				"zh-hans": "在左侧列表中添加一个分隔符。此模组对游戏没有影响。",
+				"zh-hant": "在左側列表中添加一個分隔符。此模組對遊戲沒有影響。"
+			},
+			"author": "hgcl2",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/459",
+			"github_url": "",
+			"note": {
+				"de": "",
+				"en": "",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			}
+		},
+		{
+			"folder": "___HUD",
+			"nexus_file_pattern": "___HUD-459",
+			"name": {
+				"de": "Mod-Listen-Trennzeichen - HUD",
+				"en": "Mod List Dividers - HUD",
+				"es": "Separadores de lista de mods - HUD",
+				"fr": "Séparateurs de liste de mods - HUD",
+				"it": "Separatori della lista mod - HUD",
+				"ja": "MODリスト区切り - HUD",
+				"ko": "모드 목록 구분선 - HUD",
+				"pl": "Separatory listy modów - HUD",
+				"pt-BR": "Separadores de lista de mods - HUD",
+				"ru": "Разделители списка модов - HUD",
+				"zh-hans": "模组列表分隔符 - HUD",
+				"zh-hant": "模組列表分隔符 - HUD"
 			},
 			"description": {
 				"de": "Fügt einen Trenner zur linken Liste hinzu. Diese Mod hat keinen Einfluss auf das Spiel.",
@@ -17689,70 +17738,21 @@
 			}
 		},
 		{
-			"folder": "___GamePlay Improve",
-			"nexus_file_pattern": "___GamePlay Improve-459",
+			"folder": "___Bug Fix",
+			"nexus_file_pattern": "___Bug Fix-459",
 			"name": {
-				"de": "Mod-Listen-Trennzeichen - GamePlay Improve",
-				"en": "Mod List Dividers - GamePlay Improve",
-				"es": "Separadores de lista de mods - GamePlay Improve",
-				"fr": "Séparateurs de liste de mods - GamePlay Improve",
-				"it": "Separatori della lista mod - GamePlay Improve",
-				"ja": "MODリスト区切り - GamePlay Improve",
-				"ko": "모드 목록 구분선 - GamePlay Improve",
-				"pl": "Separatory listy modów - GamePlay Improve",
-				"pt-BR": "Separadores de lista de mods - GamePlay Improve",
-				"ru": "Разделители списка модов - GamePlay Improve",
-				"zh-hans": "模组列表分隔符 - GamePlay Improve",
-				"zh-hant": "模組列表分隔符 - GamePlay Improve"
-			},
-			"description": {
-				"de": "Fügt einen Trenner zur linken Liste hinzu. Diese Mod hat keinen Einfluss auf das Spiel.",
-				"en": "This mod adds a divider to the left list. This mod has no effect on the game.",
-				"es": "Añade un separador a la lista izquierda. Este mod no tiene efecto en el juego.",
-				"fr": "Ajoute un séparateur à la liste de gauche. Ce mod n'a aucun effet sur le jeu.",
-				"it": "Aggiunge un separatore all'elenco di sinistra. Questa mod non ha alcun effetto sul gioco.",
-				"ja": "左側のリストに区切りを追加します。このMODはゲームに影響を与えません。",
-				"ko": "왼쪽 목록에 구분선을 추가합니다. 이 모드는 게임에 영향을 미치지 않습니다.",
-				"pl": "Dodaje separator do lewej listy. Ten mod nie ma wpływu na grę.",
-				"pt-BR": "Adiciona um separador à lista esquerda. Este mod não tem efeito no jogo.",
-				"ru": "Разделители списка модов - Добавляет разделитель в левый список. Этот мод не влияет на игру.",
-				"zh-hans": "在左侧列表中添加一个分隔符。此模组对游戏没有影响。",
-				"zh-hant": "在左側列表中添加一個分隔符。此模組對遊戲沒有影響。"
-			},
-			"author": "hgcl2",
-			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/459",
-			"github_url": "",
-			"note": {
-				"de": "",
-				"en": "",
-				"es": "",
-				"fr": "",
-				"it": "",
-				"ja": "",
-				"ko": "",
-				"pl": "",
-				"pt-BR": "",
-				"ru": "",
-				"zh-hans": "",
-				"zh-hant": ""
-			}
-		},
-		{
-			"folder": "___Game Tools",
-			"nexus_file_pattern": "___Game Tools-459",
-			"name": {
-				"de": "Mod-Listen-Trennzeichen - Game Tools",
-				"en": "Mod List Dividers - Game Tools",
-				"es": "Separadores de lista de mods - Game Tools",
-				"fr": "Séparateurs de liste de mods - Game Tools",
-				"it": "Separatori della lista mod - Game Tools",
-				"ja": "MODリスト区切り - Game Tools",
-				"ko": "모드 목록 구분선 - Game Tools",
-				"pl": "Separatory listy modów - Game Tools",
-				"pt-BR": "Separadores de lista de mods - Game Tools",
-				"ru": "Разделители списка модов - Game Tools",
-				"zh-hans": "模组列表分隔符 - Game Tools",
-				"zh-hant": "模組列表分隔符 - Game Tools"
+				"de": "Mod-Listen-Trennzeichen - Bug Fix",
+				"en": "Mod List Dividers - Bug Fix",
+				"es": "Separadores de lista de mods - Bug Fix",
+				"fr": "Séparateurs de liste de mods - Bug Fix",
+				"it": "Separatori della lista mod - Bug Fix",
+				"ja": "MODリスト区切り - Bug Fix",
+				"ko": "모드 목록 구분선 - Bug Fix",
+				"pl": "Separatory listy modów - Bug Fix",
+				"pt-BR": "Separadores de lista de mods - Bug Fix",
+				"ru": "Разделители списка модов - Bug Fix",
+				"zh-hans": "模组列表分隔符 - Bug Fix",
+				"zh-hant": "模組列表分隔符 - Bug Fix"
 			},
 			"description": {
 				"de": "Fügt einen Trenner zur linken Liste hinzu. Diese Mod hat keinen Einfluss auf das Spiel.",
@@ -18822,10 +18822,10 @@
 			}
 		},
 		{
-			"folder": "servo_friend",
-			"nexus_file_pattern": "servo friend-504",
+			"folder": "servo_friend_audio_server_plugin",
+			"nexus_file_pattern": "servo friend ai generated voice plugin-504",
 			"name": {
-				"en": "Servo Friend",
+				"en": "Servo Friend Audio Plugin",
 				"ru": ""
 			},
 			"description": {
@@ -18851,10 +18851,10 @@
 			}
 		},
 		{
-			"folder": "servo_friend_audio_server_plugin",
-			"nexus_file_pattern": "servo friend ai generated voice plugin-504",
+			"folder": "servo_friend",
+			"nexus_file_pattern": "servo friend-504",
 			"name": {
-				"en": "Servo Friend Audio Plugin",
+				"en": "Servo Friend",
 				"ru": ""
 			},
 			"description": {
@@ -22089,8 +22089,8 @@
 			}
 		},
 		{
-			"folder": "MiniAudioAddon",
-			"nexus_file_pattern": "mini",
+			"folder": "OrbEmitTest",
+			"nexus_file_pattern": "orb",
 			"name": {
 				"en": "MiniAudioAddon",
 				"ru": ""
@@ -22118,8 +22118,8 @@
 			}
 		},
 		{
-			"folder": "OrbEmitTest",
-			"nexus_file_pattern": "orb",
+			"folder": "DarktideLocalServer_MINIAUDIO",
+			"nexus_file_pattern": "darktide",
 			"name": {
 				"en": "MiniAudioAddon",
 				"ru": ""
@@ -22176,8 +22176,8 @@
 			}
 		},
 		{
-			"folder": "DarktideLocalServer_MINIAUDIO",
-			"nexus_file_pattern": "darktide",
+			"folder": "MiniAudioAddon",
+			"nexus_file_pattern": "mini",
 			"name": {
 				"en": "MiniAudioAddon",
 				"ru": ""
@@ -22966,7 +22966,7 @@
 				"ru": ""
 			},
 			"description": {
-				"en": "The barrel pulses to indicate how close it is to exploding, with timer count down it intensifies its pulsing heavily\n为爆桶添加脉动动画，在其被触发时随时间快速缩放其体积，越危险越快哦",
+				"en": "The barrel pulses to indicate how close it is to exploding, with timer count down it intensifies its pulsing heavily.",
 				"ru": ""
 			},
 			"author": "Paimon",
@@ -22985,25 +22985,6 @@
 				"ru": "",
 				"zh-hans": "",
 				"zh-hant": ""
-			}
-		},
-		{
-			"folder": "scripts",
-			"nexus_file_pattern": "",
-			"name": {
-				"en": "Pulsing Barrels",
-				"ru": ""
-			},
-			"description": {
-				"en": "The barrel pulses to indicate how close it is to exploding, with timer count down it intensifies its pulsing heavily\n为爆桶添加脉动动画，在其被触发时随时间快速缩放其体积，越危险越快哦",
-				"ru": ""
-			},
-			"author": "Paimon",
-			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/697",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
 			}
 		},
 		{
@@ -23636,7 +23617,7 @@
 		},
 		{
 			"folder": "IWantToHear",
-			"nexus_file_pattern": "iwanttohear",
+			"nexus_file_pattern": "iwant",
 			"name": {
 				"en": "I Want To Hear - Remove bullet dodge and howling SFX",
 				"ru": ""
@@ -25791,6 +25772,25 @@
 			}
 		},
 		{
+			"folder": "NoPetsLeftBehind",
+			"nexus_file_pattern": "no",
+			"name": {
+				"en": "No Pets Left Behind",
+				"ru": ""
+			},
+			"description": {
+				"en": "Adds your and your allies' companions to the Valkyrie intro before the mission begins",
+				"ru": ""
+			},
+			"author": "leer",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/828",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
 			"folder": "PlayerNotes",
 			"nexus_file_pattern": "player",
 			"name": {
@@ -26343,7 +26343,7 @@
 		},
 		{
 			"folder": "HolyLight",
-			"nexus_file_pattern": "holylight",
+			"nexus_file_pattern": "holy",
 			"name": {
 				"en": "Holy Light",
 				"ru": ""
@@ -26575,7 +26575,7 @@
 		},
 		{
 			"folder": "TheEmperorProtects",
-			"nexus_file_pattern": "theemperorprotects",
+			"nexus_file_pattern": "the",
 			"name": {
 				"en": "The Emperor Protects",
 				"ru": ""
@@ -27030,7 +27030,7 @@
 		},
 		{
 			"folder": "CurioHunter",
-			"nexus_file_pattern": "curiohunter-875",
+			"nexus_file_pattern": "curio",
 			"name": {
 				"en": "Curio Hunter",
 				"ru": ""
@@ -27059,7 +27059,7 @@
 		},
 		{
 			"folder": "OublietteTimer",
-			"nexus_file_pattern": "oubliettetimer",
+			"nexus_file_pattern": "oubliette",
 			"name": {
 				"en": "Oubliette Timer",
 				"ru": ""
@@ -27088,7 +27088,7 @@
 		},
 		{
 			"folder": "huntsalvage",
-			"nexus_file_pattern": "huntsalvage",
+			"nexus_file_pattern": "hunt",
 			"name": {
 				"en": "Hunt the Salvage",
 				"ru": ""
@@ -27117,7 +27117,7 @@
 		},
 		{
 			"folder": "UrlProtocol",
-			"nexus_file_pattern": "urlprotocol",
+			"nexus_file_pattern": "url",
 			"name": {
 				"en": "URL Protocol (Experimental)",
 				"ru": ""
@@ -27146,7 +27146,7 @@
 		},
 		{
 			"folder": "RoadToVictory",
-			"nexus_file_pattern": "roadtovictory",
+			"nexus_file_pattern": "road",
 			"name": {
 				"en": "Road To Victory",
 				"ru": ""
@@ -27204,7 +27204,7 @@
 		},
 		{
 			"folder": "RerollContracts",
-			"nexus_file_pattern": "rerollcontracts",
+			"nexus_file_pattern": "reroll",
 			"name": {
 				"en": "Reroll Contracts",
 				"ru": ""
@@ -27233,7 +27233,7 @@
 		},
 		{
 			"folder": "TeamAbilityCooldowns",
-			"nexus_file_pattern": "teamabilitycooldowns",
+			"nexus_file_pattern": "team",
 			"name": {
 				"en": "Team Ability Cooldowns",
 				"ru": ""
@@ -28383,7 +28383,7 @@
 		},
 		{
 			"folder": "BinarySpeak",
-			"nexus_file_pattern": "binary",
+			"nexus_file_pattern": "binar",
 			"name": {
 				"en": "BinarySpeak",
 				"ru": ""
@@ -28869,6 +28869,44 @@
 			},
 			"author": "GideonAriphael",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/975",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "CleanKills",
+			"nexus_file_pattern": "clean",
+			"name": {
+				"en": "CleanKills",
+				"ru": ""
+			},
+			"description": {
+				"en": "CleanKills is a lightweight Darktide mod that quickly removes dead enemies to reduce visual clutter and to improve visibility during fights.",
+				"ru": ""
+			},
+			"author": "marnhorn",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/979",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "ScoreboardAbilityUsage",
+			"nexus_file_pattern": "scoreboard",
+			"name": {
+				"en": "ScoreboardAbilityUsage",
+				"ru": ""
+			},
+			"description": {
+				"en": "Show the number of skill casts and their frequency for all players on the scoreboard screen at the end of the match.",
+				"ru": ""
+			},
+			"author": "kernel574",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/980",
 			"github_url": "",
 			"note": {
 				"en": "",
