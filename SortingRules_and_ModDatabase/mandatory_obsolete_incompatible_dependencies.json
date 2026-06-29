@@ -350,6 +350,8 @@
 		{ "mod1": "markers_aio",			"mod2": "Ration Pack" },
 		{ "mod1": "markers_aio",			"mod2": "StimmsPickupIcon" },
 		{ "mod1": "MemLeakFix",				"mod2": "MemLeakFixNoHUD" },
+		{ "mod1": "menu_hotkeys",			"mod2": "ExpeditionsHotkey" },
+		{ "mod1": "menu_hotkeys",			"mod2": "hub_hotkey_menus" },
 		{ "mod1": "MenuUIHider",			"mod2": "InventoryHider" },
 		{ "mod1": "modular_menu_buttons",	"mod2": "hub_shortcuts",		"type": "same" },
 		{ "mod1": "NumericUI",				"mod2": "RemoveTagSkulls" },

@@ -22,18 +22,20 @@ import (
 //go:embed lang/messages.json assets/CRT_BlackBG.jpg assets/Yellow_BG.jpg assets/Yellow_BG_button.jpg assets/Yellow_BG_col.jpg assets/icon.png assets/mechanicus.png
 var embeddedFiles embed.FS
 
+var pendingNXMURL string
+
 func main() {
 	// Проверяем, не передали ли нам nxm-ссылку при запуске
 	if len(os.Args) > 1 && os.Args[1] == NXMCommLine && len(os.Args) > 2 {
 		nxmURL := os.Args[2]
-		// Пытаемся подключиться к уже запущенному экземпляру
 		conn, err := net.Dial(NXMProtocol, NXMAddress)
 		if err == nil {
 			fmt.Fprintln(conn, nxmURL)
 			conn.Close()
 			os.Exit(0)
 		}
-		// Если не удалось - это первый экземпляр, продолжаем обычный запуск
+		// Если не удалось соединиться - сохраняем ссылку для отложенной обработки
+		pendingNXMURL = nxmURL
 	}
 
 	// Если запущены с флагом --updated, пропускаем проверку isAlreadyRunning
@@ -301,5 +303,12 @@ func main() {
 			}
 		})
 	}()
+
+	// Если есть отложенная ссылка - обрабатываем её после инициализации UI
+	if pendingNXMURL != "" {
+		fyne.Do(func() {
+			application.handleNXMLink(pendingNXMURL)
+		})
+	}
 	application.mainWindow.ShowAndRun()
 }
