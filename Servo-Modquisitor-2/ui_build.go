@@ -832,6 +832,9 @@ func (app *App) buildUI() {
 		app.applyTooltip(app.btnSortChecks, "aml_sort_warning_tooltip")
 	}
 
+	app.btnAMLConfig = NewCustomButton(app.messages["btn_aml_config"], func() { app.showAMLConfigWindow() })
+	app.applyTooltip(app.btnAMLConfig, "btn_aml_config_tooltip")
+
 	app.btnInstall = NewCustomButton(app.messages["btn_install"], func() {
 		fd := dialog.NewFileOpen(func(reader fyne.URIReadCloser, err error) {
 			if err == nil && reader != nil {
@@ -1015,7 +1018,7 @@ func (app *App) buildUI() {
 	}
 
 	topRight := container.NewVBox(
-		container.NewHBox(app.btnSortChecks, app.btnInstall, app.btnRemove),
+		container.NewHBox(app.btnSortChecks, app.btnAMLConfig, app.btnInstall, app.btnRemove),
 		container.NewHBox(app.btnLaunchNormal, app.btnLaunchNoLauncher, app.btnToggle),
 		container.NewHBox(app.btnCheckUpdates, app.btnUpdateMod, app.btnUpdateAll),
 	)
@@ -1089,6 +1092,7 @@ func (app *App) refreshThemeColors() {
 		app.selectAllBtn, app.deselectAllBtn, app.enableSelectedBtn,
 		app.disableSelectedBtn, app.enableAllBtn, app.disableAllBtn, app.btnEditVersion,
 		app.manageBtn, app.searchClearBtn, app.removeAllBtn, app.removeSelectedBtn,
+		app.btnAMLConfig,
 	} {
 		if btn != nil {
 			btn.Refresh()

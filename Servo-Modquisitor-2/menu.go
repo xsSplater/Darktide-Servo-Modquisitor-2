@@ -277,6 +277,10 @@ func (app *App) changeLanguage(lang string) {
 	if app.btnSortChecks != nil {
 		app.btnSortChecks.SetText(app.messages["btn_sort_checks"])
 	}
+	if app.btnAMLConfig != nil {
+		app.btnAMLConfig.SetText(app.messages["btn_aml_config"])
+		app.applyTooltip(app.btnAMLConfig, "btn_aml_config_tooltip")
+	}
 	if app.btnRefresh != nil {
 		app.btnRefresh.SetText(app.messages["btn_refresh"])
 	}

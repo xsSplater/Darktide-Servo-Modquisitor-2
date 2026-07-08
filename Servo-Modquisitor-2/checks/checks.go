@@ -392,23 +392,9 @@ func tryFixMismatchedModFolder(folderPath, currentName string) string {
 	if isDisabledByNaming(currentName) {
 		return ""
 	}
-	entries, err := os.ReadDir(folderPath)
-	if err != nil {
-		return ""
-	}
-	var modFile string
-	for _, e := range entries {
-		if !e.IsDir() && strings.HasSuffix(strings.ToLower(e.Name()), ".mod") {
-			if modFile == "" {
-				modFile = e.Name()
-			} else {
-				// больше одного .mod файла - не трогаем
-				return ""
-			}
-		}
-	}
+	modFile := findSingleModFile(folderPath)
 	if modFile == "" {
-		return "" // нет .mod файла вообще
+		return "" // нет .mod файла (или больше одного) - не трогаем
 	}
 	expectedName := strings.TrimSuffix(modFile, ".mod")
 	if expectedName == currentName {

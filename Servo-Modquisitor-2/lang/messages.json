@@ -1,4 +1,84 @@
 {
+	"btn_aml_config": {
+		"en": "AML Config",
+		"ru": "Настройка AML"
+	},
+	"btn_aml_config_tooltip": {
+		"en": "Open AML load-order configuration: edit each mod's load_after / load_before / require, which AML reads from the mod's .mod file.",
+		"ru": "Открыть настройку порядка загрузки AML: редактирование load_after / load_before / require для каждого мода — AML читает их из .mod файла мода."
+	},
+	"aml_config_title": {
+		"en": "AML Configuration — Load Order",
+		"ru": "Настройка AML — порядок загрузки"
+	},
+	"aml_select_mod_hint": {
+		"en": "Select a mod on the left to edit its load order",
+		"ru": "Выберите мод слева, чтобы изменить порядок его загрузки"
+	},
+	"aml_search_placeholder": {
+		"en": "Type to filter mods…",
+		"ru": "Введите для фильтрации модов…"
+	},
+	"aml_filter_configured": {
+		"en": "Only AML-configured",
+		"ru": "Только с настройкой AML"
+	},
+	"aml_sort_az": {
+		"en": "Name A → Z",
+		"ru": "Имя А → Я"
+	},
+	"aml_sort_za": {
+		"en": "Name Z → A",
+		"ru": "Имя Я → А"
+	},
+	"aml_editor_load_after": {
+		"en": "Load AFTER these mods:",
+		"ru": "Загружать ПОСЛЕ этих модов:"
+	},
+	"aml_editor_load_before": {
+		"en": "Load BEFORE these mods:",
+		"ru": "Загружать ПЕРЕД этими модами:"
+	},
+	"aml_editor_require": {
+		"en": "Requires these mods (dependencies):",
+		"ru": "Требует эти моды (зависимости):"
+	},
+	"aml_editor_version": {
+		"en": "Version: %s",
+		"ru": "Версия: %s"
+	},
+	"aml_editor_hint": {
+		"en": "● = has AML config.  Counts: a=load_after, b=load_before, r=require.",
+		"ru": "● = есть настройка AML.  Счётчики: a=load_after, b=load_before, r=require."
+	},
+	"aml_btn_add": {
+		"en": "Add",
+		"ru": "Добавить"
+	},
+	"aml_btn_remove": {
+		"en": "Remove",
+		"ru": "Удалить"
+	},
+	"aml_btn_save": {
+		"en": "Save",
+		"ru": "Сохранить"
+	},
+	"aml_btn_reload": {
+		"en": "Reload",
+		"ru": "Обновить"
+	},
+	"aml_log_saved": {
+		"en": "AML config saved for '%s'.",
+		"ru": "Настройка AML сохранена для «%s»."
+	},
+	"aml_log_save_failed": {
+		"en": "Failed to save AML config for '%s': %v",
+		"ru": "Не удалось сохранить настройку AML для «%s»: %v"
+	},
+	"aml_log_unknown_ref": {
+		"en": "AML: '%s' references '%s', which is not installed.",
+		"ru": "AML: «%s» ссылается на «%s», который не установлен."
+	},
 	"already_latest": {
 		"en": "%s: already latest (%s)",
 		"ru": "%s: уже последняя версия (%s)",

@@ -119,6 +119,7 @@ type App struct {
 	btnLaunchNormal     *CustomButton
 	btnLaunchNoLauncher *CustomButton
 	btnSortChecks       *CustomButton
+	btnAMLConfig        *CustomButton
 	btnUpdateAll        *CustomButton
 	btnUpdateMod        *CustomButton
 	btnCheckUpdates     *CustomButton
