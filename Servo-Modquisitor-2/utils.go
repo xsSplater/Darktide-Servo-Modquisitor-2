@@ -452,6 +452,9 @@ func toggleModsLegacy(gameRoot string) error {
 
 // closeApp безопасно закрывает главное окно и завершает программу.
 func (app *App) closeApp() {
+	if app.nxmListener != nil {
+		app.nxmListener.Close()
+	}
 	fyne.Do(func() {
 		app.mainWindow.Close()
 	})

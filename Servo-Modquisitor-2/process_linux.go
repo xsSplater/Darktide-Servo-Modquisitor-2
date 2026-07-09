@@ -1,9 +1,9 @@
 //go:build linux
 
-// process_linux.go
 package main
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 	"strings"
@@ -13,14 +13,22 @@ func isAlreadyRunning() bool {
 	lockFile := "/tmp/servo-modquisitor.lock"
 	f, err := os.OpenFile(lockFile, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0644)
 	if err != nil {
+		// Файл уже существует - другой процесс держит его (или старый висит)
 		return true
 	}
 	defer f.Close()
+
+	// Удаляем файл из файловой системы, но оставляем открытый дескриптор.
+	// При завершении процесса дескриптор закроется, и файл исчезнет окончательно.
+	os.Remove(lockFile)
+
+	// Записываем PID (необязательно, но полезно для отладки)
+	fmt.Fprintf(f, "%d", os.Getpid())
+
 	return false
 }
 
 func showAlreadyRunningDialog() {
-	// На Linux показываем сообщение в терминал, так как GUI ещё не запущен
 	os.Stderr.WriteString("Servo-Modquisitor is already running.\nPlease close the other instance before starting a new one.\n")
 }
 

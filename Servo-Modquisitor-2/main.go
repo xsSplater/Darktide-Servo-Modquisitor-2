@@ -93,6 +93,11 @@ func main() {
 
 	// Обработчик закрытия окна
 	application.mainWindow.SetOnClosed(func() {
+		// Закрываем слушатель nxm, чтобы освободить порт
+		if application.nxmListener != nil {
+			application.nxmListener.Close()
+		}
+
 		if application.orderDirty {
 			dialog.ShowConfirm(
 				application.messages["window_error_title"],
@@ -102,22 +107,27 @@ func main() {
 						application.saveCurrentOrder()
 						application.appendLog(application.messages["order_saved_on_exit"])
 					}
+					// Сохраняем размеры окна перед выходом
 					size := application.mainWindow.Canvas().Size()
 					application.cfg.WindowWidth = int(size.Width)
 					application.cfg.WindowHeight = int(size.Height)
 					application.cfg.WindowMaximized = isWindowMaximized(application.mainWindow.Title())
 					saveConfig(application.cfg)
-					application.mainWindow.Close()
+					// Закрываем окно и завершаем процесс
+					application.closeApp()
 				},
 				application.mainWindow,
 			)
 			return
 		}
+
+		// Если изменений нет - просто выходим
 		size := application.mainWindow.Canvas().Size()
 		application.cfg.WindowWidth = int(size.Width)
 		application.cfg.WindowHeight = int(size.Height)
 		application.cfg.WindowMaximized = isWindowMaximized(application.mainWindow.Title())
 		saveConfig(application.cfg)
+		application.closeApp()
 	})
 
 	// Обработчик Drag&Drop
