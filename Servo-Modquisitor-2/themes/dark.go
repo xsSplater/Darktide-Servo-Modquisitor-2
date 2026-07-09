@@ -13,20 +13,15 @@ type ForcedDarkTheme struct{}
 func (t ForcedDarkTheme) Color(name fyne.ThemeColorName, variant fyne.ThemeVariant) color.Color {
 	switch name {
 	// ================== ФОНЫ ========================
-	// Основной фон всего приложения (окна, пустые области)
-	case theme.ColorNameBackground:
+	case theme.ColorNameBackground: // Основной фон всего приложения (окна, пустые области)
 		return color.NRGBA{R: 22, G: 22, B: 22, A: 225}
-	// Фон выпадающих меню (строки меню, контекстные меню)
-	case theme.ColorNameMenuBackground:
+	case theme.ColorNameMenuBackground: // Фон выпадающих меню (строки меню, контекстные меню)
 		return color.NRGBA{R: 60, G: 63, B: 60, A: 240} // было 52,55,52
-	// Фон полей ввода - прозрачный для видимости CRT-фона
-	case theme.ColorNameInputBackground:
+	case theme.ColorNameInputBackground: // Фон полей ввода - прозрачный для видимости CRT-фона
 		return color.NRGBA{R: 5, G: 6, B: 5, A: 155}
-	// Фон всплывающих окон (диалогов) - как основной фон
-	case theme.ColorNameOverlayBackground:
+	case theme.ColorNameOverlayBackground: // Фон всплывающих окон (диалогов) - как основной фон
 		return color.NRGBA{R: 32, G: 32, B: 32, A: 255}
-	// Цвет текста предупреждений или ошибок
-	case theme.ColorNameForegroundOnWarning:
+	case theme.ColorNameForegroundOnWarning: // Цвет текста предупреждений или ошибок
 		return color.NRGBA{R: 192, G: 255, B: 26, A: 255}
 
 	// ================== КНОПКИ ======================
@@ -127,16 +122,24 @@ func (t ForcedDarkTheme) Color(name fyne.ThemeColorName, variant fyne.ThemeVaria
 		return color.NRGBA{R: 38, G: 38, B: 42, A: 155} // Цвет основной строки
 	case ColorTableRowOdd:
 		return color.NRGBA{R: 34, G: 34, B: 38, A: 5} // ?
-	case ColorTableRowSelected:
-		return color.NRGBA{R: 60, G: 160, B: 30, A: 80} // Выделенная строка
-	case ColorTableRowConflict:
-		return color.NRGBA{R: 80, G: 40, B: 0, A: 120}
 	case ColorTableBorderDirty:
 		return color.NRGBA{R: 200, G: 100, B: 0, A: 255}
 	case ColorTableHeaderBg:
 		return color.NRGBA{R: 20, G: 20, B: 20, A: 255} // Заголовок таблицы
 	case ColorSystemTableBg:
 		return color.NRGBA{R: 20, G: 20, B: 20, A: 150} // ?
+	case ColorTableRowSelected:
+		return color.NRGBA{R: 60, G: 160, B: 30, A: 80} // Выделенная строка
+	case ColorTableRowConflict:
+		return color.NRGBA{R: 80, G: 40, B: 0, A: 111} // Mod Conflict background
+	case ColorTableObsoleteMod:
+		return color.NRGBA{R: 150, G: 150, B: 0, A: 55} // Obsolete Mod background
+	case ColorTableHasUpdateMod:
+		return color.NRGBA{R: 0, G: 222, B: 255, A: 55} // Mod Has Update background
+	case ColorTableMissingFolder:
+		return color.NRGBA{R: 220, G: 20, B: 20, A: 33} // Missing Folder background
+	case ColorStatusSymlinkBg:
+		return color.NRGBA{R: 255, G: 55, B: 255, A: 33} // Symlink background
 
 	// ──────────────── Консоль ────────────────
 	case ColorConsoleText:

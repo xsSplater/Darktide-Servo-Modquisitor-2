@@ -13,21 +13,13 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/widget"
 )
-
-func (app *App) containsStr(slice []string, item string) bool {
-	for _, s := range slice {
-		if s == item {
-			return true
-		}
-	}
-	return false
-}
 
 func (app *App) checkIncompatible(name string) bool {
 	for _, pair := range checks.IncompatiblePairs {
@@ -82,92 +74,6 @@ func detectGameVersion(gameRoot string) GameVersion {
 		return VersionSteam
 	}
 	return VersionUnknown
-}
-
-func getGameRoot() string {
-	exePath, _ := os.Executable()
-	dir := filepath.Dir(exePath) // папка, где лежит exe (mods)
-	for {
-		if detectGameVersion(dir) != VersionUnknown {
-			return dir
-		}
-		parent := filepath.Dir(dir)
-		if parent == dir {
-			break
-		}
-		dir = parent
-	}
-	return ""
-}
-
-// Патчеры toggle_darktide_mods.bat и toggle_dt_mod_autopatch.cmd
-func detectPatcherType() PatcherType {
-	gameRoot := getGameRoot()
-	if gameRoot == "" {
-		return PatcherNone
-	}
-	if _, err := os.Stat(filepath.Join(gameRoot, "toggle_dt_mod_autopatch.cmd")); err == nil {
-		return PatcherAutoPatch
-	}
-	if _, err := os.Stat(filepath.Join(gameRoot, "binaries", "plugins", "_dt_mod_autopatch.dll")); err == nil {
-		return PatcherAutoPatch
-	}
-	if _, err := os.Stat(filepath.Join(gameRoot, "tools", "dtkit-patch")); err == nil {
-		return PatcherLegacy
-	}
-	if _, err := os.Stat(filepath.Join(gameRoot, "toggle_darktide_mods.bat")); err == nil {
-		return PatcherLegacy // старый патчер
-	}
-	return PatcherNone
-}
-
-func isModsEnabledAutoPatch() bool {
-	gameRoot := getGameRoot()
-	if gameRoot == "" {
-		return false
-	}
-	_, err := os.Stat(filepath.Join(gameRoot, "DISABLE_AUTOPATCHER"))
-	return os.IsNotExist(err)
-}
-
-func toggleModsAutoPatch() error {
-	gameRoot := getGameRoot()
-	if gameRoot == "" {
-		return fmt.Errorf("game root not found")
-	}
-	if isModsEnabledAutoPatch() {
-		f, _ := os.Create(filepath.Join(gameRoot, "DISABLE_AUTOPATCHER"))
-		if f != nil {
-			f.Close()
-		}
-		bak := filepath.Join(gameRoot, "bundle", "bundle_database.data.bak")
-		original := filepath.Join(gameRoot, "bundle", "bundle_database.data")
-		if _, err := os.Stat(bak); err == nil {
-			os.Rename(bak, original)
-		}
-	} else {
-		os.Remove(filepath.Join(gameRoot, "DISABLE_AUTOPATCHER"))
-	}
-	return nil
-}
-
-func toggleModsLegacy() error {
-	gameRoot := getGameRoot()
-	if gameRoot == "" {
-		return fmt.Errorf("%s", errGameRootNotFound)
-	}
-	bat := filepath.Join(gameRoot, "toggle_darktide_mods.bat")
-	if _, err := os.Stat(bat); err != nil {
-		// если bat нет, пробуем dtkit-patch
-		dtkit := filepath.Join(gameRoot, "tools", "dtkit-patch")
-		if _, err := os.Stat(dtkit); err == nil {
-			cmd := exec.Command(dtkit, "--toggle", "bundle")
-			return cmd.Run()
-		}
-		return fmt.Errorf("no supported patcher found")
-	}
-	cmd := exec.Command(bat)
-	return cmd.Run()
 }
 
 func (app *App) makeCRTGradient(w, h int) *image.NRGBA {
@@ -384,24 +290,26 @@ func (app *App) appendLogToFile(msg string) {
 	fmt.Fprintln(app.logFile, time.Now().Format(LogTimeFormat), msg)
 }
 
-// makeStablePattern генерирует стабильный паттерн из имени файла и modID.
-// Ищет в имени файла подстроку "-<modID>" (с дефисом перед ID),
-// затем обрезает всё после ID (включая сам ID).
-// Если не находит, возвращает имя файла без расширения (запасной вариант).
-func makeStablePattern(fileName string, modID int) string {
+// extractPatternFromFilename извлекает первое слово из имени файла (без расширения) и приводит к нижнему регистру.
+// Используется для генерации nexus_file_pattern.
+func extractPatternFromFilename(filename string) string {
+	base := filepath.Base(filename)
 	// Удаляем расширение
-	base := fileName
-	if dot := strings.LastIndex(base, "."); dot != -1 {
-		base = base[:dot]
+	ext := filepath.Ext(base)
+	if ext != "" {
+		base = base[:len(base)-len(ext)]
 	}
-	search := fmt.Sprintf("-%d", modID) // ищем "-881"
-	idx := strings.Index(base, search)
-	if idx != -1 {
-		// Берём всё до найденной подстроки (без ID)
-		return base[:idx+len(search)] // оставляем дефис и ID
+	// Разбиваем по пробелам
+	parts := strings.Fields(base)
+	if len(parts) == 0 {
+		return ""
 	}
-	// Если не нашли, возвращаем как есть
-	return base
+	word := parts[0]
+	// Приводим к нижнему регистру
+	word = strings.ToLower(word)
+	// Оставляем только буквы и цифры (для чистоты)
+	// Но в именах модов обычно нет спецсимволов, можно оставить как есть.
+	return word
 }
 
 // copyFile копирует файл src в dst, перезаписывая существующий.
@@ -447,4 +355,105 @@ func (app *App) isSymlinkFolder(modName string) bool {
 		return false
 	}
 	return info.Mode()&os.ModeSymlink != 0
+}
+
+func (app *App) fixHubHotkeyMenus() {
+	wrongFolder := filepath.Join(app.cfg.ModsPath, "hub_hotkey_menus-main")
+	correctFolder := filepath.Join(app.cfg.ModsPath, "hub_hotkey_menus")
+	if info, err := os.Stat(wrongFolder); err == nil && info.IsDir() {
+		if _, err := os.Stat(correctFolder); os.IsNotExist(err) {
+			if err := os.Rename(wrongFolder, correctFolder); err == nil {
+				app.appendLog(app.messages["log_fix_hub_hk_menus"])
+			} else {
+				app.appendLog(fmt.Sprintf(app.messages["log_failed_fix_hub_hk_menus"], err))
+			}
+		}
+	}
+}
+
+func extractModIDFromKey(key string) int {
+	parts := strings.SplitN(key, ":", 2)
+	if len(parts) == 2 {
+		id, err := strconv.Atoi(parts[0])
+		if err == nil {
+			return id
+		}
+	}
+	return 0
+}
+
+// detectPatcherTypeWithRoot определяет тип патчера по переданному корню игры.
+func detectPatcherTypeWithRoot(gameRoot string) PatcherType {
+	if gameRoot == "" {
+		return PatcherNone
+	}
+	if _, err := os.Stat(filepath.Join(gameRoot, "toggle_dt_mod_autopatch.cmd")); err == nil {
+		return PatcherAutoPatch
+	}
+	if _, err := os.Stat(filepath.Join(gameRoot, "binaries", "plugins", "_dt_mod_autopatch.dll")); err == nil {
+		return PatcherAutoPatch
+	}
+	if _, err := os.Stat(filepath.Join(gameRoot, "tools", "dtkit-patch")); err == nil {
+		return PatcherLegacy
+	}
+	if _, err := os.Stat(filepath.Join(gameRoot, "toggle_darktide_mods.bat")); err == nil {
+		return PatcherLegacy
+	}
+	return PatcherNone
+}
+
+// isModsEnabledAutoPatch теперь принимает gameRoot.
+func isModsEnabledAutoPatch(gameRoot string) bool {
+	if gameRoot == "" {
+		return false
+	}
+	_, err := os.Stat(filepath.Join(gameRoot, "DISABLE_AUTOPATCHER"))
+	return os.IsNotExist(err)
+}
+
+// toggleModsAutoPatch теперь принимает gameRoot.
+func toggleModsAutoPatch(gameRoot string) error {
+	if gameRoot == "" {
+		return fmt.Errorf("game root not found")
+	}
+	if isModsEnabledAutoPatch(gameRoot) {
+		f, _ := os.Create(filepath.Join(gameRoot, "DISABLE_AUTOPATCHER"))
+		if f != nil {
+			f.Close()
+		}
+		bak := filepath.Join(gameRoot, "bundle", "bundle_database.data.bak")
+		original := filepath.Join(gameRoot, "bundle", "bundle_database.data")
+		if _, err := os.Stat(bak); err == nil {
+			os.Rename(bak, original)
+		}
+	} else {
+		os.Remove(filepath.Join(gameRoot, "DISABLE_AUTOPATCHER"))
+	}
+	return nil
+}
+
+// toggleModsLegacy теперь принимает gameRoot.
+func toggleModsLegacy(gameRoot string) error {
+	if gameRoot == "" {
+		return fmt.Errorf("%s", errGameRootNotFound)
+	}
+	bat := filepath.Join(gameRoot, "toggle_darktide_mods.bat")
+	if _, err := os.Stat(bat); err != nil {
+		dtkit := filepath.Join(gameRoot, "tools", "dtkit-patch")
+		if _, err := os.Stat(dtkit); err == nil {
+			cmd := exec.Command(dtkit, "--toggle", "bundle")
+			return cmd.Run()
+		}
+		return fmt.Errorf("no supported patcher found")
+	}
+	cmd := exec.Command(bat)
+	return cmd.Run()
+}
+
+// closeApp безопасно закрывает главное окно и завершает программу.
+func (app *App) closeApp() {
+	fyne.Do(func() {
+		app.mainWindow.Close()
+	})
+	os.Exit(0)
 }

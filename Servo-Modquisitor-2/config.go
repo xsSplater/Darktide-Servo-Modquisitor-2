@@ -11,7 +11,7 @@ import (
 // ───────────── Программа ─────────────────────────────────────────
 const (
 	AppName         = "Servo-Modquisitor-2"
-	AppVersion      = "2.0.3"
+	AppVersion      = "2.5.0"
 	AppID           = "com.xssplater.servo-modquisitor"
 	AppIcon         = "assets/icon.png"
 	СonfigFolderSMQ = "Servo-Modquisitor"
@@ -44,6 +44,9 @@ const (
 	NexusV1Filess     = "https://api.nexusmods.com/v1/games/warhammer40kdarktide/mods/%s/files/%s.json"
 	NexusV1DownLink   = "https://api.nexusmods.com/v1/games/warhammer40kdarktide/mods/%s/files/%s/download_link.json"
 	NexusModIDLink    = "https://www.nexusmods.com/warhammer40kdarktide/mods/%d"
+
+	MaxModsID      = 1500
+	MaxModsID_less = 1501
 )
 
 // ───────────── Файлы ─────────────────────────────────────────────
@@ -96,10 +99,13 @@ const (
 	DDMMYYYY_TimeFormat = "02-01-2006"
 )
 
-// ───────────── Окно программы ────────────────────────────────────
+// ───────────── Окна программы ────────────────────────────────────
 const (
-	MainWindowWidth  float32 = 900
-	MainWindowHeight float32 = 700
+	MainWindowWidth  float32 = 1666
+	MainWindowHeight float32 = 777
+
+	AMLWindowWidth  float32 = 1666
+	AMLWindowHeight float32 = 777
 )
 
 // ───────────── Панели ────────────────────────────────────────────
@@ -118,7 +124,7 @@ const (
 	ConsoleGradientOpacity = 0.4 // 1.00 - невидимый, 0 - видимый
 )
 
-// ───────────── Таблица ───────────────────────────────────────────
+// ───────────── Таблицы ───────────────────────────────────────────
 const (
 	TableColumnCount = 7
 
@@ -129,6 +135,9 @@ const (
 	ColDateWidth     float32 = 100
 	ColStatusWidth   float32 = 120
 	ColNoteWidth     float32 = 510
+
+	ModNameWidth float32 = 450
+	LABRWidth    float32 = 130
 
 	TableRowHeight    = 6
 	SystemTableHeight = 75
@@ -157,8 +166,9 @@ const (
 	FileDialogWidth  float32 = 800
 	FileDialogHeight float32 = 600
 
-	DialogMinWidth  float32 = 400
-	DialogMinHeight float32 = 300
+	DialogMinWidth     float32 = 400
+	DialogMinHeight    float32 = 300
+	DialogMinHeight200 float32 = 200
 
 	DialogGradientWidth  = 400
 	DialogGradientHeight = 50
@@ -176,8 +186,14 @@ const (
 	DescScrollMinHeight float32 = 250
 )
 
-// ───────────── Поиск ─────────────────────────────────────────────
-const SearchMinWidth = 350
+// ───────────── Поиск и Фильтр ────────────────────────────────────
+const (
+	AMLSearchMinWidth = 600
+	SearchMinWidth    = 350
+
+	AMLFilterMinWidth = 200
+	FilterMinWidth    = 200
+)
 
 // ───────────── Задержки ──────────────────────────────────────────
 const (

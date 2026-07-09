@@ -3,6 +3,7 @@ package main
 
 import (
 	"Servo-Modquisitor/checks"
+	"Servo-Modquisitor/helpers"
 	"Servo-Modquisitor/sorter"
 	"context"
 	"errors"
@@ -36,20 +37,6 @@ func safeJoin(destDir, name string) (string, error) {
 }
 
 func (app *App) refreshModList() {
-	// Фикс для существующей кривой папки hub_hotkey_menus-main
-	wrongFolder := filepath.Join(app.cfg.ModsPath, "hub_hotkey_menus-main")
-	correctFolder := filepath.Join(app.cfg.ModsPath, "hub_hotkey_menus")
-	if info, err := os.Stat(wrongFolder); err == nil && info.IsDir() {
-		if _, err := os.Stat(correctFolder); os.IsNotExist(err) {
-			if err := os.Rename(wrongFolder, correctFolder); err == nil {
-				app.appendLog(app.messages["log_fix_hub_hk_menus"])
-			} else {
-				app.appendLog(fmt.Sprintf(app.messages["log_failed_fix_hub_hk_menus"], err))
-			}
-		}
-	}
-	// Конец фикса hub_hotkey_menus-main
-
 	mods := checks.GetModsInfo(app.cfg.Language, app.cfg.ForceEnglishModNames)
 
 	var sysMods, regMods []checks.ModInfo
@@ -98,7 +85,7 @@ func (app *App) refreshModList() {
 
 	// Цикл для обработки обычных модов (regMods)
 	for i := range regMods {
-		regMods[i].Obsolete = app.containsStr(checks.ObsoleteMods, regMods[i].Name)
+		regMods[i].Obsolete = helpers.ContainsString(checks.ObsoleteMods, regMods[i].Name)
 		regMods[i].Mandatory = checks.IsMandatoryMod(regMods[i].Name)
 		regMods[i].Incompatible = app.checkIncompatible(regMods[i].Name)
 
@@ -148,7 +135,7 @@ func (app *App) refreshModList() {
 			cacheKey = "709:autopatch"
 		default:
 			if regMods[i].URL != "" {
-				modID := extractModIDFromURL(regMods[i].URL)
+				modID := helpers.ExtractModIDFromURL(regMods[i].URL)
 				if modID != 0 {
 					cacheKey = fmt.Sprintf("%d:%s", modID, regMods[i].Name)
 				}
@@ -185,7 +172,7 @@ func (app *App) refreshModList() {
 			cacheKey = "709:autopatch"
 		default:
 			if sysMods[i].URL != "" {
-				modID := extractModIDFromURL(sysMods[i].URL)
+				modID := helpers.ExtractModIDFromURL(sysMods[i].URL)
 				if modID != 0 {
 					cacheKey = fmt.Sprintf("%d:%s", modID, sysMods[i].Name)
 				}
@@ -237,6 +224,45 @@ func (app *App) refreshModList() {
 			app.btnSortChecks.SetText(app.messages["btn_sort_checks"])
 			app.applyTooltip(app.btnSaveOrder, "btn_save_order_tooltip")
 			app.applyTooltip(app.btnSortChecks, "btn_sort_checks_tooltip")
+		}
+	}
+
+	// Установка флага HasUpdate
+	for i := range regMods {
+		mod := &regMods[i]
+		var cacheKey string
+		switch mod.Name {
+		case "dmf":
+			cacheKey = "8:dmf"
+		case "base":
+			cacheKey = "19:base"
+		case "autopatch":
+			cacheKey = "709:autopatch"
+		default:
+			if mod.URL != "" {
+				modID := helpers.ExtractModIDFromURL(mod.URL)
+				if modID != 0 {
+					cacheKey = fmt.Sprintf("%d:%s", modID, mod.Name)
+				}
+			}
+		}
+		if cacheKey != "" {
+			if saved, ok := app.nexusVersionCache[cacheKey]; ok {
+				if latest, ok := app.nexusLatestVersions[cacheKey]; ok {
+					// Сравниваем версии (используем функцию compareVersions из update.go)
+					if compareVersions(latest, saved.Version) > 0 {
+						mod.HasUpdate = true
+					} else {
+						mod.HasUpdate = false
+					}
+				} else {
+					mod.HasUpdate = false
+				}
+			} else {
+				mod.HasUpdate = false
+			}
+		} else {
+			mod.HasUpdate = false
 		}
 	}
 
@@ -305,11 +331,11 @@ func (app *App) removeFromAllMods(name string) {
 func (app *App) toggleGlobalMods() {
 	switch app.patcherType {
 	case PatcherAutoPatch:
-		err := toggleModsAutoPatch()
+		err := toggleModsAutoPatch(app.gameRoot) // передаём gameRoot
 		if err != nil {
 			app.appendLog(fmt.Sprintf(app.messages["log_toggle_fail"], err))
 		} else {
-			app.cfg.ModsGloballyEnabled = isModsEnabledAutoPatch()
+			app.cfg.ModsGloballyEnabled = isModsEnabledAutoPatch(app.gameRoot) // передаём gameRoot
 			state := app.messages["log_mods_enabled"]
 			if !app.cfg.ModsGloballyEnabled {
 				state = app.messages["log_mods_disabled"]
@@ -317,7 +343,7 @@ func (app *App) toggleGlobalMods() {
 			app.appendLog(state + app.messages["log_autopatcher"])
 		}
 	case PatcherLegacy:
-		err := toggleModsLegacy()
+		err := toggleModsLegacy(app.gameRoot) // передаём gameRoot
 		if err != nil {
 			app.appendLog(fmt.Sprintf(app.messages["log_toggle_fail"], err))
 		} else {
@@ -366,13 +392,14 @@ func (app *App) handleDrop(uris []fyne.URI) {
 							return
 						}
 						checks.AutoFixMalformed()
+						app.fixHubHotkeyMenus()
 						app.refreshModList()
 						if installedName != "" {
 							app.selectAndScrollToMod(installedName)
 							// Попробуем извлечь modID из имени файла для автодобавления в базу
 							modID, _, _ := extractVersionAndModIDFromFilename(p)
 							if modID != 0 {
-								go app.autoAddModToDatabase(modID, installedName)
+								go app.autoAddModToDatabase(modID, installedName, filepath.Base(p))
 							}
 							app.orderDirty = true
 							app.updateTableBorder()
@@ -495,7 +522,7 @@ func (app *App) copyFolder(src, dst string) error {
 func (app *App) syncModsEnabledState() {
 	switch app.patcherType {
 	case PatcherAutoPatch:
-		app.cfg.ModsGloballyEnabled = isModsEnabledAutoPatch()
+		app.cfg.ModsGloballyEnabled = isModsEnabledAutoPatch(app.gameRoot)
 	case PatcherLegacy:
 	}
 	saveConfig(app.cfg)
@@ -697,7 +724,20 @@ func (app *App) InstallModFromArchive(archivePath string, activate bool, knownVe
 	// Нормализуем структуру архива
 	if err := app.normalizeArchiveStructure(tmpDir); err != nil {
 		app.appendLog(fmt.Sprintf(app.messages["log_failed_normalize"], err))
-		return "", "", err
+		// Не выходим, т.к. это может быть архив программы или сортировки
+	}
+
+	// Проверяем, не является ли архив программой (ищем Servo-Modquisitor-2.exe)
+	expectedExe := AppName + ".exe"
+	if _, err := os.Stat(filepath.Join(tmpDir, expectedExe)); err == nil {
+		app.appendLog("Program archive detected, updating...")
+		err := app.installProgramFromArchive(tmpDir)
+		if err != nil {
+			app.appendLog(fmt.Sprintf("Program update failed: %v", err))
+			return "", "", err
+		}
+		// После успешного обновления программа перезапустится, поэтому возвращаем успех
+		return "", "", nil
 	}
 
 	// Проверяем, не является ли архив сортировочным (mod_database.json и/или mandatory_obsolete_incompatible_dependencies.json)
@@ -745,14 +785,14 @@ func (app *App) InstallModFromArchive(archivePath string, activate bool, knownVe
 		// Обновляем сортировщик
 		sorter.SetMandatoryOrder(checks.MandatoryOrder)
 		sorter.SetDependencies(convertDeps(checks.Dependencies))
-		var sorterRules []sorter.LoadOrderRule
+		var sorterRules []checks.LoadOrderRule
 		for _, r := range checks.LoadOrderRules {
-			sorterRules = append(sorterRules, sorter.LoadOrderRule{Before: r.Before, After: r.After})
+			sorterRules = append(sorterRules, checks.LoadOrderRule{Before: r.Before, After: r.After})
 		}
 		sorter.SetLoadOrderRules(sorterRules)
+		app.fixHubHotkeyMenus()
 		// Обновляем UI
 		app.refreshModList()
-		app.appendLog(app.messages["log_sorting_files_updated_succ"])
 		// Синхронизируем кэш версий с обновлёнными локальными файлами
 		app.syncVersionCache()
 		app.logVersions()
@@ -815,11 +855,6 @@ func (app *App) InstallModFromArchive(archivePath string, activate bool, knownVe
 		if modName == "binaries" || modName == "mods" {
 			continue
 		}
-		// Защита от случайной установки системных папок
-		// if modName == "base" || modName == "dmf" {
-		// 	app.appendLog(fmt.Sprintf(app.messages["log_skipping_sys_folder"], modName))
-		// 	continue
-		// }
 		// Фикс для hub_hotkey_menus-main
 		if modName == "hub_hotkey_menus-main" {
 			newName := "hub_hotkey_menus"
@@ -839,6 +874,13 @@ func (app *App) InstallModFromArchive(archivePath string, activate bool, knownVe
 			return "", "", err
 		}
 		installedNames = append(installedNames, modName)
+		// Исправляем несоответствие имени папки и .mod файла
+		if newName := checks.TryFixMismatchedModFolder(dest, modName); newName != "" {
+			// Если переименовали, обновляем имя в списке установленных
+			installedNames[len(installedNames)-1] = newName
+			// Также обновляем modName для дальнейшего использования, если нужно
+			modName = newName
+		}
 	}
 
 	if len(installedNames) == 0 {
@@ -851,7 +893,7 @@ func (app *App) InstallModFromArchive(archivePath string, activate bool, knownVe
 	// Сначала попытаемся получить modID из базы данных по имени папки
 	modID := 0
 	if entry := checks.GetModDBEntry(installedName); entry != nil && entry.URL != "" {
-		modID = extractModIDFromURL(entry.URL)
+		modID = helpers.ExtractModIDFromURL(entry.URL)
 	}
 
 	// Определяем версию
@@ -903,7 +945,7 @@ func (app *App) InstallModFromArchive(archivePath string, activate bool, knownVe
 
 	// Автоматически добавляем в базу данных
 	if modID != 0 {
-		go app.autoAddModToDatabase(modID, installedName)
+		go app.autoAddModToDatabase(modID, installedName, filepath.Base(archivePath))
 	}
 
 	return installedName, version, nil
@@ -915,7 +957,7 @@ func (app *App) updateModFromNexus(mod *checks.ModInfo) {
 		app.appendLog(app.messages["update_skipped_no_url"])
 		return
 	}
-	modID := extractModIDFromURL(mod.URL)
+	modID := helpers.ExtractModIDFromURL(mod.URL)
 	if modID == 0 {
 		app.appendLog(fmt.Sprintf(app.messages["cannot_extract_mod_id"], mod.URL))
 		return
@@ -979,7 +1021,7 @@ func (app *App) updateAllModsFromNexus() {
 		if mod.URL == "" || mod.IsSystem {
 			continue
 		}
-		modID := extractModIDFromURL(mod.URL)
+		modID := helpers.ExtractModIDFromURL(mod.URL)
 		if modID == 0 {
 			continue
 		}
@@ -1181,54 +1223,13 @@ func copyPath(src, dst string) error {
 	return os.WriteFile(dst, data, 0644)
 }
 
-func (app *App) updateAutopatcher() {
-	if app.getAuthToken() == "" {
-		app.appendLog(app.messages["nexus_api_key_missing"])
-		return
-	}
-	const autopatchModID = 709
-	app.appendLog(fmt.Sprintf(app.messages["looking_for_latest_file"], autopatchModID))
-	fileInfo, err := app.getLatestFileInfo(autopatchModID)
-	if err != nil {
-		app.appendLog(fmt.Sprintf(app.messages["failed_get_latest_file_id"], err))
-		return
-	}
-
-	modIDStr := fmt.Sprintf("%d", autopatchModID)
-	cacheKey := "709:autopatch"
-	var saved ModVersionInfo
-	if info, exists := app.nexusVersionCache[cacheKey]; exists {
-		saved = info
-	}
-	// Если установлен вручную, пропускаем автоматическое обновление
-	if saved.Source == "manual" {
-		app.appendLog(app.messages["log_autopatcher_manual"])
-		return
-	}
-	if saved.Timestamp != 0 && fileInfo.UploadedTimestamp <= saved.Timestamp {
-		app.appendLog(fmt.Sprintf(app.messages["already_latest"], "Autopatcher", fileInfo.Version))
-		return
-	}
-
-	directURL, filename, err := app.getPremiumDownloadURL(modIDStr, fmt.Sprintf("%d", fileInfo.ID))
-	if err != nil {
-		app.appendLog(fmt.Sprintf(app.messages["failed_get_download_link"], err))
-		return
-	}
-	fyne.Do(func() {
-		app.showAutopatcherDownloadDialog(directURL, filename, fileInfo)
-	})
-}
-
 func (app *App) installAutopatcherFromArchive(archivePath string) error {
 	// Автопатчер устанавливается в корень игры, а не в mods
 	return app.installDMLFromArchive(archivePath) // у него такая же структура установки
 }
 
-// extractVersionAndModIDFromFilename пытается извлечь версию и ID мода из имени файла
-// Паттерн: Название-МодID-Версия-Время.zip
-// Версия может состоять из нескольких частей (например, 1-01, 26.02.08-1).
-// Последняя часть, похожая на Unix timestamp (число из 8-10 цифр), не включается в версию.
+// extractVersionAndModIDFromFilename пытается извлечь версию и ID мода из имени файла.
+// Поддерживает оба формата: старый (с дефисами) и новый (с пробелами).
 func extractVersionAndModIDFromFilename(filename string) (modID int, version string, ok bool) {
 	name := filepath.Base(filename)
 	// Удаляем расширение
@@ -1236,45 +1237,92 @@ func extractVersionAndModIDFromFilename(filename string) (modID int, version str
 	if ext != "" {
 		name = name[:len(name)-len(ext)]
 	}
-	parts := strings.Split(name, "-")
+
+	// Пробуем старый формат (через дефисы)
+	if strings.Contains(name, "-") {
+		parts := strings.Split(name, "-")
+		if len(parts) >= 3 {
+			// Ищем часть, которая является числом (ID)
+			for _, part := range parts {
+				if id, err := strconv.Atoi(part); err == nil && id > 0 && id < MaxModsID_less {
+					modID = id
+					break
+				}
+			}
+			if modID != 0 {
+				// Собираем версию из частей после ID, игнорируя timestamp
+				var versionParts []string
+				foundID := false
+				for _, part := range parts {
+					if !foundID {
+						if id, _ := strconv.Atoi(part); id == modID {
+							foundID = true
+						}
+						continue
+					}
+					// Если часть похожа на timestamp (8-10 цифр) - останавливаемся
+					if isNumeric(part) && len(part) >= 8 && len(part) <= 10 {
+						break
+					}
+					versionParts = append(versionParts, part)
+				}
+				if len(versionParts) > 0 {
+					version = strings.Join(versionParts, ".")
+					version = strings.Trim(version, ".")
+					if version != "" {
+						return modID, version, true
+					}
+				}
+			}
+		}
+	}
+
+	// Новый формат: разбиваем по пробелам
+	parts := strings.Fields(name)
 	if len(parts) < 3 {
 		return 0, "", false
 	}
 
-	// Ищем часть, которая является modID (число от 1 до 9999)
-	modIDIdx := -1
+	// Ищем часть, которая является числом (ID) и не содержит точек
+	var modIDIdx = -1
 	for i, part := range parts {
-		if id, err := strconv.Atoi(part); err == nil && id > 0 && id < 10000 {
-			modID = id
-			modIDIdx = i
-			break
+		if isNumeric(part) {
+			id, _ := strconv.Atoi(part)
+			if id > 0 && id < MaxModsID_less {
+				modID = id
+				modIDIdx = i
+				break
+			}
 		}
 	}
 	if modIDIdx == -1 {
 		return 0, "", false
 	}
 
-	// Собираем версию из частей, следующих за modID, до тех пор, пока не встретим timestamp
+	// Ищем версию: это часть, содержащая точку и цифры, или следующая после ID цифра без точки
 	var versionParts []string
-	for i := modIDIdx + 1; i < len(parts); i++ {
-		part := parts[i]
-		// Если часть выглядит как Unix timestamp (все цифры, длина 8-10) - останавливаемся
-		if isNumeric(part) && len(part) >= 8 && len(part) <= 10 {
-			break
+	for i, part := range parts {
+		if i == modIDIdx {
+			continue
 		}
-		versionParts = append(versionParts, part)
+		// Если часть содержит точку и состоит из цифр и точек
+		if strings.Contains(part, ".") && isNumeric(strings.ReplaceAll(part, ".", "")) {
+			versionParts = append(versionParts, part)
+		}
 	}
-
-	if len(versionParts) == 0 {
-		return modID, "", false
+	if len(versionParts) > 0 {
+		version = strings.Join(versionParts, ".")
+	} else {
+		// Если версия без точки (например, "1"), берём следующую часть после ID
+		for i := modIDIdx + 1; i < len(parts); i++ {
+			if isNumeric(parts[i]) && len(parts[i]) <= 4 {
+				version = parts[i]
+				break
+			}
+		}
 	}
-
-	// Объединяем части версии через точку
-	version = strings.Join(versionParts, ".")
-	// Убираем лишние точки в начале/конце
-	version = strings.Trim(version, ".")
 	if version == "" {
-		return modID, "", false
+		version = "unknown"
 	}
 	return modID, version, true
 }
@@ -1482,5 +1530,87 @@ func (app *App) normalizeArchiveStructure(tmpDir string) error {
 			}
 		}
 	}
+	return nil
+}
+
+// downloadAndInstallSystemMod загружает и устанавливает системный мод.
+func (app *App) downloadAndInstallSystemMod(downloadURL, filename, displayName string, fileInfo *FileInfo, cacheKey string, modID int, installFunc func(string) error, logInstalling, logSuccess, logManual string) {
+	app.appendLog(fmt.Sprintf(app.messages["log_downloading_mod"], displayName))
+	bar := widget.NewProgressBar()
+	lbl := widget.NewLabel(fmt.Sprintf(app.messages["downloading"], filename))
+	content := container.NewVBox(lbl, bar)
+	dlg := dialog.NewCustom(app.messages["download_title"], app.messages["btn_cancel"], content, app.mainWindow)
+	dlg.Show()
+	go func() {
+		dest := filepath.Join(app.cfg.ModsPath, filename)
+		err := app.DownloadFileWithProgress(downloadURL, dest, bar)
+		fyne.Do(func() {
+			dlg.Hide()
+			if err != nil {
+				app.appendLog(fmt.Sprintf(app.messages["download_failed"], err))
+				return
+			}
+			info, e := os.Stat(dest)
+			if e == nil && info.Size() < 100 {
+				app.appendLog(fmt.Sprintf(app.messages["log_error_file_too_small"], info.Size()))
+				os.Remove(dest)
+				return
+			}
+			app.appendLog(logInstalling)
+			if err := installFunc(dest); err != nil {
+				app.appendLog(fmt.Sprintf(app.messages["log_install_failed"], err))
+			} else {
+				if fileInfo != nil {
+					app.nexusVersionCache[cacheKey] = ModVersionInfo{
+						Timestamp: fileInfo.UploadedTimestamp,
+						Version:   fileInfo.Version,
+						Folder:    displayName,
+						Source:    "nexus",
+					}
+					app.saveNexusVersionCache()
+				}
+				app.appendLog(logSuccess)
+			}
+			os.Remove(dest)
+		})
+	}()
+}
+
+// installProgramFromArchive обновляет программу из архива.
+// tmpDir - путь к папке, содержащей новый .exe.
+// Возвращает ошибку или nil.
+func (app *App) installProgramFromArchive(tmpDir string) error {
+	// Ожидаемое имя исполняемого файла
+	expectedExe := AppName + ".exe" // "Servo-Modquisitor-2.exe"
+	newExePath := filepath.Join(tmpDir, expectedExe)
+	if _, err := os.Stat(newExePath); os.IsNotExist(err) {
+		return fmt.Errorf("expected executable %s not found in archive root", expectedExe)
+	}
+
+	// Получаем путь к текущему исполняемому файлу
+	currentExe, err := os.Executable()
+	if err != nil {
+		return fmt.Errorf("cannot locate current executable: %w", err)
+	}
+
+	// Сохраняем информацию о версии (можно оставить "manual" или попытаться извлечь, но для простоты оставляем)
+	app.nexusVersionCache[NexusCacheKeyProgram] = ModVersionInfo{
+		Timestamp: time.Now().Unix(),
+		Version:   "manual",
+		Folder:    "Program",
+		Source:    "manual",
+	}
+	app.saveNexusVersionCache()
+
+	// Копируем новый exe как .new
+	newExeFinal := currentExe + ".new"
+	if err := copyFile(newExePath, newExeFinal); err != nil {
+		return fmt.Errorf("failed to copy new executable: %w", err)
+	}
+
+	app.appendLog(app.messages["log_new_exe_copied"])
+
+	// Запускаем перезапуск
+	replaceAndRestart(currentExe, newExeFinal)
 	return nil
 }

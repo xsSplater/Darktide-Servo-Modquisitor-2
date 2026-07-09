@@ -2,6 +2,8 @@
 package checks
 
 import (
+	"Servo-Modquisitor/helpers"
+
 	"bufio"
 	"bytes"
 	"encoding/json"
@@ -9,7 +11,6 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
-	"strconv"
 	"strings"
 	"time"
 
@@ -30,6 +31,13 @@ var modListDividers = []string{
 	"___GamePlay Improve",
 	"___Game Tools",
 	"___Bug Fix",
+}
+
+var loadOrderHeaderPhrases = []string{
+	"Enter user mod names below, separated by line.",
+	"Order in the list determines the order in which mods are loaded.",
+	"Do not rename a mod's folders.",
+	"You do not need to include 'base' or 'dmf' mod folders.",
 }
 
 var (
@@ -144,6 +152,11 @@ type ModInfo struct {
 	Selected          bool
 	IsSystem          bool
 	VortexDeployed    bool
+	IsSymlink         bool // true, если папка является симлинком
+	MissingFolder     bool // true, если папка отсутствует, но мод есть в списке
+	HasUpdate         bool `json:"-"` // не сохраняем в JSON
+	NexusDownloads    int
+	NexusEndorsements int
 	Author            string
 	Description       string
 	DisplayName       string
@@ -151,15 +164,11 @@ type ModInfo struct {
 	Note              string
 	URL               string
 	GitHubURL         string
-	ModTime           time.Time
 	NexusVersion      string
 	NexusSummary      string
-	NexusDownloads    int
-	NexusEndorsements int
 	NexusPictureURL   string
-	IsSymlink         bool   // true, если папка является симлинком
-	MissingFolder     bool   // true, если папка отсутствует, но мод есть в списке
 	Source            string // "nexus" или "manual"
+	ModTime           time.Time
 }
 
 type ModDBEntry struct {
@@ -241,7 +250,7 @@ func GetModsInfo(lang string, forceEnglish bool) []ModInfo {
 		}
 
 		// Исключение мода Mod List Dividers с разделителями ___System, ___Scoreboard и т.д.
-		if contains(modListDividers, name) {
+		if helpers.ContainsString(modListDividers, name) {
 			mod.Active = true
 			mod.Note = ""
 		}
@@ -272,36 +281,8 @@ func GetModsInfo(lang string, forceEnglish bool) []ModInfo {
 			}
 			if !foundLua {
 				modFilePath := filepath.Join(fullPath, name+".mod")
+				// Проверяем .mod файл уже с учётом возможного переименования
 				if !fileExists(modFilePath) {
-					// Пытаемся исправить несовпадение имени папки и .mod файла
-					newName := tryFixMismatchedModFolder(fullPath, name)
-					if newName != "" {
-						// Обновляем имя мода и путь
-						mod.Name = newName
-						name = newName
-						fullPath = filepath.Join(modsDir, name)
-						modFilePath = filepath.Join(fullPath, name+".mod")
-						// Перечитываем время модификации папки
-						if fi, err := os.Stat(fullPath); err == nil {
-							mod.ModTime = fi.ModTime()
-						}
-						// Возможно, после переименования появился Lua-файл? Проверяем ещё раз
-						luaPaths := []string{
-							filepath.Join(fullPath, name+".lua"),
-							filepath.Join(fullPath, "scripts", "mods", name, name+".lua"),
-						}
-						for _, lp := range luaPaths {
-							if t := getModTimeFromFile(lp); !t.IsZero() {
-								mod.ModTime = t
-								foundLua = true
-								break
-							}
-						}
-					}
-				}
-
-				// Теперь проверяем .mod файл уже с учётом возможного переименования
-				if !fileExists(modFilePath) && !foundLua {
 					mod.Broken = true
 				} else {
 					mod.Broken = false
@@ -383,18 +364,18 @@ func getModTimeFromFile(path string) time.Time {
 	return info.ModTime()
 }
 
-// tryFixMismatchedModFolder проверяет, есть ли в папке ровно один .mod файл,
+// TryFixMismatchedModFolder проверяет, есть ли в папке ровно один .mod файл,
 // имя которого не совпадает с именем папки. Если да - переименовывает папку
 // в имя этого .mod файла (без расширения) и возвращает новое имя папки.
 // Если переименование не удалось или условий нет - возвращает пустую строку.
-func tryFixMismatchedModFolder(folderPath, currentName string) string {
+func TryFixMismatchedModFolder(folderPath, currentName string) string {
 	// Пропускаем папки, которые отключены по именованию
 	if isDisabledByNaming(currentName) {
 		return ""
 	}
 	modFile := findSingleModFile(folderPath)
 	if modFile == "" {
-		return "" // нет .mod файла (или больше одного) - не трогаем
+		return "" // нет .mod файла вообще
 	}
 	expectedName := strings.TrimSuffix(modFile, ".mod")
 	if expectedName == currentName {
@@ -476,6 +457,10 @@ func ReadLoadOrder() []LoadOrderEntry {
 			name = strings.TrimPrefix(line, "-- ")
 		}
 		if name == "" || name == "base" || name == "dmf" {
+			continue
+		}
+		// Игнорируем стандартные строки шапки
+		if helpers.ContainsString(loadOrderHeaderPhrases, name) {
 			continue
 		}
 		// Проверяем, что имя содержит хотя бы одну букву или цифру,
@@ -626,15 +611,6 @@ func CheckInstallation(window fyne.Window) bool {
 	}
 	appendLog((*messages)["step_install"])
 	return true
-}
-
-func contains(slice []string, item string) bool {
-	for _, s := range slice {
-		if s == item {
-			return true
-		}
-	}
-	return false
 }
 
 func askMissing(folder, modAbbr, modName, nexusURL string, window fyne.Window) bool {
@@ -995,22 +971,6 @@ func PickLocalized(tr map[string]string, lang string) string {
 	return ""
 }
 
-// GetIncompatibleDesc возвращает локализованное описание конфликта для пары модов.
-//
-//	func GetIncompatibleDesc(mod1, mod2 string) string {
-//		for _, pair := range IncompatiblePairs {
-//			if (pair.Mod1 == mod1 && pair.Mod2 == mod2) || (pair.Mod1 == mod2 && pair.Mod2 == mod1) {
-//				desc := PickLocalized(pair.Desc, currentLang)
-//
-//	if appendLog != nil {
-//		   appendLog(fmt.Sprintf("DEBUG: GetIncompatibleDesc found desc='%s'", desc))
-//	}
-//
-//				return desc
-//			}
-//		}
-//		return ""
-//	}
 func GetIncompatibleDesc(mod1, mod2 string) string {
 	for _, pair := range IncompatiblePairs {
 		if (pair.Mod1 == mod1 && pair.Mod2 == mod2) || (pair.Mod1 == mod2 && pair.Mod2 == mod1) {
@@ -1103,7 +1063,7 @@ func SaveModDatabase() error {
 		mods = append(mods, *entry)
 	}
 	sort.Slice(mods, func(i, j int) bool {
-		return modIDFromURL(mods[i].URL) < modIDFromURL(mods[j].URL)
+		return helpers.ExtractModIDFromURL(mods[i].URL) < helpers.ExtractModIDFromURL(mods[j].URL)
 	})
 
 	var buf bytes.Buffer
@@ -1141,18 +1101,6 @@ func GetModDBList() []ModDBEntry {
 		list = append(list, *e)
 	}
 	return list
-}
-
-func modIDFromURL(rawURL string) int {
-	parts := strings.Split(strings.TrimRight(rawURL, "/"), "/")
-	if len(parts) < 2 {
-		return 0
-	}
-	id, err := strconv.Atoi(parts[len(parts)-1])
-	if err != nil {
-		return 0
-	}
-	return id
 }
 
 // FolderExistsWithTimeout используется только для критических проверок при старте

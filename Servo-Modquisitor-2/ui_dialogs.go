@@ -3,6 +3,7 @@ package main
 
 import (
 	"Servo-Modquisitor/checks"
+	"Servo-Modquisitor/helpers"
 	"fmt"
 	"image/color"
 	"net/url"
@@ -25,7 +26,7 @@ type dialogButton struct {
 	Callback func()
 }
 
-func (app *App) newModalDialog(dType DialogType, title, message string, buttons []dialogButton) {
+func (app *App) newModalDialog(parentCanvas fyne.Canvas, dType DialogType, title, message string, buttons []dialogButton) {
 	fyne.Do(func() {
 		var gradImg *canvas.Image
 		switch dType {
@@ -63,14 +64,14 @@ func (app *App) newModalDialog(dType DialogType, title, message string, buttons 
 			msgScroll,
 			container.NewCenter(container.NewHBox(btnObjects...)),
 		)
-		popUp = widget.NewModalPopUp(content, app.mainWindow.Canvas())
+		popUp = widget.NewModalPopUp(content, parentCanvas)
 		popUp.Resize(fyne.NewSize(DialogMinWidth, DialogMinHeight))
 		popUp.Show()
 	})
 }
 
 func (app *App) showInfoDialog(title, message string) {
-	app.newModalDialog(DialogTypeInfo, title, message, []dialogButton{
+	app.newModalDialog(app.mainWindow.Canvas(), DialogTypeInfo, title, message, []dialogButton{
 		{Text: app.messages["btn_ok"], Callback: nil},
 	})
 }
@@ -81,16 +82,19 @@ func (app *App) showChoiceDialog(parent fyne.Window, title, message string, opti
 	for i, opt := range options {
 		idx := i
 		buttons[i] = dialogButton{
-			Text:     opt,
-			Callback: func() { resultChan <- idx },
+			Text: opt,
+			Callback: func() {
+				resultChan <- idx
+			},
 		}
 	}
-	app.newModalDialog(DialogTypeWarn, title, message, buttons)
-	return <-resultChan
+	app.newModalDialog(parent.Canvas(), DialogTypeWarn, title, message, buttons)
+	result := <-resultChan
+	return result
 }
 
 func (app *App) showConfirmDialog(title, message, confirmKey, cancelKey string, callback func(bool)) {
-	app.newModalDialog(DialogTypeWarn, title, message, []dialogButton{
+	app.newModalDialog(app.mainWindow.Canvas(), DialogTypeWarn, title, message, []dialogButton{
 		{Text: app.messages[confirmKey], Callback: func() { callback(true) }},
 		{Text: app.messages[cancelKey], Callback: func() { callback(false) }},
 	})
@@ -384,34 +388,7 @@ func (app *App) handleNXMLink(nxmURL string) {
 		return
 	}
 
-	if modID == "139" {
-		go func() {
-			// Получаем информацию о файле, если удастся (не критично)
-			var fileInfo *FileInfo
-			var err error
-			fileInfo, err = app.getFileInfoByID(modID, fileID)
-			if err != nil {
-				app.logNexusError(err, "Special Archive (Mod 139)")
-				return
-			}
-
-			var directURL, filename string
-			if key != "" {
-				directURL, filename, err = app.getFreeDownloadURL(modID, fileID, key, expires)
-			} else {
-				directURL, filename, err = app.getPremiumDownloadURL(modID, fileID)
-			}
-			if err != nil {
-				app.appendLog(fmt.Sprintf(app.messages["failed_get_download_link"], err))
-				return
-			}
-
-			app.handleSpecialNXMArchive(directURL, filename, fileInfo)
-		}()
-		return
-	}
-
-	// === Обычные моды (не 19, 709, 139) ===
+	// === Обычные моды (не 19, 709) ===
 	go func() {
 		var directURL, filename string
 		var err error
@@ -443,165 +420,6 @@ func (app *App) handleNXMLink(nxmURL string) {
 	}()
 }
 
-// handleSpecialNXMArchive обрабатывает скачанный архив программы или правил (мод 139).
-func (app *App) handleSpecialNXMArchive(downloadURL, filename string, fileInfo *FileInfo) {
-	// Создаём временную папку в папке mods (на том же диске, что и программа)
-	tmpDir := filepath.Join(app.cfg.ModsPath, "update_temp")
-	os.RemoveAll(tmpDir)
-	if err := os.MkdirAll(tmpDir, 0755); err != nil {
-		app.appendLog(app.messages["log_update_failed_temp"] + err.Error())
-		return
-	}
-	defer os.RemoveAll(tmpDir)
-
-	archivePath := filepath.Join(tmpDir, filename)
-
-	// Скачиваем с прогресс-баром
-	app.appendLog(app.messages["downloading"] + ": " + filename)
-	bar := widget.NewProgressBar()
-	bar.SetValue(0)
-	lbl := widget.NewLabel(fmt.Sprintf(app.messages["downloading"], filename))
-	content := container.NewVBox(lbl, bar)
-	dlg := dialog.NewCustom(app.messages["downloading"], app.messages["btn_cancel"], content, app.mainWindow)
-	dlg.Show()
-
-	err := app.DownloadFileWithProgress(downloadURL, archivePath, bar)
-	fyne.Do(func() { dlg.Hide() })
-	if err != nil {
-		app.appendLog(app.messages["download_failed_"] + err.Error())
-		return
-	}
-	app.appendLog(app.messages["download_complete_"])
-
-	// Распаковываем во временную папку
-	if err := app.extractArchiveTo(archivePath, tmpDir); err != nil {
-		app.appendLog(app.messages["log_extract_failed"] + err.Error())
-		return
-	}
-	app.appendLog(app.messages["log_extract_success"])
-
-	// Определяем тип архива по содержимому
-	isProgram := false
-	err = filepath.Walk(tmpDir, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		if !info.IsDir() && strings.HasSuffix(strings.ToLower(info.Name()), ".exe") {
-			isProgram = true
-			return filepath.SkipAll
-		}
-		return nil
-	})
-	if err != nil && err != filepath.SkipAll {
-		app.appendLog(app.messages["log_error_scanning_archive"] + err.Error())
-		return
-	}
-
-	if isProgram {
-		// === Обновление программы ===
-		var newExePath string
-		err = filepath.Walk(tmpDir, func(path string, info os.FileInfo, err error) error {
-			if err != nil {
-				return err
-			}
-			if !info.IsDir() && strings.HasSuffix(strings.ToLower(info.Name()), ".exe") {
-				newExePath = path
-				return filepath.SkipAll
-			}
-			return nil
-		})
-		if err != nil || newExePath == "" {
-			app.appendLog(app.messages["log_error_no_executable"])
-			return
-		}
-
-		// Сохраняем информацию об обновлении в кэш с версией из Nexus
-		version := "unknown"
-		if fileInfo != nil && fileInfo.Version != "" {
-			version = fileInfo.Version
-		}
-		timestamp := time.Now().Unix()
-		if fileInfo != nil && fileInfo.UploadedTimestamp > 0 {
-			timestamp = fileInfo.UploadedTimestamp
-		}
-
-		app.nexusVersionCache[NexusCacheKeyProgram] = ModVersionInfo{
-			Timestamp: timestamp,
-			Version:   version,
-			Folder:    "Program",
-			Source:    "nexus",
-		}
-		app.saveNexusVersionCache()
-
-		// Копируем новый exe в папку с программой с именем .new
-		currentExe, err := os.Executable()
-		if err != nil {
-			app.appendLog(app.messages["log_error_cannot_locate_exe"] + err.Error())
-			return
-		}
-		newExeFinal := currentExe + ".new"
-		if err := copyFile(newExePath, newExeFinal); err != nil {
-			app.appendLog(app.messages["log_failed_to_copy_exe"] + err.Error())
-			return
-		}
-
-		// Удаляем временную папку (она больше не нужна)
-		os.RemoveAll(tmpDir)
-
-		app.appendLog(app.messages["log_new_exe_copied"])
-		replaceAndRestart(currentExe, newExeFinal)
-	} else {
-		// === Обновление файлов сортировки ===
-		filesCopied := 0
-		for _, fname := range []string{FileNameModDatabase, FileNameMandatoryRules} {
-			src := filepath.Join(tmpDir, fname)
-			dst := filepath.Join(app.cfg.ModsPath, fname)
-			if _, err := os.Stat(src); err == nil {
-				if err := copyFile(src, dst); err != nil {
-					app.appendLog(app.messages["log_failed_to_copy"] + fname + ": " + err.Error())
-					return
-				}
-				filesCopied++
-			} else {
-				app.appendLog(app.messages["log_warning_"] + fname + app.messages["log_not_found_in_archive"])
-			}
-		}
-		if filesCopied == 0 {
-			app.appendLog(app.messages["log_not_found_in_archive_sorting"])
-			return
-		}
-
-		// Сохраняем информацию об обновлении в кэш с версией из Nexus
-		version := "unknown"
-		if fileInfo != nil && fileInfo.Version != "" {
-			version = fileInfo.Version
-		}
-		timestamp := time.Now().Unix()
-		if fileInfo != nil && fileInfo.UploadedTimestamp > 0 {
-			timestamp = fileInfo.UploadedTimestamp
-		}
-
-		app.nexusVersionCache[NexusCacheKeyRules] = ModVersionInfo{
-			Timestamp: timestamp,
-			Version:   version,
-			Folder:    "Sorting Rules",
-			Source:    "nexus",
-		}
-		app.saveNexusVersionCache()
-
-		// Перезагружаем базы и обновляем UI
-		if err := app.loadModDatabase(FileNameModDatabase); err == nil {
-			checks.SetModDatabase(app.modDatabase)
-		}
-		if err := checks.LoadExternalLists(FileNameMandatoryRules); err == nil {
-			app.cfg.LastMandatoryRulesVersion = checks.GetExternalVersion()
-			saveConfig(app.cfg)
-		}
-		app.refreshModList()
-		app.appendLog(app.messages["log_sorting_files_updated_succ"])
-	}
-}
-
 // Darktide Mod Loader
 func (app *App) updateDML() {
 	if app.getAuthToken() == "" {
@@ -615,8 +433,6 @@ func (app *App) updateDML() {
 		app.appendLog(fmt.Sprintf(app.messages["failed_get_latest_file_id"], err))
 		return
 	}
-
-	modIDStr := fmt.Sprintf("%d", dmlModID)
 	cacheKey := "19:base"
 	var saved ModVersionInfo
 	if info, exists := app.nexusVersionCache[cacheKey]; exists {
@@ -630,15 +446,20 @@ func (app *App) updateDML() {
 		app.appendLog(fmt.Sprintf(app.messages["already_latest"], "DML", fileInfo.Version))
 		return
 	}
-
-	directURL, filename, err := app.getPremiumDownloadURL(modIDStr, fmt.Sprintf("%d", fileInfo.ID))
+	directURL, filename, err := app.getPremiumDownloadURL("19", fmt.Sprintf("%d", fileInfo.ID))
 	if err != nil {
 		app.appendLog(fmt.Sprintf(app.messages["failed_get_download_link"], err))
 		return
 	}
-	fyne.Do(func() {
-		app.showDMLDownloadDialog(directURL, filename, fileInfo)
-	})
+	app.downloadAndInstallSystemMod(
+		directURL, filename,
+		"Darktide Mod Loader",
+		fileInfo, cacheKey, dmlModID,
+		app.installDMLFromArchive,
+		app.messages["installing_dml"],
+		app.messages["dml_updated"],
+		app.messages["log_dml_installed_manual"],
+	)
 }
 
 func (app *App) showDMLDownloadDialog(url, filename string, fileInfo *FileInfo) {
@@ -683,49 +504,6 @@ func (app *App) showDMLDownloadDialog(url, filename string, fileInfo *FileInfo) 
 	}()
 }
 
-// Darktide Mod Autopatcher
-func (app *App) showAutopatcherDownloadDialog(url, filename string, fileInfo *FileInfo) {
-	app.appendLog(fmt.Sprintf(app.messages["log_downloading_mod"], "Darktide Mod Autopatcher"))
-	bar := widget.NewProgressBar()
-	lbl := widget.NewLabel(fmt.Sprintf(app.messages["downloading"], filename))
-	content := container.NewVBox(lbl, bar)
-	dlg := dialog.NewCustom(app.messages["download_title"], app.messages["btn_cancel"], content, app.mainWindow)
-	dlg.Show()
-	go func() {
-		dest := filepath.Join(app.cfg.ModsPath, filename)
-		err := app.DownloadFileWithProgress(url, dest, bar)
-		fyne.Do(func() {
-			dlg.Hide()
-			if err != nil {
-				app.appendLog(fmt.Sprintf(app.messages["download_failed"], err))
-				return
-			}
-			info, e := os.Stat(dest)
-			if e == nil && info.Size() < 100 {
-				app.appendLog(fmt.Sprintf(app.messages["log_error_file_too_small"], info.Size()))
-				os.Remove(dest)
-				return
-			}
-			app.appendLog(app.messages["installing_autopatcher"])
-			if err := app.installAutopatcherFromArchive(dest); err != nil {
-				app.appendLog(fmt.Sprintf(app.messages["dma_install_failed"], err))
-			} else {
-				if fileInfo != nil {
-					app.nexusVersionCache["709:autopatch"] = ModVersionInfo{
-						Timestamp: fileInfo.UploadedTimestamp,
-						Version:   fileInfo.Version,
-						Folder:    "Darktide Autopatch",
-						Source:    "nexus",
-					}
-					app.saveNexusVersionCache()
-				}
-				app.appendLog(app.messages["autopatcher_updated"])
-			}
-			os.Remove(dest)
-		})
-	}()
-}
-
 // Darktide Mod Framework
 func (app *App) updateDMF() {
 	if app.getAuthToken() == "" {
@@ -739,8 +517,6 @@ func (app *App) updateDMF() {
 		app.appendLog(fmt.Sprintf(app.messages["failed_get_latest_file_id"], err))
 		return
 	}
-
-	modIDStr := fmt.Sprintf("%d", dmfModID)
 	cacheKey := "8:dmf"
 	var saved ModVersionInfo
 	if info, exists := app.nexusVersionCache[cacheKey]; exists {
@@ -754,15 +530,20 @@ func (app *App) updateDMF() {
 		app.appendLog(fmt.Sprintf(app.messages["already_latest"], "DMF", fileInfo.Version))
 		return
 	}
-
-	directURL, filename, err := app.getPremiumDownloadURL(modIDStr, fmt.Sprintf("%d", fileInfo.ID))
+	directURL, filename, err := app.getPremiumDownloadURL("8", fmt.Sprintf("%d", fileInfo.ID))
 	if err != nil {
 		app.appendLog(fmt.Sprintf(app.messages["failed_get_download_link"], err))
 		return
 	}
-	fyne.Do(func() {
-		app.showDMFDownloadDialog(directURL, filename, fileInfo)
-	})
+	app.downloadAndInstallSystemMod(
+		directURL, filename,
+		"Darktide Mod Framework",
+		fileInfo, cacheKey, dmfModID,
+		app.installDMLFromArchive,
+		app.messages["installing_dmf"],
+		app.messages["log_dmf_updated_succ"],
+		app.messages["log_dmf_installed_manual"],
+	)
 }
 
 func (app *App) showDMFDownloadDialog(url, filename string, fileInfo *FileInfo) {
@@ -806,6 +587,90 @@ func (app *App) showDMFDownloadDialog(url, filename string, fileInfo *FileInfo) 
 	}()
 }
 
+// Darktide Mod Autopatcher
+func (app *App) updateAutopatcher() {
+	if app.getAuthToken() == "" {
+		app.appendLog(app.messages["nexus_api_key_missing"])
+		return
+	}
+	const autopatchModID = 709
+	app.appendLog(fmt.Sprintf(app.messages["looking_for_latest_file"], autopatchModID))
+	fileInfo, err := app.getLatestFileInfo(autopatchModID)
+	if err != nil {
+		app.appendLog(fmt.Sprintf(app.messages["failed_get_latest_file_id"], err))
+		return
+	}
+	cacheKey := "709:autopatch"
+	var saved ModVersionInfo
+	if info, exists := app.nexusVersionCache[cacheKey]; exists {
+		saved = info
+	}
+	if saved.Source == "manual" {
+		app.appendLog(app.messages["log_autopatcher_manual"])
+		return
+	}
+	if saved.Timestamp != 0 && fileInfo.UploadedTimestamp <= saved.Timestamp {
+		app.appendLog(fmt.Sprintf(app.messages["already_latest"], "Autopatcher", fileInfo.Version))
+		return
+	}
+	directURL, filename, err := app.getPremiumDownloadURL("709", fmt.Sprintf("%d", fileInfo.ID))
+	if err != nil {
+		app.appendLog(fmt.Sprintf(app.messages["failed_get_download_link"], err))
+		return
+	}
+	app.downloadAndInstallSystemMod(
+		directURL, filename,
+		"Darktide Mod Autopatcher",
+		fileInfo, cacheKey, autopatchModID,
+		app.installDMLFromArchive,
+		app.messages["installing_autopatcher"],
+		app.messages["autopatcher_updated"],
+		app.messages["log_autopatcher_manual"],
+	)
+}
+
+func (app *App) showAutopatcherDownloadDialog(url, filename string, fileInfo *FileInfo) {
+	app.appendLog(fmt.Sprintf(app.messages["log_downloading_mod"], "Darktide Mod Autopatcher"))
+	bar := widget.NewProgressBar()
+	lbl := widget.NewLabel(fmt.Sprintf(app.messages["downloading"], filename))
+	content := container.NewVBox(lbl, bar)
+	dlg := dialog.NewCustom(app.messages["download_title"], app.messages["btn_cancel"], content, app.mainWindow)
+	dlg.Show()
+	go func() {
+		dest := filepath.Join(app.cfg.ModsPath, filename)
+		err := app.DownloadFileWithProgress(url, dest, bar)
+		fyne.Do(func() {
+			dlg.Hide()
+			if err != nil {
+				app.appendLog(fmt.Sprintf(app.messages["download_failed"], err))
+				return
+			}
+			info, e := os.Stat(dest)
+			if e == nil && info.Size() < 100 {
+				app.appendLog(fmt.Sprintf(app.messages["log_error_file_too_small"], info.Size()))
+				os.Remove(dest)
+				return
+			}
+			app.appendLog(app.messages["installing_autopatcher"])
+			if err := app.installAutopatcherFromArchive(dest); err != nil {
+				app.appendLog(fmt.Sprintf(app.messages["dma_install_failed"], err))
+			} else {
+				if fileInfo != nil {
+					app.nexusVersionCache["709:autopatch"] = ModVersionInfo{
+						Timestamp: fileInfo.UploadedTimestamp,
+						Version:   fileInfo.Version,
+						Folder:    "Darktide Autopatch",
+						Source:    "nexus",
+					}
+					app.saveNexusVersionCache()
+				}
+				app.appendLog(app.messages["autopatcher_updated"])
+			}
+			os.Remove(dest)
+		})
+	}()
+}
+
 func (app *App) showEditVersionDialog(mod *checks.ModInfo) {
 	// Определяем ключ кэша
 	var cacheKey string
@@ -818,7 +683,7 @@ func (app *App) showEditVersionDialog(mod *checks.ModInfo) {
 		cacheKey = "709:autopatch"
 	default:
 		if mod.URL != "" {
-			modID := extractModIDFromURL(mod.URL)
+			modID := helpers.ExtractModIDFromURL(mod.URL)
 			if modID != 0 {
 				cacheKey = fmt.Sprintf("%d:%s", modID, mod.Name)
 			}

@@ -5,14 +5,22 @@ package themes
 // Их значения задаются в тёмной и светлой теме.
 const (
 	// Статусы модов
-	ColorStatusSystem    = "color-status-system"
-	ColorStatusBroken    = "color-status-broken"
-	ColorStatusConflict  = "color-status-conflict"
-	ColorStatusObsolete  = "color-status-obsolete"
-	ColorStatusMandatory = "color-status-mandatory"
-	ColorStatusActive    = "color-status-active"
-	ColorStatusInactive  = "color-status-inactive"
-	ColorStatusVortex    = "color-status-vortex"
+	ColorStatusSystem       = "color-status-system"
+	ColorStatusBroken       = "color-status-broken"
+	ColorStatusConflict     = "color-status-conflict"
+	ColorStatusObsolete     = "color-status-obsolete"
+	ColorStatusMandatory    = "color-status-mandatory"
+	ColorStatusActive       = "color-status-active"
+	ColorStatusInactive     = "color-status-inactive"
+	ColorStatusVortex       = "color-status-vortex"
+	ColorStatusMissing      = "color-status-missing"
+	ColorStatusSymlink      = "color-status-symlink"
+	ColorStatusManual       = "color-status-manual"
+	ColorStatusNexus        = "color-status-nexus"
+	ColorTableObsoleteMod   = "color-status-obsolete-mod"
+	ColorTableHasUpdateMod  = "color-status-hasupdate-mod"
+	ColorTableMissingFolder = "color-status-missing-folder"
+	ColorStatusSymlinkBg    = "color-status-symlink-bg"
 
 	// Таблица
 	ColorTableRowEven     = "color-table-row-even"
@@ -22,10 +30,6 @@ const (
 	ColorTableBorderDirty = "color-table-border-dirty"
 	ColorTableHeaderBg    = "color-table-header-bg"
 	ColorSystemTableBg    = "color-system-table-bg"
-	ColorStatusMissing    = "color-status-missing"
-	ColorStatusSymlink    = "color-status-symlink"
-	ColorStatusManual     = "color-status-manual"
-	ColorStatusNexus      = "color-status-nexus"
 
 	// CRT-консоль
 	ColorConsoleText     = "color-console-text"

@@ -3,6 +3,7 @@ package main
 
 import (
 	"Servo-Modquisitor/checks"
+	"Servo-Modquisitor/helpers"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -12,7 +13,6 @@ import (
 	"os"
 	"regexp"
 	"sort"
-	"strconv"
 	"strings"
 	"time"
 
@@ -75,19 +75,6 @@ func (app *App) FetchNexusModInfo(modID int, apiKey string) (*NexusModInfo, erro
 	return &info, nil
 }
 
-// extractModIDFromURL пытается извлечь числовой ID из ссылки Nexus Mods.
-func extractModIDFromURL(rawURL string) int {
-	parts := strings.Split(strings.TrimRight(rawURL, "/"), "/")
-	if len(parts) < 2 {
-		return 0
-	}
-	id, err := strconv.Atoi(parts[len(parts)-1])
-	if err != nil {
-		return 0
-	}
-	return id
-}
-
 // DownloadFileWithProgress скачивает файл и обновляет прогресс‑бар.
 func (app *App) DownloadFileWithProgress(url, destPath string, bar *widget.ProgressBar) error {
 	req, _ := http.NewRequest("GET", url, nil)
@@ -148,7 +135,7 @@ func (app *App) checkNexusUpdates() {
 		if mod.URL == "" {
 			continue
 		}
-		modID := extractModIDFromURL(mod.URL)
+		modID := helpers.ExtractModIDFromURL(mod.URL)
 		if modID == 0 {
 			continue
 		}
@@ -168,6 +155,8 @@ func (app *App) checkNexusUpdates() {
 
 		modIDStr := fmt.Sprintf("%d", modID)
 		cacheKey := modIDStr + ":" + mod.Name
+		app.nexusLatestVersions[cacheKey] = fileInfo.Version
+
 		saved, exists := app.nexusVersionCache[cacheKey]
 
 		// Если нет записи в кэше - пропускаем (не создаём автоматически)
@@ -201,6 +190,9 @@ func (app *App) checkNexusUpdates() {
 	}
 	app.checkSpecialUpdates()
 	app.appendLog(app.messages["log_update_check_completed"])
+	fyne.Do(func() {
+		app.refreshModList()
+	})
 }
 
 // getPremiumDownloadURL - для Premium-пользователей (key и expires не нужны).
@@ -541,11 +533,13 @@ func cleanDescription(desc string) string {
 // autoAddModToDatabase добавляет информацию о моде в базу mod_database.json,
 // если её там ещё нет, или дополняет отсутствующие поля.
 func (app *App) autoAddModToDatabase(modID int, folderName string, fileName ...string) {
-	// Игнорируем системные папки, которые не являются модами
+	if modID == 0 || modID > MaxModsID {
+		return
+	}
+	// Игнорируем системные папки
 	if folderName == "binaries" || folderName == "bundle" || folderName == "tools" || folderName == "mods" {
 		return
 	}
-	// Проверяем, есть ли уже запись в памяти
 	existing := checks.GetModDBEntry(folderName)
 	needUpdate := existing == nil
 	if existing != nil {
@@ -557,37 +551,43 @@ func (app *App) autoAddModToDatabase(modID int, folderName string, fileName ...s
 		}
 	}
 	if !needUpdate {
-		return // всё уже есть
+		return
 	}
 
-	// Получаем данные с Nexus
 	info, err := app.FetchNexusModInfo(modID, app.getAuthToken())
 	if err != nil {
 		app.logNexusError(err, folderName)
 		return
 	}
 
-	// Создаём или обновляем запись
 	var entry checks.ModDBEntry
 	if existing != nil {
-		entry = *existing // копируем существующие данные
+		entry = *existing
 	} else {
 		entry = checks.ModDBEntry{
 			Folder: folderName,
 			URL:    fmt.Sprintf(NexusModIDLink, modID),
 		}
 	}
-	// Если передан fileName и в базе ещё нет nexus_file_pattern — заполняем
+
+	// Извлекаем паттерн из имени файла, если передан
+	pattern := ""
 	if len(fileName) > 0 && fileName[0] != "" {
-		if entry.NexusFilePattern == "" {
-			// Вместо полного имени файла, сохраняем обрезанный стабильный паттерн
-			pattern := makeStablePattern(fileName[0], modID)
-			entry.NexusFilePattern = pattern
-			app.appendLog(fmt.Sprintf(app.messages["log_autosaved_stable_pattern"], folderName, pattern))
+		pattern = extractPatternFromFilename(fileName[0])
+	}
+	if pattern == "" {
+		// fallback: используем первое слово из folderName
+		parts := strings.Fields(folderName)
+		if len(parts) > 0 {
+			pattern = strings.ToLower(parts[0])
 		}
 	}
+	if pattern != "" {
+		entry.NexusFilePattern = pattern
+		app.appendLog(fmt.Sprintf(app.messages["log_autosaved_stable_pattern"], folderName, pattern))
+	}
 
-	// Заполняем переводами
+	// Инициализируем карты, если nil
 	if entry.Name == nil {
 		entry.Name = make(map[string]string)
 	}
@@ -597,7 +597,11 @@ func (app *App) autoAddModToDatabase(modID int, folderName string, fileName ...s
 	if entry.Note == nil {
 		entry.Note = make(map[string]string)
 	}
-	// Устанавливаем английские значения только если они пустые
+
+	// Список всех языковых ключей
+	langKeys := []string{"en", "ru", "de", "es", "fr", "it", "ja", "ko", "pl", "pt-BR", "zh-hans", "zh-hant"}
+
+	// Заполняем английский, если пусто
 	if entry.Name["en"] == "" {
 		entry.Name["en"] = info.Name
 	}
@@ -607,29 +611,26 @@ func (app *App) autoAddModToDatabase(modID int, folderName string, fileName ...s
 	if entry.Author == "" {
 		entry.Author = info.Author
 	}
-	// Гарантируем наличие ключа "ru" (пустого)
-	if entry.Name["ru"] == "" {
-		entry.Name["ru"] = ""
-	}
-	if entry.Description["ru"] == "" {
-		entry.Description["ru"] = ""
-	}
-	// Гарантируем наличие ключа "en"
-	if _, ok := entry.Note["en"]; !ok {
-		entry.Note["en"] = ""
-	}
-	// Гарантируем наличие ключа "ru"
-	if _, ok := entry.Note["ru"]; !ok {
-		entry.Note["ru"] = ""
+
+	// Гарантируем наличие всех языковых ключей (пустых)
+	for _, lang := range langKeys {
+		if _, ok := entry.Name[lang]; !ok {
+			entry.Name[lang] = ""
+		}
+		if _, ok := entry.Description[lang]; !ok {
+			entry.Description[lang] = ""
+		}
+		if _, ok := entry.Note[lang]; !ok {
+			entry.Note[lang] = ""
+		}
 	}
 
-	// Обновляем память и сохраняем
+	// Сохраняем
 	checks.UpdateModDBEntry(entry)
 	if err := checks.SaveModDatabase(); err != nil {
 		app.appendLog(fmt.Sprintf(app.messages["log_failed_to_save_mod_db"], err))
 	} else {
 		app.appendLog(fmt.Sprintf(app.messages["log_mod_db_updated"], folderName))
-		// Перечитываем базу, чтобы UI увидел изменения
 		app.modDatabase = checks.GetModDBList()
 		checks.SetModDatabase(app.modDatabase)
 		app.refreshModList()

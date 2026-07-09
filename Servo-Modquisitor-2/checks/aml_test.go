@@ -76,8 +76,8 @@ func TestWriteAMLConfigReplaceInsertClear(t *testing.T) {
 
 	cfg := ReadAMLConfig("testmod")
 	cfg.LoadAfter = []string{"weapon_customization"} // replace existing array
-	cfg.LoadBefore = []string{"some_hud_mod"}         // insert new key (was absent)
-	cfg.Require = nil                                  // clear existing -> `require = {}`
+	cfg.LoadBefore = []string{"some_hud_mod"}        // insert new key (was absent)
+	cfg.Require = nil                                // clear existing -> `require = {}`
 
 	if err := WriteAMLConfig(cfg); err != nil {
 		t.Fatalf("WriteAMLConfig: %v", err)

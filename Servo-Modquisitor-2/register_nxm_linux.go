@@ -10,36 +10,25 @@ import (
 )
 
 func registerNXMProtocol(exePath string) error {
-	homeDir, err := os.UserHomeDir()
-	if err != nil {
-		return err
-	}
+	homeDir, _ := os.UserHomeDir()
+	desktopFile := filepath.Join(homeDir, ".local", "share", "applications", "servo-modquisitor.desktop")
 
-	desktopDir := filepath.Join(homeDir, ".local", "share", "applications")
-	if err := os.MkdirAll(desktopDir, 0755); err != nil {
-		return err
-	}
-
-	desktopFile := filepath.Join(desktopDir, "servo-modquisitor.desktop")
-
+	// Экранируем путь кавычками, чтобы корректно обрабатывать пробелы
 	content := fmt.Sprintf(`[Desktop Entry]
 Name=Servo-Modquisitor
 Comment=Darktide mod manager
-Exec=%s --nxm %%u
+Exec="%s" --nxm %%u
 Type=Application
 Terminal=false
 MimeType=x-scheme-handler/nxm;
 `, exePath)
 
-	if err := os.WriteFile(desktopFile, []byte(content), 0644); err != nil {
+	if err := os.WriteFile(desktopFile, []byte(content), 0755); err != nil {
 		return err
 	}
 
 	// Регистрируем MIME-тип
-	_ = exec.Command("xdg-mime", "default", "servo-modquisitor.desktop", "x-scheme-handler/nxm").Run()
-
-	// Обновляем базу desktop-файлов
-	_ = exec.Command("update-desktop-database", desktopDir).Run()
+	exec.Command("xdg-mime", "default", "servo-modquisitor.desktop", "x-scheme-handler/nxm").Run()
 
 	return nil
 }

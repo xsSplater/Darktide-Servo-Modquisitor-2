@@ -2,6 +2,8 @@
 package sorter
 
 import (
+	"Servo-Modquisitor/checks"
+	
 	"bufio"
 	"container/heap"
 	"fmt"
@@ -9,17 +11,12 @@ import (
 	"strings"
 )
 
-type LoadOrderRule struct {
-	Before string
-	After  string
-}
-
 var (
 	folderExists    func(string) bool
 	listModFolders  func() []string
 	logFunc         func(string)
 	mandatoryOrder  []string
-	loadOrderRules  []LoadOrderRule
+	loadOrderRules  []checks.LoadOrderRule
 	dependencies    []ModDependency
 	sortWarningRu   string
 	sortWarningEn   string
@@ -44,7 +41,7 @@ func SetLogMessages(createMLOT, mlotCreated string) {
 	logCreateMLOT = createMLOT
 	logMLOTCreated = mlotCreated
 }
-func SetLoadOrderRules(rules []LoadOrderRule) {
+func SetLoadOrderRules(rules []checks.LoadOrderRule) {
 	loadOrderRules = rules
 }
 func SetHeaderFunc(fn func(*os.File, string)) {

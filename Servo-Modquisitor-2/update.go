@@ -38,27 +38,11 @@ func (app *App) shouldCheckUpdates() bool {
 	return false
 }
 
-// checkForProgramUpdate - открывает страницу мода на Nexus (ручное обновление).
-func (app *App) checkForProgramUpdate() {
-	u, _ := url.Parse(ServoMQModPage)
-	_ = app.myApp.OpenURL(u)
-	app.appendLog(app.messages["open_download_page"])
-}
-
-// initiateProgramUpdate - открывает страницу мода и предлагает скачать программу через Mod manager download.
-func (app *App) initiateProgramUpdate() {
-	app.appendLog(app.messages["log_open_nexus_page"])
-	u, _ := url.Parse(ServoMQModPage)
-	_ = app.myApp.OpenURL(u)
-	app.appendLog(app.messages["log_please_click_smq_zip"])
-}
-
-// initiateSortFilesUpdate - открывает страницу мода и предлагает скачать файлы сортировки через Mod manager download.
+// initiateSortFilesUpdate - открывает страницу мода и предлагает скачать файлы сортировки
 func (app *App) initiateSortFilesUpdate() {
 	app.appendLog(app.messages["log_open_nexus_page"])
 	u, _ := url.Parse(ServoMQModPage)
 	_ = app.myApp.OpenURL(u)
-	app.appendLog(app.messages["log_please_click_sort_zip"])
 }
 
 // ensureSortFiles - вызывается при старте, если файлы отсутствуют.

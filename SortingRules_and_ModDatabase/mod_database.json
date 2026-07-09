@@ -1,5 +1,5 @@
 {
-	"version": "0.9.96",
+	"version": "1.0.0",
 	"mod_database": [
 		{
 			"folder": "for_the_drip",
@@ -2430,60 +2430,6 @@
 			}
 		},
 		{
-			"folder": "KOREAN_scoreboard",
-			"nexus_file_pattern": "scoreboard",
-			"name": {
-				"en": "Scoreboard (ko-kr)"
-			},
-			"description": {
-				"en": "스코어보드 모드 한글 번역판"
-			},
-			"author": "hgcl2",
-			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/65",
-			"github_url": "",
-			"note": {
-				"de": "",
-				"en": "",
-				"es": "",
-				"fr": "",
-				"it": "",
-				"ja": "",
-				"ko": "",
-				"pl": "",
-				"pt-BR": "",
-				"ru": "",
-				"zh-hans": "",
-				"zh-hant": ""
-			}
-		},
-		{
-			"folder": "KOREAN_ScoreboardAmmos",
-			"nexus_file_pattern": "scoreboard Ammunitions picked",
-			"name": {
-				"en": "Scoreboard Ammunitions picked (ko-kr)"
-			},
-			"description": {
-				"en": "스코어보드 모드 한글 번역판"
-			},
-			"author": "hgcl2",
-			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/65",
-			"github_url": "",
-			"note": {
-				"de": "",
-				"en": "",
-				"es": "",
-				"fr": "",
-				"it": "",
-				"ja": "",
-				"ko": "",
-				"pl": "",
-				"pt-BR": "",
-				"ru": "",
-				"zh-hans": "",
-				"zh-hant": ""
-			}
-		},
-		{
 			"folder": "KOREAN_ScoreboardDamage",
 			"nexus_file_pattern": "scoreboard Damage",
 			"name": {
@@ -2511,10 +2457,64 @@
 			}
 		},
 		{
+			"folder": "KOREAN_scoreboard",
+			"nexus_file_pattern": "scoreboard",
+			"name": {
+				"en": "Scoreboard (ko-kr)"
+			},
+			"description": {
+				"en": "스코어보드 모드 한글 번역판"
+			},
+			"author": "hgcl2",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/65",
+			"github_url": "",
+			"note": {
+				"de": "",
+				"en": "",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			}
+		},
+		{
 			"folder": "KOREAN_scoreboard_enhanced_defense_plugin",
 			"nexus_file_pattern": "scoreboard enhanced defense plugin-65",
 			"name": {
 				"en": "Scoreboard Enhanced Defense Plugin (ko-kr)"
+			},
+			"description": {
+				"en": "스코어보드 모드 한글 번역판"
+			},
+			"author": "hgcl2",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/65",
+			"github_url": "",
+			"note": {
+				"de": "",
+				"en": "",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			}
+		},
+		{
+			"folder": "KOREAN_ScoreboardAmmos",
+			"nexus_file_pattern": "scoreboard Ammunitions picked",
+			"name": {
+				"en": "Scoreboard Ammunitions picked (ko-kr)"
 			},
 			"description": {
 				"en": "스코어보드 모드 한글 번역판"
@@ -3496,7 +3496,7 @@
 			}
 		},
 		{
-			"folder": "FullAuto",
+			"folder": "FullAuto_OLD",
 			"nexus_file_pattern": "full",
 			"name": {
 				"de": "FullAuto",
@@ -4465,6 +4465,55 @@
 			"author": "ItsAlxl",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/111",
 			"github_url": "https://github.com/ItsAlxl/darktide-mods/tree/main/Perspectives",
+			"note": {
+				"de": "",
+				"en": "",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			}
+		},
+		{
+			"folder": "which_book",
+			"nexus_file_pattern": "which",
+			"name": {
+				"de": "",
+				"en": "Distinct Side Mission Icons (aka Which Book)",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"description": {
+				"de": "",
+				"en": "Changes the side mission icons in the mission terminal to be distinguishable.",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"author": "Zombine",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/112",
+			"github_url": "",
 			"note": {
 				"de": "",
 				"en": "",
@@ -11696,18 +11745,37 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/310",
 			"github_url": "",
 			"note": {
-				"de": "Die neueste Version ist falsch gepackt. Sie müssen einen Ordner 'blessings_archive' erstellen und den Archivinhalt dort ablegen.",
-				"en": "The latest version is packaged incorrectly. You need to create a 'blessings_archive' folder and place the archive contents there.",
-				"es": "La última versión está empaquetada incorrectamente. Debe crear una carpeta 'blessings_archive' y colocar el contenido del archivo allí.",
-				"fr": "La dernière version est mal emballée. Vous devez créer un dossier 'blessings_archive' et y placer le contenu de l'archive.",
-				"it": "L'ultima versione è confezionata in modo errato. Devi creare una cartella 'blessings_archive' e inserire lì il contenuto dell'archivio.",
-				"ja": "最新バージョンのパッケージングが正しくありません。'blessings_archive'フォルダを作成し、アーカイブの内容をその中に配置する必要があります。",
-				"ko": "최신 버전이 잘못 패키징되었습니다. 'blessings_archive' 폴더를 만들고 그 안에 아카이브 내용을 넣어야 합니다.",
-				"pl": "Najnowsza wersja jest niepoprawnie spakowana. Musisz utworzyć folder 'blessings_archive' i umieścić tam zawartość archiwum.",
-				"pt-BR": "A versão mais recente está empacotada incorretamente. Você precisa criar uma pasta 'blessings_archive' e colocar o conteúdo do arquivo lá.",
-				"ru": "Последняя версия неправильно упакована. Нужно создать папку «blessings_archive» и в неё положить содержимое архива.",
-				"zh-hans": "最新版本打包不正确。你需要创建一个「blessings_archive」文件夹，并将压缩包内容放入其中。",
-				"zh-hant": "最新版本打包不正確。你需要建立一個「blessings_archive」資料夾，並將壓縮包內容放入其中。"
+				"de": "",
+				"en": "",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			}
+		},
+		{
+			"folder": "scripts",
+			"nexus_file_pattern": "Blessings Archive-310",
+			"name": {
+				"en": "Blessings Archive",
+				"ru": ""
+			},
+			"description": {
+				"en": "Adds a custom screen that displays detailed information about blessings, featuring filters by weapon category and tier (rarity).",
+				"ru": ""
+			},
+			"author": "Klavionik",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/310",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
 			}
 		},
 		{
@@ -12789,55 +12857,6 @@
 			}
 		},
 		{
-			"folder": "PsykerCriticalPerilQuiet_Super_Quiet",
-			"nexus_file_pattern": "quieter",
-			"name": {
-				"de": "Leiserer kritischer Gefahrenhinweis des Psykers",
-				"en": "Quieter Psyker Critical Peril",
-				"es": "Peligro crítico del Psíquico más silencioso",
-				"fr": "Péril critique du Psyker plus silencieux",
-				"it": "Pericolo critico del Psichico più silenzioso",
-				"ja": "より静かなサイカー危機的危険音",
-				"ko": "더 조용한 사이커 위험 경보음",
-				"pl": "Cichsze ostrzeżenie o krytycznym niebezpieczeństwie Psychera",
-				"pt-BR": "Perigo crítico do Psíquico mais silencioso",
-				"ru": "Тише звук критической опасности псайкера",
-				"zh-hans": "更安静的灵能者临界危险音效",
-				"zh-hant": "更安靜的靈能者臨界危險音效"
-			},
-			"description": {
-				"de": "VERALTET!",
-				"en": "OBSOLETE!",
-				"es": "¡OBSOLETO!",
-				"fr": "OBSOLÈTE !",
-				"it": "OBSOLETO!",
-				"ja": "廃止！",
-				"ko": "구식!",
-				"pl": "PRZESTARZAŁY!",
-				"pt-BR": "OBSOLETO!",
-				"ru": "УСТАРЕЛ!",
-				"zh-hans": "已过时！",
-				"zh-hant": "已過時！"
-			},
-			"author": "OrangeKing64",
-			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/333",
-			"github_url": "",
-			"note": {
-				"de": "",
-				"en": "",
-				"es": "",
-				"fr": "",
-				"it": "",
-				"ja": "",
-				"ko": "",
-				"pl": "",
-				"pt-BR": "",
-				"ru": "",
-				"zh-hans": "",
-				"zh-hant": ""
-			}
-		},
-		{
 			"folder": "PsykerCriticalPerilQuiet",
 			"nexus_file_pattern": "quieter",
 			"name": {
@@ -12888,6 +12907,55 @@
 		},
 		{
 			"folder": "PsykerCriticalPerilQuiet_Mute",
+			"nexus_file_pattern": "quieter",
+			"name": {
+				"de": "Leiserer kritischer Gefahrenhinweis des Psykers",
+				"en": "Quieter Psyker Critical Peril",
+				"es": "Peligro crítico del Psíquico más silencioso",
+				"fr": "Péril critique du Psyker plus silencieux",
+				"it": "Pericolo critico del Psichico più silenzioso",
+				"ja": "より静かなサイカー危機的危険音",
+				"ko": "더 조용한 사이커 위험 경보음",
+				"pl": "Cichsze ostrzeżenie o krytycznym niebezpieczeństwie Psychera",
+				"pt-BR": "Perigo crítico do Psíquico mais silencioso",
+				"ru": "Тише звук критической опасности псайкера",
+				"zh-hans": "更安静的灵能者临界危险音效",
+				"zh-hant": "更安靜的靈能者臨界危險音效"
+			},
+			"description": {
+				"de": "VERALTET!",
+				"en": "OBSOLETE!",
+				"es": "¡OBSOLETO!",
+				"fr": "OBSOLÈTE !",
+				"it": "OBSOLETO!",
+				"ja": "廃止！",
+				"ko": "구식!",
+				"pl": "PRZESTARZAŁY!",
+				"pt-BR": "OBSOLETO!",
+				"ru": "УСТАРЕЛ!",
+				"zh-hans": "已过时！",
+				"zh-hant": "已過時！"
+			},
+			"author": "OrangeKing64",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/333",
+			"github_url": "",
+			"note": {
+				"de": "",
+				"en": "",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			}
+		},
+		{
+			"folder": "PsykerCriticalPerilQuiet_Super_Quiet",
 			"nexus_file_pattern": "quieter",
 			"name": {
 				"de": "Leiserer kritischer Gefahrenhinweis des Psykers",
@@ -13656,18 +13724,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/352",
 			"github_url": "",
 			"note": {
-				"de": "Fix in den Kommentaren auf Nexus Mods.",
-				"en": "Fix in the comments on the Nexus Mods.",
-				"es": "Corrección en los comentarios de Nexus Mods.",
-				"fr": "Correctif dans les commentaires sur Nexus Mods.",
-				"it": "Correzione nei commenti su Nexus Mods.",
-				"ja": "Nexus Modsのコメント欄に修正があります。",
-				"ko": "Nexus Mods 댓글에 수정 사항이 있습니다.",
-				"pl": "Poprawka w komentarzach na Nexus Mods.",
-				"pt-BR": "Correção nos comentários do Nexus Mods.",
-				"ru": "Фикс в комментариях на Нексусе.",
-				"zh-hans": "修复方法见 Nexus Mods 评论区。",
-				"zh-hant": "修復方法見 Nexus Mods 評論區。"
+				"de": "",
+				"en": "",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
 			}
 		},
 		{
@@ -13999,18 +14067,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/361",
 			"github_url": "https://github.com/ItsAlxl/darktide-mods/tree/main/GoToMastery",
 			"note": {
-				"de": "Funktioniert. Wurde eine Weile nicht aktualisiert. Kann Abstürze verursachen.",
-				"en": "Works. Hasn't been updated in a while. May cause crashes.",
-				"es": "Funciona. No ha sido actualizado en un tiempo. Puede causar bloqueos.",
-				"fr": "Fonctionne. N'a pas été mis à jour depuis un moment. Peut causer des crashs.",
-				"it": "Funziona. Non è stato aggiornato per un po'. Potrebbe causare crash.",
-				"ja": "動作します。しばらく更新されていません。クラッシュを引き起こす可能性があります。",
-				"ko": "작동합니다. 한동안 업데이트되지 않았습니다. 충돌을 일으킬 수 있습니다.",
-				"pl": "Działa. Od jakiegoś czasu nie był aktualizowany. Może powodować awarie.",
-				"pt-BR": "Funciona. Não é atualizado há algum tempo. Pode causar travamentos.",
-				"ru": "Работает. Давно не обновляется. Может вызывать вылеты.",
-				"zh-hans": "能工作。已有一段时间未更新。可能导致崩溃。",
-				"zh-hant": "能工作。已有一段時間未更新。可能導致崩潰。"
+				"de": "",
+				"en": "",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
 			}
 		},
 		{
@@ -14504,7 +14572,7 @@
 			}
 		},
 		{
-			"folder": "AutoLoot",
+			"folder": "AutoLoot_OLD",
 			"nexus_file_pattern": "auto",
 			"name": {
 				"de": "Automatische Beute",
@@ -17444,70 +17512,21 @@
 			}
 		},
 		{
-			"folder": "___GamePlay Utilities",
-			"nexus_file_pattern": "___GamePlay Utilities-459",
+			"folder": "___Game Tools",
+			"nexus_file_pattern": "___Game Tools-459",
 			"name": {
-				"de": "Mod-Listen-Trennzeichen - GamePlay Utilities",
-				"en": "Mod List Dividers - GamePlay Utilities",
-				"es": "Separadores de lista de mods - GamePlay Utilities",
-				"fr": "Séparateurs de liste de mods - GamePlay Utilities",
-				"it": "Separatori della lista mod - _GamePlay Utilities",
-				"ja": "MODリスト区切り - GamePlay Utilities",
-				"ko": "모드 목록 구분선 - GamePlay Utilities",
-				"pl": "Separatory listy modów - GamePlay Utilities",
-				"pt-BR": "Separadores de lista de mods - GamePlay Utilities",
-				"ru": "Разделители списка модов - GamePlay Utilities",
-				"zh-hans": "模组列表分隔符 - GamePlay Utilities",
-				"zh-hant": "模組列表分隔符 - GamePlay Utilities"
-			},
-			"description": {
-				"de": "Fügt einen Trenner zur linken Liste hinzu. Diese Mod hat keinen Einfluss auf das Spiel.",
-				"en": "This mod adds a divider to the left list. This mod has no effect on the game.",
-				"es": "Añade un separador a la lista izquierda. Este mod no tiene efecto en el juego.",
-				"fr": "Ajoute un séparateur à la liste de gauche. Ce mod n'a aucun effet sur le jeu.",
-				"it": "Aggiunge un separatore all'elenco di sinistra. Questa mod non ha alcun effetto sul gioco.",
-				"ja": "左側のリストに区切りを追加します。このMODはゲームに影響を与えません。",
-				"ko": "왼쪽 목록에 구분선을 추가합니다. 이 모드는 게임에 영향을 미치지 않습니다.",
-				"pl": "Dodaje separator do lewej listy. Ten mod nie ma wpływu na grę.",
-				"pt-BR": "Adiciona um separador à lista esquerda. Este mod não tem efeito no jogo.",
-				"ru": "Разделители списка модов - Добавляет разделитель в левый список. Этот мод не влияет на игру.",
-				"zh-hans": "在左侧列表中添加一个分隔符。此模组对游戏没有影响。",
-				"zh-hant": "在左側列表中添加一個分隔符。此模組對遊戲沒有影響。"
-			},
-			"author": "hgcl2",
-			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/459",
-			"github_url": "",
-			"note": {
-				"de": "",
-				"en": "",
-				"es": "",
-				"fr": "",
-				"it": "",
-				"ja": "",
-				"ko": "",
-				"pl": "",
-				"pt-BR": "",
-				"ru": "",
-				"zh-hans": "",
-				"zh-hant": ""
-			}
-		},
-		{
-			"folder": "___GamePlay Improve",
-			"nexus_file_pattern": "___GamePlay Improve-459",
-			"name": {
-				"de": "Mod-Listen-Trennzeichen - GamePlay Improve",
-				"en": "Mod List Dividers - GamePlay Improve",
-				"es": "Separadores de lista de mods - GamePlay Improve",
-				"fr": "Séparateurs de liste de mods - GamePlay Improve",
-				"it": "Separatori della lista mod - GamePlay Improve",
-				"ja": "MODリスト区切り - GamePlay Improve",
-				"ko": "모드 목록 구분선 - GamePlay Improve",
-				"pl": "Separatory listy modów - GamePlay Improve",
-				"pt-BR": "Separadores de lista de mods - GamePlay Improve",
-				"ru": "Разделители списка модов - GamePlay Improve",
-				"zh-hans": "模组列表分隔符 - GamePlay Improve",
-				"zh-hant": "模組列表分隔符 - GamePlay Improve"
+				"de": "Mod-Listen-Trennzeichen - Game Tools",
+				"en": "Mod List Dividers - Game Tools",
+				"es": "Separadores de lista de mods - Game Tools",
+				"fr": "Séparateurs de liste de mods - Game Tools",
+				"it": "Separatori della lista mod - Game Tools",
+				"ja": "MODリスト区切り - Game Tools",
+				"ko": "모드 목록 구분선 - Game Tools",
+				"pl": "Separatory listy modów - Game Tools",
+				"pt-BR": "Separadores de lista de mods - Game Tools",
+				"ru": "Разделители списка модов - Game Tools",
+				"zh-hans": "模组列表分隔符 - Game Tools",
+				"zh-hant": "模組列表分隔符 - Game Tools"
 			},
 			"description": {
 				"de": "Fügt einen Trenner zur linken Liste hinzu. Diese Mod hat keinen Einfluss auf das Spiel.",
@@ -17591,21 +17610,21 @@
 			}
 		},
 		{
-			"folder": "___Game Tools",
-			"nexus_file_pattern": "___Game Tools-459",
+			"folder": "___System",
+			"nexus_file_pattern": "___System-459",
 			"name": {
-				"de": "Mod-Listen-Trennzeichen - Game Tools",
-				"en": "Mod List Dividers - Game Tools",
-				"es": "Separadores de lista de mods - Game Tools",
-				"fr": "Séparateurs de liste de mods - Game Tools",
-				"it": "Separatori della lista mod - Game Tools",
-				"ja": "MODリスト区切り - Game Tools",
-				"ko": "모드 목록 구분선 - Game Tools",
-				"pl": "Separatory listy modów - Game Tools",
-				"pt-BR": "Separadores de lista de mods - Game Tools",
-				"ru": "Разделители списка модов - Game Tools",
-				"zh-hans": "模组列表分隔符 - Game Tools",
-				"zh-hant": "模組列表分隔符 - Game Tools"
+				"de": "Mod-Listen-Trennzeichen - System",
+				"en": "Mod List Dividers - System",
+				"es": "Separadores de lista de mods - System",
+				"fr": "Séparateurs de liste de mods - System",
+				"it": "Separatori della lista mod - System",
+				"ja": "MODリスト区切り - System",
+				"ko": "모드 목록 구분선 - System",
+				"pl": "Separatory listy modów - System",
+				"pt-BR": "Separadores de lista de mods - System",
+				"ru": "Разделители списка модов - System",
+				"zh-hans": "模组列表分隔符 - System",
+				"zh-hant": "模組列表分隔符 - System"
 			},
 			"description": {
 				"de": "Fügt einen Trenner zur linken Liste hinzu. Diese Mod hat keinen Einfluss auf das Spiel.",
@@ -17689,21 +17708,70 @@
 			}
 		},
 		{
-			"folder": "___System",
-			"nexus_file_pattern": "___System-459",
+			"folder": "___GamePlay Utilities",
+			"nexus_file_pattern": "___GamePlay Utilities-459",
 			"name": {
-				"de": "Mod-Listen-Trennzeichen - System",
-				"en": "Mod List Dividers - System",
-				"es": "Separadores de lista de mods - System",
-				"fr": "Séparateurs de liste de mods - System",
-				"it": "Separatori della lista mod - System",
-				"ja": "MODリスト区切り - System",
-				"ko": "모드 목록 구분선 - System",
-				"pl": "Separatory listy modów - System",
-				"pt-BR": "Separadores de lista de mods - System",
-				"ru": "Разделители списка модов - System",
-				"zh-hans": "模组列表分隔符 - System",
-				"zh-hant": "模組列表分隔符 - System"
+				"de": "Mod-Listen-Trennzeichen - GamePlay Utilities",
+				"en": "Mod List Dividers - GamePlay Utilities",
+				"es": "Separadores de lista de mods - GamePlay Utilities",
+				"fr": "Séparateurs de liste de mods - GamePlay Utilities",
+				"it": "Separatori della lista mod - _GamePlay Utilities",
+				"ja": "MODリスト区切り - GamePlay Utilities",
+				"ko": "모드 목록 구분선 - GamePlay Utilities",
+				"pl": "Separatory listy modów - GamePlay Utilities",
+				"pt-BR": "Separadores de lista de mods - GamePlay Utilities",
+				"ru": "Разделители списка модов - GamePlay Utilities",
+				"zh-hans": "模组列表分隔符 - GamePlay Utilities",
+				"zh-hant": "模組列表分隔符 - GamePlay Utilities"
+			},
+			"description": {
+				"de": "Fügt einen Trenner zur linken Liste hinzu. Diese Mod hat keinen Einfluss auf das Spiel.",
+				"en": "This mod adds a divider to the left list. This mod has no effect on the game.",
+				"es": "Añade un separador a la lista izquierda. Este mod no tiene efecto en el juego.",
+				"fr": "Ajoute un séparateur à la liste de gauche. Ce mod n'a aucun effet sur le jeu.",
+				"it": "Aggiunge un separatore all'elenco di sinistra. Questa mod non ha alcun effetto sul gioco.",
+				"ja": "左側のリストに区切りを追加します。このMODはゲームに影響を与えません。",
+				"ko": "왼쪽 목록에 구분선을 추가합니다. 이 모드는 게임에 영향을 미치지 않습니다.",
+				"pl": "Dodaje separator do lewej listy. Ten mod nie ma wpływu na grę.",
+				"pt-BR": "Adiciona um separador à lista esquerda. Este mod não tem efeito no jogo.",
+				"ru": "Разделители списка модов - Добавляет разделитель в левый список. Этот мод не влияет на игру.",
+				"zh-hans": "在左侧列表中添加一个分隔符。此模组对游戏没有影响。",
+				"zh-hant": "在左側列表中添加一個分隔符。此模組對遊戲沒有影響。"
+			},
+			"author": "hgcl2",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/459",
+			"github_url": "",
+			"note": {
+				"de": "",
+				"en": "",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			}
+		},
+		{
+			"folder": "___GamePlay Improve",
+			"nexus_file_pattern": "___GamePlay Improve-459",
+			"name": {
+				"de": "Mod-Listen-Trennzeichen - GamePlay Improve",
+				"en": "Mod List Dividers - GamePlay Improve",
+				"es": "Separadores de lista de mods - GamePlay Improve",
+				"fr": "Séparateurs de liste de mods - GamePlay Improve",
+				"it": "Separatori della lista mod - GamePlay Improve",
+				"ja": "MODリスト区切り - GamePlay Improve",
+				"ko": "모드 목록 구분선 - GamePlay Improve",
+				"pl": "Separatory listy modów - GamePlay Improve",
+				"pt-BR": "Separadores de lista de mods - GamePlay Improve",
+				"ru": "Разделители списка модов - GamePlay Improve",
+				"zh-hans": "模组列表分隔符 - GamePlay Improve",
+				"zh-hant": "模組列表分隔符 - GamePlay Improve"
 			},
 			"description": {
 				"de": "Fügt einen Trenner zur linken Liste hinzu. Diese Mod hat keinen Einfluss auf das Spiel.",
@@ -18042,11 +18110,11 @@
 			"folder": "LoadScreenDecorationRemover",
 			"nexus_file_pattern": "load",
 			"name": {
-				"en": "Loading Screen Decoration Remover - Hide Load Screen Divider and Next Hint Prompt",
+				"en": "Loading Screen Decoration Remover",
 				"ru": ""
 			},
 			"description": {
-				"en": "Options to hide the hints, divider, and text prompt from loading screens.",
+				"en": "Hide Load Screen Divider and Next Hint Prompt - Options to hide the hints, divider, and text prompt from loading screens.",
 				"ru": ""
 			},
 			"author": "Backup158",
@@ -21823,8 +21891,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/652",
 			"github_url": "",
 			"note": {
+				"de": "",
 				"en": "",
-				"ru": "Не обновляется. Игра может вылетать."
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
 			}
 		},
 		{
@@ -22118,8 +22196,8 @@
 			}
 		},
 		{
-			"folder": "DarktideLocalServer_MINIAUDIO",
-			"nexus_file_pattern": "darktide",
+			"folder": "MiniAudioExample",
+			"nexus_file_pattern": "mini",
 			"name": {
 				"en": "MiniAudioAddon",
 				"ru": ""
@@ -22147,8 +22225,8 @@
 			}
 		},
 		{
-			"folder": "MiniAudioExample",
-			"nexus_file_pattern": "mini",
+			"folder": "DarktideLocalServer_MINIAUDIO",
+			"nexus_file_pattern": "darktide",
 			"name": {
 				"en": "MiniAudioAddon",
 				"ru": ""
@@ -23118,8 +23196,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/705",
 			"github_url": "",
 			"note": {
+				"de": "",
 				"en": "",
-				"ru": ""
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
 			}
 		},
 		{
@@ -25743,14 +25831,14 @@
 			}
 		},
 		{
-			"folder": "valkyrie_dog",
-			"nexus_file_pattern": "valkyrie",
+			"folder": "NoPetsLeftBehind",
+			"nexus_file_pattern": "no",
 			"name": {
-				"en": "No Dog Left Behind",
+				"en": "No Pets Left Behind",
 				"ru": ""
 			},
 			"description": {
-				"en": "Adds your and your allies' Cyber-Mastiffs to the Valkyrie intro before the mission begins",
+				"en": "Adds your and your allies' companions to the Valkyrie intro before the mission begins",
 				"ru": ""
 			},
 			"author": "leer",
@@ -25772,22 +25860,42 @@
 			}
 		},
 		{
-			"folder": "NoPetsLeftBehind",
-			"nexus_file_pattern": "no",
+			"folder": "valkyrie_dog",
+			"nexus_file_pattern": "valkyrie",
 			"name": {
-				"en": "No Pets Left Behind",
+				"en": "No Dog Left Behind",
 				"ru": ""
 			},
 			"description": {
-				"en": "Adds your and your allies' companions to the Valkyrie intro before the mission begins",
-				"ru": ""
+				"de": "VERALTET!",
+				"en": "OBSOLETE!",
+				"es": "¡OBSOLETO!",
+				"fr": "OBSOLÈTE !",
+				"it": "OBSOLETO!",
+				"ja": "廃止！",
+				"ko": "구식!",
+				"pl": "PRZESTARZAŁY!",
+				"pt-BR": "OBSOLETO!",
+				"ru": "УСТАРЕЛ!",
+				"zh-hans": "已过时！",
+				"zh-hant": "已過時！"
 			},
 			"author": "leer",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/828",
 			"github_url": "",
 			"note": {
-				"en": "",
-				"ru": ""
+				"de": "No Pets Left Behind ist die Nachfolger-Mod.",
+				"en": "No Pets Left Behind is a successor mod.",
+				"es": "No Pets Left Behind es el mod sucesor.",
+				"fr": "No Pets Left Behind est le mod successeur.",
+				"it": "No Pets Left Behind è il mod successore.",
+				"ja": "No Pets Left Behind が後継MODです。",
+				"ko": "No Pets Left Behind가 후속 모드입니다.",
+				"pl": "No Pets Left Behind jest modem następczym.",
+				"pt-BR": "No Pets Left Behind é o mod sucessor.",
+				"ru": "No Pets Left Behind - мод-наследник.",
+				"zh-hans": "No Pets Left Behind 是其继承模组。",
+				"zh-hant": "No Pets Left Behind 是其繼承模組。"
 			}
 		},
 		{
@@ -27795,8 +27903,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/906",
 			"github_url": "",
 			"note": {
+				"de": "",
 				"en": "",
-				"ru": ""
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
 			}
 		},
 		{
@@ -27814,8 +27932,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/907",
 			"github_url": "",
 			"note": {
+				"de": "",
 				"en": "",
-				"ru": ""
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
 			}
 		},
 		{
@@ -27833,8 +27961,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/908",
 			"github_url": "",
 			"note": {
+				"de": "",
 				"en": "",
-				"ru": ""
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
 			}
 		},
 		{
@@ -27852,8 +27990,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/909",
 			"github_url": "",
 			"note": {
+				"de": "",
 				"en": "",
-				"ru": ""
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
 			}
 		},
 		{
@@ -27871,8 +28019,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/911",
 			"github_url": "",
 			"note": {
+				"de": "",
 				"en": "",
-				"ru": ""
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
 			}
 		},
 		{
@@ -27890,8 +28048,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/912",
 			"github_url": "",
 			"note": {
+				"de": "",
 				"en": "",
-				"ru": ""
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
 			}
 		},
 		{
@@ -27909,8 +28077,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/913",
 			"github_url": "",
 			"note": {
+				"de": "",
 				"en": "",
-				"ru": ""
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
 			}
 		},
 		{
@@ -27928,8 +28106,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/914",
 			"github_url": "",
 			"note": {
+				"de": "",
 				"en": "",
-				"ru": ""
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
 			}
 		},
 		{
@@ -27947,8 +28135,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/915",
 			"github_url": "",
 			"note": {
+				"de": "",
 				"en": "",
-				"ru": ""
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
 			}
 		},
 		{
@@ -27966,8 +28164,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/916",
 			"github_url": "",
 			"note": {
+				"de": "",
 				"en": "",
-				"ru": ""
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
 			}
 		},
 		{
@@ -27985,8 +28193,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/917",
 			"github_url": "",
 			"note": {
+				"de": "",
 				"en": "",
-				"ru": ""
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
 			}
 		},
 		{
@@ -28024,8 +28242,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/918",
 			"github_url": "",
 			"note": {
+				"de": "",
 				"en": "",
-				"ru": ""
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
 			}
 		},
 		{
@@ -28043,8 +28271,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/919",
 			"github_url": "",
 			"note": {
+				"de": "",
 				"en": "",
-				"ru": ""
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
 			}
 		},
 		{
@@ -28062,8 +28300,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/921",
 			"github_url": "",
 			"note": {
+				"de": "",
 				"en": "",
-				"ru": ""
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
 			}
 		},
 		{
@@ -28081,8 +28329,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/922",
 			"github_url": "",
 			"note": {
+				"de": "",
 				"en": "",
-				"ru": ""
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
 			}
 		},
 		{
@@ -28100,8 +28358,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/924",
 			"github_url": "",
 			"note": {
+				"de": "",
 				"en": "",
-				"ru": ""
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
 			}
 		},
 		{
@@ -28119,8 +28387,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/925",
 			"github_url": "",
 			"note": {
+				"de": "",
 				"en": "",
-				"ru": ""
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
 			}
 		},
 		{
@@ -28138,8 +28416,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/926",
 			"github_url": "",
 			"note": {
+				"de": "",
 				"en": "",
-				"ru": ""
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
 			}
 		},
 		{
@@ -28157,8 +28445,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/927",
 			"github_url": "",
 			"note": {
+				"de": "",
 				"en": "",
-				"ru": ""
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
 			}
 		},
 		{
@@ -28176,8 +28474,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/929",
 			"github_url": "",
 			"note": {
+				"de": "",
 				"en": "",
-				"ru": ""
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
 			}
 		},
 		{
@@ -28195,8 +28503,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/930",
 			"github_url": "",
 			"note": {
+				"de": "",
 				"en": "",
-				"ru": ""
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
 			}
 		},
 		{
@@ -28214,13 +28532,23 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/931",
 			"github_url": "",
 			"note": {
+				"de": "",
 				"en": "",
-				"ru": ""
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
 			}
 		},
 		{
 			"folder": "FpsDoctor",
-			"nexus_file_pattern": "fps",
+			"nexus_file_pattern": "f",
 			"name": {
 				"en": "FPS Doctor",
 				"ru": ""
@@ -28233,8 +28561,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/932",
 			"github_url": "",
 			"note": {
+				"de": "",
 				"en": "",
-				"ru": ""
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
 			}
 		},
 		{
@@ -28252,8 +28590,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/934",
 			"github_url": "",
 			"note": {
+				"de": "",
 				"en": "",
-				"ru": ""
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
 			}
 		},
 		{
@@ -28271,8 +28619,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/935",
 			"github_url": "",
 			"note": {
+				"de": "",
 				"en": "",
-				"ru": ""
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
 			}
 		},
 		{
@@ -28290,8 +28648,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/936",
 			"github_url": "",
 			"note": {
+				"de": "",
 				"en": "",
-				"ru": ""
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
 			}
 		},
 		{
@@ -28358,8 +28726,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/943",
 			"github_url": "",
 			"note": {
+				"de": "",
 				"en": "",
-				"ru": ""
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
 			}
 		},
 		{
@@ -28377,8 +28755,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/944",
 			"github_url": "",
 			"note": {
+				"de": "",
 				"en": "",
-				"ru": ""
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
 			}
 		},
 		{
@@ -28396,8 +28784,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/945",
 			"github_url": "",
 			"note": {
+				"de": "",
 				"en": "",
-				"ru": ""
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
 			}
 		},
 		{
@@ -28415,8 +28813,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/947",
 			"github_url": "",
 			"note": {
+				"de": "",
 				"en": "",
-				"ru": ""
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
 			}
 		},
 		{
@@ -28434,8 +28842,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/948",
 			"github_url": "",
 			"note": {
+				"de": "",
 				"en": "",
-				"ru": ""
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
 			}
 		},
 		{
@@ -28453,8 +28871,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/949",
 			"github_url": "",
 			"note": {
+				"de": "",
 				"en": "",
-				"ru": ""
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
 			}
 		},
 		{
@@ -28472,8 +28900,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/950",
 			"github_url": "",
 			"note": {
+				"de": "",
 				"en": "",
-				"ru": ""
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
 			}
 		},
 		{
@@ -28491,8 +28929,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/951",
 			"github_url": "",
 			"note": {
+				"de": "",
 				"en": "",
-				"ru": ""
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
 			}
 		},
 		{
@@ -28510,8 +28958,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/952",
 			"github_url": "",
 			"note": {
+				"de": "",
 				"en": "",
-				"ru": ""
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
 			}
 		},
 		{
@@ -28529,8 +28987,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/953",
 			"github_url": "",
 			"note": {
+				"de": "",
 				"en": "",
-				"ru": ""
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
 			}
 		},
 		{
@@ -28548,8 +29016,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/954",
 			"github_url": "",
 			"note": {
+				"de": "",
 				"en": "",
-				"ru": ""
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
 			}
 		},
 		{
@@ -28567,8 +29045,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/955",
 			"github_url": "",
 			"note": {
+				"de": "",
 				"en": "",
-				"ru": ""
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
 			}
 		},
 		{
@@ -28586,8 +29074,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/956",
 			"github_url": "",
 			"note": {
+				"de": "",
 				"en": "",
-				"ru": ""
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
 			}
 		},
 		{
@@ -28605,8 +29103,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/959",
 			"github_url": "",
 			"note": {
+				"de": "",
 				"en": "",
-				"ru": ""
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
 			}
 		},
 		{
@@ -28624,8 +29132,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/960",
 			"github_url": "",
 			"note": {
+				"de": "",
 				"en": "",
-				"ru": ""
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
 			}
 		},
 		{
@@ -28643,8 +29161,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/962",
 			"github_url": "",
 			"note": {
+				"de": "",
 				"en": "",
-				"ru": ""
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
 			}
 		},
 		{
@@ -28662,8 +29190,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/963",
 			"github_url": "",
 			"note": {
+				"de": "",
 				"en": "",
-				"ru": ""
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
 			}
 		},
 		{
@@ -28681,8 +29219,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/964",
 			"github_url": "",
 			"note": {
+				"de": "",
 				"en": "",
-				"ru": ""
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
 			}
 		},
 		{
@@ -28700,8 +29248,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/965",
 			"github_url": "",
 			"note": {
+				"de": "",
 				"en": "",
-				"ru": ""
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
 			}
 		},
 		{
@@ -28719,8 +29277,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/966",
 			"github_url": "",
 			"note": {
+				"de": "",
 				"en": "",
-				"ru": ""
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
 			}
 		},
 		{
@@ -28738,8 +29306,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/967",
 			"github_url": "",
 			"note": {
+				"de": "",
 				"en": "",
-				"ru": ""
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
 			}
 		},
 		{
@@ -28757,8 +29335,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/968",
 			"github_url": "",
 			"note": {
+				"de": "",
 				"en": "",
-				"ru": ""
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
 			}
 		},
 		{
@@ -28776,8 +29364,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/969",
 			"github_url": "",
 			"note": {
+				"de": "",
 				"en": "",
-				"ru": ""
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
 			}
 		},
 		{
@@ -28795,8 +29393,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/970",
 			"github_url": "",
 			"note": {
+				"de": "",
 				"en": "",
-				"ru": ""
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
 			}
 		},
 		{
@@ -28814,8 +29422,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/972",
 			"github_url": "",
 			"note": {
+				"de": "",
 				"en": "",
-				"ru": ""
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
 			}
 		},
 		{
@@ -28833,8 +29451,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/973",
 			"github_url": "",
 			"note": {
+				"de": "",
 				"en": "",
-				"ru": ""
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
 			}
 		},
 		{
@@ -28852,8 +29480,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/974",
 			"github_url": "",
 			"note": {
+				"de": "",
 				"en": "",
-				"ru": ""
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
 			}
 		},
 		{
@@ -28871,15 +29509,25 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/975",
 			"github_url": "",
 			"note": {
+				"de": "",
 				"en": "",
-				"ru": ""
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
 			}
 		},
 		{
 			"folder": "CleanKills",
 			"nexus_file_pattern": "clean",
 			"name": {
-				"en": "CleanKills",
+				"en": "Clean Kills",
 				"ru": ""
 			},
 			"description": {
@@ -28890,15 +29538,25 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/979",
 			"github_url": "",
 			"note": {
+				"de": "",
 				"en": "",
-				"ru": ""
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
 			}
 		},
 		{
 			"folder": "ScoreboardAbilityUsage",
 			"nexus_file_pattern": "scoreboard",
 			"name": {
-				"en": "ScoreboardAbilityUsage",
+				"en": "Scoreboard Ability Usage",
 				"ru": ""
 			},
 			"description": {
@@ -28909,8 +29567,1719 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/980",
 			"github_url": "",
 			"note": {
+				"de": "",
+				"en": "",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			}
+		},
+		{
+			"folder": "SlotFix",
+			"nexus_file_pattern": "slot",
+			"name": {
+				"en": "Slot Fix",
+				"ru": ""
+			},
+			"description": {
+				"en": "Standalone mod that fixes a base bug that results in players appearing black or having no slot.",
+				"ru": ""
+			},
+			"author": "indicabunny",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/982",
+			"github_url": "",
+			"note": {
 				"en": "",
 				"ru": ""
+			}
+		},
+		{
+			"folder": "AutoLoot",
+			"nexus_file_pattern": "auto",
+			"name": {
+				"en": "Auto Loot Redux",
+				"ru": ""
+			},
+			"description": {
+				"en": "QoL updates to the AutoLoot mod; by user d3fallt.",
+				"ru": ""
+			},
+			"author": "d3fallt",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/983",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "resized_talents",
+			"nexus_file_pattern": "resized",
+			"name": {
+				"en": "Resized Talents",
+				"ru": ""
+			},
+			"description": {
+				"en": "Resize talent trees with per-class width and height sliders, plus an icon scale slider. Supports all classes including Arbites, Hive Scum, and Skitarii.",
+				"ru": ""
+			},
+			"author": "antisynco",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/984",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "Galvanic Augur",
+			"nexus_file_pattern": "galvanic",
+			"name": {
+				"en": "Galvanic Augur",
+				"ru": ""
+			},
+			"description": {
+				"en": "Adds a visual indicator of the range and targets of the Skitarii Voltaic Emitter",
+				"ru": ""
+			},
+			"author": "wobin",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/986",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "FullAuto",
+			"nexus_file_pattern": "full",
+			"name": {
+				"en": "FullAuto Redux",
+				"ru": ""
+			},
+			"description": {
+				"en": "QoL changes to the FullAuto Mod by user ItsAlxl",
+				"ru": ""
+			},
+			"author": "ItsAlxl",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/988",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "bot_hud_transparency",
+			"nexus_file_pattern": "bot",
+			"name": {
+				"en": "Transparent Bot Hud",
+				"ru": ""
+			},
+			"description": {
+				"en": "Makes hud elements transparent with customizable sliders and options :)",
+				"ru": ""
+			},
+			"author": "indicabunny",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/990",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "easy_server_switcher",
+			"nexus_file_pattern": "easy",
+			"name": {
+				"de": "",
+				"en": "Easy Server Switcher - Unemployment Tide",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"description": {
+				"de": "",
+				"en": "Adds buttons to switch server &amp; PREVENTS game from auto-closing the menu upon pressing play. For people who play in non-peak hours and tired of going through the menus to change servers constantly to find people to play.",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"author": "zrovihr",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/991",
+			"github_url": "",
+			"note": {
+				"de": "",
+				"en": "",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			}
+		},
+		{
+			"folder": "Redshift",
+			"nexus_file_pattern": "redshift",
+			"name": {
+				"en": "Redshift - A Sniper Laser direction indicator",
+				"ru": ""
+			},
+			"description": {
+				"en": "Will indicate the direction of fire of an enemy sniper with a series of moving dotted lines",
+				"ru": ""
+			},
+			"author": "wobin",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/994",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
+			"folder": "Havoc_Web_View",
+			"nexus_file_pattern": "havoc_web_view",
+			"name": {
+				"de": "",
+				"en": "Havoc_Web_View",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"description": {
+				"de": "",
+				"en": "Supports viewing Havoc rooms and detailed talent info, submitting room join requests, and letting hosts accept or reject applications via host mode on the website.",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"author": "afei1",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/995",
+			"github_url": "",
+			"note": {
+				"de": "",
+				"en": "",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			}
+		},
+		{
+			"folder": "WeaponStats",
+			"nexus_file_pattern": "weaponstats",
+			"name": {
+				"de": "",
+				"en": "WeaponStats",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"description": {
+				"de": "",
+				"en": "In-game weapon stats inspector showing damage breakdowns, multipliers, cleave, and armor modifiers for any weapon.",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"author": "thedeathbeam",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/999",
+			"github_url": "",
+			"note": {
+				"de": "",
+				"en": "",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			}
+		},
+		{
+			"folder": "CustomAmmo",
+			"nexus_file_pattern": "custom",
+			"name": {
+				"de": "",
+				"en": "Custom Ammo",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"description": {
+				"de": "",
+				"en": "Change font, show ammo level colours, percent, REAL shots for plasma/lasgun",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"author": "GideonAriphael",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1001",
+			"github_url": "",
+			"note": {
+				"de": "",
+				"en": "",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			}
+		},
+		{
+			"folder": "CopyChat",
+			"nexus_file_pattern": "copy",
+			"name": {
+				"de": "",
+				"en": "Copy Chat",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"description": {
+				"de": "",
+				"en": "Copies the chat including player chat and mod:echo with a hotkey.",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"author": "aftensleuken",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1002",
+			"github_url": "",
+			"note": {
+				"de": "",
+				"en": "",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			}
+		},
+		{
+			"folder": "EmperorsTouch",
+			"nexus_file_pattern": "emperor",
+			"name": {
+				"de": "",
+				"en": "Emperor's Touch",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"description": {
+				"de": "",
+				"en": "Simple Lovense Integration for Darktide",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"author": "augentism",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1003",
+			"github_url": "",
+			"note": {
+				"de": "",
+				"en": "",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			}
+		},
+		{
+			"folder": "presencespoof",
+			"nexus_file_pattern": "presence",
+			"name": {
+				"de": "",
+				"en": "Uninvitable (Presence Spoofer)",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"description": {
+				"de": "",
+				"en": "Since we can't go \"invisible\". The next best option is to tell the Darktide servers you're in a game state where you cannot be invited or joined.",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"author": "tdopz Fviuff",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1005",
+			"github_url": "",
+			"note": {
+				"de": "",
+				"en": "",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			}
+		},
+		{
+			"folder": "ServoSkullCommander",
+			"nexus_file_pattern": "s",
+			"name": {
+				"de": "",
+				"en": "Skitarii_AutoSkull_HealFix_PsykerShieldFix_SmokeFix_SkullCommander",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"description": {
+				"de": "",
+				"en": "Mod allow u fully customize ur servo skulls, and fix enrgy losses by targeting enemies in psyker shield or behind it with noospheric command.",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"author": "Artem228337",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1006",
+			"github_url": "",
+			"note": {
+				"de": "",
+				"en": "",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			}
+		},
+		{
+			"folder": "Vox Medicae",
+			"nexus_file_pattern": "vox",
+			"name": {
+				"de": "",
+				"en": "Vox Medicae - Restore the Medicae Servitor Voice Lines",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"description": {
+				"de": "",
+				"en": "Restores the voicelines to the Medicae Servitor",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"author": "wobin",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1007",
+			"github_url": "",
+			"note": {
+				"de": "",
+				"en": "",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			}
+		},
+		{
+			"folder": "SimpleAssets",
+			"nexus_file_pattern": "simple",
+			"name": {
+				"de": "",
+				"en": "Simple Assets",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"description": {
+				"de": "",
+				"en": "Provides local asset (texture) loading helpers for other mods.",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"author": "deluxghost",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1008",
+			"github_url": "",
+			"note": {
+				"de": "",
+				"en": "",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			}
+		},
+		{
+			"folder": "MechanicusPowerSwordEnhanced",
+			"nexus_file_pattern": "mechanicus",
+			"name": {
+				"de": "",
+				"en": "Mechanicus Power Sword Enhanced",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"description": {
+				"de": "",
+				"en": "Fixes the Mechanicus Power Sword's unresponsive input when out of charges, adds a toggle-based operation mode similar to the Arc Maul, and fixes the special heavy attack sprint interruption bug.",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"author": "shui yu",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1009",
+			"github_url": "",
+			"note": {
+				"de": "",
+				"en": "",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			}
+		},
+		{
+			"folder": "weapon_action_details",
+			"nexus_file_pattern": "weapon",
+			"name": {
+				"de": "",
+				"en": "Weapon Action Details - Hidden Combos and Stats",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"description": {
+				"de": "",
+				"en": "Adds extra weapon details to the weapon Attack Breakdowns screen",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"author": "GideonAriphael",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1010",
+			"github_url": "",
+			"note": {
+				"de": "",
+				"en": "",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			}
+		},
+		{
+			"folder": "TakeAim",
+			"nexus_file_pattern": "take",
+			"name": {
+				"de": "",
+				"en": "Take Aim - Discontinued",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"description": {
+				"de": "",
+				"en": "Aim assist, basically almost an aimbot.",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"author": "ImperialSkoom",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1011",
+			"github_url": "",
+			"note": {
+				"de": "",
+				"en": "",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			}
+		},
+		{
+			"folder": "improved_loading_screens",
+			"nexus_file_pattern": "improved",
+			"name": {
+				"de": "",
+				"en": "Improved Loading Screens",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"description": {
+				"de": "",
+				"en": "Replaces the default loading screens with 40+ rotating wallpapers and tips with the ability to add your own images as well.",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"author": "Ejdan",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1012",
+			"github_url": "",
+			"note": {
+				"de": "",
+				"en": "",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			}
+		},
+		{
+			"folder": "ImprovedMeatGrinder",
+			"nexus_file_pattern": "improved",
+			"name": {
+				"de": "",
+				"en": "Improved Meat Grinder",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"description": {
+				"de": "",
+				"en": "Gives you more control over you Meat Grinder experience with a spawn menu, waves, player tweaks, and armor visuals.",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"author": "Ejdan",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1013",
+			"github_url": "",
+			"note": {
+				"de": "",
+				"en": "",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			}
+		},
+		{
+			"folder": "LuaExec",
+			"nexus_file_pattern": "luaexec",
+			"name": {
+				"de": "",
+				"en": "Darktide CLI",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"description": {
+				"de": "",
+				"en": "A command-line tool for AI agents to execute lua code in Darktide.",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"author": "deluxghost",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1016",
+			"github_url": "",
+			"note": {
+				"de": "",
+				"en": "",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			}
+		},
+		{
+			"folder": "CustomPlayerPanel",
+			"nexus_file_pattern": "customplayerpanel",
+			"name": {
+				"de": "",
+				"en": "Custom Player Panel",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"description": {
+				"de": "",
+				"en": "Fully customise your player panel's layout, health and toughness bars, fonts, colours and dynamic contextual visibility",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"author": "GideonAriphael",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1017",
+			"github_url": "",
+			"note": {
+				"de": "",
+				"en": "",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			}
+		},
+		{
+			"folder": "ForceAllFonts",
+			"nexus_file_pattern": "forceallfonts",
+			"name": {
+				"de": "",
+				"en": "Force All Fonts",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"description": {
+				"de": "",
+				"en": "Force all text in the game to use the font you choose",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"author": "GideonAriphael",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1018",
+			"github_url": "",
+			"note": {
+				"de": "",
+				"en": "",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			}
+		},
+		{
+			"folder": "enemy_outlines",
+			"nexus_file_pattern": "enemy",
+			"name": {
+				"de": "",
+				"en": "Enemy Outlines",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"description": {
+				"de": "",
+				"en": "Outlines elites, specials, and bosses with customisable colours based on their enemy type and line of sight.",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"author": "indicabunny",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1019",
+			"github_url": "",
+			"note": {
+				"de": "",
+				"en": "",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			}
+		},
+		{
+			"folder": "Lingua Imperialis",
+			"nexus_file_pattern": "lingua",
+			"name": {
+				"de": "",
+				"en": "Lingua Imperialis - Live chat translation",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"description": {
+				"de": "",
+				"en": "Translates any other language sent to the chat window to one you specify",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"author": "wobin",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1020",
+			"github_url": "",
+			"note": {
+				"de": "",
+				"en": "",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			}
+		},
+		{
+			"folder": "Disco Inferno",
+			"nexus_file_pattern": "disco",
+			"name": {
+				"de": "",
+				"en": "Disco Inferno - A Purgator Servo Skull Disco Light Modification",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"description": {
+				"de": "",
+				"en": "In an ongoing series to disco light everything, I present Disco Inferno for your heavier metal rocking out",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"author": "wobin",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1021",
+			"github_url": "",
+			"note": {
+				"de": "",
+				"en": "",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			}
+		},
+		{
+			"folder": "strikemap",
+			"nexus_file_pattern": "strikemap",
+			"name": {
+				"de": "",
+				"en": "Strikemap - Minimaps and Fullmaps",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"description": {
+				"de": "",
+				"en": "Strikemap is a mod for Darktide that adds in a fully functional Radar! Showing the map layout, enemy locations, crate spawns, medical stations, and more!",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"author": "HereticEater",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1022",
+			"github_url": "",
+			"note": {
+				"de": "",
+				"en": "",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			}
+		},
+		{
+			"folder": "DodgeFeedback",
+			"nexus_file_pattern": "dodgefeedback",
+			"name": {
+				"de": "",
+				"en": "Dodge Feedback",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"description": {
+				"de": "",
+				"en": "Animated, colored text under your crosshair that calls out your dodges. Configurable colors, size, position, and animation.",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"author": "Ejdan",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1023",
+			"github_url": "",
+			"note": {
+				"de": "",
+				"en": "",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			}
+		},
+		{
+			"folder": "dynamic_settings",
+			"nexus_file_pattern": "dynamic",
+			"name": {
+				"de": "",
+				"en": "Dynamic Mod Settings",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"description": {
+				"de": "",
+				"en": "Plug-and-play utility for mod authors who want to control visibility of settings based on any runtime condition.",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"author": "malevhf",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1024",
+			"github_url": "",
+			"note": {
+				"de": "",
+				"en": "",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			}
+		},
+		{
+			"folder": "dynamic_settings_demo",
+			"nexus_file_pattern": "dynamic",
+			"name": {
+				"de": "",
+				"en": "Dynamic Mod Settings",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"description": {
+				"de": "",
+				"en": "Plug-and-play utility for mod authors who want to control visibility of settings based on any runtime condition.",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"author": "malevhf",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1024",
+			"github_url": "",
+			"note": {
+				"de": "",
+				"en": "",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			}
+		},
+		{
+			"folder": "nanerpeel",
+			"nexus_file_pattern": "nanerpeel",
+			"name": {
+				"de": "",
+				"en": "Naner Peel",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"description": {
+				"de": "",
+				"en": "Plays banana peel sound effect when, and only when, a pox burster trips and falls forwards or is pushed forwards. Not backwards, not pushed mid-lunge. Just when it falls fowards.",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"author": "tdopz",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1025",
+			"github_url": "",
+			"note": {
+				"de": "",
+				"en": "",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			}
+		},
+		{
+			"folder": "CuriosChecker",
+			"nexus_file_pattern": "curios",
+			"name": {
+				"de": "",
+				"en": "Curios Checker",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"description": {
+				"de": "",
+				"en": "Scans every character's Brunt's Armoury rotation and puts a badge on the Character Select portraits whose shop is currently selling a curio worth buying. Hover for the stats and prices, or click the badge to that character's Armoury.",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"author": "Ejdan",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1026",
+			"github_url": "",
+			"note": {
+				"de": "",
+				"en": "",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			}
+		},
+		{
+			"folder": "PartyChatFix",
+			"nexus_file_pattern": "party",
+			"name": {
+				"de": "",
+				"en": "Party Chat Fix",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"description": {
+				"de": "",
+				"en": "Fixes the bug where party (strike team) chat dies when you get back to the Mourningstar after a mission — you're stuck with only the hub channel.",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"author": "friday1956",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1028",
+			"github_url": "",
+			"note": {
+				"de": "",
+				"en": "",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			}
+		},
+		{
+			"folder": "player_voice_popup",
+			"nexus_file_pattern": "player",
+			"name": {
+				"de": "",
+				"en": "Vox Chat",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"description": {
+				"de": "",
+				"en": "Adds a hud element thats like the mission speaker but for teammates when they speak :)",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"author": "indicabunny",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1030",
+			"github_url": "",
+			"note": {
+				"de": "",
+				"en": "",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			}
+		},
+		{
+			"folder": "ImprovedSpeechBubbles",
+			"nexus_file_pattern": "improved",
+			"name": {
+				"de": "",
+				"en": "Improved Speech Bubbles",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"description": {
+				"de": "",
+				"en": "Replaces the default speech bubbles with my improved speech bubbles that show from farther away and during missions.",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"author": "Ejdan",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1031",
+			"github_url": "",
+			"note": {
+				"de": "",
+				"en": "",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			}
+		},
+		{
+			"folder": "ServoSkullDistance",
+			"nexus_file_pattern": "servo",
+			"name": {
+				"de": "",
+				"en": "Servo Skull Distance",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"description": {
+				"de": "",
+				"en": "Move the Skitarii companion servo skull(s) out of your face - especially on ultrawide aspect ratios where it's so close it blocks your peripheral vision. Move all together as a group or each skull individually! Can place the turret gun over your right shoulder, for example.",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"author": "Syatek",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1032",
+			"github_url": "",
+			"note": {
+				"de": "",
+				"en": "",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			}
+		},
+		{
+			"folder": "Hit_Kill_Sounds",
+			"nexus_file_pattern": "hit",
+			"name": {
+				"de": "",
+				"en": "Hit_Kill_Sounds",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"description": {
+				"de": "",
+				"en": "一个暗潮 (Darktide) MOD，可以在命中或击杀敌人时播放来自不同游戏的命中和击杀音效，并显示动态击杀图标。",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"author": "m4a1deathDawn",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1034",
+			"github_url": "",
+			"note": {
+				"de": "",
+				"en": "",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
 			}
 		}
 	]

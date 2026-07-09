@@ -3,6 +3,7 @@ package main
 
 import (
 	"Servo-Modquisitor/checks"
+	"Servo-Modquisitor/helpers"
 	"Servo-Modquisitor/themes"
 	"fmt"
 	"image/color"
@@ -74,6 +75,7 @@ func (v VBoxWithSpacing) MinSize(objects []fyne.CanvasObject) fyne.Size {
 }
 
 func (app *App) buildUI() {
+	// app.fixHubHotkeyMenus()
 	// Лог
 	app.logWindow = widget.NewRichText(
 		&widget.TextSegment{
@@ -161,6 +163,10 @@ func (app *App) buildUI() {
 	app.filterSelect.SetSelected(app.messages["filter_all"])
 	app.filterSelect.OnChanged = func(s string) { app.filterModList() }
 	app.filterLabel = widget.NewLabel(app.messages["filter_label"])
+	// Увеличиваем ширину выпадающего списка фильтра
+	filterSpacer := canvas.NewRectangle(color.Transparent)
+	filterSpacer.SetMinSize(fyne.NewSize(FilterMinWidth, 1))
+	filterSelectWithSize := container.NewStack(filterSpacer, app.filterSelect)
 
 	// Статус-менеджер
 	app.statusLabel = widget.NewLabel("")
@@ -320,6 +326,9 @@ func (app *App) buildUI() {
 	})
 	app.applyTooltip(app.manageBtn, "btn_manage_mods_tooltip")
 
+	app.btnAMLConfig = NewCustomButton(app.messages["btn_aml_config"], func() { app.showAMLConfigWindow() })
+	app.applyTooltip(app.btnAMLConfig, "btn_aml_config_tooltip")
+
 	if btnImgData, _ := embeddedFiles.ReadFile(ButtonBackgroundImage); btnImgData != nil {
 		img := canvas.NewImageFromResource(fyne.NewStaticResource("Yellow_BG_button", btnImgData))
 		img.FillMode = canvas.ImageFillStretch
@@ -331,7 +340,7 @@ func (app *App) buildUI() {
 	}
 
 	moveToGroup := container.NewHBox(app.moveLabel, app.moveToEntry)
-	navigationGroup := container.NewHBox(app.btnUp, app.btnDown, app.moveToTopBtn, app.moveToBottomBtn, app.removeSelectedBtn, app.removeAllBtn)
+	navigationGroup := container.NewHBox(app.btnUp, app.btnDown, app.moveToTopBtn, app.moveToBottomBtn, app.removeSelectedBtn, app.removeAllBtn, app.btnAMLConfig)
 	selectGroup := container.NewHBox(app.selectAllBtn, app.deselectAllBtn, app.enableSelectedBtn, app.disableSelectedBtn)
 	allModsGroup := container.NewHBox(app.enableAllBtn, app.disableAllBtn, app.btnEditVersion)
 
@@ -357,7 +366,7 @@ func (app *App) buildUI() {
 
 	// Верхняя панель
 	app.topPanelBgRect = canvas.NewRectangle(th.Color(themes.ColorTopPanelBg, variant))
-	topPanelContent := container.NewHBox(app.manageBtn, app.filterLabel, app.filterSelect, searchBar, app.btnRefresh, app.btnSaveOrder)
+	topPanelContent := container.NewHBox(app.manageBtn, app.filterLabel, filterSelectWithSize, searchBar, app.btnRefresh, app.btnSaveOrder)
 	topPanelWithBg := container.NewStack(app.topPanelBgRect, topPanelContent)
 
 	// Таблица заголовков
@@ -534,8 +543,16 @@ func (app *App) buildUI() {
 		}
 		if id.Row == int(app.selectedModIndex.Load()) {
 			bgColor = th.Color(themes.ColorTableRowSelected, variant)
+		} else if mod.HasUpdate {
+			bgColor = th.Color(themes.ColorTableHasUpdateMod, variant)
+		} else if mod.Obsolete {
+			bgColor = th.Color(themes.ColorTableObsoleteMod, variant)
+		} else if mod.MissingFolder {
+			bgColor = th.Color(themes.ColorTableMissingFolder, variant)
 		} else if mod.Incompatible {
 			bgColor = th.Color(themes.ColorTableRowConflict, variant)
+		} else if mod.IsSymlink {
+			bgColor = th.Color(themes.ColorStatusSymlinkBg, variant)
 		} else {
 			bgColor = baseBG
 		}
@@ -640,40 +657,45 @@ func (app *App) buildUI() {
 				mainStatusColor = th.Color(themes.ColorStatusInactive, variant)
 			}
 
-			// Дополнительный статус
-			switch {
-			case mod.MissingFolder:
-				subStatusText = app.messages["status_missing_folder"]
-				subStatusColor = th.Color(themes.ColorStatusMissing, variant)
-			case mod.VortexDeployed:
-				subStatusText = app.messages["status_vortex"]
-				subStatusColor = th.Color(themes.ColorStatusVortex, variant)
-			case mod.IsSymlink:
-				subStatusText = app.messages["status_symlink"]
-				subStatusColor = th.Color(themes.ColorStatusSymlink, variant)
-			case mod.IsSystem:
-				subStatusText = app.messages["status_system"]
-				subStatusColor = th.Color(themes.ColorStatusSystem, variant)
-			case mod.Broken:
-				subStatusText = app.messages["desc_broken"]
-				subStatusColor = th.Color(themes.ColorStatusBroken, variant)
-			case mod.Incompatible:
-				subStatusText = app.messages["desc_conflict"]
-				subStatusColor = th.Color(themes.ColorStatusConflict, variant)
-			case mod.Obsolete:
-				subStatusText = app.messages["desc_obsolete"]
-				subStatusColor = th.Color(themes.ColorStatusObsolete, variant)
-			case mod.Mandatory && mod.Active:
-				subStatusText = app.messages["status_mandatory"]
-				subStatusColor = th.Color(themes.ColorStatusMandatory, variant)
-			case mod.Source == "manual":
-				subStatusText = app.messages["status_manual"]
-				subStatusColor = th.Color(themes.ColorStatusManual, variant)
-			case mod.Source == "nexus":
-				subStatusText = app.messages["status_nexus"]
-				subStatusColor = th.Color(themes.ColorStatusNexus, variant)
-			default:
-				subStatusText = ""
+			if mod.HasUpdate {
+				subStatusText = app.messages["status_update_available"]
+				subStatusColor = th.Color(theme.ColorNamePrimary, variant)
+			} else {
+				// Дополнительный статус
+				switch {
+				case mod.MissingFolder:
+					subStatusText = app.messages["status_missing_folder"]
+					subStatusColor = th.Color(themes.ColorStatusMissing, variant)
+				case mod.VortexDeployed:
+					subStatusText = app.messages["status_vortex"]
+					subStatusColor = th.Color(themes.ColorStatusVortex, variant)
+				case mod.IsSymlink:
+					subStatusText = app.messages["status_symlink"]
+					subStatusColor = th.Color(themes.ColorStatusSymlink, variant)
+				case mod.IsSystem:
+					subStatusText = app.messages["status_system"]
+					subStatusColor = th.Color(themes.ColorStatusSystem, variant)
+				case mod.Broken:
+					subStatusText = app.messages["desc_broken"]
+					subStatusColor = th.Color(themes.ColorStatusBroken, variant)
+				case mod.Incompatible:
+					subStatusText = app.messages["desc_conflict"]
+					subStatusColor = th.Color(themes.ColorStatusConflict, variant)
+				case mod.Obsolete:
+					subStatusText = app.messages["desc_obsolete"]
+					subStatusColor = th.Color(themes.ColorStatusObsolete, variant)
+				case mod.Mandatory && mod.Active:
+					subStatusText = app.messages["status_mandatory"]
+					subStatusColor = th.Color(themes.ColorStatusMandatory, variant)
+				case mod.Source == "manual":
+					subStatusText = app.messages["status_manual"]
+					subStatusColor = th.Color(themes.ColorStatusManual, variant)
+				case mod.Source == "nexus":
+					subStatusText = app.messages["status_nexus"]
+					subStatusColor = th.Color(themes.ColorStatusNexus, variant)
+				default:
+					subStatusText = ""
+				}
 			}
 
 			// Создаём вертикальный контейнер
@@ -832,9 +854,6 @@ func (app *App) buildUI() {
 		app.applyTooltip(app.btnSortChecks, "aml_sort_warning_tooltip")
 	}
 
-	app.btnAMLConfig = NewCustomButton(app.messages["btn_aml_config"], func() { app.showAMLConfigWindow() })
-	app.applyTooltip(app.btnAMLConfig, "btn_aml_config_tooltip")
-
 	app.btnInstall = NewCustomButton(app.messages["btn_install"], func() {
 		fd := dialog.NewFileOpen(func(reader fyne.URIReadCloser, err error) {
 			if err == nil && reader != nil {
@@ -984,23 +1003,26 @@ func (app *App) buildUI() {
 			app.appendLog(app.messages["update_no_url"])
 			return
 		}
-		if mod.Name == "base" {
-			app.updateDML()
-			return
-		}
-		if mod.Name == "dmf" {
-			app.updateDMF()
-			return
-		}
-		if mod.Name == "autopatch" {
-			app.updateAutopatcher()
-			return
-		}
-		if mod.IsSystem {
-			app.appendLog(app.messages["log_cannot_update_system"])
-			return
-		}
-		app.updateModFromNexus(mod)
+		// Все длительные операции - в фоновой горутине
+		go func() {
+			if mod.Name == "base" {
+				app.updateDML()
+				return
+			}
+			if mod.Name == "dmf" {
+				app.updateDMF()
+				return
+			}
+			if mod.Name == "autopatch" {
+				app.updateAutopatcher()
+				return
+			}
+			if mod.IsSystem {
+				app.appendLog(app.messages["log_cannot_update_system"])
+				return
+			}
+			app.updateModFromNexus(mod)
+		}()
 	})
 	app.applyTooltip(app.btnUpdateMod, "btn_update_mod_premium_only")
 	app.btnUpdateAll = NewCustomButton(app.messages["btn_update_all"], func() {
@@ -1018,7 +1040,7 @@ func (app *App) buildUI() {
 	}
 
 	topRight := container.NewVBox(
-		container.NewHBox(app.btnSortChecks, app.btnAMLConfig, app.btnInstall, app.btnRemove),
+		container.NewHBox(app.btnSortChecks, app.btnInstall, app.btnRemove),
 		container.NewHBox(app.btnLaunchNormal, app.btnLaunchNoLauncher, app.btnToggle),
 		container.NewHBox(app.btnCheckUpdates, app.btnUpdateMod, app.btnUpdateAll),
 	)
@@ -1088,11 +1110,10 @@ func (app *App) refreshThemeColors() {
 		app.btnSaveOrder, app.btnRefresh, app.btnInstall, app.btnRemove,
 		app.btnUp, app.btnDown, app.btnSortChecks, app.btnToggle,
 		app.btnLaunchNormal, app.btnLaunchNoLauncher,
-		app.moveToTopBtn, app.moveToBottomBtn,
+		app.moveToTopBtn, app.moveToBottomBtn, app.btnAMLConfig,
 		app.selectAllBtn, app.deselectAllBtn, app.enableSelectedBtn,
 		app.disableSelectedBtn, app.enableAllBtn, app.disableAllBtn, app.btnEditVersion,
 		app.manageBtn, app.searchClearBtn, app.removeAllBtn, app.removeSelectedBtn,
-		app.btnAMLConfig,
 	} {
 		if btn != nil {
 			btn.Refresh()
@@ -1173,7 +1194,7 @@ func (app *App) updateDescriptionForMod(name string) {
 			cacheKey = "709:autopatch"
 		default:
 			if mod.URL != "" {
-				modID := extractModIDFromURL(mod.URL)
+				modID := helpers.ExtractModIDFromURL(mod.URL)
 				if modID != 0 {
 					cacheKey = fmt.Sprintf("%d:%s", modID, mod.Name)
 				}
@@ -1201,7 +1222,7 @@ func (app *App) updateDescriptionForMod(name string) {
 			cacheKey = "709:autopatch"
 		default:
 			if mod.URL != "" {
-				modID := extractModIDFromURL(mod.URL)
+				modID := helpers.ExtractModIDFromURL(mod.URL)
 				if modID != 0 {
 					cacheKey = fmt.Sprintf("%d:%s", modID, mod.Name)
 				}
@@ -1288,11 +1309,7 @@ func (app *App) enrichModFromNexus(mod *checks.ModInfo) {
 	if app.getAuthToken() == "" || mod.URL == "" {
 		return
 	}
-	// Проверка на симлинк - не добавляем описания
-	// if app.isSymlinkFolder(mod.Name) {
-	// 	return
-	// }
-	modID := extractModIDFromURL(mod.URL)
+	modID := helpers.ExtractModIDFromURL(mod.URL)
 	if modID == 0 {
 		return
 	}
@@ -1318,11 +1335,13 @@ func (app *App) enrichModFromNexus(mod *checks.ModInfo) {
 		if fileInfo.FileName != "" {
 			entry := checks.GetModDBEntry(mod.Name)
 			if entry != nil && entry.NexusFilePattern == "" {
-				pattern := makeStablePattern(fileInfo.FileName, modID)
-				entry.NexusFilePattern = pattern
-				checks.UpdateModDBEntry(*entry)
-				checks.SaveModDatabase()
-				app.appendLog(fmt.Sprintf(app.messages["log_autosaved_stable_pattern"], mod.Name, pattern))
+				pattern := extractPatternFromFilename(fileInfo.FileName)
+				if pattern != "" {
+					entry.NexusFilePattern = pattern
+					checks.UpdateModDBEntry(*entry)
+					checks.SaveModDatabase()
+					app.appendLog(fmt.Sprintf(app.messages["log_autosaved_stable_pattern"], mod.Name, pattern))
+				}
 			}
 		}
 		fyne.Do(func() {
@@ -1336,7 +1355,7 @@ func (app *App) enrichModFromNexus(mod *checks.ModInfo) {
 func (app *App) updateToggleButtonText(btn *CustomButton) {
 	switch app.patcherType {
 	case PatcherAutoPatch:
-		if isModsEnabledAutoPatch() {
+		if isModsEnabledAutoPatch(app.gameRoot) {
 			btn.SetText(app.messages["btn_disable_mods"])
 		} else {
 			btn.SetText(app.messages["btn_enable_mods"])
@@ -1436,12 +1455,13 @@ func (app *App) filterModList() {
 	}
 
 	predicates := map[string]modFilterFunc{
-		app.messages["filter_all"]:      func(m checks.ModInfo) bool { return true },
-		app.messages["filter_active"]:   func(m checks.ModInfo) bool { return m.Active },
-		app.messages["filter_inactive"]: func(m checks.ModInfo) bool { return !m.Active },
-		app.messages["filter_obsolete"]: func(m checks.ModInfo) bool { return m.Obsolete },
-		app.messages["filter_conflict"]: func(m checks.ModInfo) bool { return m.Incompatible },
-		app.messages["filter_missing"]:  func(m checks.ModInfo) bool { return m.MissingFolder },
+		app.messages["filter_all"]:        func(m checks.ModInfo) bool { return true },
+		app.messages["filter_active"]:     func(m checks.ModInfo) bool { return m.Active },
+		app.messages["filter_inactive"]:   func(m checks.ModInfo) bool { return !m.Active },
+		app.messages["filter_obsolete"]:   func(m checks.ModInfo) bool { return m.Obsolete },
+		app.messages["filter_conflict"]:   func(m checks.ModInfo) bool { return m.Incompatible },
+		app.messages["filter_missing"]:    func(m checks.ModInfo) bool { return m.MissingFolder },
+		app.messages["filter_has_update"]: func(m checks.ModInfo) bool { return m.HasUpdate },
 	}
 	filter := app.filterSelect.Selected
 	if filter == "" {
@@ -1509,6 +1529,7 @@ func (app *App) filterOptions() []string {
 		app.messages["filter_obsolete"],
 		app.messages["filter_conflict"],
 		app.messages["filter_missing"],
+		app.messages["filter_has_update"],
 	}
 }
 

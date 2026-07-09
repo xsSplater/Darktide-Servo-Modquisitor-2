@@ -39,20 +39,41 @@ func (app *App) buildMainMenu() *fyne.MainMenu {
 	langMenu := fyne.NewMenuItem(app.messages["menu_language"], nil)
 	langMenu.ChildMenu = fyne.NewMenu("", langItems...)
 
-	themeDark := fyne.NewMenuItem(app.messages["menu_theme_dark"], func() {
+	// Создаём пункты меню с маркерами
+	themeDark := fyne.NewMenuItem("", func() {
 		app.cfg.Theme = "dark"
 		saveConfig(app.cfg)
 		app.myApp.Settings().SetTheme(&themes.ForcedDarkTheme{})
 		app.refreshThemeColors()
+		app.mainWindow.SetMainMenu(app.buildMainMenu()) // <-- обновляем меню
 	})
-	themeLight := fyne.NewMenuItem(app.messages["menu_theme_light"], func() {
+	themeLight := fyne.NewMenuItem("", func() {
 		app.cfg.Theme = "light"
 		saveConfig(app.cfg)
 		app.myApp.Settings().SetTheme(&themes.ForcedLightTheme{})
 		app.refreshThemeColors()
+		app.mainWindow.SetMainMenu(app.buildMainMenu())
 	})
+	themeHighContrast := fyne.NewMenuItem("", func() {
+		app.cfg.Theme = "highcontrast"
+		saveConfig(app.cfg)
+		app.myApp.Settings().SetTheme(&themes.HighContrastTheme{})
+		app.refreshThemeColors()
+		app.mainWindow.SetMainMenu(app.buildMainMenu())
+	})
+
+	// Устанавливаем текст с маркером
+	markTheme := func(label string, current string, target string) string {
+		if current == target {
+			return "✅ " + label
+		}
+		return "❌ " + label
+	}
+	themeDark.Label = markTheme(app.messages["menu_theme_dark"], app.cfg.Theme, "dark")
+	themeLight.Label = markTheme(app.messages["menu_theme_light"], app.cfg.Theme, "light")
+	themeHighContrast.Label = markTheme(app.messages["menu_theme_highcontrast"], app.cfg.Theme, "highcontrast")
 	themeMenu := fyne.NewMenuItem(app.messages["menu_theme"], nil)
-	themeMenu.ChildMenu = fyne.NewMenu("", themeDark, themeLight)
+	themeMenu.ChildMenu = fyne.NewMenu("", themeDark, themeLight, themeHighContrast)
 
 	dateYYYY := fyne.NewMenuItem(app.messages["menu_date_format_yyyy_mm_dd"], func() {
 		app.cfg.DateFormat = "yyyy-mm-dd"
@@ -140,21 +161,12 @@ func (app *App) buildMainMenu() *fyne.MainMenu {
 	periodicSub := fyne.NewMenuItem(app.messages["menu_periodic_check"], nil)
 	periodicSub.ChildMenu = fyne.NewMenu("", freqItems...)
 
-	// updateProgram := fyne.NewMenuItem(app.messages["menu_update_program"], func() {
-	// 	go app.checkForProgramUpdate() // существующая функция открытия Nexus
-	// })
-	updateProgramAuto := fyne.NewMenuItem(app.messages["menu_update_program"], func() {
-		go app.initiateProgramUpdate()
-	})
-	updateSortFiles := fyne.NewMenuItem(app.messages["menu_update_sort_files"], func() {
+	openSMQNexusPage := fyne.NewMenuItem(app.messages["menu_open_smq_page"], func() {
 		go app.initiateSortFilesUpdate()
 	})
 
 	updatesMenu := fyne.NewMenu(app.messages["menu_updates"],
-		// updateProgram,
-		// fyne.NewMenuItemSeparator(),
-		updateProgramAuto,
-		updateSortFiles,
+		openSMQNexusPage,
 		fyne.NewMenuItemSeparator(),
 		periodicSub,
 	)
@@ -190,6 +202,10 @@ func (app *App) buildMainMenu() *fyne.MainMenu {
 		u, _ := url.Parse(DonateDonationAlertsURL)
 		_ = app.myApp.OpenURL(u)
 	})
+	donateSteamGift := fyne.NewMenuItem(app.messages["menu_steam_gift"], func() {
+		u, _ := url.Parse("https://steamcommunity.com/id/xssplater/")
+		_ = app.myApp.OpenURL(u)
+	})
 	donateCard := fyne.NewMenuItem(app.messages["menu_card"], func() {
 		app.myApp.Clipboard().SetContent(DonateCardNumber)
 		app.tooltipStatus.Show(app.messages["card_copied_tip"])
@@ -199,6 +215,7 @@ func (app *App) buildMainMenu() *fyne.MainMenu {
 	donateMenu := fyne.NewMenu(app.messages["menu_donate"],
 		donateBoosty,
 		donateDonationAlerts,
+		donateSteamGift,
 		donateCard,
 	)
 
@@ -277,7 +294,7 @@ func (app *App) changeLanguage(lang string) {
 	if app.btnSortChecks != nil {
 		app.btnSortChecks.SetText(app.messages["btn_sort_checks"])
 	}
-	if app.btnAMLConfig != nil {
+	if app.btnAMLConfig != nil { // AML
 		app.btnAMLConfig.SetText(app.messages["btn_aml_config"])
 		app.applyTooltip(app.btnAMLConfig, "btn_aml_config_tooltip")
 	}
@@ -332,9 +349,11 @@ func (app *App) changeLanguage(lang string) {
 	// Кнопки удаления модов
 	if app.removeAllBtn != nil {
 		app.removeAllBtn.SetText(app.messages["btn_remove_all_mods"])
+		app.applyTooltip(app.removeAllBtn, "btn_remove_all_tooltip")
 	}
 	if app.removeSelectedBtn != nil {
 		app.removeSelectedBtn.SetText(app.messages["btn_remove_selected"])
+		app.applyTooltip(app.removeSelectedBtn, "btn_remove_selected_tooltip")
 	}
 	// Кнопки запуска
 	app.updateLaunchButtonTexts()
@@ -344,33 +363,29 @@ func (app *App) changeLanguage(lang string) {
 	if app.manageBtn != nil {
 		app.manageBtn.SetText(app.messages["btn_manage_mods"])
 	}
-	// добавить:
 	if app.btnCheckUpdates != nil {
 		app.btnCheckUpdates.SetText(app.messages["btn_check_updates"])
+		app.applyTooltip(app.btnCheckUpdates, "btn_check_updates_tooltip")
 	}
 	if app.btnUpdateMod != nil {
 		app.btnUpdateMod.SetText(app.messages["btn_update_mod"])
+		app.applyTooltip(app.btnUpdateMod, "btn_update_mod_tooltip")
 	}
 	if app.btnUpdateAll != nil {
 		app.btnUpdateAll.SetText(app.messages["btn_update_all"])
+		app.applyTooltip(app.btnUpdateAll, "btn_update_all_tooltip")
 	}
 
 	if app.btnEditVersion != nil {
 		app.btnEditVersion.SetText(app.messages["btn_edit_version"])
+		app.applyTooltip(app.btnEditVersion, "btn_edit_version_tooltip")
 	}
-	app.applyTooltip(app.btnEditVersion, "btn_edit_version_tooltip")
 
 	// Обновляем заголовок консоли
 	if app.logHeaderText != nil {
 		app.logHeaderText.Text = app.messages["log_start0"]
 		app.logHeaderText.Refresh()
 	}
-
-	app.applyTooltip(app.removeSelectedBtn, "btn_remove_selected_tooltip")
-	app.applyTooltip(app.removeAllBtn, "btn_remove_all_tooltip")
-	app.applyTooltip(app.btnCheckUpdates, "btn_check_updates_tooltip")
-	app.applyTooltip(app.btnUpdateMod, "btn_update_mod_tooltip")
-	app.applyTooltip(app.btnUpdateAll, "btn_update_all_tooltip")
 
 	app.reapplyTooltips()
 	app.updateDescriptionForMod(app.selectedModName)
@@ -407,4 +422,5 @@ func (app *App) reapplyTooltips() {
 	app.applyTooltip(app.manageBtn, "btn_manage_mods_tooltip")
 	app.applyTooltip(app.removeAllBtn, "btn_remove_all_tooltip")
 	app.applyTooltip(app.removeSelectedBtn, "btn_remove_selected_tooltip")
+	app.applyTooltip(app.btnAMLConfig, "btn_aml_config_tooltip")
 }
