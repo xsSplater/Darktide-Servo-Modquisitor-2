@@ -52,8 +52,6 @@ func (app *App) FetchNexusModInfo(modID int, apiKey string) (*NexusModInfo, erro
 	// иначе считаем, что это старый API-ключ.
 	if app.cfg.OAuthAccessToken != "" {
 		req.Header.Set("Authorization", "Bearer "+apiKey)
-	} else {
-		req.Header.Set("apikey", apiKey)
 	}
 	req.Header.Set("Application-Name", appName)
 	req.Header.Set("Application-Version", appVersion)
@@ -220,8 +218,6 @@ func (app *App) getPremiumDownloadURL(modID, fileID string) (string, string, err
 	// Авторизация: предпочитаем Bearer, если токен похож на JWT
 	if app.cfg.OAuthAccessToken != "" {
 		req.Header.Set("Authorization", "Bearer "+token)
-	} else {
-		req.Header.Set("apikey", token)
 	}
 
 	req.Header.Set("Application-Name", appName)
@@ -279,8 +275,6 @@ func (app *App) getFreeDownloadURL(modID, fileID, key, expires string) (string, 
 		// Необязательная авторизация (может помочь в некоторых случаях)
 		if app.cfg.OAuthAccessToken != "" {
 			req.Header.Set("Authorization", "Bearer "+token)
-		} else {
-			req.Header.Set("apikey", token)
 		}
 	}
 
@@ -341,8 +335,6 @@ func (app *App) getLatestFileInfo(modID int) (*FileInfo, error) {
 	req, _ := http.NewRequest("GET", url, nil)
 	if app.cfg.OAuthAccessToken != "" {
 		req.Header.Set("Authorization", "Bearer "+token)
-	} else {
-		req.Header.Set("apikey", token)
 	}
 	req.Header.Set("Application-Name", appName)
 	req.Header.Set("Application-Version", appVersion)
@@ -403,8 +395,6 @@ func (app *App) getFileInfoByID(modID, fileID string) (*FileInfo, error) {
 
 	if app.cfg.OAuthAccessToken != "" {
 		req.Header.Set("Authorization", "Bearer "+token)
-	} else {
-		req.Header.Set("apikey", token)
 	}
 	req.Header.Set("Application-Name", appName)
 	req.Header.Set("Application-Version", appVersion)
@@ -450,8 +440,6 @@ func (app *App) getFileInfoByFolderPattern(modID int, folderName string) (*FileI
 	req, _ := http.NewRequest("GET", url, nil)
 	if app.cfg.OAuthAccessToken != "" {
 		req.Header.Set("Authorization", "Bearer "+token)
-	} else {
-		req.Header.Set("apikey", token)
 	}
 	req.Header.Set("Application-Name", appName)
 	req.Header.Set("Application-Version", appVersion)

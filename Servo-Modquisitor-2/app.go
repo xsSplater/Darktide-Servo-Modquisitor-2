@@ -48,7 +48,6 @@ type Config struct {
 	ShowSystemMods            bool      `json:"show_system_mods"`
 	ShowModListAfterSort      bool      `json:"show_mod_list_after_sort"`
 	SuppressAMLWarning        bool      `json:"suppress_aml_warning"` // не предупреждаем об AML
-	NexusAPIKey               string    `json:"nexus_api_key"`
 	OAuthAccessToken          string    `json:"oauth_access_token,omitempty"`
 	OAuthRefreshToken         string    `json:"oauth_refresh_token,omitempty"`
 	OAuthExpiry               time.Time `json:"oauth_expiry,omitempty"`

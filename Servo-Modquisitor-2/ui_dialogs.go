@@ -137,29 +137,6 @@ func (app *App) showChoiceDialogAsync(parent fyne.Window, title, message string,
 	})
 }
 
-func (app *App) requestNexusAPIKey() {
-	if app.cfg.NexusAPIKey != "" {
-		return
-	}
-	fyne.Do(func() {
-		entry := widget.NewEntry()
-		entry.SetPlaceHolder(app.messages["nexus_api_key_placeholder"])
-		var dlg dialog.Dialog
-		content := container.NewVBox(
-			widget.NewLabel(app.messages["nexus_api_key_label"]),
-			entry,
-			widget.NewButton(app.messages["btn_save"], func() {
-				app.cfg.NexusAPIKey = entry.Text
-				saveConfig(app.cfg)
-				app.appendLog(app.messages["nexus_api_key_saved"])
-				dlg.Hide()
-			}),
-		)
-		dlg = dialog.NewCustom(app.messages["nexus_api_key_title"], app.messages["btn_cancel"], content, app.mainWindow)
-		dlg.Show()
-	})
-}
-
 func (app *App) applyTooltip(btn *CustomButton, tipKey string) {
 	tip := ""
 	if tipKey != "" {
@@ -176,59 +153,6 @@ func (app *App) applyTooltip(btn *CustomButton, tipKey string) {
 	btn.OnMouseOut = func() {
 		app.tooltipStatus.HideAfterDelay()
 	}
-}
-
-func (app *App) showNexusAPIKeyDialog() {
-	fyne.Do(func() {
-		entry := widget.NewEntry()
-		entry.SetPlaceHolder(app.messages["nexus_api_key_placeholder"])
-		entry.SetText(app.cfg.NexusAPIKey)
-
-		clearBtn := NewCustomButton("✕", func() {
-			entry.SetText("")
-		})
-		clearBtn.Importance = widget.DangerImportance
-		clearBtn.Hide()
-		entry.OnChanged = func(s string) {
-			if s != "" {
-				clearBtn.Show()
-			} else {
-				clearBtn.Hide()
-			}
-		}
-		entryBox := container.NewBorder(nil, nil, nil, clearBtn, entry)
-
-		var dlg dialog.Dialog
-		var deleteBtn *CustomButton
-		if app.cfg.NexusAPIKey != "" {
-			deleteBtn = NewCustomButton(app.messages["btn_delete_api_key"], func() {
-				app.cfg.NexusAPIKey = ""
-				saveConfig(app.cfg)
-				app.appendLog(app.messages["nexus_api_key_deleted"])
-				dlg.Hide()
-			})
-		}
-
-		var btns []fyne.CanvasObject
-		saveBtn := widget.NewButton(app.messages["btn_save_api"], func() {
-			app.cfg.NexusAPIKey = entry.Text
-			saveConfig(app.cfg)
-			app.appendLog(app.messages["nexus_api_key_saved"])
-			dlg.Hide()
-		})
-		btns = append(btns, saveBtn)
-		if deleteBtn != nil {
-			btns = append(btns, deleteBtn)
-		}
-
-		content := container.NewVBox(
-			widget.NewLabel(app.messages["nexus_api_key_label"]),
-			entryBox,
-			container.NewHBox(btns...),
-		)
-		dlg = dialog.NewCustom(app.messages["nexus_api_key_title"], app.messages["btn_cancel"], content, app.mainWindow)
-		dlg.Show()
-	})
 }
 
 func (app *App) showDownloadDialog(url, filename, modName string, fileInfo *FileInfo, modID string) {

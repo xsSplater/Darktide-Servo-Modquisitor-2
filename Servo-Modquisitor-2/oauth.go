@@ -330,7 +330,7 @@ func (app *App) getAuthToken() string {
 		saveConfig(app.cfg)
 		fyne.Do(func() { app.mainWindow.SetMainMenu(app.buildMainMenu()) })
 	}
-	return app.cfg.NexusAPIKey
+	return ""
 }
 
 func (app *App) logoutOAuth() {

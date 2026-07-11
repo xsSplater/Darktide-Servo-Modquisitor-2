@@ -132,13 +132,8 @@ func (app *App) buildMainMenu() *fyne.MainMenu {
 		}
 	})
 
-	nexusAPIKeyItem := fyne.NewMenuItem(app.messages["menu_nexus_api_key"], func() {
-		app.showNexusAPIKeyDialog()
-	})
-
 	nexusMenu := fyne.NewMenu(app.messages["menu_nexus"],
 		oauthActionItem,
-		nexusAPIKeyItem,
 	)
 
 	// ---- Меню Обновления ----
