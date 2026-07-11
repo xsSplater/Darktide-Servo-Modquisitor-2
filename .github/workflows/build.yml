@@ -17,7 +17,7 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
-  # === Сборка для Windows ===
+  # Windows
   build-windows:
     runs-on: windows-latest
     defaults:
@@ -26,37 +26,31 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
           go-version: '1.26'
           cache-dependency-path: ./Servo-Modquisitor-2/go.sum
-
       - name: Download dependencies
         run: go mod download
-
       - name: Build
         run: go build -ldflags="-s -w" -o servo-modquisitor.exe .
-
       - name: Prepare files for packaging (Windows)
         run: |
           mkdir Servo-Modquisitor-2
           copy servo-modquisitor.exe Servo-Modquisitor-2\
           copy ..\SortingRules_and_ModDatabase\mandatory_obsolete_incompatible_dependencies.json Servo-Modquisitor-2\
           copy ..\SortingRules_and_ModDatabase\mod_database.json Servo-Modquisitor-2\
-
       - name: Package Windows (zip)
         run: |
           7z a -tzip Servo-Modquisitor-2-windows.zip .\Servo-Modquisitor-2\
-
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: servo-modquisitor-windows
           path: ./Servo-Modquisitor-2/Servo-Modquisitor-2-windows.zip
 
-  # === Сборка для Linux ===
+  # Linux
   build-linux:
     runs-on: ubuntu-latest
     defaults:
@@ -65,19 +59,15 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
           go-version: '1.26'
           cache-dependency-path: ./Servo-Modquisitor-2/go.sum
-
       - name: Download dependencies
         run: go mod download
-
       - name: Build
         run: go build -ldflags="-s -w" -o servo-modquisitor-linux .
-
       - name: Prepare files for packaging (Linux)
         run: |
           mkdir Servo-Modquisitor-2
@@ -85,17 +75,15 @@ jobs:
           cp ../SortingRules_and_ModDatabase/mandatory_obsolete_incompatible_dependencies.json Servo-Modquisitor-2/
           cp ../SortingRules_and_ModDatabase/mod_database.json Servo-Modquisitor-2/
           chmod +x Servo-Modquisitor-2/servo-modquisitor-linux
-
       - name: Package Linux (tar.gz)
         run: tar -czvf Servo-Modquisitor-2-linux.tar.gz Servo-Modquisitor-2/
-
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: servo-modquisitor-linux
           path: ./Servo-Modquisitor-2/Servo-Modquisitor-2-linux.tar.gz
 
-  # === Создание релиза (только при публикации релиза) ===
+  # Release
   release:
     needs: [build-windows, build-linux]
     runs-on: ubuntu-latest
@@ -105,7 +93,6 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: artifacts
-
       - name: Upload to Release
         uses: softprops/action-gh-release@v2
         with:
