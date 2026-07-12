@@ -1106,6 +1106,18 @@ func (app *App) refreshThemeColors() {
 		app.modTable.Refresh()
 	}
 
+	// Принудительное обновление таблиц (изменение ширины колонки 0 заставляет пересоздать ячейки)
+	for _, tbl := range []*widget.Table{app.headerTable, app.systemModsTable, app.modTable} {
+		if tbl == nil {
+			continue
+		}
+		// Сохраняем текущую ширину колонки 0 (если GetColumnWidth не работает, используем константу)
+		// Вместо GetColumnWidth просто устанавливаем ширину в 1, затем в 0, чтобы вызвать перерисовку
+		tbl.SetColumnWidth(0, 1)
+		tbl.SetColumnWidth(0, 0)
+		tbl.Refresh()
+	}
+
 	for _, btn := range []*CustomButton{
 		app.btnSaveOrder, app.btnRefresh, app.btnInstall, app.btnRemove,
 		app.btnUp, app.btnDown, app.btnSortChecks, app.btnToggle,

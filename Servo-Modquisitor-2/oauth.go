@@ -230,9 +230,9 @@ func (app *App) startCallbackServer() {
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		w.Write([]byte(successHTML))
 
-		// Даём браузеру 100 мс получить ответ, потом плавно глушим сервер
+		// Даём браузеру 3 секунды получить ответ, потом плавно глушим сервер
 		go func() {
-			time.Sleep(100 * time.Millisecond)
+			time.Sleep(3 * time.Second)
 			server.Close()
 		}()
 	})

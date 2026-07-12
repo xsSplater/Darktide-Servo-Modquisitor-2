@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"image/color"
 	"log"
 	"net"
 	"net/url"
@@ -54,6 +55,8 @@ type Config struct {
 	LogFileSizeLimit          int64     `json:"log_file_size_limit"` // Размер файла лога
 	StatusRowSpacing          float32   `json:"status_row_spacing"`  // отступ между строками
 	StatusFontSize            float32   `json:"status_font_size"`    // размер шрифта для статуса
+
+	CustomColors map[string]color.NRGBA `json:"custom_colors"`
 }
 
 type ModVersionInfo struct {
@@ -171,6 +174,12 @@ func NewApp(cfg *Config, myApp fyne.App) *App {
 		myApp.Settings().SetTheme(&themes.ForcedLightTheme{})
 	case "highcontrast":
 		myApp.Settings().SetTheme(&themes.HighContrastTheme{})
+	case "custom":
+		colors := make(map[string]color.Color)
+		for k, v := range cfg.CustomColors {
+			colors[k] = v
+		}
+		myApp.Settings().SetTheme(&themes.CustomTheme{Colors: colors})
 	default:
 		myApp.Settings().SetTheme(&themes.ForcedDarkTheme{})
 	}

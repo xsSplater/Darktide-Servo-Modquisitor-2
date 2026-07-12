@@ -61,6 +61,9 @@ func (app *App) buildMainMenu() *fyne.MainMenu {
 		app.refreshThemeColors()
 		app.mainWindow.SetMainMenu(app.buildMainMenu())
 	})
+themeCustomize := fyne.NewMenuItem("✏️ Custom Theme...", func() {
+    app.showThemeEditor()
+})
 
 	// Устанавливаем текст с маркером
 	markTheme := func(label string, current string, target string) string {
@@ -73,7 +76,7 @@ func (app *App) buildMainMenu() *fyne.MainMenu {
 	themeLight.Label = markTheme(app.messages["menu_theme_light"], app.cfg.Theme, "light")
 	themeHighContrast.Label = markTheme(app.messages["menu_theme_highcontrast"], app.cfg.Theme, "highcontrast")
 	themeMenu := fyne.NewMenuItem(app.messages["menu_theme"], nil)
-	themeMenu.ChildMenu = fyne.NewMenu("", themeDark, themeLight, themeHighContrast)
+	themeMenu.ChildMenu = fyne.NewMenu("", themeDark, themeLight, themeHighContrast, fyne.NewMenuItemSeparator(), themeCustomize)
 
 	dateYYYY := fyne.NewMenuItem(app.messages["menu_date_format_yyyy_mm_dd"], func() {
 		app.cfg.DateFormat = "yyyy-mm-dd"
