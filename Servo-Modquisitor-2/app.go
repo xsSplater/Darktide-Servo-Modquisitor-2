@@ -19,6 +19,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"sync"
 	"sync/atomic"
 	"time"
 
@@ -27,36 +28,35 @@ import (
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/widget"
+
+	"github.com/zalando/go-keyring"
 )
 
 type Config struct {
-	Language                  string    `json:"language"`
-	Theme                     string    `json:"theme"`
-	ModsPath                  string    `json:"mods_path"`
-	GameRoot                  string    `json:"game_root"`
-	ModsGloballyEnabled       bool      `json:"mods_globally_enabled"`
-	InitialSetupDone          bool      `json:"initial_setup_done"`
-	DateFormat                string    `json:"date_format"`
-	ForceEnglishModNames      bool      `json:"force_english_mod_names"`
-	WindowWidth               int       `json:"window_width"`
-	WindowHeight              int       `json:"window_height"`
-	WindowMaximized           bool      `json:"window_maximized"`
-	LastModDatabaseVersion    string    `json:"last_mod_database_version"`
-	LastMandatoryRulesVersion string    `json:"last_mandatory_rules_version"`
-	LastUpdateCheck           string    `json:"last_update_check"`
-	SkipSortFilesPrompt       bool      `json:"skip_sort_files_prompt"`
-	UpdateCheckFrequency      string    `json:"update_check_frequency"`
-	ShowSystemMods            bool      `json:"show_system_mods"`
-	ShowModListAfterSort      bool      `json:"show_mod_list_after_sort"`
-	SuppressAMLWarning        bool      `json:"suppress_aml_warning"` // не предупреждаем об AML
-	OAuthAccessToken          string    `json:"oauth_access_token,omitempty"`
-	OAuthRefreshToken         string    `json:"oauth_refresh_token,omitempty"`
-	OAuthExpiry               time.Time `json:"oauth_expiry,omitempty"`
-	LogFileSizeLimit          int64     `json:"log_file_size_limit"` // Размер файла лога
-	StatusRowSpacing          float32   `json:"status_row_spacing"`  // отступ между строками
-	StatusFontSize            float32   `json:"status_font_size"`    // размер шрифта для статуса
-
 	CustomColors map[string]color.NRGBA `json:"custom_colors"`
+
+	InitialSetupDone          bool    `json:"initial_setup_done"`
+	ForceEnglishModNames      bool    `json:"force_english_mod_names"`
+	ModsGloballyEnabled       bool    `json:"mods_globally_enabled"`
+	ShowSystemMods            bool    `json:"show_system_mods"`
+	ShowModListAfterSort      bool    `json:"show_mod_list_after_sort"`
+	SkipSortFilesPrompt       bool    `json:"skip_sort_files_prompt"`
+	SuppressAMLWarning        bool    `json:"suppress_aml_warning"` // не предупреждаем об AML
+	WindowMaximized           bool    `json:"window_maximized"`
+	StatusRowSpacing          float32 `json:"status_row_spacing"` // отступ между строками
+	StatusFontSize            float32 `json:"status_font_size"`   // размер шрифта для статуса
+	WindowHeight              int     `json:"window_height"`
+	WindowWidth               int     `json:"window_width"`
+	LogFileSizeLimit          int64   `json:"log_file_size_limit"` // Размер файла лога
+	DateFormat                string  `json:"date_format"`
+	GameRoot                  string  `json:"game_root"`
+	Language                  string  `json:"language"`
+	LastMandatoryRulesVersion string  `json:"last_mandatory_rules_version"`
+	LastModDatabaseVersion    string  `json:"last_mod_database_version"`
+	LastUpdateCheck           string  `json:"last_update_check"`
+	ModsPath                  string  `json:"mods_path"`
+	Theme                     string  `json:"theme"`
+	UpdateCheckFrequency      string  `json:"update_check_frequency"`
 }
 
 type ModVersionInfo struct {
@@ -67,29 +67,32 @@ type ModVersionInfo struct {
 }
 
 type App struct {
-	cfg                      *Config
-	mainWindow               fyne.Window
-	myApp                    fyne.App
-	logFile                  *os.File // Логирование
-	consoleScroll            *container.Scroll
+	launchGameFunc      func(version GameVersion, gameRoot string, skipLauncher bool) error
+	messages            map[string]string
+	nexusVersionCache   map[string]ModVersionInfo // локальная версия
+	nexusLatestVersions map[string]string         // последняя версия с сайта
+
+	selectedModIndex         atomic.Int32
+	orderDirty               bool
+	blinkSaveOrderActive     bool
+	amlDetected              bool
+	showSelectColumn         bool
+	pathsInitialized         bool
+	tableBorder              *canvas.Rectangle // Рамка вокруг таблицы
+	screenBgRect             *canvas.Rectangle // ссылки на динамически окрашиваемые объекты
+	headerBoxBgRect          *canvas.Rectangle
+	tipBgRect                *canvas.Rectangle
+	topPanelBgRect           *canvas.Rectangle
+	managePanelBgRect        *canvas.Rectangle
+	descCardBgRect           *canvas.Rectangle
+	descTitle                *canvas.Text
+	logHeaderText            *canvas.Text
 	allMods                  []checks.ModInfo
 	displayedMods            []checks.ModInfo
 	systemMods               []checks.ModInfo // base и dmf
-	systemModsTableContainer *fyne.Container
-	selectedModName          string
-	selectedModIndex         atomic.Int32
-	orderDirty               bool
-	tableBorder              *canvas.Rectangle // Рамка вокруг таблицы
-	tableBorderContainer     *fyne.Container
-	blinkSaveOrderActive     bool
-	amlDetected              bool
-	managePanel              *fyne.Container // Управление видимостью панели управления модами
-	showSelectColumn         bool
-	pathsInitialized         bool
-	selectColumnBgRes        fyne.Resource
-	moveLabel                *widget.Label
-	statusLabel              *widget.Label
-	tooltipStatus            *TooltipStatusManager
+	modDatabase              []checks.ModDBEntry
+	cfg                      *Config
+	consoleScroll            *container.Scroll
 	manageBtn                *CustomButton
 	selectAllBtn             *CustomButton
 	deselectAllBtn           *CustomButton
@@ -117,44 +120,45 @@ type App struct {
 	btnEditVersion           *CustomButton
 	searchClearBtn           *CustomButton
 	btnAMLConfig             *CustomButton // AML
-	oauthState               string        // Nexus API
+	myApp                    fyne.App
+	mainWindow               fyne.Window
+	selectColumnBgRes        fyne.Resource
+	systemModsTableContainer *fyne.Container
+	tableBorderContainer     *fyne.Container
+	managePanel              *fyne.Container // Управление видимостью панели управления модами
+	nxmListener              net.Listener    // слушатель nxm-ссылок
+	logFile                  *os.File        // Логирование
+	patcherType              PatcherType
+	gameRoot                 string
+	selectedModName          string
+	oauthState               string // Nexus API
 	oauthVerifier            string
-	nxmListener              net.Listener // слушатель nxm-ссылок
-	enrichDebounce           *time.Timer
 	lastNxmURL               string
+	modsMutex                sync.RWMutex // защита allMods
+	cacheMutex               sync.RWMutex // для nexusVersionCache
+	latestMutex              sync.RWMutex // для nexusLatestVersions
 	lastNxmTime              time.Time
-	moveToEntry              *widget.Entry
-	searchEntry              *widget.Entry
-	descTitle                *canvas.Text
+	enrichDebounce           *time.Timer
+	tooltipStatus            *TooltipStatusManager
+	moveLabel                *widget.Label
+	statusLabel              *widget.Label
 	descAuthor               *widget.Label
 	descInstalled            *widget.Label
 	descBody                 *widget.Label
-	descURL                  *widget.Hyperlink
-	githubLink               *widget.Hyperlink
 	filterLabel              *widget.Label
 	counterLabel             *widget.Label
 	descLocalVersion         *widget.Label
 	descLatestVersion        *widget.Label
 	descConflict             *widget.Label // под descStatus
-	logHeaderText            *canvas.Text
+	moveToEntry              *widget.Entry
+	searchEntry              *widget.Entry
+	descURL                  *widget.Hyperlink
+	githubLink               *widget.Hyperlink
 	logWindow                *widget.RichText
 	filterSelect             *widget.Select
 	modTable                 *widget.Table
 	headerTable              *widget.Table
 	systemModsTable          *widget.Table // таблица системных модов
-	messages                 map[string]string
-	modDatabase              []checks.ModDBEntry
-	screenBgRect             *canvas.Rectangle // ссылки на динамически окрашиваемые объекты
-	headerBoxBgRect          *canvas.Rectangle
-	tipBgRect                *canvas.Rectangle
-	topPanelBgRect           *canvas.Rectangle
-	managePanelBgRect        *canvas.Rectangle
-	descCardBgRect           *canvas.Rectangle
-	nexusVersionCache        map[string]ModVersionInfo // локальная версия
-	nexusLatestVersions      map[string]string         // последняя версия с сайта
-	gameRoot                 string
-	patcherType              PatcherType
-	launchGameFunc           func(version GameVersion, gameRoot string, skipLauncher bool) error
 }
 
 func NewApp(cfg *Config, myApp fyne.App) *App {
@@ -380,13 +384,13 @@ func (app *App) syncVersionCache() {
 		if info, err := os.Stat(exePath); err == nil {
 			ts := info.ModTime().Unix()
 			// Обновляем кэш программы, если версия отличается или ключа нет
-			if saved, ok := app.nexusVersionCache[NexusCacheKeyProgram]; !ok || saved.Version != AppVersion {
-				app.nexusVersionCache[NexusCacheKeyProgram] = ModVersionInfo{
+			if saved, ok := app.getCachedVersion(NexusCacheKeyProgram); !ok || saved.Version != AppVersion {
+				app.setCachedVersion(NexusCacheKeyProgram, ModVersionInfo{
 					Timestamp: ts,
 					Version:   AppVersion,
 					Folder:    "Program",
 					Source:    "nexus",
-				}
+				})
 				app.saveNexusVersionCache()
 				app.appendLog(app.messages["log_version_cached_program"] + AppVersion)
 			}
@@ -399,13 +403,13 @@ func (app *App) syncVersionCache() {
 		dbPath := filepath.Join(app.cfg.ModsPath, FileNameModDatabase)
 		if info, err := os.Stat(dbPath); err == nil {
 			ts := info.ModTime().Unix()
-			if saved, ok := app.nexusVersionCache[NexusCacheKeyRules]; !ok || saved.Version != dbVersion {
-				app.nexusVersionCache[NexusCacheKeyRules] = ModVersionInfo{
+			if saved, ok := app.getCachedVersion(NexusCacheKeyRules); !ok || saved.Version != dbVersion {
+				app.setCachedVersion(NexusCacheKeyRules, ModVersionInfo{
 					Timestamp: ts,
 					Version:   dbVersion,
 					Folder:    "Sorting Rules",
 					Source:    "nexus",
-				}
+				})
 				app.saveNexusVersionCache()
 				app.appendLog(app.messages["log_version_cached_sort"] + dbVersion)
 			}
@@ -556,30 +560,25 @@ func (app *App) logVersions() {
 // initializePaths определяет пути к корню игры и папке mods.
 // Вызывается один раз при старте, если пути ещё не заданы.
 func (app *App) initializePaths() {
-	// app.appendLog("DEBUG: initializePaths START")
 
 	// 0. Если путь уже есть и валиден — выходим
 	if app.cfg.ModsPath != "" {
-		// app.appendLog("DEBUG: cfg.ModsPath is set: " + app.cfg.ModsPath)
 		if _, err := os.Stat(app.cfg.ModsPath); err == nil {
 			if app.cfg.GameRoot == "" {
 				app.cfg.GameRoot = filepath.Dir(app.cfg.ModsPath)
 				saveConfig(app.cfg)
 			}
-			// app.appendLog("DEBUG: Paths valid, exiting initializePaths")
 			return
 		}
 		app.cfg.ModsPath = ""
 		app.cfg.GameRoot = ""
 		saveConfig(app.cfg)
-		// app.appendLog("DEBUG: cfg.ModsPath invalid, cleared")
 	}
 
 	// 1. Автопоиск по стандартным папкам (Steam, Xbox)
 	autoRoot := autoFindGameRoot()
-	// app.appendLog("DEBUG: autoRoot = " + autoRoot)
 	if autoRoot != "" {
-		choice := app.showChoiceDialog(
+		choice := app.showChoiceDialogSync(
 			app.mainWindow,
 			app.messages["path_found_title"],
 			fmt.Sprintf(app.messages["path_found_message"], autoRoot),
@@ -588,7 +587,6 @@ func (app *App) initializePaths() {
 		)
 		if choice == 0 {
 			app.setGamePaths(autoRoot)
-			// app.appendLog("DEBUG: initializePaths END (autoRoot)")
 			return
 		}
 		// choice == 1 -> продолжаем к поиску от exe
@@ -598,9 +596,8 @@ func (app *App) initializePaths() {
 	exePath, _ := os.Executable()
 	exeDir := filepath.Dir(exePath)
 	guessedRoot := findGameRootFrom(exeDir)
-	// app.appendLog("DEBUG: guessedRoot = " + guessedRoot)
 	if guessedRoot != "" {
-		choice := app.showChoiceDialog(
+		choice := app.showChoiceDialogSync(
 			app.mainWindow,
 			app.messages["path_found_title"],
 			fmt.Sprintf(app.messages["path_found_message"], guessedRoot),
@@ -609,7 +606,6 @@ func (app *App) initializePaths() {
 		)
 		if choice == 0 {
 			app.setGamePaths(guessedRoot)
-			// app.appendLog("DEBUG: initializePaths END (guessedRoot)")
 			return
 		}
 		// choice == 1 -> продолжаем к ручному выбору
@@ -618,19 +614,15 @@ func (app *App) initializePaths() {
 	// В initializePaths, после неудачного автопоиска по стандартным папкам и до ручного выбора:
 
 	// 2.5. Расширенный поиск по дискам
-	// app.appendLog("DEBUG: starting disk search")
 	diskSearchResult := app.showDiskSearchDialog()
 	res := <-diskSearchResult
 	if res.Success && res.Path != "" {
 		app.setGamePaths(res.Path)
-		// app.appendLog("DEBUG: initializePaths END (disk search)")
 		return
 	}
 	// Если пользователь закрыл диалог без выбора или выбрал отмену - переходим к ручному
-	// app.appendLog("DEBUG: disk search cancelled or failed, proceeding to manual selection")
 
 	// 3. Ручной выбор папки (асинхронный, без блокировки главного потока)
-	// app.appendLog("DEBUG: starting manual folder selection")
 	done := make(chan struct{})
 	var selectedPath string
 	var cancelled bool
@@ -638,7 +630,6 @@ func (app *App) initializePaths() {
 	app.chooseGameRootManually(done, &selectedPath, &cancelled)
 
 	<-done // ожидание в фоновой горутине
-	// app.appendLog("DEBUG: folder selection done, cancelled = " + strconv.FormatBool(cancelled))
 
 	if cancelled {
 		app.appendLog("Game root not selected. Exiting.")
@@ -649,7 +640,7 @@ func (app *App) initializePaths() {
 	if _, err := os.Stat(filepath.Join(selectedPath, "binaries")); os.IsNotExist(err) {
 		if _, err := os.Stat(filepath.Join(selectedPath, "content")); os.IsNotExist(err) {
 			// Папка не похожа на корень игры - предлагаем выбрать другую или выйти
-			choice := app.showChoiceDialog(
+			choice := app.showChoiceDialogSync(
 				app.mainWindow,
 				app.messages["not_game_root_title"],
 				fmt.Sprintf(app.messages["not_game_root_message"], selectedPath),
@@ -668,7 +659,6 @@ func (app *App) initializePaths() {
 
 	// 5. Путь корректен - сохраняем
 	app.setGamePaths(selectedPath)
-	// app.appendLog("DEBUG: initializePaths END (manual selection)")
 }
 
 // findGameRootFrom поднимается от указанной директории вверх, пока не найдёт папку с binaries или content.
@@ -717,21 +707,17 @@ func autoFindGameRoot() string {
 
 // setGamePaths устанавливает корень игры и определяет путь к mods.
 func (app *App) setGamePaths(gameRoot string) {
-	// app.appendLog("DEBUG: setGamePaths START with gameRoot = " + gameRoot)
 	app.cfg.GameRoot = gameRoot
 	modsPath := filepath.Join(gameRoot, "mods")
-	// app.appendLog("DEBUG: modsPath = " + modsPath)
 
 	if _, err := os.Stat(modsPath); os.IsNotExist(err) {
-		// app.appendLog("DEBUG: modsPath does not exist, showing dialog")
-		choice := app.showChoiceDialog(
+		choice := app.showChoiceDialogSync(
 			app.mainWindow,
 			app.messages["mods_not_found_title"],
 			app.messages["mods_not_found_message"],
 			app.messages["btn_yes_open_dml"],
 			app.messages["btn_no_create_folder"],
 		)
-		// app.appendLog("DEBUG: mods_not_found dialog returned " + strconv.Itoa(choice))
 		if choice == 0 {
 			u1, _ := url.Parse("https://www.nexusmods.com/warhammer40kdarktide/mods/19")
 			u2, _ := url.Parse("https://www.nexusmods.com/warhammer40kdarktide/mods/8")
@@ -750,39 +736,29 @@ func (app *App) setGamePaths(gameRoot string) {
 			}
 		}
 	} else {
-		// app.appendLog("DEBUG: modsPath already exists")
 	}
 	app.cfg.ModsPath = modsPath
 	saveConfig(app.cfg)
 	app.gameRoot = gameRoot
 	app.patcherType = detectPatcherTypeWithRoot(gameRoot)
-	// app.appendLog("DEBUG: setGamePaths END")
 }
 
 // chooseGameRootManually открывает диалог выбора папки для корня игры.
 func (app *App) chooseGameRootManually(done chan struct{}, selectedPath *string, cancelled *bool) {
-	// app.appendLog("DEBUG: chooseGameRootManually START (async)")
 	fyne.Do(func() {
-		// app.appendLog("DEBUG: creating dialog.NewFolderOpen inside fyne.Do")
 		dlg := dialog.NewFolderOpen(func(uri fyne.ListableURI, err error) {
-			// app.appendLog("DEBUG: FolderOpen callback triggered")
 			if err != nil || uri == nil {
-				// app.appendLog("DEBUG: FolderOpen cancelled or error")
 				*cancelled = true
 				close(done)
 				return
 			}
 			*selectedPath = filepath.FromSlash(uri.Path())
-			// app.appendLog("DEBUG: FolderOpen selected: " + *selectedPath)
 			close(done)
 		}, app.mainWindow)
 
-		// app.appendLog("DEBUG: resizing and showing dialog")
 		dlg.Resize(fyne.NewSize(FileDialogWidth, FileDialogHeight))
 		dlg.Show()
-		// app.appendLog("DEBUG: dialog shown")
 	})
-	// app.appendLog("DEBUG: chooseGameRootManually END (async)")
 }
 
 // reloadAfterPathChange перезагружает все данные после смены пути.
@@ -827,7 +803,7 @@ func (app *App) loadDataAfterInit() {
 		func(text string) { app.appendLog(text) },
 		&app.messages,
 		func(parent fyne.Window, header, msg string, opts ...string) int {
-			return app.showChoiceDialog(parent, header, msg, opts...)
+			return app.showChoiceDialogSync(parent, header, msg, opts...)
 		},
 		func(link string) {
 			fyne.Do(func() { u, _ := url.Parse(link); app.myApp.OpenURL(u) })
@@ -963,4 +939,35 @@ func (app *App) loadDataAfterInit() {
 			}()
 		}
 	}
+}
+
+func (app *App) isLoggedIn() bool {
+	_, err := keyring.Get(keyringService, "access_token")
+	return err == nil
+}
+
+func (app *App) getCachedVersion(key string) (ModVersionInfo, bool) {
+	app.cacheMutex.RLock()
+	defer app.cacheMutex.RUnlock()
+	v, ok := app.nexusVersionCache[key]
+	return v, ok
+}
+
+func (app *App) setCachedVersion(key string, info ModVersionInfo) {
+	app.cacheMutex.Lock()
+	defer app.cacheMutex.Unlock()
+	app.nexusVersionCache[key] = info
+}
+
+func (app *App) getLatestVersion(key string) (string, bool) {
+	app.latestMutex.RLock()
+	defer app.latestMutex.RUnlock()
+	v, ok := app.nexusLatestVersions[key]
+	return v, ok
+}
+
+func (app *App) setLatestVersion(key string, version string) {
+	app.latestMutex.Lock()
+	defer app.latestMutex.Unlock()
+	app.nexusLatestVersions[key] = version
 }

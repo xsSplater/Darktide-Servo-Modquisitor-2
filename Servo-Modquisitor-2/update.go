@@ -66,10 +66,10 @@ func (app *App) ensureSortFiles() {
 		return
 	}
 
-	choice := app.showChoiceDialog(app.mainWindow,
+	choice := app.showChoiceDialogSync(app.mainWindow,
 		app.messages["sort_files_missing"],
 		app.messages["sort_files_missing_open_page"],
-		app.messages["yes"],
+		app.messages["btn_yes"],
 		app.messages["skip"],
 		app.messages["download_skip_forever"],
 	)
@@ -128,7 +128,7 @@ func (app *App) checkSpecialUpdates() {
 	if err != nil {
 		app.logNexusError(err, "Program", app.messages["program_update_unavailable"])
 	} else if programFileInfo != nil {
-		if saved, ok := app.nexusVersionCache[NexusCacheKeyProgram]; ok {
+		if saved, ok := app.getCachedVersion(NexusCacheKeyProgram); ok {
 			// сравниваем, но не обновляем кэш
 			if compareVersions(programFileInfo.Version, saved.Version) > 0 {
 				app.appendLog(fmt.Sprintf(app.messages["log_new_program_version_available"],
@@ -145,7 +145,7 @@ func (app *App) checkSpecialUpdates() {
 	if err != nil {
 		app.logNexusError(err, "Rules", app.messages["rules_update_unavailable"])
 	} else if rulesFileInfo != nil {
-		if saved, ok := app.nexusVersionCache[NexusCacheKeyRules]; ok {
+		if saved, ok := app.getCachedVersion(NexusCacheKeyRules); ok {
 			if compareVersions(rulesFileInfo.Version, saved.Version) > 0 {
 				app.appendLog(fmt.Sprintf(app.messages["log_new_sorting_files_available"],
 					rulesFileInfo.Version, saved.Version))

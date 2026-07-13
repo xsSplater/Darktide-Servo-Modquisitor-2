@@ -158,7 +158,9 @@ func (app *App) runAllChecks() {
 	}
 
 	// 1. Перечитываем самый свежий сохранённый файл
-	app.refreshModList()
+	fyne.Do(func() {
+		app.refreshModList()
+	})
 
 	// 2. Собираем активные моды для сортировки
 	var activeNames []string
@@ -242,18 +244,20 @@ func (app *App) runAllChecks() {
 
 func (app *App) forceRefreshTable() {
 	if app.modTable == nil {
+		app.appendLog("forceRefreshTable: modTable is nil, skipping")
+		return
+	}
+	if app.mainWindow == nil || app.mainWindow.Canvas() == nil {
+		app.appendLog("forceRefreshTable: mainWindow or Canvas is nil, skipping")
 		return
 	}
 	app.modTable.Refresh()
-	// Принудительно обновляем контейнер, в котором находится таблица
 	if app.tableBorderContainer != nil {
 		app.tableBorderContainer.Refresh()
 	}
-	// Также обновляем заголовки (на случай, если ширина колонок изменилась)
 	if app.headerTable != nil {
 		app.headerTable.Refresh()
 	}
-	// Запрашиваем перерисовку всего окна
 	app.mainWindow.Canvas().Refresh(app.modTable)
 }
 
@@ -459,4 +463,26 @@ func (app *App) closeApp() {
 		app.mainWindow.Close()
 	})
 	os.Exit(0)
+}
+
+// sanitizeFilename проверяет, что имя файла безопасно для сохранения в папку mods.
+// Возвращает очищенное имя или ошибку.
+func sanitizeFilename(filename string) (string, error) {
+	if filename == "" {
+		return "", fmt.Errorf("empty filename")
+	}
+	// filepath.Base удаляет все разделители и приводит к простому имени
+	base := filepath.Base(filename)
+	if base == "." || base == ".." {
+		return "", fmt.Errorf("invalid filename: %s", filename)
+	}
+	// Запрещаем абсолютные пути (filepath.Base уже убрал разделители, но проверим на всякий случай)
+	if filepath.IsAbs(base) {
+		return "", fmt.Errorf("absolute path not allowed: %s", filename)
+	}
+	// Проверяем, что в имени нет запрещённых символов (дополнительная защита)
+	if strings.ContainsAny(base, "/\\") {
+		return "", fmt.Errorf("filename contains path separators: %s", filename)
+	}
+	return base, nil
 }

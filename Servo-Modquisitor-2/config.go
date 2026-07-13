@@ -11,12 +11,17 @@ import (
 // ───────────── Программа ─────────────────────────────────────────
 const (
 	AppName         = "Servo-Modquisitor-2"
-	AppVersion      = "2.5.4"
+	AppVersion      = "2.7.5"
 	AppID           = "com.xssplater.servo-modquisitor"
 	AppIcon         = "assets/icon.png"
 	СonfigFolderSMQ = "Servo-Modquisitor"
 	DarktideAppID   = "1361210"
 	MaxLogFileSize  = 512 * 1024 // 512 Кб, 1*1024*1024 = 1 Мб
+
+	// Ограничения для распаковки архивов
+	MaxArchiveSize   = 500 * 1024 * 1024      // 500 МБ — максимальный размер скачиваемого архива
+	MaxExtractedSize = 1 * 1024 * 1024 * 1024 // 1 ГБ — максимальный общий объём распакованных данных
+	MaxFileSize      = 500 * 1024 * 1024      // 500 МБ — максимальный размер одного файла внутри архива
 
 	NexusModIDForUpdates = 139 // Nexus ID SMQ для обновлений программы и файлов сортировки
 
@@ -37,6 +42,8 @@ const (
 	clientID          = "servomodquisitor2"
 	NexusMainURL      = "https://www.nexusmods.com/"
 	nexusAPIBase      = "https://api.nexusmods.com/v1"
+	nexusV3APIBase    = "https://api.nexusmods.com/v3"
+	gameDomain        = "warhammer40kdarktide"
 	oauthAuthorizeURL = "https://users.nexusmods.com/oauth/authorize"
 	oauthTokenURL     = "https://users.nexusmods.com/oauth/token"
 	redirectURI       = "http://localhost:31337/callback" // НЕ менять!
@@ -167,6 +174,7 @@ const (
 	FileDialogHeight float32 = 600
 
 	DialogMinWidth     float32 = 400
+	DialogMinWidth500  float32 = 500
 	DialogMinHeight    float32 = 300
 	DialogMinHeight200 float32 = 200
 

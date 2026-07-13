@@ -206,12 +206,8 @@ func (app *App) buildUI() {
 		app.showConfirmDialog(
 			app.messages["confirm_remove_all_title"],
 			app.messages["confirm_remove_all_text"],
-			"btn_yes",
-			"btn_no",
-			func(ok bool) {
-				if ok {
-					app.removeAllMods()
-				}
+			func() {
+				app.removeAllMods()
 			},
 		)
 	})
@@ -225,12 +221,8 @@ func (app *App) buildUI() {
 		app.showConfirmDialog(
 			app.messages["confirm_remove_selected_title"],
 			fmt.Sprintf(app.messages["confirm_remove_selected_text"], len(sel)),
-			"btn_yes",
-			"btn_no",
-			func(ok bool) {
-				if ok {
-					app.removeSelectedMods()
-				}
+			func() {
+				app.removeSelectedMods()
 			},
 		)
 	})
@@ -268,7 +260,7 @@ func (app *App) buildUI() {
 	app.btnRefresh = NewCustomButton(app.messages["btn_refresh"], func() {
 		go func() {
 			if app.orderDirty {
-				choice := app.showChoiceDialog(app.mainWindow,
+				choice := app.showChoiceDialogSync(app.mainWindow,
 					app.messages["warning_title"],
 					app.messages["refresh_discard_changes"],
 					app.messages["btn_save_and_refresh"],
@@ -914,48 +906,45 @@ func (app *App) buildUI() {
 		app.showConfirmDialog(
 			app.messages["confirm_delete_title"],
 			fmt.Sprintf(app.messages["confirm_delete_text"], mod.Name),
-			"btn_yes",
-			"btn_no",
-			func(ok bool) {
-				if ok {
-					// Физически удаляем папку
-					checks.RemoveMod(modName)
-					// Удаляем из внутренних структур
-					oldIndex, _ := app.removeModFromData(modName)
+			func() {
+				// Физически удаляем папку
+				checks.RemoveMod(modName)
+				// Удаляем из внутренних структур
+				oldIndex, _ := app.removeModFromData(modName)
 
-					// Обновляем счётчик и таблицу
-					app.updateModCounter()
-					app.modTable.Length = func() (int, int) { return len(app.displayedMods), TableColumnCount }
-					app.modTable.Refresh()
-					app.orderDirty = true
-					app.updateTableBorder()
-					app.appendLog(fmt.Sprintf(app.messages["log_deleted"], modName))
+				// Обновляем счётчик и таблицу
+				app.updateModCounter()
+				app.modTable.Length = func() (int, int) { return len(app.displayedMods), TableColumnCount }
+				app.modTable.Refresh()
+				app.orderDirty = true
+				app.updateTableBorder()
+				app.appendLog(fmt.Sprintf(app.messages["log_deleted"], modName))
 
-					// Восстанавливаем выделение и прокрутку
-					if nextModName != "" {
-						for i, m := range app.displayedMods {
-							if m.Name == nextModName {
-								app.modTable.Select(widget.TableCellID{Row: i, Col: 0})
-								app.modTable.ScrollTo(widget.TableCellID{Row: i, Col: 0})
-								break
-							}
+				// Восстанавливаем выделение и прокрутку
+				if nextModName != "" {
+					for i, m := range app.displayedMods {
+						if m.Name == nextModName {
+							app.modTable.Select(widget.TableCellID{Row: i, Col: 0})
+							app.modTable.ScrollTo(widget.TableCellID{Row: i, Col: 0})
+							break
 						}
-					} else if len(app.displayedMods) > 0 {
-						newIndex := oldIndex
-						if newIndex >= len(app.displayedMods) {
-							newIndex = len(app.displayedMods) - 1
-						}
-						if newIndex >= 0 {
-							app.modTable.Select(widget.TableCellID{Row: newIndex, Col: 0})
-							app.modTable.ScrollTo(widget.TableCellID{Row: newIndex, Col: 0})
-						}
-					} else {
-						app.selectedModName = ""
-						app.selectedModIndex.Store(-1)
-						app.updateDescriptionForMod("")
-						app.updateUpDownButtons()
 					}
+				} else if len(app.displayedMods) > 0 {
+					newIndex := oldIndex
+					if newIndex >= len(app.displayedMods) {
+						newIndex = len(app.displayedMods) - 1
+					}
+					if newIndex >= 0 {
+						app.modTable.Select(widget.TableCellID{Row: newIndex, Col: 0})
+						app.modTable.ScrollTo(widget.TableCellID{Row: newIndex, Col: 0})
+					}
+				} else {
+					app.selectedModName = ""
+					app.selectedModIndex.Store(-1)
+					app.updateDescriptionForMod("")
+					app.updateUpDownButtons()
 				}
+
 			},
 		)
 	})
@@ -1021,7 +1010,7 @@ func (app *App) buildUI() {
 				app.appendLog(app.messages["log_cannot_update_system"])
 				return
 			}
-			app.updateModFromNexus(mod)
+			app.updateModFromNexus(mod, false)
 		}()
 	})
 	app.applyTooltip(app.btnUpdateMod, "btn_update_mod_premium_only")
@@ -1141,6 +1130,10 @@ func (app *App) appendLog(text string) {
 		return
 	}
 	fyne.Do(func() {
+		// Внутри fyne.Do тоже проверим на nil (на случай, если logWindow стал nil)
+		if app.logWindow == nil {
+			return
+		}
 		seg := &widget.TextSegment{
 			Style: widget.RichTextStyle{
 				ColorName: themes.ColorConsoleText,
@@ -1213,7 +1206,7 @@ func (app *App) updateDescriptionForMod(name string) {
 			}
 		}
 		if cacheKey != "" {
-			if info, ok := app.nexusVersionCache[cacheKey]; ok && info.Version != "" {
+			if info, ok := app.getCachedVersion(cacheKey); ok && info.Version != "" {
 				app.descLocalVersion.SetText(fmt.Sprintf(app.messages["nexus_local_version_label"], info.Version))
 			} else {
 				app.descLocalVersion.SetText(app.messages["nexus_local_version_unknown"])
@@ -1241,7 +1234,7 @@ func (app *App) updateDescriptionForMod(name string) {
 			}
 		}
 		if cacheKey != "" {
-			if latest, ok := app.nexusLatestVersions[cacheKey]; ok {
+			if latest, ok := app.getLatestVersion(cacheKey); ok {
 				app.descLatestVersion.SetText(fmt.Sprintf(app.messages["nexus_latest_version_label"], latest))
 			} else {
 				app.descLatestVersion.SetText(app.messages["nexus_latest_version_unknown"])
@@ -1329,12 +1322,9 @@ func (app *App) enrichModFromNexus(mod *checks.ModInfo) {
 		defer func() { recover() }()
 		var fileInfo *FileInfo
 		var err error
-		// Для системных модов (base, dmf) используем getLatestFileInfo (без паттерна)
 		if mod.Name == "base" || mod.Name == "dmf" {
-			// app.appendLog("DEBUG: Using getLatestFileInfo for " + mod.Name)
 			fileInfo, err = app.getLatestFileInfo(modID)
 		} else {
-			// app.appendLog("DEBUG: Using getLatestFileInfoForMod for " + mod.Name)
 			fileInfo, err = app.getLatestFileInfoForMod(modID, mod.Name)
 		}
 		if err != nil {
@@ -1342,8 +1332,7 @@ func (app *App) enrichModFromNexus(mod *checks.ModInfo) {
 			return
 		}
 		cacheKey := fmt.Sprintf("%d:%s", modID, mod.Name)
-		app.nexusLatestVersions[cacheKey] = fileInfo.Version
-		// app.appendLog(fmt.Sprintf("DEBUG: %s latest version = %s", mod.Name, fileInfo.Version))
+		app.setLatestVersion(cacheKey, fileInfo.Version) // <-- замена
 		if fileInfo.FileName != "" {
 			entry := checks.GetModDBEntry(mod.Name)
 			if entry != nil && entry.NexusFilePattern == "" {
@@ -1436,9 +1425,11 @@ type modFilterFunc func(checks.ModInfo) bool
 
 func (app *App) filterModList() {
 	if app.modTable == nil {
+		app.appendLog("filterModList: modTable is nil, skipping")
 		return
 	}
 	if app.filterSelect == nil {
+		app.appendLog("filterModList: filterSelect is nil, using all mods")
 		app.displayedMods = app.allMods
 		app.modTable.Length = func() (int, int) { return len(app.displayedMods), TableColumnCount }
 		if app.selectedModName != "" {
@@ -1547,22 +1538,25 @@ func (app *App) filterOptions() []string {
 
 // Выделение всех модов, с учётом фильтра
 func (app *App) selectAllMods(selected bool) {
-	// Создаём карту имён модов, которые сейчас отображаются (с учётом фильтра и поиска)
+	app.modsMutex.Lock()
+	defer app.modsMutex.Unlock()
 	visibleNames := make(map[string]bool)
 	for _, mod := range app.displayedMods {
 		visibleNames[mod.Name] = true
 	}
-	// Проходим по всем модам, но меняем только те, что видны
 	for i := range app.allMods {
 		if visibleNames[app.allMods[i].Name] {
 			app.allMods[i].Selected = selected
 		}
 	}
-	// Обновляем отображение таблицы, чтобы чекбоксы обновились
-	app.filterModList()
+	// UI-обновление после разблокировки
+	fyne.Do(func() {
+		app.filterModList()
+	})
 }
 
 func (app *App) setSelectedActive(active bool) {
+	app.modsMutex.Lock()
 	changed := false
 	for i := range app.allMods {
 		if app.allMods[i].Selected && !app.allMods[i].IsSystem {
@@ -1572,15 +1566,19 @@ func (app *App) setSelectedActive(active bool) {
 			}
 		}
 	}
+	app.modsMutex.Unlock()
 	if changed {
 		app.orderDirty = true
-		app.updateTableBorder()
-		app.filterModList()
-		app.forceRefreshTable()
+		fyne.Do(func() {
+			app.updateTableBorder()
+			app.filterModList()
+			app.forceRefreshTable()
+		})
 	}
 }
 
 func (app *App) setAllModsActive(active bool) {
+	app.modsMutex.Lock()
 	changed := false
 	for i := range app.allMods {
 		if !app.allMods[i].IsSystem {
@@ -1590,10 +1588,13 @@ func (app *App) setAllModsActive(active bool) {
 			}
 		}
 	}
+	app.modsMutex.Unlock()
 	if changed {
 		app.orderDirty = true
-		app.updateTableBorder()
-		app.filterModList()
+		fyne.Do(func() {
+			app.updateTableBorder()
+			app.filterModList()
+		})
 	}
 }
 

@@ -61,9 +61,9 @@ func (app *App) buildMainMenu() *fyne.MainMenu {
 		app.refreshThemeColors()
 		app.mainWindow.SetMainMenu(app.buildMainMenu())
 	})
-themeCustomize := fyne.NewMenuItem("✏️ Custom Theme...", func() {
-    app.showThemeEditor()
-})
+	themeCustomize := fyne.NewMenuItem("✏️ Custom Theme...", func() {
+		app.showThemeEditor()
+	})
 
 	// Устанавливаем текст с маркером
 	markTheme := func(label string, current string, target string) string {
@@ -124,11 +124,11 @@ themeCustomize := fyne.NewMenuItem("✏️ Custom Theme...", func() {
 	// --- Меню Nexus ---
 	// Пункт входа/выхода
 	oauthActionLabel := app.messages["menu_nexus_login"]
-	if app.cfg.OAuthAccessToken != "" {
+	if app.isLoggedIn() {
 		oauthActionLabel = app.messages["menu_nexus_logout"]
 	}
 	oauthActionItem := fyne.NewMenuItem(oauthActionLabel, func() {
-		if app.cfg.OAuthAccessToken != "" {
+		if app.isLoggedIn() {
 			app.logoutOAuth()
 		} else {
 			app.startOAuthFlow()

@@ -122,19 +122,26 @@ func getColorFromMap(m map[string]color.Color, key string) color.Color {
 	return color.NRGBA{R: 0, G: 0, B: 0, A: 255}
 }
 
-// hexFromColor converts a color.Color to a hex string (#RRGGBB).
+// hexFromColor возвращает #RRGGBBAA (8 символов)
 func hexFromColor(c color.Color) string {
-	r, g, b, _ := c.RGBA()
-	return fmt.Sprintf("#%02X%02X%02X", uint8(r>>8), uint8(g>>8), uint8(b>>8))
+	r, g, b, a := c.RGBA()
+	return fmt.Sprintf("#%02X%02X%02X%02X", uint8(r>>8), uint8(g>>8), uint8(b>>8), uint8(a>>8))
 }
 
-// colorFromHex parses a hex string (#RRGGBB) and returns color.NRGBA.
+// colorFromHex парсит #RRGGBB или #RRGGBBAA
 func colorFromHex(hex string) (color.NRGBA, error) {
-	if len(hex) == 7 && hex[0] == '#' {
+	hex = strings.TrimPrefix(hex, "#")
+	if len(hex) == 6 {
 		var r, g, b uint8
-		_, err := fmt.Sscanf(hex, "#%02X%02X%02X", &r, &g, &b)
+		_, err := fmt.Sscanf(hex, "%02X%02X%02X", &r, &g, &b)
 		if err == nil {
 			return color.NRGBA{R: r, G: g, B: b, A: 255}, nil
+		}
+	} else if len(hex) == 8 {
+		var r, g, b, a uint8
+		_, err := fmt.Sscanf(hex, "%02X%02X%02X%02X", &r, &g, &b, &a)
+		if err == nil {
+			return color.NRGBA{R: r, G: g, B: b, A: a}, nil
 		}
 	}
 	return color.NRGBA{}, fmt.Errorf("invalid hex")
@@ -156,6 +163,12 @@ func (app *App) showThemeEditor() {
 		currentColors[e.Key] = col
 	}
 
+	// ── Сохраняем исходные цвета для Reset ──
+	originalColors := make(map[string]color.Color)
+	for k, v := range currentColors {
+		originalColors[k] = v
+	}
+
 	win := app.myApp.NewWindow("Theme Editor")
 	win.Resize(fyne.NewSize(1200, 800))
 
@@ -170,9 +183,75 @@ func (app *App) showThemeEditor() {
 	var colorList *widget.Table
 	var previewContainer *fyne.Container
 	var colorPicker colorpicker.ColorPicker
-	var hexEntry *widget.Entry
-	var sampleRect *canvas.Rectangle
 	var colorNameLabel *widget.Label
+
+	// ── Флаг для предотвращения рекурсии ──
+	var updating bool
+
+	// ── Виджеты правой панели ──
+	colorNameLabel = widget.NewLabel("")
+	sampleRect := canvas.NewRectangle(color.Transparent)
+	sampleRect.SetMinSize(fyne.NewSize(60, 40))
+
+	hexEntry := widget.NewEntry()
+	hexEntry.Validator = validation.NewRegexp(`^#[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$`, "Invalid hex (#RRGGBB or #RRGGBBAA)")
+	hexEntry.SetPlaceHolder("#RRGGBB")
+
+	rLabel := widget.NewLabel("255")
+	gLabel := widget.NewLabel("255")
+	bLabel := widget.NewLabel("255")
+	aLabel := widget.NewLabel("255")
+
+	// ── Сохраняемый текущий цвет пикера ──
+	var currentPickerColor color.Color = color.NRGBA{R: 0, G: 0, B: 0, A: 255}
+
+	// Функция обновления отображения цвета (образец, hex, RGB)
+	updateColorDisplay := func(c color.Color) {
+		currentPickerColor = c
+		r, g, b, a := c.RGBA()
+		r8, g8, b8, a8 := uint8(r>>8), uint8(g>>8), uint8(b>>8), uint8(a>>8)
+		sampleRect.FillColor = c
+		sampleRect.Refresh()
+		hexEntry.SetText(hexFromColor(c))
+		rLabel.SetText(fmt.Sprintf("%d", r8))
+		gLabel.SetText(fmt.Sprintf("%d", g8))
+		bLabel.SetText(fmt.Sprintf("%d", b8))
+		aLabel.SetText(fmt.Sprintf("%d", a8))
+	}
+
+	// Функция обновления редактора при выборе цвета в списке
+	updateEditorForSelected := func(key string) {
+		if updating || key == "" {
+			return
+		}
+		updating = true
+		defer func() { updating = false }()
+
+		selectedKey = key
+		col := getColorFromMap(currentColors, key)
+		r, g, b, _ := col.RGBA()
+		// Используем альфа из currentPickerColor, если он есть
+		alpha := uint8(255)
+		if currentPickerColor != nil {
+			_, _, _, a := currentPickerColor.RGBA()
+			alpha = uint8(a >> 8)
+		}
+		newCol := color.NRGBA{R: uint8(r >> 8), G: uint8(g >> 8), B: uint8(b >> 8), A: alpha}
+		currentPickerColor = newCol
+		updateColorDisplay(newCol)
+		if colorPicker != nil {
+			colorPicker.SetColor(newCol)
+			colorPicker.Refresh()
+		}
+		if colorNameLabel != nil {
+			for _, e := range entries {
+				if e.Key == key {
+					colorNameLabel.SetText(e.Label)
+					break
+				}
+			}
+		}
+	}
 
 	// Функция построения превью
 	buildPreview := func() fyne.CanvasObject {
@@ -205,12 +284,17 @@ func (app *App) showThemeEditor() {
 			disabledBtn,
 		)
 
-		// ---- Поле ввода с Placeholder ----
-		entry := widget.NewEntry()
-		entry.SetPlaceHolder("Placeholder text longer")
-		entrySpacer := canvas.NewRectangle(color.Transparent)
-		entrySpacer.SetMinSize(fyne.NewSize(200, 0))
-		entryContainer := container.NewStack(entrySpacer, entry)
+		// ---- Поле ввода с Placeholder (размещаем справа от кнопок) ----
+		placeholderEntry := widget.NewEntry()
+		placeholderEntry.SetPlaceHolder("Placeholder text longer")
+		placeholderSpacer := canvas.NewRectangle(color.Transparent)
+		placeholderSpacer.SetMinSize(fyne.NewSize(200, 0))
+		placeholderContainerLocal := container.NewStack(placeholderSpacer, placeholderEntry)
+
+		topRowButtons := container.NewHBox(
+			btnRow,
+			container.NewPadded(placeholderContainerLocal),
+		)
 
 		// ---- Данные для таблицы ----
 		type rowData struct {
@@ -228,7 +312,6 @@ func (app *App) showThemeEditor() {
 			{"Missing", themes.ColorTableMissingFolder, true},
 		}
 
-		// Список статусов, которые мы покажем в колонках
 		statusKeys := []string{
 			themes.ColorStatusActive,
 			themes.ColorStatusInactive,
@@ -238,32 +321,43 @@ func (app *App) showThemeEditor() {
 			themes.ColorStatusMissing,
 			themes.ColorStatusVortex,
 			themes.ColorStatusSymlink,
+			themes.ColorStatusManual,
 		}
 		statusLabels := []string{
 			"Active", "Inactive", "Broken", "Conflict",
 			"Obsolete", "Missing", "Vortex", "Symlink",
+			"Manual",
 		}
 
-		// Создаём таблицу: строк = rows + 1 (заголовок), колонок = 2 + len(statusKeys)
 		numCols := 2 + len(statusKeys)
 
 		table := widget.NewTable(
 			func() (int, int) { return len(rows) + 1, numCols },
 			func() fyne.CanvasObject {
-				bg := canvas.NewRectangle(color.Transparent)
-				text := canvas.NewText("", color.White)
-				return container.NewStack(bg, text)
+				spacer := canvas.NewRectangle(color.Transparent)
+				spacer.SetMinSize(fyne.NewSize(1, 30))
+				return container.NewStack(spacer)
 			},
 			func(id widget.TableCellID, cell fyne.CanvasObject) {
 				stack := cell.(*fyne.Container)
-				bg := stack.Objects[0].(*canvas.Rectangle)
-				text := stack.Objects[1].(*canvas.Text)
+				var spacer fyne.CanvasObject
+				if len(stack.Objects) > 0 {
+					spacer = stack.Objects[0]
+				}
+				stack.Objects = nil
+				if spacer != nil {
+					stack.Add(spacer)
+				} else {
+					s := canvas.NewRectangle(color.Transparent)
+					s.SetMinSize(fyne.NewSize(1, 30))
+					stack.Add(s)
+				}
 
-				// Определяем, заголовок это или данные
 				if id.Row == 0 {
-					bg.FillColor = getColorFromMap(currentColors, themes.ColorTableHeaderBg)
+					bg := canvas.NewRectangle(getColorFromMap(currentColors, themes.ColorTableHeaderBg))
+					stack.Add(bg)
+					text := canvas.NewText("", fgColor)
 					text.TextStyle = fyne.TextStyle{Bold: true}
-					text.Color = fgColor
 					switch id.Col {
 					case 0:
 						text.Text = "✔"
@@ -275,55 +369,49 @@ func (app *App) showThemeEditor() {
 							text.Text = statusLabels[idx]
 						}
 					}
-				} else {
-					rowIdx := id.Row - 1
-					if rowIdx >= len(rows) {
-						return
-					}
-					row := rows[rowIdx]
+					stack.Add(text)
+					return
+				}
 
-					// Фон строки — цвет из темы
-					bg.FillColor = getColorFromMap(currentColors, row.colorKey)
+				rowIdx := id.Row - 1
+				if rowIdx >= len(rows) {
+					return
+				}
+				row := rows[rowIdx]
 
-					// Обычный текст (не жирный)
-					text.TextStyle = fyne.TextStyle{}
+				bg := canvas.NewRectangle(getColorFromMap(currentColors, row.colorKey))
+				stack.Add(bg)
 
-					switch id.Col {
-					case 0:
-						if row.checkbox {
-							text.Text = "✔"
-						} else {
-							text.Text = " "
-						}
-						text.Color = fgColor
-					case 1:
-						text.Text = row.label
-						text.Color = fgColor
-					default:
-						idx := id.Col - 2
-						if idx < len(statusKeys) {
-							statusColor := getColorFromMap(currentColors, statusKeys[idx])
-							text.Color = statusColor
-							text.Text = statusLabels[idx]
-						}
+				switch id.Col {
+				case 0:
+					check := widget.NewCheck("", nil)
+					check.SetChecked(row.checkbox)
+					check.OnChanged = func(b bool) {}
+					stack.Add(check)
+				case 1:
+					text := canvas.NewText(row.label, fgColor)
+					stack.Add(text)
+				default:
+					idx := id.Col - 2
+					if idx < len(statusKeys) {
+						statusColor := getColorFromMap(currentColors, statusKeys[idx])
+						text := canvas.NewText(statusLabels[idx], statusColor)
+						stack.Add(text)
 					}
 				}
-				bg.Refresh()
-				text.Refresh()
+				stack.Refresh()
 			},
 		)
 
-		// Настраиваем ширину колонок
-		table.SetColumnWidth(0, 40)  // чекбокс
-		table.SetColumnWidth(1, 100) // название
+		table.SetColumnWidth(0, 40)
+		table.SetColumnWidth(1, 100)
 		for i := 0; i < len(statusKeys); i++ {
-			table.SetColumnWidth(2+i, 80) // каждый статус
+			table.SetColumnWidth(2+i, 80)
 		}
 		table.SetRowHeight(-1, 30)
 
-		// Оборачиваем таблицу в скролл
 		tableScroll := container.NewVScroll(table)
-		tableScroll.SetMinSize(fyne.NewSize(0, 200))
+		tableScroll.SetMinSize(fyne.NewSize(0, 220))
 
 		// ---- Консоль (имитация) ----
 		consoleHeader := canvas.NewText("Console", fgColor)
@@ -344,7 +432,6 @@ func (app *App) showThemeEditor() {
 			container.NewPadded(consoleText),
 		)
 
-		// Добавляем распорку для минимальной высоты консоли
 		consoleSpacer := canvas.NewRectangle(color.Transparent)
 		consoleSpacer.SetMinSize(fyne.NewSize(0, 80))
 		consoleStack := container.NewStack(consoleSpacer, consoleBg, consolePanel)
@@ -352,8 +439,7 @@ func (app *App) showThemeEditor() {
 		// ---- Сборка всей превью ----
 		top := container.NewVBox(
 			headerLabel,
-			btnRow,
-			container.NewHBox(container.NewPadded(entryContainer)),
+			topRowButtons,
 			widget.NewSeparator(),
 			tableScroll,
 			consoleStack,
@@ -370,33 +456,6 @@ func (app *App) showThemeEditor() {
 		}
 	}
 
-	updateEditorForSelected := func(key string) {
-		if key == "" {
-			return
-		}
-		selectedKey = key
-		col := getColorFromMap(currentColors, key)
-		if sampleRect != nil {
-			sampleRect.FillColor = col
-			sampleRect.Refresh()
-		}
-		if colorPicker != nil {
-			colorPicker.SetColor(col)
-			colorPicker.Refresh()
-		}
-		if hexEntry != nil {
-			hexEntry.SetText(hexFromColor(col))
-		}
-		if colorNameLabel != nil {
-			for _, e := range entries {
-				if e.Key == key {
-					colorNameLabel.SetText(e.Label)
-					break
-				}
-			}
-		}
-	}
-
 	// ── Левая таблица ──────────────────────────────────────────────
 	colorList = widget.NewTable(
 		func() (int, int) { return len(displayedEntries), 2 },
@@ -404,27 +463,42 @@ func (app *App) showThemeEditor() {
 			rect := canvas.NewRectangle(color.Transparent)
 			rect.SetMinSize(fyne.NewSize(30, 20))
 			label := widget.NewLabel("")
-			return container.NewHBox(rect, label)
+			label.Wrapping = fyne.TextWrapOff
+			label.Alignment = fyne.TextAlignLeading
+			labelBg := canvas.NewRectangle(color.Transparent)
+			labelBg.SetMinSize(fyne.NewSize(170, 20))
+			stack := container.NewStack(labelBg, label)
+			return container.NewHBox(rect, stack)
 		},
 		func(id widget.TableCellID, obj fyne.CanvasObject) {
 			if id.Row >= len(displayedEntries) {
 				return
 			}
 			entry := displayedEntries[id.Row]
-			box := obj.(*fyne.Container)
+			hbox := obj.(*fyne.Container)
+			hbox.Objects = nil
+
 			if id.Col == 0 {
-				rect := box.Objects[0].(*canvas.Rectangle)
+				rect := canvas.NewRectangle(color.Transparent)
+				rect.SetMinSize(fyne.NewSize(130, 20))
 				col := getColorFromMap(currentColors, entry.Key)
 				rect.FillColor = col
-				rect.Refresh()
+				hbox.Add(rect)
 			} else {
-				label := box.Objects[1].(*widget.Label)
-				label.SetText(entry.Label)
+				label := widget.NewLabel(entry.Label)
+				label.Wrapping = fyne.TextWrapOff
+				label.Alignment = fyne.TextAlignLeading
+				label.TextStyle = fyne.TextStyle{Bold: true}
+				labelBg := canvas.NewRectangle(color.Transparent)
+				labelBg.SetMinSize(fyne.NewSize(170, 20))
+				stack := container.NewStack(labelBg, label)
+				hbox.Add(stack)
 			}
+			hbox.Refresh()
 		},
 	)
-	colorList.SetColumnWidth(0, 40)
-	colorList.SetColumnWidth(1, 200)
+	colorList.SetColumnWidth(0, 130)
+	colorList.SetColumnWidth(1, 220)
 	colorList.SetRowHeight(-1, 30)
 	colorList.OnSelected = func(id widget.TableCellID) {
 		if id.Row < len(displayedEntries) {
@@ -433,6 +507,12 @@ func (app *App) showThemeEditor() {
 	}
 
 	applyFilter := func() {
+		if updating {
+			return
+		}
+		updating = true
+		defer func() { updating = false }()
+
 		displayedEntries = nil
 		searchLower := strings.ToLower(searchText)
 		for _, e := range entries {
@@ -458,7 +538,7 @@ func (app *App) showThemeEditor() {
 		}
 	}
 
-	// ── Поиск и фильтр (с фиксированной шириной) ──────────────────
+	// ── Поиск и фильтр ──────────────────────────────────────────────
 	searchEntry := widget.NewEntry()
 	searchEntry.SetPlaceHolder("Search...")
 	searchEntry.OnChanged = func(s string) {
@@ -487,55 +567,89 @@ func (app *App) showThemeEditor() {
 	)
 
 	// ── Правая панель ──────────────────────────────────────────────
-	colorNameLabel = widget.NewLabel("")
-	sampleRect = canvas.NewRectangle(color.Transparent)
-	sampleRect.SetMinSize(fyne.NewSize(60, 40))
-
-	hexEntry = widget.NewEntry()
-	entrySpacer := canvas.NewRectangle(color.Transparent)
-	entrySpacer.SetMinSize(fyne.NewSize(150, 0))
-	hexEntryContainer := container.NewStack(entrySpacer, hexEntry)
-	hexEntry.Validator = validation.NewRegexp(`^#[0-9a-fA-F]{6}$`, "Invalid hex (#RRGGBB)")
+	// HEX ввод
 	hexEntry.OnChanged = func(s string) {
+		if updating {
+			return
+		}
+		updating = true
+		defer func() { updating = false }()
+
 		if c, err := colorFromHex(s); err == nil {
-			currentColors[selectedKey] = c
-			sampleRect.FillColor = c
-			sampleRect.Refresh()
-			colorPicker.SetColor(c)
+			// Если currentPickerColor не nil, берём альфа из него, иначе 255
+			alpha := uint8(255)
+			if currentPickerColor != nil {
+				_, _, _, a := currentPickerColor.RGBA()
+				alpha = uint8(a >> 8)
+			}
+			newCol := color.NRGBA{R: c.R, G: c.G, B: c.B, A: alpha}
+			currentPickerColor = newCol
+			currentColors[selectedKey] = newCol
+			updateColorDisplay(newCol)
+			colorPicker.SetColor(newCol)
 			colorPicker.Refresh()
 			refreshPreview()
 			colorList.Refresh()
 		}
 	}
 
+	// Пикер
 	colorPicker = colorpicker.New(200, colorpicker.StyleHue)
 	spacer := canvas.NewRectangle(color.Transparent)
 	spacer.SetMinSize(fyne.NewSize(200, 200))
 	pickerWrapper := container.NewStack(spacer, colorPicker)
 
 	colorPicker.SetOnChanged(func(c color.Color) {
+		if updating {
+			return
+		}
+		updating = true
+		defer func() { updating = false }()
+
 		if selectedKey == "" {
 			return
 		}
+		currentPickerColor = c // сохраняем
 		currentColors[selectedKey] = c
-		sampleRect.FillColor = c
-		sampleRect.Refresh()
-		hexEntry.SetText(hexFromColor(c))
+		updateColorDisplay(c)
 		refreshPreview()
 		colorList.Refresh()
 	})
-	colorPicker.Refresh()
 
-	pickerBox := container.NewVBox(
-		colorNameLabel,
-		container.NewHBox(sampleRect, hexEntryContainer),
-		pickerWrapper,
+	// Правая колонка (hex + RGB)
+	hexLabel := widget.NewLabel("Hex")
+	rgbLabel := widget.NewLabel("RGB")
+	rgbLabel.TextStyle = fyne.TextStyle{Bold: true}
+
+	hexBox := container.NewVBox(hexLabel, hexEntry)
+	rgbBox := container.NewVBox(
+		rgbLabel,
+		container.NewHBox(
+			widget.NewLabel("R:"), rLabel,
+			widget.NewLabel("  G:"), gLabel,
+			widget.NewLabel("  B:"), bLabel,
+			widget.NewLabel("  A:"), aLabel,
+		),
 	)
+	rightColumn := container.NewVBox(hexBox, widget.NewSeparator(), rgbBox)
+
+	// Горизонтальный сплит: пикер слева, колонка справа
+	pickerSplit := container.NewHSplit(pickerWrapper, rightColumn)
+	pickerSplit.Offset = 0.6
+
+	topRow := container.NewHBox(sampleRect, container.NewPadded(colorNameLabel))
+	pickerBox := container.NewVBox(topRow, pickerSplit)
 
 	previewContainer = container.NewStack(buildPreview())
 
 	// ── Кнопки ──────────────────────────────────────────────────────
 	applyBtn := widget.NewButton("Apply", func() {
+		if updating {
+			return
+		}
+		updating = true
+		defer func() { updating = false }()
+
 		if app.cfg.CustomColors == nil {
 			app.cfg.CustomColors = make(map[string]color.NRGBA)
 		}
@@ -561,11 +675,15 @@ func (app *App) showThemeEditor() {
 	})
 
 	resetBtn := widget.NewButton("Reset to Default", func() {
-		defaultTheme := app.myApp.Settings().Theme()
-		variant := app.myApp.Settings().ThemeVariant()
-		for _, e := range entries {
-			col := defaultTheme.Color(fyne.ThemeColorName(e.Key), variant)
-			currentColors[e.Key] = col
+		if updating {
+			return
+		}
+		updating = true
+		defer func() { updating = false }()
+
+		// Сброс к originalColors
+		for k, v := range originalColors {
+			currentColors[k] = v
 		}
 		refreshPreview()
 		colorList.Refresh()
@@ -585,11 +703,23 @@ func (app *App) showThemeEditor() {
 
 	previewScroll := container.NewScroll(previewContainer)
 	previewScroll.SetMinSize(fyne.NewSize(400, 300))
-	rightPanel := container.NewBorder(
+
+	topRowWithButtons := container.NewHBox(btnBox)
+	topBar := container.NewVBox(
+		topRowWithButtons,
+		widget.NewSeparator(),
+	)
+
+	contentArea := container.NewBorder(
 		pickerBox,
-		btnBox,
-		nil, nil,
+		nil, nil, nil,
 		previewScroll,
+	)
+
+	rightPanel := container.NewBorder(
+		topBar,
+		nil, nil, nil,
+		contentArea,
 	)
 
 	split := container.NewHSplit(leftPanel, rightPanel)

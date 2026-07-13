@@ -335,7 +335,7 @@ func (app *App) showAMLConfigWindow() {
 
 			if dirty {
 				// Диалог должен показываться в главном потоке, поэтому используем fyne.Do
-				choice := app.showChoiceDialog(
+				choice := app.showChoiceDialogSync(
 					win,
 					app.messages["warning_title"],
 					app.messages["refresh_discard_changes"],

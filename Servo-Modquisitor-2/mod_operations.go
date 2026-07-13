@@ -37,6 +37,14 @@ func safeJoin(destDir, name string) (string, error) {
 }
 
 func (app *App) refreshModList() {
+	// Проверяем, что UI-виджеты созданы
+	if app.modTable == nil || app.headerTable == nil || app.systemModsTable == nil {
+		return
+	}
+	if app.mainWindow == nil || app.mainWindow.Canvas() == nil {
+		return
+	}
+
 	mods := checks.GetModsInfo(app.cfg.Language, app.cfg.ForceEnglishModNames)
 
 	var sysMods, regMods []checks.ModInfo
@@ -142,7 +150,7 @@ func (app *App) refreshModList() {
 			}
 		}
 		if cacheKey != "" {
-			if info, ok := app.nexusVersionCache[cacheKey]; ok {
+			if info, ok := app.getCachedVersion(cacheKey); ok {
 				regMods[i].Source = info.Source
 			} else {
 				regMods[i].Source = "manual"
@@ -179,7 +187,7 @@ func (app *App) refreshModList() {
 			}
 		}
 		if cacheKey != "" {
-			if info, ok := app.nexusVersionCache[cacheKey]; ok {
+			if info, ok := app.getCachedVersion(cacheKey); ok {
 				sysMods[i].Source = info.Source
 			} else {
 				sysMods[i].Source = "manual"
@@ -247,14 +255,9 @@ func (app *App) refreshModList() {
 			}
 		}
 		if cacheKey != "" {
-			if saved, ok := app.nexusVersionCache[cacheKey]; ok {
-				if latest, ok := app.nexusLatestVersions[cacheKey]; ok {
-					// Сравниваем версии (используем функцию compareVersions из update.go)
-					if compareVersions(latest, saved.Version) > 0 {
-						mod.HasUpdate = true
-					} else {
-						mod.HasUpdate = false
-					}
+			if saved, ok := app.getCachedVersion(cacheKey); ok {
+				if latest, ok := app.getLatestVersion(cacheKey); ok {
+					mod.HasUpdate = compareVersions(latest, saved.Version) > 0
 				} else {
 					mod.HasUpdate = false
 				}
@@ -268,16 +271,22 @@ func (app *App) refreshModList() {
 
 	app.allMods = regMods
 	app.orderDirty = false
+
 	app.filterModList()
+
 	app.updateSystemModsTable()
+
 	app.forceRefreshTable()
+
 }
 
 func (app *App) updateSystemModsTable() {
-	if app.systemModsTable != nil {
-		app.systemModsTable.Length = func() (int, int) { return len(app.systemMods), TableColumnCount }
-		app.systemModsTable.Refresh()
+	if app.systemModsTable == nil {
+		app.appendLog("updateSystemModsTable: systemModsTable is nil, skipping")
+		return
 	}
+	app.systemModsTable.Length = func() (int, int) { return len(app.systemMods), TableColumnCount }
+	app.systemModsTable.Refresh()
 }
 
 func (app *App) saveCurrentOrder() {
@@ -286,6 +295,8 @@ func (app *App) saveCurrentOrder() {
 }
 
 func (app *App) buildLoadOrderEntries() []checks.LoadOrderEntry {
+	app.modsMutex.RLock()
+	defer app.modsMutex.RUnlock()
 	entries := make([]checks.LoadOrderEntry, len(app.allMods))
 	for i, m := range app.allMods {
 		entries[i] = checks.LoadOrderEntry{Name: m.Name, Active: m.Active}
@@ -294,6 +305,7 @@ func (app *App) buildLoadOrderEntries() []checks.LoadOrderEntry {
 }
 
 func (app *App) toggleModActive(name string, active bool) {
+	app.modsMutex.Lock()
 	for i := range app.allMods {
 		if app.allMods[i].Name == name {
 			app.allMods[i].Active = active
@@ -301,11 +313,18 @@ func (app *App) toggleModActive(name string, active bool) {
 			break
 		}
 	}
-	app.updateTableBorder()
-	app.filterModList()
+	app.modsMutex.Unlock()
+	// UI-обновления - вне мьютекса, в главном потоке
+	fyne.Do(func() {
+		app.updateTableBorder()
+		app.filterModList()
+		app.forceRefreshTable()
+	})
 }
 
 func (app *App) findModByName(name string) *checks.ModInfo {
+	app.modsMutex.RLock()
+	defer app.modsMutex.RUnlock()
 	for i := range app.allMods {
 		if app.allMods[i].Name == name {
 			return &app.allMods[i]
@@ -430,7 +449,14 @@ func (app *App) extractArchiveTo(archivePath, destDir string) error {
 	}
 	defer f.Close()
 
-	// Определяем формат архива по сигнатуре
+	info, err := f.Stat()
+	if err != nil {
+		return fmt.Errorf("failed to stat archive: %w", err)
+	}
+	if info.Size() > MaxArchiveSize {
+		return fmt.Errorf("archive size %d exceeds limit %d", info.Size(), MaxArchiveSize)
+	}
+
 	format, _, err := archives.Identify(context.Background(), archivePath, f)
 	if err != nil {
 		return fmt.Errorf("unsupported archive format: %w", err)
@@ -440,21 +466,26 @@ func (app *App) extractArchiveTo(archivePath, destDir string) error {
 		return fmt.Errorf("format does not support extraction")
 	}
 
-	// Возвращаем указатель в начало файла
 	if _, err := f.Seek(0, io.SeekStart); err != nil {
 		return err
 	}
 
-	// Создаём временную папку для безопасного извлечения
 	tmpDir, err := os.MkdirTemp("", "servo-extract-")
 	if err != nil {
 		return err
 	}
 	defer os.RemoveAll(tmpDir)
 
-	// Распаковываем во временную папку
+	var totalExtracted int64
+	var fileCount int
 	err = extractor.Extract(context.Background(), f, func(ctx context.Context, fi archives.FileInfo) error {
-		// Защита от path traversal
+		if fi.Size() > MaxFileSize {
+			return fmt.Errorf("file %s size %d exceeds limit %d", fi.NameInArchive, fi.Size(), MaxFileSize)
+		}
+		totalExtracted += fi.Size()
+		if totalExtracted > MaxExtractedSize {
+			return fmt.Errorf("total extracted size %d exceeds limit %d", totalExtracted, MaxExtractedSize)
+		}
 		targetPath, err := safeJoin(tmpDir, fi.NameInArchive)
 		if err != nil {
 			return err
@@ -462,7 +493,6 @@ func (app *App) extractArchiveTo(archivePath, destDir string) error {
 		if fi.IsDir() {
 			return os.MkdirAll(targetPath, 0755)
 		}
-		// Создаём родительские каталоги
 		if err := os.MkdirAll(filepath.Dir(targetPath), 0755); err != nil {
 			return err
 		}
@@ -477,13 +507,17 @@ func (app *App) extractArchiveTo(archivePath, destDir string) error {
 		}
 		defer rc.Close()
 		_, err = io.Copy(out, rc)
+		if err != nil {
+		}
+		fileCount++
+		if fileCount%10 == 0 {
+		}
 		return err
 	})
 	if err != nil {
 		return err
 	}
 
-	// Копируем содержимое временной папки в целевую директорию
 	entries, err := os.ReadDir(tmpDir)
 	if err != nil {
 		return err
@@ -529,6 +563,8 @@ func (app *App) syncModsEnabledState() {
 }
 
 func (app *App) selectedMods() []string {
+	app.modsMutex.RLock()
+	defer app.modsMutex.RUnlock()
 	var names []string
 	for _, m := range app.allMods {
 		if m.Selected {
@@ -691,6 +727,8 @@ func (app *App) moveSelectedToPosition() {
 }
 
 func (app *App) findModIndexByName(name string) int {
+	app.modsMutex.RLock()
+	defer app.modsMutex.RUnlock()
 	for i, m := range app.allMods {
 		if m.Name == name {
 			return i
@@ -730,14 +768,8 @@ func (app *App) InstallModFromArchive(archivePath string, activate bool, knownVe
 	// Проверяем, не является ли архив программой (ищем Servo-Modquisitor-2.exe)
 	expectedExe := AppName + ".exe"
 	if _, err := os.Stat(filepath.Join(tmpDir, expectedExe)); err == nil {
-		app.appendLog("Program archive detected, updating...")
-		err := app.installProgramFromArchive(tmpDir)
-		if err != nil {
-			app.appendLog(fmt.Sprintf("Program update failed: %v", err))
-			return "", "", err
-		}
-		// После успешного обновления программа перезапустится, поэтому возвращаем успех
-		return "", "", nil
+		app.appendLog("Program archive detected. Automatic update is not supported. Please install manually.")
+		return "", "", fmt.Errorf("program update not supported")
 	}
 
 	// Проверяем, не является ли архив сортировочным (mod_database.json и/или mandatory_obsolete_incompatible_dependencies.json)
@@ -951,8 +983,9 @@ func (app *App) InstallModFromArchive(archivePath string, activate bool, knownVe
 	return installedName, version, nil
 }
 
-// Обновление одного мода. Только для Premium-пользователей!
-func (app *App) updateModFromNexus(mod *checks.ModInfo) {
+// Обновление одного мода.
+// skipConfirm - если true, пропускаем диалог подтверждения загрузки.
+func (app *App) updateModFromNexus(mod *checks.ModInfo, skipConfirm bool) {
 	if mod.URL == "" || app.getAuthToken() == "" {
 		app.appendLog(app.messages["update_skipped_no_url"])
 		return
@@ -963,50 +996,66 @@ func (app *App) updateModFromNexus(mod *checks.ModInfo) {
 		return
 	}
 
-	// Проверяем, является ли папка симлинком
-	modPath := filepath.Join(app.cfg.ModsPath, mod.Name)
-	info, err := os.Lstat(modPath)
-	if err == nil && info.Mode()&os.ModeSymlink != 0 {
+	if app.isSymlinkFolder(mod.Name) {
 		app.appendLog(fmt.Sprintf(app.messages["log_skipping_update_symlink"], mod.Name))
 		app.tooltipStatus.Show(fmt.Sprintf(app.messages["log_skipping_update_symlink_skipped"], mod.Name))
 		app.tooltipStatus.HideAfterDelay()
 		return
 	}
 
-	modIDStr := fmt.Sprintf("%d", modID)
+	modIDStr := strconv.Itoa(modID)
 	cacheKey := modIDStr + ":" + mod.Name
-	saved, exists := app.nexusVersionCache[cacheKey]
+	saved, exists := app.getCachedVersion(cacheKey)
 
-	// Если мод установлен вручную - предупреждаем
 	if exists && saved.Source == "manual" {
-		choice := app.showChoiceDialog(
+		// Этот диалог нужен всегда - он предупреждает, что мод ручной.
+		app.showChoiceDialog(
 			app.mainWindow,
 			app.messages["warning_title"],
 			fmt.Sprintf(app.messages["manual_mod_update_warning"], mod.Name),
+			func(choice int) {
+				if choice == 0 {
+					app.doUpdateModFromNexus(mod, modID, modIDStr, cacheKey, skipConfirm)
+				}
+			},
 			app.messages["btn_continue"],
 			app.messages["btn_cancel"],
 		)
-		if choice != 0 {
-			return
-		}
+		return
 	}
+	// Если не ручной, сразу запускаем обновление
+	app.doUpdateModFromNexus(mod, modID, modIDStr, cacheKey, skipConfirm)
+}
 
+// doUpdateModFromNexus - выполняет фактическое обновление (без лишних диалогов).
+// skipConfirm - если true, пропускаем диалог подтверждения загрузки.
+func (app *App) doUpdateModFromNexus(mod *checks.ModInfo, modID int, modIDStr, cacheKey string, skipConfirm bool) {
 	fileInfo, err := app.getLatestFileInfoForMod(modID, mod.Name)
 	if err != nil {
 		app.logNexusError(err, mod.Name)
 		return
 	}
 
-	directURL, filename, err := app.getPremiumDownloadURL(modIDStr, fmt.Sprintf("%d", fileInfo.ID))
+	directURL, filename, err := app.getPremiumDownloadURL(modIDStr, strconv.Itoa(fileInfo.ID))
 	if err != nil {
 		app.appendLog(fmt.Sprintf(app.messages["failed_get_download_link"], err))
 		return
 	}
-	app.showDownloadDialog(directURL, filename, mod.Name, fileInfo, modIDStr)
+
+	if skipConfirm {
+		// Пропускаем диалог подтверждения, сразу начинаем скачивание.
+		app.startDownload(directURL, filename, mod.Name, fileInfo, modIDStr)
+	} else {
+		app.showDownloadDialog(directURL, filename, mod.Name, fileInfo, modIDStr)
+	}
 }
 
 // Обновление всех модов (только те, у которых есть обновление). Только для Premium-пользователей!
 func (app *App) updateAllModsFromNexus() {
+	if app.allMods == nil {
+		app.appendLog("No mods loaded, cannot update.")
+		return
+	}
 	app.appendLog(app.messages["log_starting_batch_update"])
 	if app.getAuthToken() == "" {
 		app.appendLog(app.messages["nexus_api_key_missing"])
@@ -1014,45 +1063,52 @@ func (app *App) updateAllModsFromNexus() {
 	}
 
 	app.appendLog(app.messages["log_collecting_mods"])
-	// Сначала собираем список модов, для которых действительно есть обновление
 	var modsToUpdate []*checks.ModInfo
+	totalMods := 0
+	processed := 0
+
+	// Считаем общее количество модов, которые будем проверять (исключаем системные и без URL)
+	for _, mod := range app.allMods {
+		if mod.URL != "" && !mod.IsSystem {
+			totalMods++
+		}
+	}
+
 	for i := range app.allMods {
 		mod := &app.allMods[i]
 		if mod.URL == "" || mod.IsSystem {
 			continue
 		}
+
 		modID := helpers.ExtractModIDFromURL(mod.URL)
 		if modID == 0 {
+			processed++
+			continue
+		}
+		if app.isSymlinkFolder(mod.Name) {
+			app.appendLog(fmt.Sprintf("Skipping %s: folder is a symlink", mod.Name))
+			processed++
 			continue
 		}
 
-		// Проверяем, является ли папка симлинком
-		modPath := filepath.Join(app.cfg.ModsPath, mod.Name)
-		info, err := os.Lstat(modPath)
-		if err == nil && info.Mode()&os.ModeSymlink != 0 {
-			app.appendLog(fmt.Sprintf("Skipping %s: folder is a symlink", mod.Name))
-			continue
-		}
-		// Получаем актуальную информацию о последнем файле, соответствующем папке
 		fileInfo, err := app.getLatestFileInfoForMod(modID, mod.Name)
 		if err != nil {
 			app.logNexusError(err, mod.Name)
+			processed++
 			continue
 		}
 		cacheKey := fmt.Sprintf("%d:%s", modID, mod.Name)
-		var saved ModVersionInfo
-		if info, exists := app.nexusVersionCache[cacheKey]; exists {
-			saved = info
-		} else {
-			// Нет записи в кэше — считаем мод установленным вручную
-			saved.Source = "manual"
-		}
-		// Если Source не задан или "manual" — пропускаем
-		if saved.Source == "" || saved.Source == "manual" {
+		saved, exists := app.getCachedVersion(cacheKey)
+		if !exists || saved.Source == "" || saved.Source == "manual" {
+			processed++
 			continue
 		}
 		if saved.Timestamp == 0 || fileInfo.UploadedTimestamp > saved.Timestamp {
 			modsToUpdate = append(modsToUpdate, mod)
+		}
+		processed++
+		if processed%10 == 0 {
+			app.appendLog(fmt.Sprintf("Progress: %d of %d mods checked", processed, totalMods))
 		}
 	}
 
@@ -1062,14 +1118,15 @@ func (app *App) updateAllModsFromNexus() {
 	}
 
 	// Диалог подтверждения
-	choice := app.showChoiceDialog(
+	choice := app.showChoiceDialogSync(
 		app.mainWindow,
 		app.messages["update_title"],
 		fmt.Sprintf(app.messages["updates_found_count_update"], len(modsToUpdate)),
-		app.messages["yes"],
+		app.messages["btn_yes"],
 		app.messages["btn_cancel"],
 	)
 	if choice != 0 {
+		app.appendLog("Batch update cancelled by user.")
 		return
 	}
 
@@ -1077,11 +1134,18 @@ func (app *App) updateAllModsFromNexus() {
 	updatedCount := 0
 	for _, mod := range modsToUpdate {
 		app.appendLog(fmt.Sprintf(app.messages["updating_mod"], mod.Name))
-		app.updateModFromNexus(mod)
+		app.updateModFromNexus(mod, true) // skipConfirm = true
 		updatedCount++
 		time.Sleep(500 * time.Millisecond)
+		app.appendLog(fmt.Sprintf("Progress: %d of %d mods updated", updatedCount, len(modsToUpdate)))
 	}
+
 	app.appendLog(fmt.Sprintf(app.messages["update_all_finished"], updatedCount))
+
+	// Финальное обновление UI
+	fyne.Do(func() {
+		app.refreshModList()
+	})
 }
 
 // Удалить выбранные моды
@@ -1147,16 +1211,24 @@ func (app *App) removeSelectedMods() {
 
 // Удалить все моды
 func (app *App) removeAllMods() {
+	app.modsMutex.RLock()
+	mods := make([]string, 0, len(app.allMods))
 	for _, mod := range app.allMods {
 		if !mod.IsSystem {
-			checks.RemoveMod(mod.Name)
-			app.appendLog(fmt.Sprintf(app.messages["log_deleted"], mod.Name))
+			mods = append(mods, mod.Name)
 		}
 	}
-	app.refreshModList()
-	app.orderDirty = true
-	app.updateTableBorder()
-	app.appendLog(app.messages["log_all_mods_removed"])
+	app.modsMutex.RUnlock()
+	for _, name := range mods {
+		checks.RemoveMod(name)
+		app.appendLog(fmt.Sprintf(app.messages["log_deleted"], name))
+	}
+	fyne.Do(func() {
+		app.refreshModList()
+		app.orderDirty = true
+		app.updateTableBorder()
+		app.appendLog(app.messages["log_all_mods_removed"])
+	})
 }
 
 // Установка DML в корень игры
@@ -1370,27 +1442,27 @@ func (app *App) cacheModVersion(cacheKey, folderName, version string, timestamp 
 		return
 	}
 	if source == "" {
-		source = "manual" // безопасное значение по умолчанию
+		source = "manual"
 	}
-	app.nexusVersionCache[cacheKey] = ModVersionInfo{
+	app.setCachedVersion(cacheKey, ModVersionInfo{
 		Timestamp: timestamp,
 		Version:   version,
 		Folder:    folderName,
 		Source:    source,
-	}
+	})
 	app.saveNexusVersionCache()
 }
 
 // removeModFromData удаляет мод из внутренних структур и возвращает индекс, на котором он находился в displayedMods
 func (app *App) removeModFromData(modName string) (indexInDisplayed int, found bool) {
-	// Удаляем из allMods
+	app.modsMutex.Lock()
+	defer app.modsMutex.Unlock()
 	for i, m := range app.allMods {
 		if m.Name == modName {
 			app.allMods = append(app.allMods[:i], app.allMods[i+1:]...)
 			break
 		}
 	}
-	// Удаляем из displayedMods и запоминаем индекс
 	for i, m := range app.displayedMods {
 		if m.Name == modName {
 			indexInDisplayed = i
@@ -1399,7 +1471,6 @@ func (app *App) removeModFromData(modName string) (indexInDisplayed int, found b
 			break
 		}
 	}
-	// Если мод был выбран, сбрасываем выделение (оно будет восстановлено позже)
 	if app.selectedModName == modName {
 		app.selectedModName = ""
 		app.selectedModIndex.Store(-1)
@@ -1535,19 +1606,48 @@ func (app *App) normalizeArchiveStructure(tmpDir string) error {
 
 // downloadAndInstallSystemMod загружает и устанавливает системный мод.
 func (app *App) downloadAndInstallSystemMod(downloadURL, filename, displayName string, fileInfo *FileInfo, cacheKey string, modID int, installFunc func(string) error, logInstalling, logSuccess, logManual string) {
+	safeFilename, err := sanitizeFilename(filename)
+	if err != nil {
+		app.appendLog(fmt.Sprintf("Invalid filename for %s: %v", displayName, err))
+		return
+	}
+
+	// Диалог подтверждения
+	choice := app.showChoiceDialogSync(
+		app.mainWindow,
+		app.messages["confirm_download_title"],
+		fmt.Sprintf(app.messages["confirm_download_text"], displayName, safeFilename),
+		app.messages["btn_yes"],
+		app.messages["btn_no"],
+	)
+	if choice != 0 {
+		return
+	}
+
 	app.appendLog(fmt.Sprintf(app.messages["log_downloading_mod"], displayName))
 	bar := widget.NewProgressBar()
-	lbl := widget.NewLabel(fmt.Sprintf(app.messages["downloading"], filename))
+	lbl := widget.NewLabel(fmt.Sprintf(app.messages["downloading"], safeFilename))
 	content := container.NewVBox(lbl, bar)
 	dlg := dialog.NewCustom(app.messages["download_title"], app.messages["btn_cancel"], content, app.mainWindow)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	dlg.SetOnClosed(func() {
+		cancel()
+	})
+
 	dlg.Show()
 	go func() {
-		dest := filepath.Join(app.cfg.ModsPath, filename)
-		err := app.DownloadFileWithProgress(downloadURL, dest, bar)
+		dest := filepath.Join(app.cfg.ModsPath, safeFilename)
+		err := app.DownloadFileWithProgress(ctx, downloadURL, dest, bar)
 		fyne.Do(func() {
 			dlg.Hide()
 			if err != nil {
-				app.appendLog(fmt.Sprintf(app.messages["download_failed"], err))
+				if err == context.Canceled {
+					app.appendLog(app.messages["download_cancelled"])
+				} else {
+					app.appendLog(fmt.Sprintf(app.messages["download_failed"], err))
+				}
+				os.Remove(dest)
 				return
 			}
 			info, e := os.Stat(dest)
@@ -1561,12 +1661,12 @@ func (app *App) downloadAndInstallSystemMod(downloadURL, filename, displayName s
 				app.appendLog(fmt.Sprintf(app.messages["log_install_failed"], err))
 			} else {
 				if fileInfo != nil {
-					app.nexusVersionCache[cacheKey] = ModVersionInfo{
+					app.setCachedVersion(cacheKey, ModVersionInfo{
 						Timestamp: fileInfo.UploadedTimestamp,
 						Version:   fileInfo.Version,
 						Folder:    displayName,
 						Source:    "nexus",
-					}
+					})
 					app.saveNexusVersionCache()
 				}
 				app.appendLog(logSuccess)
@@ -1574,43 +1674,4 @@ func (app *App) downloadAndInstallSystemMod(downloadURL, filename, displayName s
 			os.Remove(dest)
 		})
 	}()
-}
-
-// installProgramFromArchive обновляет программу из архива.
-// tmpDir - путь к папке, содержащей новый .exe.
-// Возвращает ошибку или nil.
-func (app *App) installProgramFromArchive(tmpDir string) error {
-	// Ожидаемое имя исполняемого файла
-	expectedExe := AppName + ".exe" // "Servo-Modquisitor-2.exe"
-	newExePath := filepath.Join(tmpDir, expectedExe)
-	if _, err := os.Stat(newExePath); os.IsNotExist(err) {
-		return fmt.Errorf("expected executable %s not found in archive root", expectedExe)
-	}
-
-	// Получаем путь к текущему исполняемому файлу
-	currentExe, err := os.Executable()
-	if err != nil {
-		return fmt.Errorf("cannot locate current executable: %w", err)
-	}
-
-	// Сохраняем информацию о версии (можно оставить "manual" или попытаться извлечь, но для простоты оставляем)
-	app.nexusVersionCache[NexusCacheKeyProgram] = ModVersionInfo{
-		Timestamp: time.Now().Unix(),
-		Version:   "manual",
-		Folder:    "Program",
-		Source:    "manual",
-	}
-	app.saveNexusVersionCache()
-
-	// Копируем новый exe как .new
-	newExeFinal := currentExe + ".new"
-	if err := copyFile(newExePath, newExeFinal); err != nil {
-		return fmt.Errorf("failed to copy new executable: %w", err)
-	}
-
-	app.appendLog(app.messages["log_new_exe_copied"])
-
-	// Запускаем перезапуск
-	replaceAndRestart(currentExe, newExeFinal)
-	return nil
 }

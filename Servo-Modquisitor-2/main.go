@@ -33,14 +33,9 @@ func main() {
 		// Если не удалось - это первый экземпляр, продолжаем обычный запуск
 	}
 
-	// Если запущены с флагом --updated, пропускаем проверку isAlreadyRunning
-	if len(os.Args) > 1 && os.Args[1] == "--updated" {
-		// ничего не делаем, продолжаем запуск
-	} else {
-		if isAlreadyRunning() {
-			showAlreadyRunningDialog()
-			os.Exit(0)
-		}
+	if isAlreadyRunning() {
+		showAlreadyRunningDialog()
+		os.Exit(0)
 	}
 
 	myApp := app.NewWithID(AppID)

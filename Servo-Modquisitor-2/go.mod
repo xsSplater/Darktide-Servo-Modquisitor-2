@@ -6,6 +6,7 @@ require (
 	fyne.io/fyne/v2 v2.7.4
 	github.com/lusingander/colorpicker v0.7.5
 	github.com/mholt/archives v0.1.5
+	github.com/zalando/go-keyring v0.2.8
 	golang.org/x/sys v0.45.0
 )
 
@@ -18,6 +19,7 @@ require (
 	github.com/bodgit/sevenzip v1.6.4 // indirect
 	github.com/bodgit/windows v1.0.1 // indirect
 	github.com/clipperhouse/uax29/v2 v2.7.0 // indirect
+	github.com/danieljoos/wincred v1.2.3 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dsnet/compress v0.0.2-0.20230904184137-39efe44ab707 // indirect
 	github.com/fredbi/uri v1.1.1 // indirect
