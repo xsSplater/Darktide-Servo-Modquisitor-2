@@ -1,0 +1,195 @@
+# ╔════════════════════════════════════════════════════════════════════════════════════════════════════╗
+# ║ ░Warhammer 40,000 Darktide - Custom mod sorting, specifically for the Servo-Lexmechanicus mod.░░░░ ║
+# ║ ░List compiled by xsSplater. Blocks and mods are sorted alphabetically.░░░░░░░░░░░░░░░░░░░░░░░░░░░ ║
+# ╠════════════════════════════════════════════════════════════════════════════════════════════════════╣
+# ║ ░You can rearrange, add or remove blocks and/or mods as you wish.░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ ║
+# ║ ░If you have any problems or questions, write in the comments of the sorter on Nexus.░░░░░░░░░░░░░ ║
+# ╠════════════════════════════════════════════════════════════════════════════════════════════════════╣
+# ║ ░If you use my Servo-ModQuisitor sorter, DO NOT ADD THESE MODS: CharacterGrid, LogMeIn, ░░░░░░░░░░ ║
+# ║ ░Reconnect, psych_ward, DarktideLocalServer, Audio, animation_events, scoreboard and its░░░░░░░░░░ ║
+# ║ ░plugins, ChatBlock, master_item_community_patch, MultiBind, ToggleAltFire, hybrid_sprint,░░░░░░░░ ║
+# ║ ░guarantee_ability_activation, guarantee_weapon_swap, guarantee_special_action, Power_DI,░░░░░░░░░ ║
+# ║ ░true_level, Do I Know You, servo_friend and its plugins, extended_weapon_customization and its░░░ ║
+# ║ ░plugins, for_the_drip and its plugins, who_are_you. There shouldn't be errors, but still don't.░░ ║
+# ╚════════════════════════════════════════════════════════════════════════════════════════════════════╝
+# ╔════════════════════════════════════════════════════════════════════════════════════════════════════╗
+# ║ ░[AUDIO]░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ ║
+# ╚════════════════════════════════════════════════════════════════════════════════════════════════════╝
+CacklingTrapper
+
+# ╔════════════════════════════════════════════════════════════════════════════════════════════════════╗
+# ║ ░[CONTROLS]░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ ║
+# ╚════════════════════════════════════════════════════════════════════════════════════════════════════╝
+hub_hotkey_menus
+FullAuto
+PsykaniumInvHotkey
+
+# ╔════════════════════════════════════════════════════════════════════════════════════════════════════╗
+# ║ ░[DECODING]░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ ║
+# ╚════════════════════════════════════════════════════════════════════════════════════════════════════╝
+Decode_Helper
+Tree_Helper
+DecodeMinigameSolver
+
+# ╔════════════════════════════════════════════════════════════════════════════════════════════════════╗
+# ║ ░[FIXES]░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ ║
+# ╚════════════════════════════════════════════════════════════════════════════════════════════════════╝
+CorrectMissionVotingInfo
+crosshairs_fix
+GasOutline
+MemLeakFix
+YesTakeCandle
+
+# ╔════════════════════════════════════════════════════════════════════════════════════════════════════╗
+# ║ ░[GAMEPLAY]░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ ║
+# ╚════════════════════════════════════════════════════════════════════════════════════════════════════╝
+AfterGrenade
+LessAnnoyingPing
+StickyFingers
+
+# ╔════════════════════════════════════════════════════════════════════════════════════════════════════╗
+# ║ ░[HUD]░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ ║
+# ╚════════════════════════════════════════════════════════════════════════════════════════════════════╝
+barrels
+better_hud_info_view
+BrokerStimTimer
+custom_hud
+DisplayPing
+ForTheEmperor
+Healthbars
+HUDTweaker
+hideprompts
+kill_tracker
+KillfeedImprovements
+NumericUI
+PerilGauge
+pickup_notif_tweaker
+RecolorBossHealthBars
+Remembrancer
+show_crit_chance
+SimpleSpeedMeter
+StaminaVis
+TalentUI
+train_timer
+WarpUnboundTimer
+
+# ╔════════════════════════════════════════════════════════════════════════════════════════════════════╗
+# ║ ░[INDICATORS]░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ ║
+# ╚════════════════════════════════════════════════════════════════════════════════════════════════════╝
+crusher_attack_indicator
+danger_zone
+debuff_indicator
+Hound Zero
+markers_aio
+mauler_attack_indicator
+outline_colours
+PlayerOutlines
+RecolorStimms
+ScanHelper
+Spidey Sense
+status_colours
+StimmSupplyRings
+ticking_barrels
+TraumaOutlines
+whats_in_the_box
+
+# ╔════════════════════════════════════════════════════════════════════════════════════════════════════╗
+# ║ ░[INVENTORY]░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ ║
+# ╚════════════════════════════════════════════════════════════════════════════════════════════════════╝
+BetterLoadouts
+DefaultToHighestBlessingTier
+EmpowerUntilLimit
+EquippedIconPlus
+FilterSacrifice
+GoToMastery
+how_did_I_get_that
+ItemBorderColor
+ItemSorting
+LoadoutNames
+MarkPreview
+MyFavorites
+name_it
+QuickLookCard
+red_weapons_at_home
+ShowMeRealWeaponStats
+SortBrunt
+
+# ╔════════════════════════════════════════════════════════════════════════════════════════════════════╗
+# ║ ░[MENU]░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ ║
+# ╚════════════════════════════════════════════════════════════════════════════════════════════════════╝
+BetterMelk
+BornReady
+cancel_loading
+character_cosmetics_view_improved
+commodores_vestures_improved
+DifficultyColor
+DistinctSideMissionIcons
+Enhanced_descriptions
+ImprovedHavocTags
+InspectFromSocial
+InspectFromPartyFinder
+loadinglore
+MenuUIHider
+MissionGrid
+modular_menu_buttons
+MoreGraphicsOptions
+NoNews
+Nothing New
+OpenPlayerProfile
+REALPRICES
+ReorderChars
+RememberDifficulty
+RememberServerLocation
+ShowEquippedInLobby
+weapon_cosmetics_view_improved
+xsSplained
+
+# ╔════════════════════════════════════════════════════════════════════════════════════════════════════╗
+# ║ ░[MISSIONS]░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ ║
+# ╚════════════════════════════════════════════════════════════════════════════════════════════════════╝
+ManyMoreTry
+MissionBrief
+quickest_play
+SoloPlay
+TrueSoloQoL
+valkyrie
+
+# ╔════════════════════════════════════════════════════════════════════════════════════════════════════╗
+# ║ ░[PENANCES]░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ ║
+# ╚════════════════════════════════════════════════════════════════════════════════════════════════════╝
+Archivum Messelina
+claim_all_penances
+penances_improved
+PenancesForTheMission
+show-current-penance-stat
+
+# ╔════════════════════════════════════════════════════════════════════════════════════════════════════╗
+# ║ ░[TALENTS]░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ ║
+# ╚════════════════════════════════════════════════════════════════════════════════════════════════════╝
+MergedTalentStats
+ShareTalents
+smaller_talent_tree
+TalentRefundBelow
+
+# ╔════════════════════════════════════════════════════════════════════════════════════════════════════╗
+# ║ ░[VISUALS]░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ ║
+# ╚════════════════════════════════════════════════════════════════════════════════════════════════════╝
+BetterFireGrenade
+camera_freeflight
+CleanForceBlocking
+clear_smoke
+ConstantFov
+DisableScreenEffects
+GetOutOfTheWay
+machine_gods_beacon
+Perspectives
+veil_shield
+
+# ╔════════════════════════════════════════════════════════════════════════════════════════════════════╗
+# ║ ░[TESTING]░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ ║
+# ╚════════════════════════════════════════════════════════════════════════════════════════════════════╝
+creature_spawner
+hitbox_debug_draw
+loadout_config
+pickup_spawner
+WhatTheLocalization
