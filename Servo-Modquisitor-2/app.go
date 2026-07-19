@@ -788,11 +788,9 @@ func (app *App) reloadAfterPathChange() {
 				app.messages["missing_dmf_dmf"],
 			)
 		}
-		// Откладываем вызов ensureSortFiles, чтобы окно успело отобразиться и диалог мог быть показан корректно.
-		time.AfterFunc(1000*time.Millisecond, func() {
-			fyne.Do(func() {
-				app.ensureSortFiles()
-			})
+		// Диалог внутри ensureSortFiles асинхронный, поэтому задержка не нужна
+		fyne.Do(func() {
+			app.ensureSortFiles()
 		})
 	}
 }

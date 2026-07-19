@@ -46,7 +46,6 @@ func (app *App) initiateSortFilesUpdate() {
 }
 
 // ensureSortFiles - вызывается при старте, если файлы отсутствуют.
-// Теперь открывает страницу мода и просит пользователя скачать их вручную.
 func (app *App) ensureSortFiles() {
 	missing := false
 	if _, err := os.Stat(filepath.Join(app.cfg.ModsPath, FileNameMandatoryRules)); os.IsNotExist(err) {
@@ -66,25 +65,29 @@ func (app *App) ensureSortFiles() {
 		return
 	}
 
-	choice := app.showChoiceDialogSync(app.mainWindow,
+	// Асинхронный диалог - не блокирует поток
+	app.showChoiceDialog(
+		app.mainWindow,
 		app.messages["sort_files_missing"],
 		app.messages["sort_files_missing_open_page"],
+		func(choice int) {
+			switch choice {
+			case 0:
+				u, _ := url.Parse(ServoMQModPage)
+				_ = app.myApp.OpenURL(u)
+				app.appendLog(app.messages["please_download_mod_db_install"])
+			case 2:
+				app.cfg.SkipSortFilesPrompt = true
+				saveConfig(app.cfg)
+				fallthrough
+			case 1:
+				app.appendLog(app.messages["download_skipped"])
+			}
+		},
 		app.messages["btn_yes"],
 		app.messages["skip"],
 		app.messages["download_skip_forever"],
 	)
-	switch choice {
-	case 0:
-		u, _ := url.Parse(ServoMQModPage)
-		_ = app.myApp.OpenURL(u)
-		app.appendLog(app.messages["please_download_mod_db_install"])
-	case 2:
-		app.cfg.SkipSortFilesPrompt = true
-		saveConfig(app.cfg)
-		fallthrough
-	case 1:
-		app.appendLog(app.messages["download_skipped"])
-	}
 }
 
 // compareVersions сравнивает две семантические версии (например, "1.9.0" и "1.9.5").
