@@ -435,8 +435,23 @@ func (app *App) autoAddModToDatabase(modID int, folderName string, fileName ...s
 	if existing != nil && existing.URL != "" {
 		existingModID := helpers.ExtractModIDFromURL(existing.URL)
 		if existingModID != 0 && existingModID != modID {
-			app.appendLog(fmt.Sprintf("⚠️ Mod %s already has a different Nexus ID (%d), skipping update with ID %d", folderName, existingModID, modID))
-			return
+			// Если запись неполная (поля пустые) — разрешаем перезапись, удалив старую запись из кэша
+			if existing.Name == nil || checks.PickLocalized(existing.Name, "en") == "" ||
+				existing.Description == nil || checks.PickLocalized(existing.Description, "en") == "" ||
+				existing.Author == "" {
+				// Удаляем старую запись из кэша
+				oldCacheKey := fmt.Sprintf("%d:%s", existingModID, folderName)
+				app.cacheMutex.Lock()
+				delete(app.nexusVersionCache, oldCacheKey)
+				app.cacheMutex.Unlock()
+				app.saveNexusVersionCache()
+				app.appendLog(fmt.Sprintf("ℹ️ Removed stale cache entry for %s (old ID: %d), will save with new ID: %d", folderName, existingModID, modID))
+				// Далее создадим новую запись с нуля
+				existing = nil // чтобы не копировать старую
+			} else {
+				app.appendLog(fmt.Sprintf("⚠️ Mod %s already has a different Nexus ID (%d) and is complete, skipping update with ID %d", folderName, existingModID, modID))
+				return
+			}
 		}
 	}
 
@@ -451,7 +466,12 @@ func (app *App) autoAddModToDatabase(modID int, folderName string, fileName ...s
 		}
 	}
 	if !needUpdate {
-		return // Все поля уже заполнены, ничего не делаем
+		// Запись уже полная, но добавим недостающие языковые ключи (если они отсутствуют)
+		ensureAllLanguageKeys(existing)
+		if err := checks.SaveModDatabase(); err != nil {
+			app.appendLog(fmt.Sprintf("Failed to save mod database (language keys): %v", err))
+		}
+		return
 	}
 
 	// Получаем информацию с Nexus
@@ -464,6 +484,8 @@ func (app *App) autoAddModToDatabase(modID int, folderName string, fileName ...s
 	var entry checks.ModDBEntry
 	if existing != nil {
 		entry = *existing
+		// Убедимся, что URL правильный
+		entry.URL = fmt.Sprintf(NexusModIDLink, modID)
 	} else {
 		entry = checks.ModDBEntry{
 			Folder: folderName,
@@ -499,9 +521,6 @@ func (app *App) autoAddModToDatabase(modID int, folderName string, fileName ...s
 		entry.Note = make(map[string]string)
 	}
 
-	// Список всех языковых ключей
-	langKeys := []string{"en", "ru", "de", "es", "fr", "it", "ja", "ko", "pl", "pt-BR", "zh-hans", "zh-hant"}
-
 	// Заполняем английский, если пусто
 	if entry.Name["en"] == "" {
 		entry.Name["en"] = info.Name
@@ -514,17 +533,7 @@ func (app *App) autoAddModToDatabase(modID int, folderName string, fileName ...s
 	}
 
 	// Гарантируем наличие всех языковых ключей (пустых)
-	for _, lang := range langKeys {
-		if _, ok := entry.Name[lang]; !ok {
-			entry.Name[lang] = ""
-		}
-		if _, ok := entry.Description[lang]; !ok {
-			entry.Description[lang] = ""
-		}
-		if _, ok := entry.Note[lang]; !ok {
-			entry.Note[lang] = ""
-		}
-	}
+	ensureAllLanguageKeys(&entry)
 
 	// Сохраняем
 	checks.UpdateModDBEntry(entry)
@@ -621,4 +630,33 @@ func (app *App) getFreeDownloadURL(modID, fileID, key, expires string) (string, 
 	downloadURL := mirrors[0].URI
 	fileName := extractFileNameFromURL(downloadURL)
 	return downloadURL, fileName, nil
+}
+
+// ensureAllLanguageKeys добавляет отсутствующие языковые ключи в карты entry.Name, entry.Description, entry.Note.
+func ensureAllLanguageKeys(entry *checks.ModDBEntry) {
+	langKeys := []string{"en", "ru", "de", "es", "fr", "it", "ja", "ko", "pl", "pt-BR", "zh-hans", "zh-hant"}
+	if entry.Name == nil {
+		entry.Name = make(map[string]string)
+	}
+	for _, lang := range langKeys {
+		if _, ok := entry.Name[lang]; !ok {
+			entry.Name[lang] = ""
+		}
+	}
+	if entry.Description == nil {
+		entry.Description = make(map[string]string)
+	}
+	for _, lang := range langKeys {
+		if _, ok := entry.Description[lang]; !ok {
+			entry.Description[lang] = ""
+		}
+	}
+	if entry.Note == nil {
+		entry.Note = make(map[string]string)
+	}
+	for _, lang := range langKeys {
+		if _, ok := entry.Note[lang]; !ok {
+			entry.Note[lang] = ""
+		}
+	}
 }

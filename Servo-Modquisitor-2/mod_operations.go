@@ -404,7 +404,7 @@ func (app *App) handleDrop(uris []fyne.URI) {
 			ext := strings.ToLower(filepath.Ext(path))
 			if ext == ".zip" || ext == ".rar" || ext == ".7z" {
 				go func(p string) {
-					installedName, _, err := app.InstallModFromArchive(p, true, "")
+					installedName, _, err := app.InstallModFromArchive(p, true, "", "")
 					fyne.Do(func() {
 						if err != nil {
 							app.appendLog(fmt.Sprintf(app.messages["log_extract_error"], err))
@@ -746,7 +746,13 @@ func (app *App) selectModByName(name string) {
 	}
 }
 
-func (app *App) InstallModFromArchive(archivePath string, activate bool, knownVersion string) (string, string, error) {
+func (app *App) InstallModFromArchive(archivePath string, activate bool, knownVersion string, modNameToUpdate string) (string, string, error) {
+	// Если это обновление - удаляем старую папку
+	if modNameToUpdate != "" {
+		checks.RemoveMod(modNameToUpdate)
+		app.appendLog(fmt.Sprintf("Removed old folder for update: %s", modNameToUpdate))
+	}
+
 	tmpDir, err := os.MkdirTemp("", "servo-mod-")
 	if err != nil {
 		app.appendLog(fmt.Sprintf(app.messages["log_update_failed_temp_dir"], err))
@@ -916,31 +922,31 @@ func (app *App) InstallModFromArchive(archivePath string, activate bool, knownVe
 	}
 
 	if len(installedNames) == 0 {
-		// Используем errors.New, так как в сообщении нет плейсхолдеров
 		return "", "", errors.New(app.messages["log_no_mod_folder_found"])
 	}
 
 	installedName := installedNames[0] // для обратной совместимости возвращаем первый
 
-	// Сначала попытаемся получить modID из базы данных по имени папки
+	// Сначала пробуем извлечь ID и версию из имени файла (новый приоритет)
 	modID := 0
-	if entry := checks.GetModDBEntry(installedName); entry != nil && entry.URL != "" {
-		modID = helpers.ExtractModIDFromURL(entry.URL)
-	}
-
-	// Определяем версию
 	version := knownVersion
-	if version == "" {
-		// Всегда спрашиваем пользователя, если версия не передана
-		version = app.promptUserForVersion(installedName)
+	if idFromFile, v, ok := extractVersionAndModIDFromFilename(archivePath); ok && idFromFile != 0 {
+		modID = idFromFile
+		if v != "" && version == "" {
+			version = v
+		}
 	}
 
-	// Если modID всё ещё 0, пробуем извлечь из имени файла (запасной вариант)
+	// Если не удалось извлечь ID из имени, берём из базы
 	if modID == 0 {
-		idFromFile, _, _ := extractVersionAndModIDFromFilename(archivePath)
-		if idFromFile != 0 {
-			modID = idFromFile
+		if entry := checks.GetModDBEntry(installedName); entry != nil && entry.URL != "" {
+			modID = helpers.ExtractModIDFromURL(entry.URL)
 		}
+	}
+
+	// Если версия всё ещё пуста, спрашиваем пользователя
+	if version == "" {
+		version = app.promptUserForVersion(installedName)
 	}
 
 	// Обновляем UI
@@ -973,11 +979,6 @@ func (app *App) InstallModFromArchive(archivePath string, activate bool, knownVe
 	// Синхронизируем кэш версий с локальными файлами (особенно для правил)
 	if installedName == "base" || installedName == "dmf" {
 		app.syncVersionCache()
-	}
-
-	// Автоматически добавляем в базу данных
-	if modID != 0 {
-		go app.autoAddModToDatabase(modID, installedName, filepath.Base(archivePath))
 	}
 
 	return installedName, version, nil
@@ -1300,8 +1301,8 @@ func (app *App) installAutopatcherFromArchive(archivePath string) error {
 	return app.installDMLFromArchive(archivePath) // у него такая же структура установки
 }
 
-// extractVersionAndModIDFromFilename пытается извлечь версию и ID мода из имени файла.
-// Поддерживает оба формата: старый (с дефисами) и новый (с пробелами).
+// extractVersionAndModIDFromFilename для нового формата:
+// ModName ModID Version DateStamp RandomHash.zip
 func extractVersionAndModIDFromFilename(filename string) (modID int, version string, ok bool) {
 	name := filepath.Base(filename)
 	// Удаляем расширение
@@ -1310,93 +1311,62 @@ func extractVersionAndModIDFromFilename(filename string) (modID int, version str
 		name = name[:len(name)-len(ext)]
 	}
 
-	// Пробуем старый формат (через дефисы)
-	if strings.Contains(name, "-") {
-		parts := strings.Split(name, "-")
-		if len(parts) >= 3 {
-			// Ищем часть, которая является числом (ID)
-			for _, part := range parts {
-				if id, err := strconv.Atoi(part); err == nil && id > 0 && id < MaxModsID_less {
-					modID = id
-					break
-				}
-			}
-			if modID != 0 {
-				// Собираем версию из частей после ID, игнорируя timestamp
-				var versionParts []string
-				foundID := false
-				for _, part := range parts {
-					if !foundID {
-						if id, _ := strconv.Atoi(part); id == modID {
-							foundID = true
-						}
-						continue
-					}
-					// Если часть похожа на timestamp (8-10 цифр) - останавливаемся
-					if isNumeric(part) && len(part) >= 8 && len(part) <= 10 {
-						break
-					}
-					versionParts = append(versionParts, part)
-				}
-				if len(versionParts) > 0 {
-					version = strings.Join(versionParts, ".")
-					version = strings.Trim(version, ".")
-					if version != "" {
-						return modID, version, true
-					}
-				}
-			}
-		}
-	}
-
-	// Новый формат: разбиваем по пробелам
+	// Разбиваем по пробелам
 	parts := strings.Fields(name)
 	if len(parts) < 3 {
 		return 0, "", false
 	}
 
 	// Ищем часть, которая является числом (ID) и не содержит точек
-	var modIDIdx = -1
+	var idIdx = -1
 	for i, part := range parts {
 		if isNumeric(part) {
-			id, _ := strconv.Atoi(part)
-			if id > 0 && id < MaxModsID_less {
+			id, err := strconv.Atoi(part)
+			if err == nil && id > 0 && id < MaxModsID_less {
 				modID = id
-				modIDIdx = i
+				idIdx = i
 				break
 			}
 		}
 	}
-	if modIDIdx == -1 {
+	if idIdx == -1 {
 		return 0, "", false
 	}
 
-	// Ищем версию: это часть, содержащая точку и цифры, или следующая после ID цифра без точки
+	// Версия — первая часть после ID, которая является числом или числом с точками
 	var versionParts []string
-	for i, part := range parts {
-		if i == modIDIdx {
-			continue
-		}
-		// Если часть содержит точку и состоит из цифр и точек
-		if strings.Contains(part, ".") && isNumeric(strings.ReplaceAll(part, ".", "")) {
+	for i := idIdx + 1; i < len(parts); i++ {
+		part := parts[i]
+		// Проверяем, что это похоже на версию (цифры и точки)
+		if isNumeric(strings.ReplaceAll(part, ".", "")) {
 			versionParts = append(versionParts, part)
+		} else {
+			// если встретили нечисловой элемент — это дата или хэш, останавливаемся
+			break
 		}
 	}
 	if len(versionParts) > 0 {
 		version = strings.Join(versionParts, ".")
+		// Убираем лишние точки в конце
+		version = strings.Trim(version, ".")
+		if version != "" {
+			ok = true
+		}
 	} else {
-		// Если версия без точки (например, "1"), берём следующую часть после ID
-		for i := modIDIdx + 1; i < len(parts); i++ {
-			if isNumeric(parts[i]) && len(parts[i]) <= 4 {
-				version = parts[i]
-				break
+		// Если версия не найдена, пробуем взять следующую часть после ID (если она есть)
+		if idIdx+1 < len(parts) {
+			candidate := parts[idIdx+1]
+			if isNumeric(strings.ReplaceAll(candidate, ".", "")) {
+				version = candidate
+				ok = true
 			}
 		}
 	}
-	if version == "" {
+	if !ok {
 		version = "unknown"
+		ok = true // возвращаем unknown, чтобы не потерять ID
 	}
-	return modID, version, true
+	return modID, version, ok
 }
 
 // isNumeric проверяет, состоит ли строка только из цифр
@@ -1415,24 +1385,40 @@ func (app *App) promptUserForVersion(modName string) string {
 	fyne.Do(func() {
 		entry := widget.NewEntry()
 		entry.SetPlaceHolder(app.messages["placeholder_mod_version"])
-		var dlg dialog.Dialog
+
+		var popUp *widget.PopUp
+		titleLabel := widget.NewLabelWithStyle(app.messages["mod_version"], fyne.TextAlignCenter, fyne.TextStyle{Bold: true})
+		msgLabel := widget.NewLabel(fmt.Sprintf(app.messages["failed_get_mod_version"], modName))
+		msgLabel.Wrapping = fyne.TextWrapWord
+
+		saveBtn := widget.NewButton(app.messages["btn_save"], func() {
+			if popUp != nil {
+				popUp.Hide()
+			}
+			resultChan <- entry.Text
+		})
+		cancelBtn := widget.NewButton(app.messages["btn_cancel"], func() {
+			if popUp != nil {
+				popUp.Hide()
+			}
+			resultChan <- ""
+		})
+
+		// Центрируем кнопки
+		btnContainer := container.NewCenter(container.NewHBox(saveBtn, cancelBtn))
+
 		content := container.NewVBox(
-			widget.NewLabel(fmt.Sprintf(app.messages["failed_get_mod_version"], modName)),
+			titleLabel,
+			widget.NewSeparator(),
+			msgLabel,
 			entry,
-			container.NewHBox(
-				widget.NewButton(app.messages["btn_save"], func() {
-					resultChan <- entry.Text
-					dlg.Hide()
-				}),
-				widget.NewButton(app.messages["btn_cancel"], func() {
-					resultChan <- ""
-					dlg.Hide()
-				}),
-			),
+			widget.NewSeparator(),
+			btnContainer,
 		)
-		dlg = dialog.NewCustom(app.messages["mod_version"], "", content, app.mainWindow)
-		dlg.Resize(fyne.NewSize(400, 200))
-		dlg.Show()
+
+		popUp = widget.NewModalPopUp(content, app.mainWindow.Canvas())
+		popUp.Resize(fyne.NewSize(400, 200))
+		popUp.Show()
 	})
 	return <-resultChan
 }

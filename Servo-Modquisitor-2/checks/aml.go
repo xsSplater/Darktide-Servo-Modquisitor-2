@@ -5,14 +5,17 @@
 //
 // A ".mod" file is a small Lua script that returns a table, e.g.:
 //
-//	return {
-//	  run = function() ... end,
-//	  load_after  = { "weapon_customization", "for_the_drip" },
-//	  load_before = { "some_mod" },
-//	  require     = { "weapon_customization" },
-//	  version     = "24.07.05",
-//	  packages    = {},
-//	}
+//		return {
+//		  run = function()
+//		  ...
+//	   end,
+//		  packages    = {},
+//		  require     = { "some_mod0" },
+//		  load_before = { "some_mod1", "some_mod2" },
+//		  load_after  = { "some_mod3", "some_mod4" },
+//		  version     = "0.0.0",
+//		  author      = "BestName",
+//		}
 //
 // When the AML mod is installed it ignores mod_load_order.txt and instead orders
 // mods using the top-level `load_after`, `load_before` and `require` tables read
@@ -28,6 +31,7 @@ package checks
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -37,14 +41,15 @@ import (
 // AMLModConfig holds the AML ordering metadata parsed from a single mod's
 // ".mod" file.
 type AMLModConfig struct {
-	Folder      string   // mod folder name
-	ModFilePath string   // absolute path to the .mod file (empty if none found)
-	LoadAfter   []string // top-level load_after = { ... }
-	LoadBefore  []string // top-level load_before = { ... }
-	Require     []string // top-level require = { ... }
-	Version     string   // top-level version = "..."
-	HasConfig   bool     // true if any of the three arrays is non-empty
-	ParseErr    string   // non-fatal note: no .mod file / unreadable / unparseable
+	Folder      string // mod folder name
+	ModFilePath string // absolute path to the .mod file
+	Require     []string
+	LoadAfter   []string
+	LoadBefore  []string
+	Version     string
+	Author      string
+	HasConfig   bool   // true if any of the three arrays is non-empty
+	ParseErr    string // non-fatal note: no .mod file / unreadable / unparseable
 }
 
 // amlFields are the editable top-level array keys, in display order.
@@ -117,6 +122,7 @@ func ReadAMLConfig(folder string) AMLModConfig {
 	cfg.LoadBefore = readArrayKey(content, open, closeIdx, "load_before")
 	cfg.Require = readArrayKey(content, open, closeIdx, "require")
 	cfg.Version = readStringKey(content, open, closeIdx, "version")
+	cfg.Author = readStringKey(content, open, closeIdx, "author")
 	cfg.HasConfig = len(cfg.LoadAfter) > 0 || len(cfg.LoadBefore) > 0 || len(cfg.Require) > 0
 	return cfg
 }
@@ -159,8 +165,6 @@ func WriteAMLConfig(cfg AMLModConfig) error {
 		"load_before": cleanList(cfg.LoadBefore),
 		"require":     cleanList(cfg.Require),
 	}
-	// Apply in a fixed order, re-parsing the working string each time so byte
-	// offsets stay valid after each edit.
 	for _, key := range amlFields {
 		working, err = applyArrayKey(working, key, updates[key])
 		if err != nil {
@@ -168,15 +172,24 @@ func WriteAMLConfig(cfg AMLModConfig) error {
 		}
 	}
 
+	// Запись строковых полей
+	working, err = applyStringKey(working, "version", cfg.Version)
+	if err != nil {
+		return err
+	}
+	working, err = applyStringKey(working, "author", cfg.Author)
+	if err != nil {
+		return err
+	}
+
 	if !luaBracesBalanced(working) {
 		return errors.New("aml: unbalanced_result")
 	}
 
-	// Back up the original (overwrite any previous backup).
+	// Резервное копирование и атомарная запись
 	if err := os.WriteFile(path+".bak", data, 0644); err != nil {
 		return err
 	}
-	// Atomic write: temp file in the same dir, then rename.
 	tmp := path + ".tmp"
 	if err := os.WriteFile(tmp, []byte(working), 0644); err != nil {
 		return err
@@ -209,7 +222,17 @@ func applyArrayKey(content, key string, items []string) (string, error) {
 			return content, errors.New("aml: unbalanced")
 		}
 		valEnd := valClose + 1 // just past the closing '}' (any trailing comma stays)
-		return content[:keyStart] + serialized + content[valEnd:], nil
+
+		// Определяем начало строки с ключом (после последнего \n)
+		lineStart := keyStart
+		for lineStart > 0 && content[lineStart-1] != '\n' {
+			lineStart--
+		}
+		// Отступы — это всё между началом строки и началом ключа
+		indent := content[lineStart:keyStart]
+
+		// Заменяем от lineStart до valEnd на indent + serialized (сохраняя отступы)
+		return content[:lineStart] + indent + serialized + content[valEnd:], nil
 	}
 
 	// Not present: only insert when there is something to write.
@@ -220,7 +243,7 @@ func applyArrayKey(content, key string, items []string) (string, error) {
 	if closeIdx > 0 && content[closeIdx-1] != '\n' {
 		ins = "\n"
 	}
-	ins += "  " + serialized + ",\n"
+	ins += "\t" + serialized + ",\n"
 	return content[:closeIdx] + ins + content[closeIdx:], nil
 }
 
@@ -234,11 +257,11 @@ func serializeArray(key string, items []string) string {
 	b.WriteString(key)
 	b.WriteString(" = {\n")
 	for _, it := range items {
-		b.WriteString("    ")
+		b.WriteString("\t\t")
 		b.WriteString(strconv.Quote(it)) // ASCII mod names: Lua-compatible quoting
 		b.WriteString(",\n")
 	}
-	b.WriteString("  }")
+	b.WriteString("\t}")
 	return b.String()
 }
 
@@ -582,4 +605,40 @@ func luaBracesBalanced(content string) bool {
 		i++
 	}
 	return depth == 0
+}
+
+// applyStringKey заменяет или вставляет строковое значение ключа, сохраняя запятые.
+func applyStringKey(content, key, value string) (string, error) {
+	open, ok := findLuaOuterBrace(content)
+	if !ok {
+		return content, errors.New("aml: no_table")
+	}
+	closeIdx, ok := matchLuaBrace(content, open)
+	if !ok {
+		return content, errors.New("aml: unbalanced")
+	}
+
+	_, valStart, found := findLuaTopLevelKey(content, open, closeIdx, key)
+
+	if found {
+		// Находим конец значения (до запятой или закрывающей скобки)
+		valEnd := valStart
+		for valEnd < len(content) && content[valEnd] != ',' && content[valEnd] != '}' {
+			valEnd++
+		}
+		// Заменяем только значение, оставляя запятую на месте
+		newVal := fmt.Sprintf(`%q`, value)
+		return content[:valStart] + newVal + content[valEnd:], nil
+	}
+
+	// Ключ отсутствует - вставляем перед закрывающей скобкой
+	if len(value) == 0 {
+		return content, nil
+	}
+	ins := ""
+	if closeIdx > 0 && content[closeIdx-1] != '\n' {
+		ins = "\n"
+	}
+	ins += "\t" + fmt.Sprintf(`%s = %q`, key, value) + ",\n"
+	return content[:closeIdx] + ins + content[closeIdx:], nil
 }

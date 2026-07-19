@@ -186,7 +186,8 @@ func (app *App) startDownload(downloadURL, filename, modName string, fileInfo *F
 			}
 
 			app.appendLog(app.messages["download_complete"])
-			installedName, installedVersion, err := app.InstallModFromArchive(dest, false, fileInfo.Version)
+			// Передаём modName для удаления старой папки при обновлении
+			installedName, installedVersion, err := app.InstallModFromArchive(dest, false, fileInfo.Version, modName)
 			if err != nil {
 				app.appendLog(fmt.Sprintf(app.messages["log_install_failed"], err))
 			} else {

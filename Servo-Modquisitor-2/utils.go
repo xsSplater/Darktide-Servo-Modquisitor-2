@@ -486,3 +486,54 @@ func sanitizeFilename(filename string) (string, error) {
 	}
 	return base, nil
 }
+
+// Управление настройками игры
+func (app *App) createSettingsBackup() {
+	settingsPath := app.getUserSettingsPath()
+	if _, err := os.Stat(settingsPath); os.IsNotExist(err) {
+		app.showInfoDialog(app.messages["error_title"], app.messages["settings_file_not_found"])
+		return
+	}
+
+	// Путь к папке конфигурации программы (там же, где config.json)
+	configDir := filepath.Dir(configFilePath())
+	backupDir := filepath.Join(configDir, "backups", "user_settings")
+	if err := os.MkdirAll(backupDir, 0755); err != nil {
+		app.appendLog(fmt.Sprintf("Failed to create backup directory: %v", err))
+		return
+	}
+
+	timestamp := time.Now().Format("20060102_150405")
+	backupPath := filepath.Join(backupDir, fmt.Sprintf("user_settings_%s.config", timestamp))
+
+	data, err := os.ReadFile(settingsPath)
+	if err != nil {
+		app.showInfoDialog(app.messages["error_title"], fmt.Sprintf("Failed to read settings: %v", err))
+		return
+	}
+	if err := os.WriteFile(backupPath, data, 0644); err != nil {
+		app.showInfoDialog(app.messages["error_title"], fmt.Sprintf("Failed to write backup: %v", err))
+		return
+	}
+	app.appendLog(fmt.Sprintf("Backup created: %s", backupPath))
+}
+
+// getUserSettingsPath возвращает путь к файлу настроек игры
+func (app *App) getUserSettingsPath() string {
+	// Для Windows Steam
+	if appData := os.Getenv("APPDATA"); appData != "" {
+		path := filepath.Join(appData, "Fatshark", "Darktide", "user_settings.config")
+		if _, err := os.Stat(path); err == nil {
+			return path
+		}
+	}
+	// Для Linux (Wine) — возможный путь
+	if home := os.Getenv("HOME"); home != "" {
+		path := filepath.Join(home, ".config", "Fatshark", "Darktide", "user_settings.config")
+		if _, err := os.Stat(path); err == nil {
+			return path
+		}
+	}
+	// fallback: рядом с mods (если не нашли в стандартных местах)
+	return filepath.Join(app.cfg.ModsPath, "..", "user_settings.config")
+}

@@ -446,6 +446,10 @@ func ReadLoadOrder() []LoadOrderEntry {
 		if strings.HasPrefix(line, "-- ▒") {
 			continue
 		}
+		// Пропускаем строки от другого мод-менеджера
+		if strings.Contains(strings.ToLower(line), "modified by modtide on") {
+			continue
+		}
 		// Комментарий: строка начинается с "--" и НЕ с "-- " (т.е. без пробела после дефисов)
 		if strings.HasPrefix(line, "--") && !strings.HasPrefix(line, "-- ") {
 			continue

@@ -332,7 +332,8 @@ func (app *App) buildUI() {
 	}
 
 	moveToGroup := container.NewHBox(app.moveLabel, app.moveToEntry)
-	navigationGroup := container.NewHBox(app.btnUp, app.btnDown, app.moveToTopBtn, app.moveToBottomBtn, app.removeSelectedBtn, app.removeAllBtn, app.btnAMLConfig)
+	navigationGroup := container.NewHBox(app.btnUp, app.btnDown, app.moveToTopBtn, app.moveToBottomBtn, app.removeSelectedBtn, app.removeAllBtn)
+	// navigationGroup := container.NewHBox(app.btnUp, app.btnDown, app.moveToTopBtn, app.moveToBottomBtn, app.removeSelectedBtn, app.removeAllBtn, app.btnAMLConfig)
 	selectGroup := container.NewHBox(app.selectAllBtn, app.deselectAllBtn, app.enableSelectedBtn, app.disableSelectedBtn)
 	allModsGroup := container.NewHBox(app.enableAllBtn, app.disableAllBtn, app.btnEditVersion)
 
@@ -854,7 +855,7 @@ func (app *App) buildUI() {
 				if strings.HasSuffix(strings.ToLower(path), ".zip") {
 					// Запускаем установку в отдельной горутине, чтобы не блокировать UI
 					go func(p string) {
-						installedName, _, err := app.InstallModFromArchive(p, true, "")
+						installedName, _, err := app.InstallModFromArchive(p, true, "", "")
 						fyne.Do(func() {
 							if err != nil {
 								app.appendLog(fmt.Sprintf(app.messages["log_extract_error"], err))

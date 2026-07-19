@@ -163,10 +163,20 @@ func (app *App) buildMainMenu() *fyne.MainMenu {
 		go app.initiateSortFilesUpdate()
 	})
 
+	// Обновление - ссылка на Нексус
 	updatesMenu := fyne.NewMenu(app.messages["menu_updates"],
 		openSMQNexusPage,
 		fyne.NewMenuItemSeparator(),
 		periodicSub,
+	)
+
+	// Настройки AML и конфига игры
+	amlUSConfMenu := fyne.NewMenu(app.messages["menu_aml_usconf"],
+		fyne.NewMenuItem(app.messages["btn_aml_config"], func() { app.showAMLConfigWindow() }),
+		fyne.NewMenuItemSeparator(),
+		// fyne.NewMenuItem(app.messages["menu_game_settings_editor"], func() { app.showGameSettingsEditor() }),
+		fyne.NewMenuItem(app.messages["menu_backup_settings"], func() { app.createSettingsBackup() }),
+		fyne.NewMenuItem(app.messages["menu_restore_settings"], func() { app.showRestoreSettingsDialog() }),
 	)
 
 	// Контакты
@@ -249,7 +259,7 @@ func (app *App) buildMainMenu() *fyne.MainMenu {
 		fyne.NewMenuItemSeparator(),
 	)
 	// Строка меню
-	return fyne.NewMainMenu(settingsMenu, nexusMenu, updatesMenu, contactMenu, guidesMenu, donateMenu)
+	return fyne.NewMainMenu(settingsMenu, nexusMenu, updatesMenu, amlUSConfMenu, contactMenu, guidesMenu, donateMenu)
 }
 
 func (app *App) changeLanguage(lang string) {

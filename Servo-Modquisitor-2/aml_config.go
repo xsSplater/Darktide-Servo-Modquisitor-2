@@ -51,6 +51,7 @@ type amlEdit struct {
 	folder  string
 	path    string
 	version string
+	author  string
 	lists   [3][]string
 }
 
@@ -274,6 +275,8 @@ func (app *App) showAMLConfigWindow() {
 			LoadAfter:   edit.lists[0],
 			LoadBefore:  edit.lists[1],
 			Require:     edit.lists[2],
+			Version:     edit.version,
+			Author:      edit.author,
 		}
 		if err := checks.WriteAMLConfig(cfg); err != nil {
 			app.appendLog(fmt.Sprintf(app.messages["aml_log_save_failed"], edit.folder, err))
@@ -402,7 +405,28 @@ func (app *App) showAMLConfigWindow() {
 
 	// ── right: editor widgets ────────────────────────────────────────
 	editorTitle := widget.NewLabelWithStyle(app.messages["aml_select_mod_hint"], fyne.TextAlignLeading, fyne.TextStyle{Bold: true})
-	versionLabel := widget.NewLabel("")
+	versionEntry := widget.NewEntry()
+	versionEntry.SetPlaceHolder(app.messages["placeholder_mod_version"])
+	versionEntry.OnChanged = func(s string) {
+		edit.version = s
+		dirty = true
+		updateSaveButtonAppearance()
+	}
+	// Обёртка для фиксированной ширины (100 пикселей)
+	versionSpacer := canvas.NewRectangle(color.Transparent)
+	versionSpacer.SetMinSize(fyne.NewSize(150, 1))
+	versionEntryBox := container.NewStack(versionSpacer, versionEntry)
+
+	authorEntry := widget.NewEntry()
+	authorEntry.SetPlaceHolder(app.messages["author_unknown"])
+	authorEntry.OnChanged = func(s string) {
+		edit.author = s
+		dirty = true
+		updateSaveButtonAppearance()
+	}
+	authorSpacer := canvas.NewRectangle(color.Transparent)
+	authorSpacer.SetMinSize(fyne.NewSize(300, 1))
+	authorEntryBox := container.NewStack(authorSpacer, authorEntry)
 
 	var sectionLists [3]*widget.List
 	var addBtns [3]*CustomButton
@@ -566,16 +590,18 @@ func (app *App) showAMLConfigWindow() {
 		edit.folder = c.Folder
 		edit.path = c.ModFilePath
 		edit.version = c.Version
+		edit.author = c.Author
 		edit.lists[0] = append([]string{}, c.LoadAfter...)
 		edit.lists[1] = append([]string{}, c.LoadBefore...)
 		edit.lists[2] = append([]string{}, c.Require...)
 
 		editorTitle.SetText(app.getAMLDisplayName(c.Folder))
+		versionEntry.SetText(c.Version)
+		authorEntry.SetText(c.Author)
 		ver := c.Version
 		if ver == "" {
 			ver = "-"
 		}
-		versionLabel.SetText(fmt.Sprintf(app.messages["aml_editor_version"], ver))
 		for k := 0; k < 3; k++ {
 			sectionLists[k].UnselectAll()
 			sectionLists[k].Refresh()
@@ -670,15 +696,15 @@ func (app *App) showAMLConfigWindow() {
 			lbl.Alignment = fyne.TextAlignCenter
 			switch id.Col {
 			case 0:
-				lbl.SetText("")
+				lbl.SetText(app.messages["col_checkbox"])
 			case 1:
-				lbl.SetText("Mod Name")
+				lbl.SetText(app.messages["col_name"])
 			case 2:
-				lbl.SetText("Load After")
+				lbl.SetText(app.messages["aml_col_load_after"])
 			case 3:
-				lbl.SetText("Load Before")
+				lbl.SetText(app.messages["aml_col_load_before"])
 			case 4:
-				lbl.SetText("Required")
+				lbl.SetText(app.messages["aml_col_required"])
 			}
 		},
 	)
@@ -715,8 +741,12 @@ func (app *App) showAMLConfigWindow() {
 		container.NewHBox(saveBtn, reloadBtn),
 		widget.NewSeparator(),
 		editorTitle,
-		versionLabel,
-		widget.NewSeparator(),
+		container.NewHBox(
+			widget.NewLabel(app.messages["aml_editor_version"]),
+			versionEntryBox,
+			widget.NewLabel(app.messages["aml_editor_author"]),
+			authorEntryBox,
+		),
 		widget.NewSeparator(),
 	)
 

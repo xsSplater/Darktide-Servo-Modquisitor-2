@@ -11,17 +11,17 @@ import (
 // ───────────── Программа ─────────────────────────────────────────
 const (
 	AppName         = "Servo-Modquisitor-2"
-	AppVersion      = "2.7.5"
+	AppVersion      = "2.8.5"
 	AppID           = "com.xssplater.servo-modquisitor"
 	AppIcon         = "assets/icon.png"
 	СonfigFolderSMQ = "Servo-Modquisitor"
 	DarktideAppID   = "1361210"
 	MaxLogFileSize  = 512 * 1024 // 512 Кб, 1*1024*1024 = 1 Мб
 
-	// Ограничения для распаковки архивов
-	MaxArchiveSize   = 500 * 1024 * 1024      // 500 МБ — максимальный размер скачиваемого архива
-	MaxExtractedSize = 1 * 1024 * 1024 * 1024 // 1 ГБ — максимальный общий объём распакованных данных
-	MaxFileSize      = 500 * 1024 * 1024      // 500 МБ — максимальный размер одного файла внутри архива
+	// Limitations for unpacking archives
+	MaxArchiveSize   = 500 * 1024 * 1024      // 500 MB is the maximum downloadable archive size.
+	MaxExtractedSize = 1 * 1024 * 1024 * 1024 // 1 GB is the maximum total volume of unpacked data
+	MaxFileSize      = 500 * 1024 * 1024      // 500 MB is the maximum size of a single file within an archive.
 
 	NexusModIDForUpdates = 139 // Nexus ID SMQ для обновлений программы и файлов сортировки
 
@@ -52,8 +52,8 @@ const (
 	NexusV1DownLink   = "https://api.nexusmods.com/v1/games/warhammer40kdarktide/mods/%s/files/%s/download_link.json"
 	NexusModIDLink    = "https://www.nexusmods.com/warhammer40kdarktide/mods/%d"
 
-	MaxModsID      = 1500
-	MaxModsID_less = 1501
+	MaxModsID      = 2000
+	MaxModsID_less = 2001
 )
 
 // ───────────── Файлы ─────────────────────────────────────────────
