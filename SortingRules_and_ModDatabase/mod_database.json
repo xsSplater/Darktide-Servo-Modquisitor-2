@@ -1,5 +1,5 @@
 {
-	"version": "1.1.2",
+	"version": "1.1.3",
 	"mod_database": [
 		{
 			"folder": "for_the_drip",
@@ -2082,8 +2082,8 @@
 				"pl": "Przestarzały! Działa, ale nie był aktualizowany - pewne nieścisłości.",
 				"pt-BR": "Desatualizado! Funciona, mas não foi atualizado - algumas imprecisões.",
 				"ru": "Немного устарел! Работает, но давно не обновляется. Есть неточности.",
-				"zh-hans": "已过时！它能用，但很久没更新了——存在一些不准确之处。",
-				"zh-hant": "已過時！它能用，但很久沒更新了——存在一些不準確之處。"
+				"zh-hans": "已过时！它能用，但很久没更新了--存在一些不准确之处。",
+				"zh-hant": "已過時！它能用，但很久沒更新了--存在一些不準確之處。"
 			}
 		},
 		{
@@ -8035,7 +8035,7 @@
 				"ko": "모드는 유형별 스폰(무리, 특수, 배회자, 몬스터, 이벤트)을 비활성화할 수 있습니다. 주요 목적은 테스트 및 기타 실험입니다. 솔로 모드 전용.",
 				"pl": "Mod pozwala wyłączyć spawn według typu: hordy, specjaliści, wędrowcy, potwory i wydarzenia. Głównym celem jest testowanie i inne eksperymenty. Tylko tryb solo.",
 				"pt-BR": "O mod permite desativar surgimentos por tipo: hordas, especiais, errantes, monstros e eventos. O objetivo principal é teste e outras experimentações. Apenas modo solo.",
-				"ru": "Spawn Tweaks - Мод позволяет отключать спавн по типу: орды, специалисты, бродячие враги, чудовищеы и события. Основное назначение — тестирование и другие эксперименты. Только в одиночном режиме.",
+				"ru": "Spawn Tweaks - Мод позволяет отключать спавн по типу: орды, специалисты, бродячие враги, чудовищеы и события. Основное назначение - тестирование и другие эксперименты. Только в одиночном режиме.",
 				"zh-hans": "模组允许按类型禁用生成：群敌、特殊敌人、游荡者、怪物和事件。主要用途是测试和其他实验。仅限单人模式。",
 				"zh-hant": "模組允許按類型禁用生成：群敵、特殊敵人、遊蕩者、怪物和事件。主要用途是測試和其他實驗。僅限單人模式。"
 			},
@@ -12344,7 +12344,7 @@
 				"ko": "HUD에서 팀원의 수류탄 아이콘을 변경하여 그들이 사용하는 블리츠를 반영합니다. 기본적으로 수류탄 픽업을 사용하는 블리츠는 기본 수류탄 아이콘, 픽업을 사용하지 않지만 충전량이 있는 블리츠는 번개 아이콘, 충전량이 없는 블리츠는 아이콘이 표시되지 않습니다.\n\n사이커 지팡이의 탄약 아이콘을 숨깁니다.",
 				"pl": "Zmienia ikonę granatu dla twoich towarzyszy w HUD, aby odzwierciedlić, jakiego blitza używają - domyślnie podstawowa ikona granatu dla blitzów używających podniesionych granatów, piorun dla blitzów, które nie używają podniesień, ale mają ładunki, i brak ikony dla blitzów bez ładunków.\n\nUkrywa ikonę amunicji dla kosturów Psychera.",
 				"pt-BR": "Altera o ícone de granada para seus companheiros de equipe no seu HUD para refletir qual blitz eles estão usando - por padrão, o ícone de granada base para blitzes que usam coleta de granadas, um raio para blitzes que não usam coleta, mas têm cargas, e nenhum ícone para blitzes sem cargas.\n\nOculta o ícone de munição para os cajados do Psíquico.",
-				"ru": "Alternate Grenade Icons - Изменяет значок гранаты для ваших товарищей по команде на HUD, чтобы отражать, какой блиц они используют — по умолчанию: обычная граната для блицев, использующих гранаты с подбором, молния для блицев, не использующих подбор, но имеющих заряды, и отсутствие значка для блицев без зарядов.\n\nСкрывает значок боеприпасов для посохов псайкера.",
+				"ru": "Alternate Grenade Icons - Изменяет значок гранаты для ваших товарищей по команде на HUD, чтобы отражать, какой блиц они используют - по умолчанию: обычная граната для блицев, использующих гранаты с подбором, молния для блицев, не использующих подбор, но имеющих заряды, и отсутствие значка для блицев без зарядов.\n\nСкрывает значок боеприпасов для посохов псайкера.",
 				"zh-hans": "更改 HUD 上队友的手雷图标，以反映他们正在使用的闪击技能。默认情况下：使用手雷拾取物的闪击显示基础手雷图标，不拾取但有充能的显示闪电图标，没有充能的不显示图标。\n\n隐藏灵能者法杖的弹药图标。",
 				"zh-hant": "更改 HUD 上隊友的手榴彈圖示，以反映他們正在使用的閃擊技能。預設情況下：使用手榴彈拾取物的閃擊顯示基礎手榴彈圖示，不拾取但有充能的顯示閃電圖示，沒有充能的不顯示圖示。\n\n隱藏靈能者法杖的彈藥圖示。"
 			},
@@ -15374,17 +15374,17 @@
 			},
 			"description": {
 				"de": "Wählen Sie einen alternativen Spiel-Sound oder eine benutzerdefinierte Sounddatei, die bei jedem gesammelten Stapel von Stoß abgespielt wird.\nLegen Sie individuelle Sounds für jeden Stoß-Stapel fest. Für benutzerdefinierte Sounds ist das Audio Plugin Mod erforderlich.\n\nWenn Sie den Creature Spawner Mod verwenden und die Option Sound Muffler im Psykhanium aktiviert haben, werden die Feindgeräusche stummgeschaltet. Das bedeutet, wenn Sie einen Ihrer Audible Thrust-Sounds so eingestellt haben, dass sie Plague Ogryn- oder Chaos Spawn-Sounds (aus den Dropdown-Optionen) verwenden, werden sie im Psykhanium nicht abgespielt, solange Sound Muffler aktiv ist. Der Mod funktioniert trotzdem - deaktivieren Sie einfach Sound Muffler, um diese Sounds während des Testens zu hören.",
-				"en": "Choose an alternate in-game sound or custom sound file to play on each stack of Thrust gained.\nSet specific sounds for each Thrust Stack individually. Audio plugin mod required for custom sounds.\n\nIf you're using the Creature Spawner mod and have the Sound Muffler option enabled in the Psykhanium, enemy sounds will be muted. This means if you've set either of your Audible Thrust sounds to use Plague Ogryn or Chaos Spawn sounds (from the dropdown options), they will not play in the Psykhanium while Sound Muffler is active. The mod is still working—just disable Sound Muffler to hear those sounds while testing.",
+				"en": "Choose an alternate in-game sound or custom sound file to play on each stack of Thrust gained.\nSet specific sounds for each Thrust Stack individually. Audio plugin mod required for custom sounds.\n\nIf you're using the Creature Spawner mod and have the Sound Muffler option enabled in the Psykhanium, enemy sounds will be muted. This means if you've set either of your Audible Thrust sounds to use Plague Ogryn or Chaos Spawn sounds (from the dropdown options), they will not play in the Psykhanium while Sound Muffler is active. The mod is still working-just disable Sound Muffler to hear those sounds while testing.",
 				"es": "Elige un sonido alternativo del juego o un archivo de sonido personalizado para reproducir en cada pila de Empuje obtenida.\nEstablece sonidos específicos para cada pila de Empuje individualmente. Se requiere el mod Audio Plugin para sonidos personalizados.\n\nSi estás usando el mod Creature Spawner y tienes habilitada la opción Sound Muffler en el Psykhanium, los sonidos de los enemigos se silenciarán. Esto significa que si has configurado alguno de tus sonidos Audible Thrust para usar sonidos de Plague Ogryn o Chaos Spawn (de las opciones desplegables), no se reproducirán en el Psykhanium mientras Sound Muffler esté activo. El mod sigue funcionando: simplemente desactiva Sound Muffler para escuchar esos sonidos durante las pruebas.",
-				"fr": "Choisissez un son alternatif du jeu ou un fichier son personnalisé à lire pour chaque pile de Poussée gagnée.\nDéfinissez des sons spécifiques pour chaque pile de Poussée individuellement. Le mod Audio Plugin est requis pour les sons personnalisés.\n\nSi vous utilisez le mod Creature Spawner et que l'option Sound Muffler est activée dans le Psykhanium, les sons des ennemis seront coupés. Cela signifie que si vous avez défini l'un de vos sons Audible Thrust pour utiliser les sons de Plague Ogryn ou de Chaos Spawn (dans les options déroulantes), ils ne seront pas joués dans le Psykhanium tant que Sound Muffler est actif. Le mod fonctionne toujours — désactivez simplement Sound Muffler pour entendre ces sons lors des tests.",
+				"fr": "Choisissez un son alternatif du jeu ou un fichier son personnalisé à lire pour chaque pile de Poussée gagnée.\nDéfinissez des sons spécifiques pour chaque pile de Poussée individuellement. Le mod Audio Plugin est requis pour les sons personnalisés.\n\nSi vous utilisez le mod Creature Spawner et que l'option Sound Muffler est activée dans le Psykhanium, les sons des ennemis seront coupés. Cela signifie que si vous avez défini l'un de vos sons Audible Thrust pour utiliser les sons de Plague Ogryn ou de Chaos Spawn (dans les options déroulantes), ils ne seront pas joués dans le Psykhanium tant que Sound Muffler est actif. Le mod fonctionne toujours - désactivez simplement Sound Muffler pour entendre ces sons lors des tests.",
 				"it": "Scegli un suono di gioco alternativo o un file audio personalizzato da riprodurre per ogni accumulo di Spinta ottenuto.\nImposta suoni specifici per ogni accumulo di Spinta individualmente. Per i suoni personalizzati è richiesto il mod Audio Plugin.\n\nSe stai utilizzando il mod Creature Spawner e hai abilitato l'opzione Sound Muffler nel Psykhanium, i suoni dei nemici verranno silenziati. Ciò significa che se hai impostato uno dei tuoi suoni Audible Thrust per utilizzare suoni di Plague Ogryn o Chaos Spawn (dalle opzioni a discesa), non verranno riprodotti nel Psykhanium finché Sound Muffler è attivo. Il mod funziona comunque: disabilita semplicemente Sound Muffler per ascoltare quei suoni durante i test.",
-				"ja": "取得したスラストスタックごとに再生する代替ゲームサウンドまたはカスタムサウンドファイルを選択します。\n各スラストスタックに個別のサウンドを設定します。カスタムサウンドにはAudio Plugin MODが必要です。\n\nCreature Spawner MODを使用していて、プシカニウムでサウンドマフラーオプションが有効になっている場合、敵のサウンドはミュートされます。つまり、Audible ThrustのサウンドのいずれかをPlague OgrynまたはChaos Spawnのサウンド（ドロップダウンオプションから）に設定している場合、サウンドマフラーがアクティブな間はプシカニウムで再生されません。MODは引き続き機能します——テスト中にそれらのサウンドを聞くには、サウンドマフラーを無効にしてください。",
-				"ko": "획득한 스러스트 스택마다 재생할 대체 게임 사운드 또는 사용자 정의 사운드 파일을 선택하세요.\n각 스러스트 스택에 개별 사운드를 설정하세요. 사용자 정의 사운드에는 Audio Plugin 모드가 필요합니다.\n\nCreature Spawner 모드를 사용하고 프시카니움에서 사운드 머플러 옵션이 활성화된 경우, 적 사운드가 음소거됩니다. 즉, Audible Thrust 사운드 중 하나를 Plague Ogryn 또는 Chaos Spawn 사운드(드롭다운 옵션에서)로 설정한 경우 사운드 머플러가 활성화된 동안 프시카니움에서 재생되지 않습니다. 모드는 여전히 작동합니다——테스트 중에 해당 사운드를 들으려면 사운드 머플러를 비활성화하세요.",
-				"pl": "Wybierz alternatywny dźwięk z gry lub niestandardowy plik dźwiękowy do odtwarzania przy każdym zdobytym stosie Pchnięcia.\nUstaw konkretne dźwięki dla każdego stosu Pchnięcia indywidualnie. Do niestandardowych dźwięków wymagany jest mod Audio Plugin.\n\nJeśli używasz moda Creature Spawner i masz włączoną opcję Sound Muffler w Psykanium, dźwięki wrogów zostaną wyciszone. Oznacza to, że jeśli ustawiłeś któryś z dźwięków Audible Thrust na używanie dźwięków Plague Ogryn lub Chaos Spawn (z opcji rozwijanych), nie będą one odtwarzane w Psykanium, dopóki Sound Muffler jest aktywny. Mod nadal działa — po prostu wyłącz Sound Muffler, aby usłyszeć te dźwięki podczas testów.",
-				"pt-BR": "Escolha um som alternativo do jogo ou um arquivo de som personalizado para reproduzir a cada pilha de Investida obtida.\nDefina sons específicos para cada pilha de Investida individualmente. O mod Audio Plugin é necessário para sons personalizados.\n\nSe você estiver usando o mod Creature Spawner e tiver a opção Sound Muffler ativada no Psykhanium, os sons dos inimigos serão silenciados. Isso significa que se você definiu algum de seus sons Audible Thrust para usar sons de Plague Ogryn ou Chaos Spawn (nas opções suspensas), eles não serão reproduzidos no Psykhanium enquanto o Sound Muffler estiver ativo. O mod ainda funciona — basta desativar o Sound Muffler para ouvir esses sons durante os testes.",
-				"ru": "Audible Thrust - Выберите альтернативный внутриигровой звук или пользовательский звуковой файл для воспроизведения при каждом накопленном заряде Выпада.\nУстановите отдельные звуки для каждого заряда Выпада. Для пользовательских звуков требуется мод Audio плагин.\n\nЕсли вы используете мод Creature Spawner и у вас включена опция заглушения звуков (Sound Muffler) в Псайканиуме, звуки врагов будут отключены. Это означает, что если вы установили звуки Чумного Огрина или Порождения Хаоса (из выпадающего списка), они не будут воспроизводиться в Псайканиуме, пока активна опция заглушения звуков. Мод работает — просто отключите заглушение звуков, чтобы слышать эти звуки во время тестов.",
-				"zh-hans": "选择替代游戏内音效或自定义音频文件，在每次获得突刺层数时播放。\n为每层突刺单独设置特定音效。自定义音效需要音频插件模组。\n\n如果你使用了 Creature Spawner 模组并在灵能室中启用了声音抑制选项，敌人的声音将被静音。这意味着如果你将 Audible Thrust 音效设置为使用瘟疫食人魔或混沌卵的声音（从下拉选项中），在声音抑制激活时它们不会在灵能室中播放。模组仍在工作——只需禁用声音抑制即可在测试时听到这些声音。",
-				"zh-hant": "選擇替代遊戲內音效或自訂音訊檔案，在每次獲得突刺層數時播放。\n為每層突刺單獨設定特定音效。自訂音效需要音訊插件模組。\n\n如果你使用了 Creature Spawner 模組並在靈能室中啟用了聲音抑制選項，敵人的聲音將被靜音。這意味著如果你將 Audible Thrust 音效設定為使用瘟疫食人魔或混沌卵的聲音（從下拉選項中），在聲音抑制激活時它們不會在靈能室中播放。模組仍在工作——只需禁用聲音抑制即可在測試時聽到這些聲音。"
+				"ja": "取得したスラストスタックごとに再生する代替ゲームサウンドまたはカスタムサウンドファイルを選択します。\n各スラストスタックに個別のサウンドを設定します。カスタムサウンドにはAudio Plugin MODが必要です。\n\nCreature Spawner MODを使用していて、プシカニウムでサウンドマフラーオプションが有効になっている場合、敵のサウンドはミュートされます。つまり、Audible ThrustのサウンドのいずれかをPlague OgrynまたはChaos Spawnのサウンド（ドロップダウンオプションから）に設定している場合、サウンドマフラーがアクティブな間はプシカニウムで再生されません。MODは引き続き機能します--テスト中にそれらのサウンドを聞くには、サウンドマフラーを無効にしてください。",
+				"ko": "획득한 스러스트 스택마다 재생할 대체 게임 사운드 또는 사용자 정의 사운드 파일을 선택하세요.\n각 스러스트 스택에 개별 사운드를 설정하세요. 사용자 정의 사운드에는 Audio Plugin 모드가 필요합니다.\n\nCreature Spawner 모드를 사용하고 프시카니움에서 사운드 머플러 옵션이 활성화된 경우, 적 사운드가 음소거됩니다. 즉, Audible Thrust 사운드 중 하나를 Plague Ogryn 또는 Chaos Spawn 사운드(드롭다운 옵션에서)로 설정한 경우 사운드 머플러가 활성화된 동안 프시카니움에서 재생되지 않습니다. 모드는 여전히 작동합니다--테스트 중에 해당 사운드를 들으려면 사운드 머플러를 비활성화하세요.",
+				"pl": "Wybierz alternatywny dźwięk z gry lub niestandardowy plik dźwiękowy do odtwarzania przy każdym zdobytym stosie Pchnięcia.\nUstaw konkretne dźwięki dla każdego stosu Pchnięcia indywidualnie. Do niestandardowych dźwięków wymagany jest mod Audio Plugin.\n\nJeśli używasz moda Creature Spawner i masz włączoną opcję Sound Muffler w Psykanium, dźwięki wrogów zostaną wyciszone. Oznacza to, że jeśli ustawiłeś któryś z dźwięków Audible Thrust na używanie dźwięków Plague Ogryn lub Chaos Spawn (z opcji rozwijanych), nie będą one odtwarzane w Psykanium, dopóki Sound Muffler jest aktywny. Mod nadal działa - po prostu wyłącz Sound Muffler, aby usłyszeć te dźwięki podczas testów.",
+				"pt-BR": "Escolha um som alternativo do jogo ou um arquivo de som personalizado para reproduzir a cada pilha de Investida obtida.\nDefina sons específicos para cada pilha de Investida individualmente. O mod Audio Plugin é necessário para sons personalizados.\n\nSe você estiver usando o mod Creature Spawner e tiver a opção Sound Muffler ativada no Psykhanium, os sons dos inimigos serão silenciados. Isso significa que se você definiu algum de seus sons Audible Thrust para usar sons de Plague Ogryn ou Chaos Spawn (nas opções suspensas), eles não serão reproduzidos no Psykhanium enquanto o Sound Muffler estiver ativo. O mod ainda funciona - basta desativar o Sound Muffler para ouvir esses sons durante os testes.",
+				"ru": "Audible Thrust - Выберите альтернативный внутриигровой звук или пользовательский звуковой файл для воспроизведения при каждом накопленном заряде Выпада.\nУстановите отдельные звуки для каждого заряда Выпада. Для пользовательских звуков требуется мод Audio плагин.\n\nЕсли вы используете мод Creature Spawner и у вас включена опция заглушения звуков (Sound Muffler) в Псайканиуме, звуки врагов будут отключены. Это означает, что если вы установили звуки Чумного Огрина или Порождения Хаоса (из выпадающего списка), они не будут воспроизводиться в Псайканиуме, пока активна опция заглушения звуков. Мод работает - просто отключите заглушение звуков, чтобы слышать эти звуки во время тестов.",
+				"zh-hans": "选择替代游戏内音效或自定义音频文件，在每次获得突刺层数时播放。\n为每层突刺单独设置特定音效。自定义音效需要音频插件模组。\n\n如果你使用了 Creature Spawner 模组并在灵能室中启用了声音抑制选项，敌人的声音将被静音。这意味着如果你将 Audible Thrust 音效设置为使用瘟疫食人魔或混沌卵的声音（从下拉选项中），在声音抑制激活时它们不会在灵能室中播放。模组仍在工作--只需禁用声音抑制即可在测试时听到这些声音。",
+				"zh-hant": "選擇替代遊戲內音效或自訂音訊檔案，在每次獲得突刺層數時播放。\n為每層突刺單獨設定特定音效。自訂音效需要音訊插件模組。\n\n如果你使用了 Creature Spawner 模組並在靈能室中啟用了聲音抑制選項，敵人的聲音將被靜音。這意味著如果你將 Audible Thrust 音效設定為使用瘟疫食人魔或混沌卵的聲音（從下拉選項中），在聲音抑制激活時它們不會在靈能室中播放。模組仍在工作--只需禁用聲音抑制即可在測試時聽到這些聲音。"
 			},
 			"author": "demba",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/397",
@@ -16011,17 +16011,17 @@
 			},
 			"description": {
 				"de": "Wählen Sie einen Sound aus einer Liste von 25, der im Spiel beim Erhalten von Stapeln von Chirurgisch abgespielt wird. Alle 10 Stapel sind umschaltbar und können einzigartige Sounds haben. Kein Audio-Plugin-Mod erforderlich.\n\nWenn Sie den Creature Spawner-Mod verwenden und die Option Sound Muffler im Psykhanium aktiviert haben, werden die Feindgeräusche stummgeschaltet. Das bedeutet, wenn Sie einen Ihrer Audible Thrust-Sounds so eingestellt haben, dass sie Plague Ogryn- oder Chaos Spawn-Sounds (aus den Dropdown-Optionen) verwenden, werden sie im Psykhanium nicht abgespielt, solange Sound Muffler aktiv ist. Der Mod funktioniert trotzdem - deaktivieren Sie einfach Sound Muffler, um diese Sounds während des Testens zu hören.",
-				"en": "Choose a sound from a list of 25 to play in-game when gaining Surgical stacks, all 10 stacks are toggleable and can have unique sounds. No audio plugin mod required.\n\nIf you're using the Creature Spawner mod and have the Sound Muffler option enabled in the Psykhanium, enemy sounds will be muted. This means if you've set either of your Audible Thrust sounds to use Plague Ogryn or Chaos Spawn sounds (from the dropdown options), they will not play in the Psykhanium while Sound Muffler is active. The mod is still working—just disable Sound Muffler to hear those sounds while testing.",
+				"en": "Choose a sound from a list of 25 to play in-game when gaining Surgical stacks, all 10 stacks are toggleable and can have unique sounds. No audio plugin mod required.\n\nIf you're using the Creature Spawner mod and have the Sound Muffler option enabled in the Psykhanium, enemy sounds will be muted. This means if you've set either of your Audible Thrust sounds to use Plague Ogryn or Chaos Spawn sounds (from the dropdown options), they will not play in the Psykhanium while Sound Muffler is active. The mod is still working-just disable Sound Muffler to hear those sounds while testing.",
 				"es": "Elige un sonido de una lista de 25 para reproducir en el juego al obtener pilas de Quirúrgico, todas las 10 pilas se pueden activar/desactivar y pueden tener sonidos únicos. No se requiere el mod Audio Plugin.\n\nSi estás usando el mod Creature Spawner y tienes habilitada la opción Sound Muffler en el Psykhanium, los sonidos de los enemigos se silenciarán. Esto significa que si has configurado alguno de tus sonidos Audible Thrust para usar sonidos de Plague Ogryn o Chaos Spawn, no se reproducirán en el Psykhanium mientras Sound Muffler esté activo. El mod sigue funcionando: solo desactiva Sound Muffler para escuchar esos sonidos durante las pruebas.",
-				"fr": "Choisissez un son parmi une liste de 25 à jouer en jeu lors de l'obtention de piles Chirurgical, les 10 piles sont activables/désactivables et peuvent avoir des sons uniques. Aucun mod Audio Plugin requis.\n\nSi vous utilisez le mod Creature Spawner et que vous avez activé l'option Sound Muffler dans le Psykhanium, les sons des ennemis seront coupés. Cela signifie que si vous avez défini l'un de vos sons Audible Thrust pour utiliser les sons de Plague Ogryn ou de Chaos Spawn (dans les options déroulantes), ils ne seront pas joués dans le Psykhanium tant que Sound Muffler est actif. Le mod fonctionne toujours — désactivez simplement Sound Muffler pour entendre ces sons lors des tests.",
+				"fr": "Choisissez un son parmi une liste de 25 à jouer en jeu lors de l'obtention de piles Chirurgical, les 10 piles sont activables/désactivables et peuvent avoir des sons uniques. Aucun mod Audio Plugin requis.\n\nSi vous utilisez le mod Creature Spawner et que vous avez activé l'option Sound Muffler dans le Psykhanium, les sons des ennemis seront coupés. Cela signifie que si vous avez défini l'un de vos sons Audible Thrust pour utiliser les sons de Plague Ogryn ou de Chaos Spawn (dans les options déroulantes), ils ne seront pas joués dans le Psykhanium tant que Sound Muffler est actif. Le mod fonctionne toujours - désactivez simplement Sound Muffler pour entendre ces sons lors des tests.",
 				"it": "Scegli un suono da un elenco di 25 da riprodurre in gioco quando si ottengono accumuli di Chirurgia, tutti e 10 gli accumuli sono attivabili e possono avere suoni unici. Non è richiesto il mod Audio Plugin.\n\nSe stai utilizzando il mod Creature Spawner e hai abilitato l'opzione Sound Muffler nel Psykhanium, i suoni dei nemici verranno silenziati. Ciò significa che se hai impostato uno dei tuoi suoni Audible Thrust per utilizzare suoni di Plague Ogryn o Chaos Spawn, non verranno riprodotti nel Psykhanium finché Sound Muffler è attivo. Il mod funziona comunque: disabilita semplicemente Sound Muffler per ascoltare quei suoni durante i test.",
-				"ja": "25のサウンドリストから選択し、サージカルスタックを獲得したときにゲーム内で再生します。10スタックすべてトグル可能で、それぞれユニークなサウンドを設定できます。Audio Plugin MODは不要です。\n\nCreature Spawner MODを使用していて、プシカニウムでサウンドマフラーオプションが有効な場合、敵のサウンドはミュートされます。つまり、Audible ThrustのサウンドをPlague OgrynやChaos Spawnのサウンドに設定している場合、サウンドマフラーがアクティブな間はプシカニウムで再生されません。MODは動作しています——テスト中にそれらのサウンドを聞くには、サウンドマフラーを無効にしてください。",
-				"ko": "25개의 사운드 목록 중에서 선택하여 '외과적 정밀성' 스택을 획득할 때 게임 내에서 재생합니다. 모든 10개 스택은 토글 가능하며 고유한 사운드를 가질 수 있습니다. Audio Plugin 모드가 필요하지 않습니다.\n\nCreature Spawner 모드를 사용하고 프시카니움에서 사운드 머플러 옵션이 활성화된 경우, 적 사운드가 음소거됩니다. 즉, Audible Thrust 사운드를 Plague Ogryn 또는 Chaos Spawn 사운드로 설정한 경우 사운드 머플러가 활성화된 동안 프시카니움에서 재생되지 않습니다. 모드는 작동합니다——테스트 중에 해당 사운드를 들으려면 사운드 머플러를 비활성화하세요.",
-				"pl": "Wybierz dźwięk z listy 25, który będzie odtwarzany w grze podczas zdobywania stosów Chirurgiczny, wszystkie 10 stosów jest przełączalnych i mogą mieć unikalne dźwięki. Nie wymaga moda Audio Plugin.\n\nJeśli używasz moda Creature Spawner i masz włączoną opcję Sound Muffler w Psykanium, dźwięki wrogów zostaną wyciszone. Oznacza to, że jeśli ustawiłeś któryś z dźwięków Audible Thrust na używanie dźwięków Plague Ogryn lub Chaos Spawn, nie będą one odtwarzane w Psykanium, dopóki Sound Muffler jest aktywny. Mod nadal działa — po prostu wyłącz Sound Muffler, aby usłyszeć te dźwięki podczas testów.",
-				"pt-BR": "Escolha um som de uma lista de 25 para reproduzir no jogo ao ganhar pilhas de Cirúrgico, todas as 10 pilhas são alternáveis e podem ter sons únicos. Nenhum mod Audio Plugin é necessário.\n\nSe você estiver usando o mod Creature Spawner e tiver a opção Sound Muffler ativada no Psykhanium, os sons dos inimigos serão silenciados. Isso significa que se você definiu algum de seus sons Audible Thrust para usar sons de Plague Ogryn ou Chaos Spawn, eles não serão reproduzidos no Psykhanium enquanto o Sound Muffler estiver ativo. O mod ainda funciona — basta desativar o Sound Muffler para ouvir esses sons durante os testes.",
-				"ru": "Audible Surgical - Выберите звук в списке из 25 вариантов, который будет воспроизводиться в игре при получении зарядов «Хирургическая точность». Все 10 зарядов можно переключать и каждый может иметь уникальное звучание. Мод Audio плагин не требуется.\n\nЕсли вы используете мод Creature Spawner и у вас включена опция заглушения звуков (Sound Muffler) в Псайканиуме, звуки врагов будут отключены. Это означает, что если вы установили звуки Чумного Огрина или Порождения Хаоса (из выпадающего списка), они не будут воспроизводиться в Псайканиуме, пока активна опция заглушения звуков. Мод работает — просто отключите заглушение звуков, чтобы слышать эти звуки во время тестов.",
-				"zh-hans": "从 25 个声音列表中选择一个，在获得「外科手术」层数时播放，所有 10 层均可切换并设置独特音效。无需音频插件模组。\n\n如果您使用了 Creature Spawner 模组并在灵能室中启用了声音抑制选项，敌人的声音将被静音。这意味着如果您将 Audible Thrust 音效设置为使用瘟疫食人魔或混沌卵的声音，在声音抑制激活时它们不会在灵能室中播放。模组仍可工作——只需禁用声音抑制即可在测试时听到这些声音。",
-				"zh-hant": "從 25 個聲音清單中選擇一個，在獲得「外科手術」層數時播放，所有 10 層均可切換並設定獨特音效。無需音訊插件模組。\n\n如果您使用了 Creature Spawner 模組並在靈能室中啟用了聲音抑制選項，敵人的聲音將被靜音。這意味著如果您將 Audible Thrust 音效設定為使用瘟疫食人魔或混沌卵的聲音，在聲音抑制激活時它們不會在靈能室中播放。模組仍可工作——只需禁用聲音抑制即可在測試時聽到這些聲音。"
+				"ja": "25のサウンドリストから選択し、サージカルスタックを獲得したときにゲーム内で再生します。10スタックすべてトグル可能で、それぞれユニークなサウンドを設定できます。Audio Plugin MODは不要です。\n\nCreature Spawner MODを使用していて、プシカニウムでサウンドマフラーオプションが有効な場合、敵のサウンドはミュートされます。つまり、Audible ThrustのサウンドをPlague OgrynやChaos Spawnのサウンドに設定している場合、サウンドマフラーがアクティブな間はプシカニウムで再生されません。MODは動作しています--テスト中にそれらのサウンドを聞くには、サウンドマフラーを無効にしてください。",
+				"ko": "25개의 사운드 목록 중에서 선택하여 '외과적 정밀성' 스택을 획득할 때 게임 내에서 재생합니다. 모든 10개 스택은 토글 가능하며 고유한 사운드를 가질 수 있습니다. Audio Plugin 모드가 필요하지 않습니다.\n\nCreature Spawner 모드를 사용하고 프시카니움에서 사운드 머플러 옵션이 활성화된 경우, 적 사운드가 음소거됩니다. 즉, Audible Thrust 사운드를 Plague Ogryn 또는 Chaos Spawn 사운드로 설정한 경우 사운드 머플러가 활성화된 동안 프시카니움에서 재생되지 않습니다. 모드는 작동합니다--테스트 중에 해당 사운드를 들으려면 사운드 머플러를 비활성화하세요.",
+				"pl": "Wybierz dźwięk z listy 25, który będzie odtwarzany w grze podczas zdobywania stosów Chirurgiczny, wszystkie 10 stosów jest przełączalnych i mogą mieć unikalne dźwięki. Nie wymaga moda Audio Plugin.\n\nJeśli używasz moda Creature Spawner i masz włączoną opcję Sound Muffler w Psykanium, dźwięki wrogów zostaną wyciszone. Oznacza to, że jeśli ustawiłeś któryś z dźwięków Audible Thrust na używanie dźwięków Plague Ogryn lub Chaos Spawn, nie będą one odtwarzane w Psykanium, dopóki Sound Muffler jest aktywny. Mod nadal działa - po prostu wyłącz Sound Muffler, aby usłyszeć te dźwięki podczas testów.",
+				"pt-BR": "Escolha um som de uma lista de 25 para reproduzir no jogo ao ganhar pilhas de Cirúrgico, todas as 10 pilhas são alternáveis e podem ter sons únicos. Nenhum mod Audio Plugin é necessário.\n\nSe você estiver usando o mod Creature Spawner e tiver a opção Sound Muffler ativada no Psykhanium, os sons dos inimigos serão silenciados. Isso significa que se você definiu algum de seus sons Audible Thrust para usar sons de Plague Ogryn ou Chaos Spawn, eles não serão reproduzidos no Psykhanium enquanto o Sound Muffler estiver ativo. O mod ainda funciona - basta desativar o Sound Muffler para ouvir esses sons durante os testes.",
+				"ru": "Audible Surgical - Выберите звук в списке из 25 вариантов, который будет воспроизводиться в игре при получении зарядов «Хирургическая точность». Все 10 зарядов можно переключать и каждый может иметь уникальное звучание. Мод Audio плагин не требуется.\n\nЕсли вы используете мод Creature Spawner и у вас включена опция заглушения звуков (Sound Muffler) в Псайканиуме, звуки врагов будут отключены. Это означает, что если вы установили звуки Чумного Огрина или Порождения Хаоса (из выпадающего списка), они не будут воспроизводиться в Псайканиуме, пока активна опция заглушения звуков. Мод работает - просто отключите заглушение звуков, чтобы слышать эти звуки во время тестов.",
+				"zh-hans": "从 25 个声音列表中选择一个，在获得「外科手术」层数时播放，所有 10 层均可切换并设置独特音效。无需音频插件模组。\n\n如果您使用了 Creature Spawner 模组并在灵能室中启用了声音抑制选项，敌人的声音将被静音。这意味着如果您将 Audible Thrust 音效设置为使用瘟疫食人魔或混沌卵的声音，在声音抑制激活时它们不会在灵能室中播放。模组仍可工作--只需禁用声音抑制即可在测试时听到这些声音。",
+				"zh-hant": "從 25 個聲音清單中選擇一個，在獲得「外科手術」層數時播放，所有 10 層均可切換並設定獨特音效。無需音訊插件模組。\n\n如果您使用了 Creature Spawner 模組並在靈能室中啟用了聲音抑制選項，敵人的聲音將被靜音。這意味著如果您將 Audible Thrust 音效設定為使用瘟疫食人魔或混沌卵的聲音，在聲音抑制激活時它們不會在靈能室中播放。模組仍可工作--只需禁用聲音抑制即可在測試時聽到這些聲音。"
 			},
 			"author": "demba",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/414",
@@ -16109,17 +16109,17 @@
 			},
 			"description": {
 				"de": "Wählen Sie einen Sound aus einer Liste von 25, der im Spiel beim Erhalten von Stapeln von DEZIMATOR abgespielt wird. Alle 10 Stapel sind umschaltbar und können einzigartige Sounds haben. Kein Audio-Plugin-Mod erforderlich.\n\nWenn Sie den Creature Spawner-Mod verwenden und die Option Sound Muffler im Psykhanium aktiviert haben, werden die Feindgeräusche stummgeschaltet. Das bedeutet, wenn Sie einen Ihrer Audible Thrust-Sounds so eingestellt haben, dass sie Plague Ogryn- oder Chaos Spawn-Sounds (aus den Dropdown-Optionen) verwenden, werden sie im Psykhanium nicht abgespielt, solange Sound Muffler aktiv ist. Der Mod funktioniert trotzdem - deaktivieren Sie einfach Sound Muffler, um diese Sounds während des Testens zu hören.",
-				"en": "Choose a sound from a list of 25 to play in-game when gaining DECIMATOR stacks, all 10 stacks are toggleable and can have unique sounds. No audio plugin mod required.\n\nIf you're using the Creature Spawner mod and have the Sound Muffler option enabled in the Psykhanium, enemy sounds will be muted. This means if you've set either of your Audible Thrust sounds to use Plague Ogryn or Chaos Spawn sounds (from the dropdown options), they will not play in the Psykhanium while Sound Muffler is active. The mod is still working—just disable Sound Muffler to hear those sounds while testing.",
+				"en": "Choose a sound from a list of 25 to play in-game when gaining DECIMATOR stacks, all 10 stacks are toggleable and can have unique sounds. No audio plugin mod required.\n\nIf you're using the Creature Spawner mod and have the Sound Muffler option enabled in the Psykhanium, enemy sounds will be muted. This means if you've set either of your Audible Thrust sounds to use Plague Ogryn or Chaos Spawn sounds (from the dropdown options), they will not play in the Psykhanium while Sound Muffler is active. The mod is still working-just disable Sound Muffler to hear those sounds while testing.",
 				"es": "Elige un sonido de una lista de 25 para reproducir en el juego al obtener pilas de DIEZMADOR, todas las 10 pilas se pueden activar/desactivar y pueden tener sonidos únicos. No se requiere el mod Audio Plugin.\n\nSi estás usando el mod Creature Spawner y tienes habilitada la opción Sound Muffler en el Psykhanium, los sonidos de los enemigos se silenciarán. Esto significa que si has configurado alguno de tus sonidos Audible Thrust para usar sonidos de Plague Ogryn o Chaos Spawn, no se reproducirán en el Psykhanium mientras Sound Muffler esté activo. El mod sigue funcionando: solo desactiva Sound Muffler para escuchar esos sonidos durante las pruebas.",
-				"fr": "Choisissez un son parmi une liste de 25 à jouer en jeu lors de l'obtention de piles DÉCIMATEUR, les 10 piles sont activables/désactivables et peuvent avoir des sons uniques. Aucun mod Audio Plugin requis.\n\nSi vous utilisez le mod Creature Spawner et que vous avez activé l'option Sound Muffler dans le Psykhanium, les sons des ennemis seront coupés. Cela signifie que si vous avez défini l'un de vos sons Audible Thrust pour utiliser les sons de Plague Ogryn ou de Chaos Spawn (dans les options déroulantes), ils ne seront pas joués dans le Psykhanium tant que Sound Muffler est actif. Le mod fonctionne toujours — désactivez simplement Sound Muffler pour entendre ces sons lors des tests.",
+				"fr": "Choisissez un son parmi une liste de 25 à jouer en jeu lors de l'obtention de piles DÉCIMATEUR, les 10 piles sont activables/désactivables et peuvent avoir des sons uniques. Aucun mod Audio Plugin requis.\n\nSi vous utilisez le mod Creature Spawner et que vous avez activé l'option Sound Muffler dans le Psykhanium, les sons des ennemis seront coupés. Cela signifie que si vous avez défini l'un de vos sons Audible Thrust pour utiliser les sons de Plague Ogryn ou de Chaos Spawn (dans les options déroulantes), ils ne seront pas joués dans le Psykhanium tant que Sound Muffler est actif. Le mod fonctionne toujours - désactivez simplement Sound Muffler pour entendre ces sons lors des tests.",
 				"it": "Scegli un suono da un elenco di 25 da riprodurre in gioco quando si ottengono accumuli di DECIMATORE, tutti e 10 gli accumuli sono attivabili e possono avere suoni unici. Non è richiesto il mod Audio Plugin.\n\nSe stai utilizzando il mod Creature Spawner e hai abilitato l'opzione Sound Muffler nel Psykhanium, i suoni dei nemici verranno silenziati. Ciò significa che se hai impostato uno dei tuoi suoni Audible Thrust per utilizzare suoni di Plague Ogryn o Chaos Spawn, non verranno riprodotti nel Psykhanium finché Sound Muffler è attivo. Il mod funziona comunque: disabilita semplicemente Sound Muffler per ascoltare quei suoni durante i test.",
-				"ja": "25のサウンドリストから選択し、デシメータースタックを獲得したときにゲーム内で再生します。10スタックすべてトグル可能で、それぞれユニークなサウンドを設定できます。Audio Plugin MODは不要です。\n\nCreature Spawner MODを使用していて、プシカニウムでサウンドマフラーオプションが有効な場合、敵のサウンドはミュートされます。つまり、Audible ThrustのサウンドをPlague OgrynやChaos Spawnのサウンドに設定している場合、サウンドマフラーがアクティブな間はプシカニウムで再生されません。MODは動作しています——テスト中にそれらのサウンドを聞くには、サウンドマフラーを無効にしてください。",
-				"ko": "25개의 사운드 목록 중에서 선택하여 '학살자' 스택을 획득할 때 게임 내에서 재생합니다. 모든 10개 스택은 토글 가능하며 고유한 사운드를 가질 수 있습니다. Audio Plugin 모드가 필요하지 않습니다.\n\nCreature Spawner 모드를 사용하고 프시카니움에서 사운드 머플러 옵션이 활성화된 경우, 적 사운드가 음소거됩니다. 즉, Audible Thrust 사운드를 Plague Ogryn 또는 Chaos Spawn 사운드로 설정한 경우 사운드 머플러가 활성화된 동안 프시카니움에서 재생되지 않습니다. 모드는 작동합니다——테스트 중에 해당 사운드를 들으려면 사운드 머플러를 비활성화하세요.",
-				"pl": "Wybierz dźwięk z listy 25, który będzie odtwarzany w grze podczas zdobywania stosów DEKIMATOR, wszystkie 10 stosów jest przełączalnych i mogą mieć unikalne dźwięki. Nie wymaga moda Audio Plugin.\n\nJeśli używasz moda Creature Spawner i masz włączoną opcję Sound Muffler w Psykanium, dźwięki wrogów zostaną wyciszone. Oznacza to, że jeśli ustawiłeś któryś z dźwięków Audible Thrust na używanie dźwięków Plague Ogryn lub Chaos Spawn, nie będą one odtwarzane w Psykanium, dopóki Sound Muffler jest aktywny. Mod nadal działa — po prostu wyłącz Sound Muffler, aby usłyszeć te dźwięki podczas testów.",
-				"pt-BR": "Escolha um som de uma lista de 25 para reproduzir no jogo ao ganhar pilhas de DIZIMADOR, todas as 10 pilhas são alternáveis e podem ter sons únicos. Nenhum mod Audio Plugin é necessário.\n\nSe você estiver usando o mod Creature Spawner e tiver a opção Sound Muffler ativada no Psykhanium, os sons dos inimigos serão silenciados. Isso significa que se você definiu algum de seus sons Audible Thrust para usar sons de Plague Ogryn ou Chaos Spawn, eles não serão reproduzidos no Psykhanium enquanto o Sound Muffler estiver ativo. O mod ainda funciona — basta desativar o Sound Muffler para ouvir esses sons durante os testes.",
-				"ru": "Audible DECIMATOR - Выберите звук в списке из 25 вариантов, который будет воспроизводиться в игре при получении зарядов Дециматор. Все 10 зарядов можно переключать и каждый может иметь уникальное звучание. Мод Audio плагин не требуется.\n\nЕсли вы используете мод Creature Spawner и у вас включена опция заглушения звуков (Sound Muffler) в Псайканиуме, звуки врагов будут отключены. Это означает, что если вы установили звуки Чумного Огрина или Порождения Хаоса (из выпадающего списка), они не будут воспроизводиться в Псайканиуме, пока активна опция заглушения звуков. Мод работает — просто отключите заглушение звуков, чтобы слышать эти звуки во время тестов.",
-				"zh-hans": "从 25 个声音列表中选择一个，在获得「屠戮者」层数时播放，所有 10 层均可切换并设置独特音效。无需音频插件模组。\n\n如果您使用了 Creature Spawner 模组并在灵能室中启用了声音抑制选项，敌人的声音将被静音。这意味着如果您将 Audible Thrust 音效设置为使用瘟疫食人魔或混沌卵的声音，在声音抑制激活时它们不会在灵能室中播放。模组仍可工作——只需禁用声音抑制即可在测试时听到这些声音。",
-				"zh-hant": "從 25 個聲音清單中選擇一個，在獲得「屠戮者」層數時播放，所有 10 層均可切換並設定獨特音效。無需音訊插件模組。\n\n如果您使用了 Creature Spawner 模組並在靈能室中啟用了聲音抑制選項，敵人的聲音將被靜音。這意味著如果您將 Audible Thrust 音效設定為使用瘟疫食人魔或混沌卵的聲音，在聲音抑制激活時它們不會在靈能室中播放。模組仍可工作——只需禁用聲音抑制即可在測試時聽到這些聲音。"
+				"ja": "25のサウンドリストから選択し、デシメータースタックを獲得したときにゲーム内で再生します。10スタックすべてトグル可能で、それぞれユニークなサウンドを設定できます。Audio Plugin MODは不要です。\n\nCreature Spawner MODを使用していて、プシカニウムでサウンドマフラーオプションが有効な場合、敵のサウンドはミュートされます。つまり、Audible ThrustのサウンドをPlague OgrynやChaos Spawnのサウンドに設定している場合、サウンドマフラーがアクティブな間はプシカニウムで再生されません。MODは動作しています--テスト中にそれらのサウンドを聞くには、サウンドマフラーを無効にしてください。",
+				"ko": "25개의 사운드 목록 중에서 선택하여 '학살자' 스택을 획득할 때 게임 내에서 재생합니다. 모든 10개 스택은 토글 가능하며 고유한 사운드를 가질 수 있습니다. Audio Plugin 모드가 필요하지 않습니다.\n\nCreature Spawner 모드를 사용하고 프시카니움에서 사운드 머플러 옵션이 활성화된 경우, 적 사운드가 음소거됩니다. 즉, Audible Thrust 사운드를 Plague Ogryn 또는 Chaos Spawn 사운드로 설정한 경우 사운드 머플러가 활성화된 동안 프시카니움에서 재생되지 않습니다. 모드는 작동합니다--테스트 중에 해당 사운드를 들으려면 사운드 머플러를 비활성화하세요.",
+				"pl": "Wybierz dźwięk z listy 25, który będzie odtwarzany w grze podczas zdobywania stosów DEKIMATOR, wszystkie 10 stosów jest przełączalnych i mogą mieć unikalne dźwięki. Nie wymaga moda Audio Plugin.\n\nJeśli używasz moda Creature Spawner i masz włączoną opcję Sound Muffler w Psykanium, dźwięki wrogów zostaną wyciszone. Oznacza to, że jeśli ustawiłeś któryś z dźwięków Audible Thrust na używanie dźwięków Plague Ogryn lub Chaos Spawn, nie będą one odtwarzane w Psykanium, dopóki Sound Muffler jest aktywny. Mod nadal działa - po prostu wyłącz Sound Muffler, aby usłyszeć te dźwięki podczas testów.",
+				"pt-BR": "Escolha um som de uma lista de 25 para reproduzir no jogo ao ganhar pilhas de DIZIMADOR, todas as 10 pilhas são alternáveis e podem ter sons únicos. Nenhum mod Audio Plugin é necessário.\n\nSe você estiver usando o mod Creature Spawner e tiver a opção Sound Muffler ativada no Psykhanium, os sons dos inimigos serão silenciados. Isso significa que se você definiu algum de seus sons Audible Thrust para usar sons de Plague Ogryn ou Chaos Spawn, eles não serão reproduzidos no Psykhanium enquanto o Sound Muffler estiver ativo. O mod ainda funciona - basta desativar o Sound Muffler para ouvir esses sons durante os testes.",
+				"ru": "Audible DECIMATOR - Выберите звук в списке из 25 вариантов, который будет воспроизводиться в игре при получении зарядов Дециматор. Все 10 зарядов можно переключать и каждый может иметь уникальное звучание. Мод Audio плагин не требуется.\n\nЕсли вы используете мод Creature Spawner и у вас включена опция заглушения звуков (Sound Muffler) в Псайканиуме, звуки врагов будут отключены. Это означает, что если вы установили звуки Чумного Огрина или Порождения Хаоса (из выпадающего списка), они не будут воспроизводиться в Псайканиуме, пока активна опция заглушения звуков. Мод работает - просто отключите заглушение звуков, чтобы слышать эти звуки во время тестов.",
+				"zh-hans": "从 25 个声音列表中选择一个，在获得「屠戮者」层数时播放，所有 10 层均可切换并设置独特音效。无需音频插件模组。\n\n如果您使用了 Creature Spawner 模组并在灵能室中启用了声音抑制选项，敌人的声音将被静音。这意味着如果您将 Audible Thrust 音效设置为使用瘟疫食人魔或混沌卵的声音，在声音抑制激活时它们不会在灵能室中播放。模组仍可工作--只需禁用声音抑制即可在测试时听到这些声音。",
+				"zh-hant": "從 25 個聲音清單中選擇一個，在獲得「屠戮者」層數時播放，所有 10 層均可切換並設定獨特音效。無需音訊插件模組。\n\n如果您使用了 Creature Spawner 模組並在靈能室中啟用了聲音抑制選項，敵人的聲音將被靜音。這意味著如果您將 Audible Thrust 音效設定為使用瘟疫食人魔或混沌卵的聲音，在聲音抑制激活時它們不會在靈能室中播放。模組仍可工作--只需禁用聲音抑制即可在測試時聽到這些聲音。"
 			},
 			"author": "demba",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/418",
@@ -17187,17 +17187,17 @@
 			},
 			"description": {
 				"de": "Wählen Sie einen alternativen Spiel-Sound oder eine benutzerdefinierte Sounddatei, die abgespielt wird, wenn sich Ihre Fähigkeit auflädt. Legen Sie individuelle Sounds für die Fähigkeitsladungen 1 und 2 fest. Für benutzerdefinierte Sounds ist das Audio Plugin Mod erforderlich.\n\nWenn Sie den Creature Spawner-Mod verwenden und die Option Sound Muffler im Psykhanium aktiviert haben, werden die Feindgeräusche stummgeschaltet. Das bedeutet, wenn Sie Ihre Audible Thrust-Sounds auf Plague Ogryn- oder Chaos Spawn-Sounds eingestellt haben, werden sie im Psykhanium nicht abgespielt, solange Sound Muffler aktiv ist. Der Mod funktioniert trotzdem - deaktivieren Sie einfach Sound Muffler, um diese Sounds während des Testens zu hören.",
-				"en": "Choose an alternate in-game sound or custom sound file to play in-game when your ability recharges. Set specific sounds for ability charges 1 and 2 individually. Audio plugin mod required for custom sounds.\n\nIf you're using the Creature Spawner mod and have the Sound Muffler option enabled in the Psykhanium, enemy sounds will be muted. This means if you've set either of your Audible Thrust sounds to use Plague Ogryn or Chaos Spawn sounds (from the dropdown options), they will not play in the Psykhanium while Sound Muffler is active. The mod is still working—just disable Sound Muffler to hear those sounds while testing.",
+				"en": "Choose an alternate in-game sound or custom sound file to play in-game when your ability recharges. Set specific sounds for ability charges 1 and 2 individually. Audio plugin mod required for custom sounds.\n\nIf you're using the Creature Spawner mod and have the Sound Muffler option enabled in the Psykhanium, enemy sounds will be muted. This means if you've set either of your Audible Thrust sounds to use Plague Ogryn or Chaos Spawn sounds (from the dropdown options), they will not play in the Psykhanium while Sound Muffler is active. The mod is still working-just disable Sound Muffler to hear those sounds while testing.",
 				"es": "Elige un sonido alternativo del juego o un archivo de sonido personalizado para reproducir cuando tu habilidad se recarga. Establece sonidos específicos para las cargas 1 y 2 individualmente. Para sonidos personalizados se requiere el mod Audio Plugin.\n\nSi estás usando el mod Creature Spawner y tienes habilitada la opción Sound Muffler en el Psykhanium, los sonidos de los enemigos se silenciarán. Esto significa que si has configurado tus sonidos Audible Thrust para usar sonidos de Plague Ogryn o Chaos Spawn, no se reproducirán en el Psykhanium mientras Sound Muffler esté activo. El mod sigue funcionando: solo desactiva Sound Muffler para escuchar esos sonidos durante las pruebas.",
-				"fr": "Choisissez un son alternatif du jeu ou un fichier son personnalisé à jouer lorsque votre capacité se recharge. Définissez des sons spécifiques pour les charges 1 et 2 individuellement. Le mod Audio Plugin est requis pour les sons personnalisés.\n\nSi vous utilisez le mod Creature Spawner et que vous avez activé l'option Sound Muffler dans le Psykhanium, les sons des ennemis seront coupés. Cela signifie que si vous avez défini l'un de vos sons Audible Thrust pour utiliser les sons de Plague Ogryn ou de Chaos Spawn, ils ne seront pas joués dans le Psykhanium tant que Sound Muffler est actif. Le mod fonctionne toujours — désactivez simplement Sound Muffler pour entendre ces sons lors des tests.",
+				"fr": "Choisissez un son alternatif du jeu ou un fichier son personnalisé à jouer lorsque votre capacité se recharge. Définissez des sons spécifiques pour les charges 1 et 2 individuellement. Le mod Audio Plugin est requis pour les sons personnalisés.\n\nSi vous utilisez le mod Creature Spawner et que vous avez activé l'option Sound Muffler dans le Psykhanium, les sons des ennemis seront coupés. Cela signifie que si vous avez défini l'un de vos sons Audible Thrust pour utiliser les sons de Plague Ogryn ou de Chaos Spawn, ils ne seront pas joués dans le Psykhanium tant que Sound Muffler est actif. Le mod fonctionne toujours - désactivez simplement Sound Muffler pour entendre ces sons lors des tests.",
 				"it": "Scegli un suono di gioco alternativo o un file audio personalizzato da riprodurre quando la tua abilità si ricarica. Imposta suoni specifici per le cariche 1 e 2 individualmente. Per i suoni personalizzati è richiesto il mod Audio Plugin.\n\nSe stai utilizzando il mod Creature Spawner e hai abilitato l'opzione Sound Muffler nel Psykhanium, i suoni dei nemici verranno silenziati. Ciò significa che se hai impostato i tuoi suoni Audible Thrust per utilizzare suoni di Plague Ogryn o Chaos Spawn, non verranno riprodotti nel Psykhanium finché Sound Muffler è attivo. Il mod funziona comunque: disabilita semplicemente Sound Muffler per ascoltare quei suoni durante i test.",
-				"ja": "アビリティが再チャージされたときに再生する代替ゲームサウンドまたはカスタムサウンドファイルを選択します。アビリティチャージ1と2に個別のサウンドを設定できます。カスタムサウンドにはAudio Plugin MODが必要です。\n\nCreature Spawner MODを使用していて、プシカニウムでサウンドマフラーオプションが有効な場合、敵のサウンドはミュートされます。つまり、Audible ThrustのサウンドをPlague OgrynやChaos Spawnのサウンドに設定している場合、サウンドマフラーがアクティブな間はプシカニウムで再生されません。MODは動作しています——テスト中にそれらのサウンドを聞くには、サウンドマフラーを無効にしてください。",
-				"ko": "능력이 재충전될 때 재생할 대체 게임 사운드 또는 사용자 정의 사운드 파일을 선택하세요. 능력 충전 1과 2에 대해 개별 사운드를 설정할 수 있습니다. 사용자 정의 사운드에는 Audio Plugin 모드가 필요합니다.\n\nCreature Spawner 모드를 사용하고 프시카니움에서 사운드 머플러 옵션이 활성화된 경우, 적 사운드가 음소거됩니다. 즉, Audible Thrust 사운드를 Plague Ogryn 또는 Chaos Spawn 사운드로 설정한 경우 사운드 머플러가 활성화된 동안 프시카니움에서 재생되지 않습니다. 모드는 작동합니다——테스트 중에 해당 사운드를 들으려면 사운드 머플러를 비활성화하세요.",
-				"pl": "Wybierz alternatywny dźwięk z gry lub niestandardowy plik dźwiękowy do odtworzenia, gdy twoja umiejętność się ładuje. Ustaw osobne dźwięki dla naładowań 1 i 2. Dla niestandardowych dźwięków wymagany jest mod Audio Plugin.\n\nJeśli używasz moda Creature Spawner i masz włączoną opcję Sound Muffler w Psykanium, dźwięki wrogów zostaną wyciszone. Oznacza to, że jeśli ustawiłeś dźwięki Audible Thrust na używanie dźwięków Plague Ogryn lub Chaos Spawn, nie będą one odtwarzane w Psykanium, dopóki Sound Muffler jest aktywny. Mod nadal działa — po prostu wyłącz Sound Muffler, aby usłyszeć te dźwięki podczas testów.",
-				"pt-BR": "Escolha um som alternativo do jogo ou um arquivo de som personalizado para reproduzir quando sua habilidade recarregar. Defina sons específicos para as cargas 1 e 2 individualmente. Para sons personalizados, é necessário o mod Audio Plugin.\n\nSe você estiver usando o mod Creature Spawner e tiver a opção Sound Muffler ativada no Psykhanium, os sons dos inimigos serão silenciados. Isso significa que se você definiu seus sons Audible Thrust para usar sons de Plague Ogryn ou Chaos Spawn, eles não serão reproduzidos no Psykhanium enquanto o Sound Muffler estiver ativo. O mod ainda funciona — basta desativar o Sound Muffler para ouvir esses sons durante os testes.",
-				"ru": "Audible Ability Recharge - Выберите альтернативный внутриигровой звук или пользовательский звуковой файл для воспроизведения в игре при перезарядке вашей способности. Настройте отдельные звуки для перезарядки способностей 1 и 2. Для пользовательских звуков требуется мод Audio плагин.\n\nЕсли вы используете мод Creature Spawner и у вас включена опция заглушения звуков (Sound Muffler) в Псайканиуме, звуки врагов будут отключены. Это означает, что если вы установили звуки Чумного Огрина или Порождения Хаоса (из выпадающего списка), они не будут воспроизводиться в Псайканиуме, пока активна опция заглушения звуков. Мод работает — просто отключите заглушение звуков, чтобы слышать эти звуки во время тестов.",
-				"zh-hans": "选择替代游戏内音效或自定义音频文件，在技能充能时播放。为技能充能 1 和 2 分别设置特定音效。自定义音效需要音频插件模组。\n\n如果您使用了 Creature Spawner 模组并在灵能室中启用了声音抑制选项，敌人的声音将被静音。这意味着如果您将 Audible Thrust 音效设置为使用瘟疫食人魔或混沌卵的声音，在声音抑制激活时它们不会在灵能室中播放。模组仍可工作——只需禁用声音抑制即可在测试时听到这些声音。",
-				"zh-hant": "選擇替代遊戲內音效或自訂音訊檔案，在技能充能時播放。為技能充能 1 和 2 分別設定特定音效。自訂音效需要音訊插件模組。\n\n如果您使用了 Creature Spawner 模組並在靈能室中啟用了聲音抑制選項，敵人的聲音將被靜音。這意味著如果您將 Audible Thrust 音效設定為使用瘟疫食人魔或混沌卵的聲音，在聲音抑制激活時它們不會在靈能室中播放。模組仍可工作——只需禁用聲音抑制即可在測試時聽到這些聲音。"
+				"ja": "アビリティが再チャージされたときに再生する代替ゲームサウンドまたはカスタムサウンドファイルを選択します。アビリティチャージ1と2に個別のサウンドを設定できます。カスタムサウンドにはAudio Plugin MODが必要です。\n\nCreature Spawner MODを使用していて、プシカニウムでサウンドマフラーオプションが有効な場合、敵のサウンドはミュートされます。つまり、Audible ThrustのサウンドをPlague OgrynやChaos Spawnのサウンドに設定している場合、サウンドマフラーがアクティブな間はプシカニウムで再生されません。MODは動作しています--テスト中にそれらのサウンドを聞くには、サウンドマフラーを無効にしてください。",
+				"ko": "능력이 재충전될 때 재생할 대체 게임 사운드 또는 사용자 정의 사운드 파일을 선택하세요. 능력 충전 1과 2에 대해 개별 사운드를 설정할 수 있습니다. 사용자 정의 사운드에는 Audio Plugin 모드가 필요합니다.\n\nCreature Spawner 모드를 사용하고 프시카니움에서 사운드 머플러 옵션이 활성화된 경우, 적 사운드가 음소거됩니다. 즉, Audible Thrust 사운드를 Plague Ogryn 또는 Chaos Spawn 사운드로 설정한 경우 사운드 머플러가 활성화된 동안 프시카니움에서 재생되지 않습니다. 모드는 작동합니다--테스트 중에 해당 사운드를 들으려면 사운드 머플러를 비활성화하세요.",
+				"pl": "Wybierz alternatywny dźwięk z gry lub niestandardowy plik dźwiękowy do odtworzenia, gdy twoja umiejętność się ładuje. Ustaw osobne dźwięki dla naładowań 1 i 2. Dla niestandardowych dźwięków wymagany jest mod Audio Plugin.\n\nJeśli używasz moda Creature Spawner i masz włączoną opcję Sound Muffler w Psykanium, dźwięki wrogów zostaną wyciszone. Oznacza to, że jeśli ustawiłeś dźwięki Audible Thrust na używanie dźwięków Plague Ogryn lub Chaos Spawn, nie będą one odtwarzane w Psykanium, dopóki Sound Muffler jest aktywny. Mod nadal działa - po prostu wyłącz Sound Muffler, aby usłyszeć te dźwięki podczas testów.",
+				"pt-BR": "Escolha um som alternativo do jogo ou um arquivo de som personalizado para reproduzir quando sua habilidade recarregar. Defina sons específicos para as cargas 1 e 2 individualmente. Para sons personalizados, é necessário o mod Audio Plugin.\n\nSe você estiver usando o mod Creature Spawner e tiver a opção Sound Muffler ativada no Psykhanium, os sons dos inimigos serão silenciados. Isso significa que se você definiu seus sons Audible Thrust para usar sons de Plague Ogryn ou Chaos Spawn, eles não serão reproduzidos no Psykhanium enquanto o Sound Muffler estiver ativo. O mod ainda funciona - basta desativar o Sound Muffler para ouvir esses sons durante os testes.",
+				"ru": "Audible Ability Recharge - Выберите альтернативный внутриигровой звук или пользовательский звуковой файл для воспроизведения в игре при перезарядке вашей способности. Настройте отдельные звуки для перезарядки способностей 1 и 2. Для пользовательских звуков требуется мод Audio плагин.\n\nЕсли вы используете мод Creature Spawner и у вас включена опция заглушения звуков (Sound Muffler) в Псайканиуме, звуки врагов будут отключены. Это означает, что если вы установили звуки Чумного Огрина или Порождения Хаоса (из выпадающего списка), они не будут воспроизводиться в Псайканиуме, пока активна опция заглушения звуков. Мод работает - просто отключите заглушение звуков, чтобы слышать эти звуки во время тестов.",
+				"zh-hans": "选择替代游戏内音效或自定义音频文件，在技能充能时播放。为技能充能 1 和 2 分别设置特定音效。自定义音效需要音频插件模组。\n\n如果您使用了 Creature Spawner 模组并在灵能室中启用了声音抑制选项，敌人的声音将被静音。这意味着如果您将 Audible Thrust 音效设置为使用瘟疫食人魔或混沌卵的声音，在声音抑制激活时它们不会在灵能室中播放。模组仍可工作--只需禁用声音抑制即可在测试时听到这些声音。",
+				"zh-hant": "選擇替代遊戲內音效或自訂音訊檔案，在技能充能時播放。為技能充能 1 和 2 分別設定特定音效。自訂音效需要音訊插件模組。\n\n如果您使用了 Creature Spawner 模組並在靈能室中啟用了聲音抑制選項，敵人的聲音將被靜音。這意味著如果您將 Audible Thrust 音效設定為使用瘟疫食人魔或混沌卵的聲音，在聲音抑制激活時它們不會在靈能室中播放。模組仍可工作--只需禁用聲音抑制即可在測試時聽到這些聲音。"
 			},
 			"author": "demba",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/449",
@@ -17538,7 +17538,7 @@
 				"ko": "왼쪽 목록에 구분선을 추가합니다. 이 모드는 게임에 영향을 미치지 않습니다.",
 				"pl": "Dodaje separator do lewej listy. Ten mod nie ma wpływu na grę.",
 				"pt-BR": "Adiciona um separador à lista esquerda. Este mod não tem efeito no jogo.",
-				"ru": "Разделители списка модов - Добавляет разделитель в левый список. Этот мод не влияет на игру.",
+				"ru": "Mod List Dividers - HUD - Добавляет разделитель в левый список. Этот мод не влияет на игру.",
 				"zh-hans": "在左侧列表中添加一个分隔符。此模组对游戏没有影响。",
 				"zh-hant": "在左側列表中添加一個分隔符。此模組對遊戲沒有影響。"
 			},
@@ -17587,7 +17587,7 @@
 				"ko": "왼쪽 목록에 구분선을 추가합니다. 이 모드는 게임에 영향을 미치지 않습니다.",
 				"pl": "Dodaje separator do lewej listy. Ten mod nie ma wpływu na grę.",
 				"pt-BR": "Adiciona um separador à lista esquerda. Este mod não tem efeito no jogo.",
-				"ru": "Разделители списка модов - Добавляет разделитель в левый список. Этот мод не влияет на игру.",
+				"ru": "Mod List Dividers - Bug Fix - Добавляет разделитель в левый список. Этот мод не влияет на игру.",
 				"zh-hans": "在左侧列表中添加一个分隔符。此模组对游戏没有影响。",
 				"zh-hant": "在左側列表中添加一個分隔符。此模組對遊戲沒有影響。"
 			},
@@ -17636,7 +17636,7 @@
 				"ko": "왼쪽 목록에 구분선을 추가합니다. 이 모드는 게임에 영향을 미치지 않습니다.",
 				"pl": "Dodaje separator do lewej listy. Ten mod nie ma wpływu na grę.",
 				"pt-BR": "Adiciona um separador à lista esquerda. Este mod não tem efeito no jogo.",
-				"ru": "Разделители списка модов - Добавляет разделитель в левый список. Этот мод не влияет на игру.",
+				"ru": "Mod List Dividers - GamePlay Utilities - Добавляет разделитель в левый список. Этот мод не влияет на игру.",
 				"zh-hans": "在左侧列表中添加一个分隔符。此模组对游戏没有影响。",
 				"zh-hant": "在左側列表中添加一個分隔符。此模組對遊戲沒有影響。"
 			},
@@ -17685,7 +17685,7 @@
 				"ko": "왼쪽 목록에 구분선을 추가합니다. 이 모드는 게임에 영향을 미치지 않습니다.",
 				"pl": "Dodaje separator do lewej listy. Ten mod nie ma wpływu na grę.",
 				"pt-BR": "Adiciona um separador à lista esquerda. Este mod não tem efeito no jogo.",
-				"ru": "Разделители списка модов - Добавляет разделитель в левый список. Этот мод не влияет на игру.",
+				"ru": "Mod List Dividers - System - Добавляет разделитель в левый список. Этот мод не влияет на игру.",
 				"zh-hans": "在左侧列表中添加一个分隔符。此模组对游戏没有影响。",
 				"zh-hant": "在左側列表中添加一個分隔符。此模組對遊戲沒有影響。"
 			},
@@ -17734,7 +17734,7 @@
 				"ko": "왼쪽 목록에 구분선을 추가합니다. 이 모드는 게임에 영향을 미치지 않습니다.",
 				"pl": "Dodaje separator do lewej listy. Ten mod nie ma wpływu na grę.",
 				"pt-BR": "Adiciona um separador à lista esquerda. Este mod não tem efeito no jogo.",
-				"ru": "Разделители списка модов - Добавляет разделитель в левый список. Этот мод не влияет на игру.",
+				"ru": "Mod List Dividers - Scoreboard - Добавляет разделитель в левый список. Этот мод не влияет на игру.",
 				"zh-hans": "在左侧列表中添加一个分隔符。此模组对游戏没有影响。",
 				"zh-hant": "在左側列表中添加一個分隔符。此模組對遊戲沒有影響。"
 			},
@@ -17783,7 +17783,7 @@
 				"ko": "왼쪽 목록에 구분선을 추가합니다. 이 모드는 게임에 영향을 미치지 않습니다.",
 				"pl": "Dodaje separator do lewej listy. Ten mod nie ma wpływu na grę.",
 				"pt-BR": "Adiciona um separador à lista esquerda. Este mod não tem efeito no jogo.",
-				"ru": "Разделители списка модов - Добавляет разделитель в левый список. Этот мод не влияет на игру.",
+				"ru": "Mod List Dividers - Game Tools - Добавляет разделитель в левый список. Этот мод не влияет на игру.",
 				"zh-hans": "在左侧列表中添加一个分隔符。此模组对游戏没有影响。",
 				"zh-hant": "在左側列表中添加一個分隔符。此模組對遊戲沒有影響。"
 			},
@@ -17832,7 +17832,7 @@
 				"ko": "왼쪽 목록에 구분선을 추가합니다. 이 모드는 게임에 영향을 미치지 않습니다.",
 				"pl": "Dodaje separator do lewej listy. Ten mod nie ma wpływu na grę.",
 				"pt-BR": "Adiciona um separador à lista esquerda. Este mod não tem efeito no jogo.",
-				"ru": "Разделители списка модов - Добавляет разделитель в левый список. Этот мод не влияет на игру.",
+				"ru": "Mod List Dividers - GamePlay Improve - Добавляет разделитель в левый список. Этот мод не влияет на игру.",
 				"zh-hans": "在左侧列表中添加一个分隔符。此模组对游戏没有影响。",
 				"zh-hant": "在左側列表中添加一個分隔符。此模組對遊戲沒有影響。"
 			},
@@ -17881,7 +17881,7 @@
 				"ko": "다양한 사용자 정의 옵션과 함께 핑 텍스트를 HUD에 추가합니다.",
 				"pl": "Dodaje tekst pinga do HUD z wieloma opcjami dostosowania.",
 				"pt-BR": "Adiciona um texto de ping ao HUD com muitas opções de personalização.",
-				"ru": "Display Ping (Latency) - Добавляет на HUD текст с пингом и множеством настроек.",
+				"ru": "Display Ping (Latency) - Добавляет в интерфейс значение пинга с множеством настроек.",
 				"zh-hans": "在 HUD 上添加延迟文本，并提供大量自定义选项。",
 				"zh-hant": "在 HUD 上添加延遲文字，並提供大量自訂選項。"
 			},
@@ -17907,32 +17907,32 @@
 			"folder": "extended_weapon_customization_no_gun",
 			"nexus_file_pattern": "ewc",
 			"name": {
-				"de": "",
-				"en": "Hidden Viewmodels While Aiming - Extended Weapon Customization Plugin - No Gun When Aiming Down Sights ADS",
-				"es": "",
-				"fr": "",
-				"it": "",
-				"ja": "",
-				"ko": "",
-				"pl": "",
-				"pt-BR": "",
-				"ru": "",
-				"zh-hans": "",
-				"zh-hant": ""
+				"en": "Hidden Viewmodels While Aiming",
+				"ru": "Скрытие моделей оружия при прицеливании",
+				"zh-hans": "瞄准时隐藏武器模型",
+				"zh-hant": "瞄準時隱藏武器模型",
+				"de": "Waffenmodelle beim Zielen ausblenden",
+				"fr": "Masquer les modèles d'armes en visant",
+				"ja": "照準時に武器モデルを非表示",
+				"ko": "조준 시 무기 모델 숨기기",
+				"it": "Nascondi modelli arma durante la mira",
+				"pl": "Ukrywanie modeli broni podczas celowania",
+				"es": "Ocultar modelos de armas al apuntar",
+				"pt-BR": "Ocultar modelos de armas ao mirar"
 			},
 			"description": {
-				"de": "",
 				"en": "Adds sight options that hide the gun while aiming down sights.",
-				"es": "",
-				"fr": "",
-				"it": "",
-				"ja": "",
-				"ko": "",
-				"pl": "",
-				"pt-BR": "",
-				"ru": "",
-				"zh-hans": "",
-				"zh-hant": ""
+				"ru": "Hidden Viewmodels While Aiming - Добавляет опции прицелов, которые скрывают оружие при прицеливании.",
+				"zh-hans": "添加瞄准时隐藏武器的瞄准镜选项。",
+				"zh-hant": "添加瞄準時隱藏武器的瞄準鏡選項。",
+				"de": "Fügt Visieroptionen hinzu, die die Waffe beim Zielen ausblenden.",
+				"fr": "Ajoute des options de visée qui cachent l'arme en visant.",
+				"ja": "照準時に銃を非表示にする照準オプションを追加します。",
+				"ko": "조준 시 총을 숨기는 조준경 옵션을 추가합니다.",
+				"it": "Aggiunge opzioni di mira che nascondono l'arma durante la mira.",
+				"pl": "Dodaje opcje celowników, które ukrywają broń podczas celowania.",
+				"es": "Añade opciones de mira que ocultan el arma al apuntar.",
+				"pt-BR": "Adiciona opções de mira que ocultam a arma ao mirar."
 			},
 			"author": "Backup158",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/461",
@@ -17957,15 +17957,35 @@
 			"nexus_file_pattern": "custom",
 			"name": {
 				"en": "Custom Loading Background",
-				"ru": ""
+				"ru": "Пользовательский фон загрузки",
+				"zh-hans": "自定义加载背景",
+				"zh-hant": "自訂載入背景",
+				"de": "Benutzerdefinierter Ladebildschirm-Hintergrund",
+				"fr": "Arrière-plan de chargement personnalisé",
+				"ja": "カスタムローディング背景",
+				"ko": "사용자 정의 로딩 배경",
+				"it": "Sfondo di caricamento personalizzato",
+				"pl": "Niestandardowe tło ładowania",
+				"es": "Fondo de carga personalizado",
+				"pt-BR": "Fundo de carregamento personalizado"
 			},
 			"description": {
 				"en": "This mod lets you change the default loading screen background to random images that are stored locally or online.",
-				"ru": ""
+				"ru": "Custom Loading Background - Этот мод позволяет заменить стандартный фон экрана загрузки на случайные изображения, которые хранятся локально или в сети.",
+				"zh-hans": "此模组允许你将默认加载屏幕背景更改为本地或在线存储的随机图像。",
+				"zh-hant": "此模組允許你將預設載入畫面背景更改為本地或線上儲存的隨機圖像。",
+				"de": "Dieser Mod ermöglicht es, den Standard-Hintergrund des Ladebildschirms durch zufällige Bilder zu ersetzen, die lokal oder online gespeichert sind.",
+				"fr": "Ce mod vous permet de changer l'arrière-plan par défaut de l'écran de chargement par des images aléatoires stockées localement ou en ligne.",
+				"ja": "このMODは、デフォルトのロード画面の背景を、ローカルまたはオンラインに保存されたランダムな画像に変更することができます。",
+				"ko": "이 모드를 사용하면 기본 로딩 화면 배경을 로컬 또는 온라인에 저장된 무작위 이미지로 변경할 수 있습니다.",
+				"it": "Questo mod ti permette di cambiare lo sfondo predefinito della schermata di caricamento con immagini casuali archiviate localmente o online.",
+				"pl": "Ten mod pozwala zmienić domyślne tło ekranu ładowania na losowe obrazy przechowywane lokalnie lub w sieci.",
+				"es": "Este mod te permite cambiar el fondo de pantalla de carga predeterminado por imágenes aleatorias almacenadas localmente o en línea.",
+				"pt-BR": "Este mod permite que você altere o fundo da tela de carregamento padrão para imagens aleatórias armazenadas localmente ou online."
 			},
 			"author": "tickbox",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/462",
-			"github_url": "",
+			"github_url": "https://github.com/tickbox/DarktideMods/tree/1a91fe8a21e63a5b25abc8da5f816b7c3844a932/CustomLoadingBackground",
 			"note": {
 				"de": "",
 				"en": "",
@@ -17986,15 +18006,35 @@
 			"nexus_file_pattern": "return",
 			"name": {
 				"en": "Return of the Traitor",
-				"ru": ""
+				"ru": "Возвращение предателя",
+				"zh-hans": "叛徒归来",
+				"zh-hant": "叛徒歸來",
+				"de": "Rückkehr des Verräters",
+				"fr": "Le retour du traître",
+				"ja": "裏切者の帰還",
+				"ko": "배신자의 귀환",
+				"it": "Il ritorno del traditore",
+				"pl": "Powrót zdrajcy",
+				"es": "El regreso del traidor",
+				"pt-BR": "O retorno do traidor"
 			},
 			"description": {
 				"en": "Let the traitor return to the commissary, even if you have reached level 30.",
-				"ru": ""
+				"ru": "Return of the Traitor - Позволяет предателю вернуться в комиссариат, даже если вы достигли 30 уровня.",
+				"zh-hans": "即使你已经达到30级，也让叛徒回到军需官商店。",
+				"zh-hant": "即使你已達到30級，也讓叛徒回到軍需官商店。",
+				"de": "Lässt den Verräter zur Kommissariatsverkäuferin zurückkehren, auch wenn du Level 30 erreicht hast.",
+				"fr": "Permet au traître de retourner au commissariat, même si vous avez atteint le niveau 30.",
+				"ja": "レベル30に達していても、裏切り者をコミサリーに戻すことができます。",
+				"ko": "레벨 30에 도달했더라도 배신자가 위관 상점으로 돌아올 수 있습니다.",
+				"it": "Permette al traditore di tornare al commissariato, anche se hai raggiunto il livello 30.",
+				"pl": "Pozwala zdrajcy wrócić do komisariatu, nawet jeśli osiągnąłeś poziom 30.",
+				"es": "Permite que el traidor regrese a la comisaría, incluso si has alcanzado el nivel 30.",
+				"pt-BR": "Permite que o traidor retorne ao comissariado, mesmo se você atingiu o nível 30."
 			},
 			"author": "deluxghost",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/463",
-			"github_url": "",
+			"github_url": "https://github.com/deluxghost/darktide-mods/tree/main/ReturnOfTheTraitor",
 			"note": {
 				"de": "",
 				"en": "",
@@ -18015,11 +18055,31 @@
 			"nexus_file_pattern": "reforged",
 			"name": {
 				"en": "Reforged in Fury",
-				"ru": ""
+				"ru": "Перекованный в ярости",
+				"zh-hans": "怒火重铸",
+				"zh-hant": "怒火重鑄",
+				"de": "Im Zorn neu geschmiedet",
+				"fr": "Reforgé dans la fureur",
+				"ja": "怒りで鍛え直されし者",
+				"ko": "분노로 단련된 자",
+				"it": "Riforgiato nella furia",
+				"pl": "Przekuty w furii",
+				"es": "Reforjado en la furia",
+				"pt-BR": "Reforjado na fúria"
 			},
 			"description": {
 				"en": "Restores 20 voice lines that went unused for all Zealots personalities further improving your ability to purge the heretics!",
-				"ru": ""
+				"ru": "Reforged in Fury - Восстанавливает 20 голосовых реплик, которые не использовались для всех личностей изуверов, что ещё больше улучшает вашу способность очищать еретиков!",
+				"zh-hans": "恢复了所有狂热者个性中未使用的 20 条语音，进一步提升你清除异端的能力！",
+				"zh-hant": "恢復了所有狂熱者個性中未使用的 20 條語音，進一步提升你清除異端的能力！",
+				"de": "Stellt 20 nicht verwendete Sprachzeilen für alle Zelot-Persönlichkeiten wieder her und verbessert so Ihre Fähigkeit, Ketzer zu säubern!",
+				"fr": "Restaure 20 lignes vocales inutilisées pour toutes les personnalités du Zélote, améliorant encore votre capacité à purger les hérétiques !",
+				"ja": "すべてのゼロットパーソナリティで未使用だった20の音声ラインを復元し、異端者を浄化する能力をさらに向上させます！",
+				"ko": "모든 광전사 성격에 사용되지 않은 20개의 음성 대사를 복원하여 이단자를 숙청하는 능력을 더욱 향상시킵니다!",
+				"it": "Ripristina 20 linee vocali inutilizzate per tutte le personalità dello Zelota, migliorando ulteriormente la tua capacità di eliminare gli eretici!",
+				"pl": "Przywraca 20 linii głosowych, które nie były używane dla wszystkich osobowości Zeloty, jeszcze bardziej poprawiając twoją zdolność do oczyszczania heretyków!",
+				"es": "Restaura 20 líneas de voz no utilizadas para todas las personalidades del Zelota, mejorando aún más tu capacidad para purgar herejes!",
+				"pt-BR": "Restaura 20 falas não utilizadas para todas as personalidades do Zelote, melhorando ainda mais sua capacidade de purgar hereges!"
 			},
 			"author": "LukeGlitch",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/465",
@@ -18044,15 +18104,35 @@
 			"nexus_file_pattern": "dps",
 			"name": {
 				"en": "DPS Meter",
-				"ru": ""
+				"ru": "Счётчик урона в секунду",
+				"zh-hans": "DPS 计量器",
+				"zh-hant": "DPS 計量器",
+				"de": "DPS-Messer",
+				"fr": "Compteur de DPS",
+				"ja": "DPSメーター",
+				"ko": "DPS 측정기",
+				"it": "Misuratore DPS",
+				"pl": "Licznik DPS",
+				"es": "Medidor de DPS",
+				"pt-BR": "Medidor de DPS"
 			},
 			"description": {
 				"en": "Displays your DPS.",
-				"ru": ""
+				"ru": "DPS Meter - Отображает ваш урон в секунду.",
+				"zh-hans": "显示你的 DPS。",
+				"zh-hant": "顯示你的 DPS。",
+				"de": "Zeigt Ihren DPS an.",
+				"fr": "Affiche votre DPS.",
+				"ja": "あなたのDPSを表示します。",
+				"ko": "당신의 DPS를 표시합니다.",
+				"it": "Mostra il tuo DPS.",
+				"pl": "Wyświetla twój DPS.",
+				"es": "Muestra tu DPS.",
+				"pt-BR": "Exibe seu DPS."
 			},
 			"author": "Zombine",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/466",
-			"github_url": "",
+			"github_url": "https://github.com/zombine04/darktide-mods/tree/main/DPSMeter",
 			"note": {
 				"de": "",
 				"en": "",
@@ -18072,16 +18152,36 @@
 			"folder": "Favourite Child",
 			"nexus_file_pattern": "favourite",
 			"name": {
-				"en": "Favourite Child - Marking Characters as Undeletable",
-				"ru": ""
+				"en": "Favourite Child",
+				"ru": "Любимый ребёнок",
+				"zh-hans": "心爱角色 - 标记角色为不可删除",
+				"zh-hant": "心愛角色 - 標記角色為不可刪除",
+				"de": "Lieblingskind",
+				"fr": "Enfant préféré",
+				"ja": "お気に入りの子 - キャラクターを削除不可に設定",
+				"ko": "사랑하는 자식 - 캐릭터를 삭제 불가로 표시",
+				"it": "Figlio preferito",
+				"pl": "Ulubione dziecko",
+				"es": "Hijo favorito",
+				"pt-BR": "Filho favorito"
 			},
 			"description": {
 				"en": "Allows you to mark characters as undeletable",
-				"ru": ""
+				"ru": "Favourite Child - Marking Characters as Undeletable - Позволяет пометить персонажей как неудаляемых.",
+				"zh-hans": "允许你将角色标记为不可删除。",
+				"zh-hant": "允許你將角色標記為不可刪除。",
+				"de": "Ermöglicht es, Charaktere als unlöschbar zu markieren.",
+				"fr": "Permet de marquer les personnages comme indélébiles.",
+				"ja": "キャラクターを削除不可としてマークできます。",
+				"ko": "캐릭터를 삭제 불가로 표시할 수 있습니다.",
+				"it": "Permette di contrassegnare i personaggi come non eliminabili.",
+				"pl": "Pozwala oznaczyć postacie jako nieusuwalne.",
+				"es": "Permite marcar personajes como no eliminables.",
+				"pt-BR": "Permite marcar personagens como não elimináveis."
 			},
 			"author": "Wobin",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/467",
-			"github_url": "",
+			"github_url": "https://github.com/Wobin/FavouriteChild",
 			"note": {
 				"de": "",
 				"en": "",
@@ -18102,11 +18202,31 @@
 			"nexus_file_pattern": "emperor",
 			"name": {
 				"en": "Emperor's Guidance",
-				"ru": ""
+				"ru": "Руководство Императора",
+				"zh-hans": "帝皇的指引",
+				"zh-hant": "帝皇的指引",
+				"de": "Leitung des Imperators",
+				"fr": "Guidance de l'Empereur",
+				"ja": "皇帝の導き",
+				"ko": "황제의 인도",
+				"it": "Guida dell'Imperatore",
+				"pl": "Przewodnictwo Imperatora",
+				"es": "Guía del Emperador",
+				"pt-BR": "Orientação do Imperador"
 			},
 			"description": {
 				"en": "Allows for per-enemy target filtering for Psyker's Brain Burst. Filters can be set for primary and secondary attacks.",
-				"ru": ""
+				"ru": "Emperor's Guidance - Позволяет фильтровать цели для способности псайкера «Взрыв мозга» по каждому врагу. Фильтры можно настроить для основной и дополнительной атак.",
+				"zh-hans": "允许为灵能者的「脑爆」技能按每个敌人进行目标过滤。可以为主攻击和次要攻击设置过滤器。",
+				"zh-hant": "允許為靈能者的「腦爆」技能按每個敵人進行目標過濾。可以為主攻擊和次要攻擊設定過濾器。",
+				"de": "Ermöglicht eine zielgerichtete Filterung für die Fähigkeit \"Gehirnschlag\" des Psykers pro Gegner. Filter können für Primär- und Sekundärangriffe eingestellt werden.",
+				"fr": "Permet un filtrage des cibles par ennemi pour la capacité « Décharge cérébrale » du Psyker. Des filtres peuvent être définis pour les attaques primaires et secondaires.",
+				"ja": "サイカーの「ブレインバースト」に対して敵ごとのターゲットフィルタリングを可能にします。メインアタックとセカンダリアタックにフィルターを設定できます。",
+				"ko": "사이커의 '두뇌 폭발'에 대해 적별 대상 필터링을 허용합니다. 주 공격과 보조 공격에 필터를 설정할 수 있습니다.",
+				"it": "Consente il filtraggio del bersaglio per nemico per la capacità « Scoppio cerebrale » dello Psichico. È possibile impostare filtri per gli attacchi primari e secondari.",
+				"pl": "Pozwala na filtrowanie celów dla umiejętności \"Eksplozja mózgu\" Psychera na każdego wroga. Filtry można ustawić dla ataków podstawowych i dodatkowych.",
+				"es": "Permite filtrar objetivos por enemigo para la habilidad « Explosión cerebral » del Psíquico. Se pueden establecer filtros para ataques primarios y secundarios.",
+				"pt-BR": "Permite filtrar alvos por inimigo para a habilidade « Explosão Cerebral » do Psíquico. Filtros podem ser definidos para ataques primários e secundários."
 			},
 			"author": "Norkkom",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/468",
@@ -18131,15 +18251,35 @@
 			"nexus_file_pattern": "load",
 			"name": {
 				"en": "Loading Screen Decoration Remover",
-				"ru": ""
+				"ru": "Удаление декораций экрана загрузки",
+				"zh-hans": "加载屏幕装饰移除器",
+				"zh-hant": "載入畫面裝飾移除器",
+				"de": "Ladebildschirm-Dekorationsentferner",
+				"fr": "Suppresseur de décorations d'écran de chargement",
+				"ja": "ロード画面装飾削除ツール",
+				"ko": "로딩 화면 장식 제거기",
+				"it": "Rimuovi decorazioni schermata di caricamento",
+				"pl": "Usuwacz dekoracji ekranu ładowania",
+				"es": "Eliminador de decoraciones de pantalla de carga",
+				"pt-BR": "Removedor de decorações da tela de carregamento"
 			},
 			"description": {
 				"en": "Hide Load Screen Divider and Next Hint Prompt - Options to hide the hints, divider, and text prompt from loading screens.",
-				"ru": ""
+				"ru": "Loading Screen Decoration Remover - Скрывает разделитель экрана загрузки и подсказку «Далее» — опции для скрытия подсказок, разделителя и текста с экранов загрузки.",
+				"zh-hans": "隐藏加载屏幕分隔线和下一个提示 — 提供选项隐藏加载屏幕中的提示、分隔线和文字提示。",
+				"zh-hant": "隱藏載入畫面分隔線和下一個提示 — 提供選項隱藏載入畫面中的提示、分隔線和文字提示。",
+				"de": "Blendet den Ladebildschirm-Trenner und den nächsten Hinweis aus - Optionen zum Ausblenden von Hinweisen, Trennern und Textaufforderungen auf Ladebildschirmen.",
+				"fr": "Masque le séparateur d'écran de chargement et l'invite suivante - Options pour masquer les indices, le séparateur et l'invite textuelle des écrans de chargement.",
+				"ja": "ロード画面の区切り線と次のヒントプロンプトを非表示 - ロード画面からヒント、区切り線、テキストプロンプトを非表示にするオプション。",
+				"ko": "로딩 화면 구분선 및 다음 힌트 프롬프트 숨기기 - 로딩 화면에서 힌트, 구분선, 텍스트 프롬프트를 숨기는 옵션입니다.",
+				"it": "Nasconde il divisore della schermata di caricamento e il suggerimento successivo - Opzioni per nascondere suggerimenti, divisori e prompt di testo dalle schermate di caricamento.",
+				"pl": "Ukryj separator ekranu ładowania i następną podpowiedź - Opcje ukrywania podpowiedzi, separatora i monitów tekstowych z ekranów ładowania.",
+				"es": "Oculta el divisor de la pantalla de carga y la siguiente sugerencia - Opciones para ocultar sugerencias, divisores y mensajes de texto de las pantallas de carga.",
+				"pt-BR": "Ocultar divisor da tela de carregamento e próxima dica - Opções para ocultar dicas, divisores e prompts de texto das telas de carregamento."
 			},
 			"author": "Backup158",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/469",
-			"github_url": "",
+			"github_url": "https://github.com/Backup158/DarktideLoadScreenDecorationRemover",
 			"note": {
 				"de": "",
 				"en": "",
@@ -18160,11 +18300,31 @@
 			"nexus_file_pattern": "buff",
 			"name": {
 				"en": "HUD Buff Stacks",
-				"ru": ""
+				"ru": "Счётчик баффов в интерфейсе",
+				"zh-hans": "HUD 增益层数",
+				"zh-hant": "HUD 增益層數",
+				"de": "HUD-Buff-Stapel",
+				"fr": "Piles de buffs HUD",
+				"ja": "HUDバフスタック",
+				"ko": "HUD 버프 스택",
+				"it": "Accumuli di buff HUD",
+				"pl": "Stosy buffów na HUD",
+				"es": "Pilas de beneficios HUD",
+				"pt-BR": "Pilhas de buffs no HUD"
 			},
 			"description": {
 				"en": "A HUD mod for to show stacking buffs and its remaining time",
-				"ru": ""
+				"ru": "HUD Buff Stacks - Мод для интерфейса, показывающий накапливающиеся баффы и оставшееся время их действия.",
+				"zh-hans": "一个 HUD 模组，用于显示叠加增益及其剩余时间。",
+				"zh-hant": "一個 HUD 模組，用於顯示疊加增益及其剩餘時間。",
+				"de": "Ein HUD-Mod, der stapelbare Buffs und ihre verbleibende Zeit anzeigt.",
+				"fr": "Un mod HUD pour afficher les buffs cumulables et leur temps restant.",
+				"ja": "スタックするバフとその残り時間を表示するHUDMOD。",
+				"ko": "중첩되는 버프와 남은 시간을 표시하는 HUD 모드입니다.",
+				"it": "Un mod HUD per mostrare i buff accumulabili e il loro tempo rimanente.",
+				"pl": "Mod HUD do wyświetlania kumulujących się buffów i ich pozostałego czasu.",
+				"es": "Un mod HUD para mostrar los beneficios acumulables y su tiempo restante.",
+				"pt-BR": "Um mod de HUD para mostrar buffs acumuláveis e seu tempo restante."
 			},
 			"author": "bountygiver",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/470",
@@ -18189,15 +18349,35 @@
 			"nexus_file_pattern": "contextual",
 			"name": {
 				"en": "Contextual Audio Settings",
-				"ru": ""
+				"ru": "Контекстные аудионастройки",
+				"zh-hans": "上下文音频设置",
+				"zh-hant": "上下文音訊設定",
+				"de": "Kontextuelle Audioeinstellungen",
+				"fr": "Paramètres audio contextuels",
+				"ja": "コンテクストオーディオ設定",
+				"ko": "맥락 오디오 설정",
+				"it": "Impostazioni audio contestuali",
+				"pl": "Kontekstowe ustawienia dźwięku",
+				"es": "Configuración de audio contextual",
+				"pt-BR": "Configurações de áudio contextuais"
 			},
 			"description": {
 				"en": "Automatically adjust audio settings for different contexts (e.g. lower music volume on Mourningstar Hub vs. missions)",
-				"ru": ""
+				"ru": "Contextual Audio Settings - Автоматически регулирует аудионастройки для разных контекстов (например, уменьшает громкость музыки в Хабе по сравнению с миссиями).",
+				"zh-hans": "根据不同上下文自动调整音频设置（例如，在哀星号枢纽中降低音乐音量，与任务中不同）。",
+				"zh-hant": "根據不同上下文自動調整音訊設定（例如，在哀星號樞紐中降低音樂音量，與任務中不同）。",
+				"de": "Passt Audioeinstellungen automatisch an verschiedene Kontexte an (z. B. niedrigere Musiklautstärke im Mourningstar-Hub im Vergleich zu Missionen).",
+				"fr": "Ajuste automatiquement les paramètres audio pour différents contextes (par exemple, volume de musique plus bas sur le hub Mourningstar par rapport aux missions).",
+				"ja": "異なるコンテキストに応じてオーディオ設定を自動調整します（例：ミッションと比較してモーニングスターハブでの音楽音量を下げる）。",
+				"ko": "다른 상황에 따라 오디오 설정을 자동으로 조정합니다(예: 미션 대비 모닝스타 허브에서 음악 볼륨 낮추기).",
+				"it": "Regola automaticamente le impostazioni audio per diversi contesti (es. abbassa il volume della musica nell'Hub Mourningstar rispetto alle missioni).",
+				"pl": "Automatycznie dostosowuje ustawienia dźwięku do różnych kontekstów (np. obniża głośność muzyki w Hubie Mourningstar w porównaniu do misji).",
+				"es": "Ajusta automáticamente la configuración de audio para diferentes contextos (por ejemplo, menor volumen de música en el Centro Mourningstar frente a las misiones).",
+				"pt-BR": "Ajusta automaticamente as configurações de áudio para diferentes contextos (ex.: volume de música mais baixo no Hub Mourningstar em comparação com as missões)."
 			},
 			"author": "LeicaSimile",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/471",
-			"github_url": "",
+			"github_url": "https://github.com/LeicaSimile/contextual_audio_settings",
 			"note": {
 				"de": "",
 				"en": "",
@@ -18217,12 +18397,32 @@
 			"folder": "CustomTattoos",
 			"nexus_file_pattern": "custom",
 			"name": {
-				"en": "CustomTattoos",
-				"ru": ""
+				"en": "Custom Tattoos",
+				"ru": "Настраиваемые татуировки",
+				"zh-hans": "自定义纹身",
+				"zh-hant": "自訂紋身",
+				"de": "Benutzerdefinierte Tattoos",
+				"fr": "Tatouages personnalisés",
+				"ja": "カスタムタトゥー",
+				"ko": "사용자 정의 문신",
+				"it": "Tatuaggi personalizzati",
+				"pl": "Niestandardowe tatuaże",
+				"es": "Tatuajes personalizados",
+				"pt-BR": "Tatuagens personalizadas"
 			},
 			"description": {
 				"en": "Change your tattoos color and purge in Style!",
-				"ru": ""
+				"ru": "Custom Tattoos - Изменяйте цвет ваших татуировок и очищайте еретиков со стилем!",
+				"zh-hans": "更改纹身颜色，以时尚的方式清除异端！",
+				"zh-hant": "更改紋身顏色，以時尚的方式清除異端！",
+				"de": "Ändern Sie die Farbe Ihrer Tätowierungen und säubern Sie mit Stil!",
+				"fr": "Changez la couleur de vos tatouages et purifiez avec style !",
+				"ja": "タトゥーの色を変更し、スタイリッシュに浄化しましょう！",
+				"ko": "문신 색상을 변경하고 스타일리시하게 숙청하세요!",
+				"it": "Cambia il colore dei tuoi tatuaggi e purga con stile!",
+				"pl": "Zmień kolor swoich tatuaży i oczyszczaj w stylu!",
+				"es": "¡Cambia el color de tus tatuajes y purga con estilo!",
+				"pt-BR": "Mude a cor de suas tatuagens e purgue com estilo!"
 			},
 			"author": "LukeGlitch - EggFever - Defallt",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/475",
@@ -18247,11 +18447,31 @@
 			"nexus_file_pattern": "unga",
 			"name": {
 				"en": "Unga Bunga",
-				"ru": ""
+				"ru": "Унга Бунга",
+				"zh-hans": "乌加邦加",
+				"zh-hant": "烏加邦加",
+				"de": "Unga Bunga",
+				"fr": "Unga Bunga",
+				"ja": "ウンガブンガ",
+				"ko": "웅가 붕가",
+				"it": "Unga Bunga",
+				"pl": "Unga Bunga",
+				"es": "Unga Bunga",
+				"pt-BR": "Unga Bunga"
 			},
 			"description": {
 				"en": "A mod to spam heavy attacks as fast as possible.",
-				"ru": ""
+				"ru": "Unga Bunga - Мод для максимально быстрого спама тяжёлых атак.",
+				"zh-hans": "一个尽可能快速地 spam 重击的模组。",
+				"zh-hant": "一個盡可能快速地 spam 重擊的模組。",
+				"de": "Ein Mod, um schwere Angriffe so schnell wie möglich zu spammen.",
+				"fr": "Un mod pour spammer les attaques lourdes aussi vite que possible.",
+				"ja": "可能な限り高速でヘビーアタックを連打するためのMOD。",
+				"ko": "가능한 한 빠르게 강공격을 난사하는 모드입니다.",
+				"it": "Un mod per spamare attacchi pesanti il più velocemente possibile.",
+				"pl": "Mod do spamowania ciężkich ataków tak szybko, jak to możliwe.",
+				"es": "Un mod para spamear ataques pesados lo más rápido posible.",
+				"pt-BR": "Um mod para spammar ataques pesados o mais rápido possível."
 			},
 			"author": "Norkkom",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/476",
@@ -18275,16 +18495,36 @@
 			"folder": "PewPew",
 			"nexus_file_pattern": "pew",
 			"name": {
-				"en": "PewPew (Continued)",
-				"ru": ""
+				"en": "Pew Pew (Continued)",
+				"ru": "Пиф Паф (Продолжение)",
+				"zh-hans": "PewPew（续）",
+				"zh-hant": "PewPew（續）",
+				"de": "PewPew (Fortgesetzt)",
+				"fr": "PewPew (suite)",
+				"ja": "PewPew（続）",
+				"ko": "PewPew (계속)",
+				"it": "PewPew (continuato)",
+				"pl": "PewPew (kontynuacja)",
+				"es": "PewPew (continuación)",
+				"pt-BR": "PewPew (continuação)"
 			},
 			"description": {
 				"en": "Change your ranged weapon's firing sound and/or the projectile it shoots  (Updated).",
-				"ru": ""
+				"ru": "Pew Pew (Continued)- Изменяйте звук стрельбы вашего дальнобойного оружия и/или снаряд, который оно выпускает (обновлено).",
+				"zh-hans": "更改远程武器的射击声音和/或发射的弹丸（已更新）。",
+				"zh-hant": "更改遠程武器的射擊聲音和/或發射的彈丸（已更新）。",
+				"de": "Ändern Sie den Schussklang Ihrer Fernkampfwaffe und/oder das Projektil, das sie abfeuert (aktualisiert).",
+				"fr": "Modifiez le son de tir de votre arme à distance et/ou le projectile qu'elle tire (mis à jour).",
+				"ja": "遠距離武器の発射音や発射物を変更します（更新済み）。",
+				"ko": "원거리 무기의 발사음 및 발사체를 변경하세요 (업데이트됨).",
+				"it": "Cambia il suono di sparo della tua arma a distanza e/o il proiettile che spara (aggiornato).",
+				"pl": "Zmień dźwięk strzału swojej broni dystansowej i/lub pocisk, który wystrzeliwuje (zaktualizowane).",
+				"es": "Cambia el sonido de disparo de tu arma a distancia y/o el proyectil que dispara (actualizado).",
+				"pt-BR": "Altere o som de disparo da sua arma de longo alcance e/ou o projétil que ela dispara (atualizado)."
 			},
 			"author": "tinybike - Backup158",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/477",
-			"github_url": "",
+			"github_url": "https://github.com/Backup158/DarktidePewPewContinued",
 			"note": {
 				"de": "",
 				"en": "",
@@ -18305,11 +18545,31 @@
 			"nexus_file_pattern": "testing",
 			"name": {
 				"en": "Testing Utilities (add buffs)",
-				"ru": ""
+				"ru": "Тестовые утилиты (добавление баффов)",
+				"zh-hans": "测试工具（添加增益）",
+				"zh-hant": "測試工具（添加增益）",
+				"de": "Test-Dienstprogramme (Buffs hinzufügen)",
+				"fr": "Utilitaires de test (ajouter des buffs)",
+				"ja": "テストユーティリティ（バフ追加）",
+				"ko": "테스트 유틸리티 (버프 추가)",
+				"it": "Utility di test (aggiungi buff)",
+				"pl": "Narzędzia testowe (dodawanie buffów)",
+				"es": "Utilidades de prueba (añadir beneficios)",
+				"pt-BR": "Utilidades de teste (adicionar buffs)"
 			},
 			"description": {
 				"en": "Testing utilities for the Psykhanium and the Solo Play and Datatide mods. Applies Keystone Buff Stacks, Resets HP, Toughness, Abilities, and a host of other things to improve the experience of testing builds in Darktide.",
-				"ru": ""
+				"ru": "Testing Utilities (add buffs) - Тестовые утилиты для Псайканиума, а также модов Solo Play и Datatide. Применяет баффы краеугольных камней, сбрасывает HP, выносливость, способности и множество других параметров, чтобы улучшить опыт тестирования сборок в Darktide.",
+				"zh-hans": "为灵能室、单人游戏和 Datatide 模组提供的测试工具。应用基石增益层数、重置生命值、韧性、技能以及许多其他内容，以改善在暗潮中测试构建的体验。",
+				"zh-hant": "為靈能室、單人遊戲和 Datatide 模組提供的測試工具。應用基石增益層數、重置生命值、韌性、技能以及許多其他內容，以改善在暗潮中測試構建的體驗。",
+				"de": "Test-Dienstprogramme für das Psykhanium und die Solo-Play- und Datatide-Mods. Wendet Keystone-Buff-Stapel an, setzt HP, Zähigkeit, Fähigkeiten und eine Reihe anderer Dinge zurück, um das Testen von Builds in Darktide zu verbessern.",
+				"fr": "Utilitaires de test pour le Psykhanium et les mods Solo Play et Datatide. Applique des piles de buffs de pierre angulaire, réinitialise les PV, la ténacité, les capacités et bien d'autres choses pour améliorer l'expérience de test des builds dans Darktide.",
+				"ja": "プシカニウムおよびSolo PlayおよびDatatide MODのテストユーティリティ。キーストーンバフスタックを適用し、HP、タフネス、アビリティなどをリセットして、Darktideでのビルドテスト体験を向上させます。",
+				"ko": "프시카니움 및 Solo Play 및 Datatide 모드용 테스트 유틸리티입니다. 키스톤 버프 스택을 적용하고 HP, 강인함, 능력 등을 재설정하여 Darktide에서 빌드 테스트 경험을 개선합니다.",
+				"it": "Utility di test per il Psykhanium e i mod Solo Play e Datatide. Applica accumuli di buff chiave, reimposta HP, resistenza, abilità e molte altre cose per migliorare l'esperienza di test delle build in Darktide.",
+				"pl": "Narzędzia testowe dla Psykanium oraz modów Solo Play i Datatide. Stosuje stosy buffów kamieni węgielnych, resetuje HP, wytrzymałość, umiejętności i wiele innych rzeczy, aby poprawić doświadczenie testowania buildów w Darktide.",
+				"es": "Utilidades de prueba para el Psykhanium y los mods Solo Play y Datatide. Aplica pilas de beneficios de piedra angular, reinicia HP, fortaleza, habilidades y muchas otras cosas para mejorar la experiencia de prueba de builds en Darktide.",
+				"pt-BR": "Utilidades de teste para o Psykhanium e os mods Solo Play e Datatide. Aplica pilhas de buffs de pedra angular, redefine HP, resistência, habilidades e várias outras coisas para melhorar a experiência de teste de builds em Darktide."
 			},
 			"author": "Littlemonde",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/478",
@@ -18334,15 +18594,35 @@
 			"nexus_file_pattern": "auto",
 			"name": {
 				"en": "AutoBlitz",
-				"ru": ""
+				"ru": "АвтоБлиц",
+				"zh-hans": "自动闪击",
+				"zh-hant": "自動閃擊",
+				"de": "Auto-Blitz",
+				"fr": "AutoBlitz",
+				"ja": "オートブリッツ",
+				"ko": "자동 블리츠",
+				"it": "AutoBlitz",
+				"pl": "AutoBlitz",
+				"es": "AutoBlitz",
+				"pt-BR": "AutoBlitz"
 			},
 			"description": {
 				"en": "Automatically throws blitzes when they are equipped.",
-				"ru": ""
+				"ru": "AutoBlitz - Автоматически бросает блицы, когда они экипированы.",
+				"zh-hans": "当装备闪击技能时自动释放。",
+				"zh-hant": "當裝備閃擊技能時自動釋放。",
+				"de": "Wirft automatisch Blitze, wenn sie ausgerüstet sind.",
+				"fr": "Lance automatiquement les blitz lorsqu'ils sont équipés.",
+				"ja": "ブリッツが装備されているときに自動的に投げます。",
+				"ko": "블리츠가 장착되어 있을 때 자동으로 던집니다.",
+				"it": "Lancia automaticamente i blitz quando sono equipaggiati.",
+				"pl": "Automatycznie rzuca błyskawice, gdy są wyposażone.",
+				"es": "Lanza automáticamente los asaltos cuando están equipados.",
+				"pt-BR": "Lança automaticamente os blitz quando estão equipados."
 			},
 			"author": "Norkkom",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/480",
-			"github_url": "",
+			"github_url": "https://github.com/CATBIRDS/AutoBlitz",
 			"note": {
 				"de": "",
 				"en": "",
@@ -18363,11 +18643,31 @@
 			"nexus_file_pattern": "usch",
 			"name": {
 				"en": "USCH Chorus of Metal",
-				"ru": ""
+				"ru": "USCH Хор металла",
+				"zh-hans": "USCH 金属合唱",
+				"zh-hant": "USCH 金屬合唱",
+				"de": "USCH Metal-Chor",
+				"fr": "USCH Chœur de métal",
+				"ja": "USCH メタルコーラス",
+				"ko": "USCH 메탈 합창",
+				"it": "USCH Coro di metallo",
+				"pl": "USCH Chór metalu",
+				"es": "USCH Coro de metal",
+				"pt-BR": "USCH Coral de metal"
 			},
 			"description": {
 				"en": "Plays random parts of Turmion Kätilöt - U.S.C.H! when using Zealot Chorus ability.",
-				"ru": ""
+				"ru": "USCH Chorus of Metal - Воспроизводит случайные фрагменты песни Turmion Kätilöt - U.S.C.H! при использовании способности «Хор» у изувера.",
+				"zh-hans": "使用狂热者「合唱」技能时播放 Turmion Kätilöt - U.S.C.H! 的随机片段。",
+				"zh-hant": "使用狂熱者「合唱」技能時播放 Turmion Kätilöt - U.S.C.H! 的隨機片段。",
+				"de": "Spielt zufällige Teile von Turmion Kätilöt - U.S.C.H! ab, wenn die Fähigkeit \"Chor des Zeloten\" verwendet wird.",
+				"fr": "Joue des parties aléatoires de Turmion Kätilöt - U.S.C.H! lors de l'utilisation de la capacité « Chœur du Zélote ».",
+				"ja": "ゼロットの「合唱」アビリティ使用時に Turmion Kätilöt - U.S.C.H! のランダムな部分を再生します。",
+				"ko": "광전사의 '합창' 능력 사용 시 Turmion Kätilöt - U.S.C.H!의 무작위 부분을 재생합니다.",
+				"it": "Riproduce parti casuali di Turmion Kätilöt - U.S.C.H! quando si utilizza l'abilità « Coro dello Zelota ».",
+				"pl": "Odtwarza losowe fragmenty utworu Turmion Kätilöt - U.S.C.H! podczas używania umiejętności \"Chór Zeloty\".",
+				"es": "Reproduce partes aleatorias de Turmion Kätilöt - U.S.C.H! al usar la habilidad « Coro del Zelota ».",
+				"pt-BR": "Reproduz partes aleatórias de Turmion Kätilöt - U.S.C.H! ao usar a habilidade « Coral do Zelote »."
 			},
 			"author": "The Redshirt",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/482",
@@ -18392,11 +18692,31 @@
 			"nexus_file_pattern": "welcome",
 			"name": {
 				"en": "Welcome to Catachan",
-				"ru": ""
+				"ru": "Добро пожаловать на Катачан",
+				"zh-hans": "欢迎来到卡塔昌",
+				"zh-hant": "歡迎來到卡塔昌",
+				"de": "Willkommen auf Catachan",
+				"fr": "Bienvenue sur Catachan",
+				"ja": "カタチャンへようこそ",
+				"ko": "카타찬에 오신 것을 환영합니다",
+				"it": "Benvenuto su Catachan",
+				"pl": "Witaj na Catachan",
+				"es": "Bienvenido a Catachan",
+				"pt-BR": "Bem-vindo a Catachan"
 			},
 			"description": {
-				"en": "Plays random parts of Guns N\" Roses \"Welcome to the Jungle\" when activating Veteran's Infiltrate ability, Executioner Stance, and Zealot's Fury of the Faithful",
-				"ru": ""
+				"en": "Plays random parts of Guns N' Roses \"Welcome to the Jungle\" when activating Veteran's Infiltrate ability, Executioner Stance, and Zealot's Fury of the Faithful.",
+				"ru": "Welcome to Catachan - Воспроизводит случайные фрагменты песни Guns N' Roses «Welcome to the Jungle» при активации способностей ветерана «Проникновение», «Стойка палача» и изувера «Ярость верных».",
+				"zh-hans": "激活老兵「渗透」、「处决者姿态」和狂热者「信仰之怒」技能时播放 Guns N' Roses - Welcome to the Jungle 的随机片段。",
+				"zh-hant": "激活老兵「滲透」、「處決者姿態」和狂熱者「信仰之怒」技能時播放 Guns N' Roses - Welcome to the Jungle 的隨機片段。",
+				"de": "Spielt zufällige Teile von Guns N' Roses - Welcome to the Jungle ab, wenn die Fähigkeiten \"Infiltrieren\", \"Henker-Haltung\" des Veteranen und \"Zorn der Gläubigen\" des Zeloten aktiviert werden.",
+				"fr": "Joue des parties aléatoires de Guns N' Roses - Welcome to the Jungle lors de l'activation des capacités « Infiltration », « Posture du bourreau » du Vétéran et « Fureur des fidèles » du Zélote.",
+				"ja": "ベテランの「潜入」、「処刑人の構え」、ゼロットの「忠実なる者の怒り」を発動したときに、Guns N' Roses - Welcome to the Jungleのランダムな部分を再生します。",
+				"ko": "베테랑의 '잠입', '처형자의 자세', 광전사의 '신앙의 분노' 능력 활성화 시 Guns N' Roses - Welcome to the Jungle의 무작위 부분을 재생합니다.",
+				"it": "Riproduce parti casuali di Guns N' Roses - Welcome to the Jungle quando si attivano le abilità « Infiltrazione », « Posizione del boia » del Veterano e « Furia dei fedeli » dello Zelota.",
+				"pl": "Odtwarza losowe fragmenty utworu Guns N' Roses - Welcome to the Jungle podczas aktywacji umiejętności \"Infiltracja\", \"Postawa kata\" Weterana oraz \"Furia wiernych\" Zeloty.",
+				"es": "Reproduce partes aleatorias de Guns N' Roses - Welcome to the Jungle al activar las habilidades « Infiltración », « Postura del verdugo » del Veterano y « Furia de los fieles » del Zelota.",
+				"pt-BR": "Reproduz partes aleatórias de Guns N' Roses - Welcome to the Jungle ao ativar as habilidades « Infiltração », « Postura do Carrasco » do Veterano e « Fúria dos Fiéis » do Zelote."
 			},
 			"author": "The Redshirt",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/483",
@@ -18421,11 +18741,31 @@
 			"nexus_file_pattern": "custom",
 			"name": {
 				"en": "Jerry's Custom Crit",
-				"ru": ""
+				"ru": "Кастомный крит Джерри",
+				"zh-hans": "杰瑞的自定义暴击",
+				"zh-hant": "傑瑞的自訂暴擊",
+				"de": "JERRY'S BENUTZERDEFINIERTER KRIT",
+				"fr": "Critique personnalisée de Jerry",
+				"ja": "ジェリーのカスタムクリティカル",
+				"ko": "제리의 커스텀 크리티컬",
+				"it": "Critico personalizzato di Jerry",
+				"pl": "Niestandardowy krytyk Jerry'ego",
+				"es": "Crítico personalizado de Jerry",
+				"pt-BR": "Crítico personalizado do Jerry"
 			},
 			"description": {
 				"en": "An easy way to import your very own custom critical hit noise or even multiple noises. friggin shweet right?\nNOTE: This might also trigger when other players crit, but otherwise it triggers whenever a crit would happen, even if you miss.",
-				"ru": ""
+				"ru": "Jerry's Custom Crit - Простой способ импортировать свой собственный звук критического попадания или даже несколько звуков. Круто, правда?\nПРИМЕЧАНИЕ: Может также срабатывать при критах других игроков, но в остальном срабатывает каждый раз, когда должен произойти крит, даже если вы промахнулись.",
+				"zh-hans": "一种导入自定义暴击音效甚至多个音效的简单方法。太酷了吧？\n注意：这也可能在队友暴击时触发，但除此之外，只要发生暴击就会触发，即使你打空了。",
+				"zh-hant": "一種匯入自訂暴擊音效甚至多個音效的簡單方法。太酷了吧？\n注意：這也可能在隊友暴擊時觸發，但除此之外，只要發生暴擊就會觸發，即使你打空了。",
+				"de": "Eine einfache Möglichkeit, Ihre eigenen benutzerdefinierten kritischen Treffergeräusche oder sogar mehrere Geräusche zu importieren. Verdammt cool, oder?\nHINWEIS: Dies kann auch ausgelöst werden, wenn andere Spieler kritisch treffen, aber ansonsten wird es jedes Mal ausgelöst, wenn ein Kritischer Treffer auftreten würde, selbst wenn Sie daneben zielen.",
+				"fr": "Un moyen simple d'importer votre propre bruit de coup critique personnalisé ou même plusieurs bruits. Trop cool, non ?\nREMARQUE : Cela peut également se déclencher lorsque d'autres joueurs critiquent, mais sinon, cela se déclenche chaque fois qu'un critique devrait se produire, même si vous ratez votre coup.",
+				"ja": "独自のカスタムクリティカルヒットノイズ、または複数のノイズを簡単にインポートできる方法です。めっちゃイケてるでしょ？\n注：他のプレイヤーがクリティカルを出したときにもトリガーされることがありますが、それ以外はクリティカルが発生するたびにトリガーされます（外した場合でも）。",
+				"ko": "나만의 커스텀 치명타 소리 또는 여러 소리를 쉽게 가져올 수 있는 방법입니다. 엄청 멋지죠?\n참고: 다른 플레이어가 치명타를 발동할 때도 트리거될 수 있지만, 그 외에는 치명타가 발생할 때마다 트리거됩니다(빗나가도 마찬가지).",
+				"it": "Un modo semplice per importare il tuo suono di colpo critico personalizzato o anche più suoni. Fighissimo, vero?\nNOTA: Potrebbe attivarsi anche quando altri giocatori fanno critici, ma altrimenti si attiva ogni volta che un critico dovrebbe verificarsi, anche se manchi il colpo.",
+				"pl": "Łatwy sposób na zaimportowanie własnego niestandardowego dźwięku krytycznego trafienia, a nawet wielu dźwięków. Niezłe, co?\nUWAGA: Może to również uruchamiać się, gdy inni gracze zadają krytyka, ale poza tym uruchamia się za każdym razem, gdy krytyk ma miejsce, nawet jeśli spudłujesz.",
+				"es": "Una manera fácil de importar tu propio sonido de golpe crítico personalizado o incluso múltiples sonidos. Genial, ¿verdad?\nNOTA: Esto también podría activarse cuando otros jugadores critiquen, pero fuera de eso se activa cada vez que ocurre un crítico, incluso si fallas el tiro.",
+				"pt-BR": "Uma maneira fácil de importar seu próprio som de acerto crítico personalizado ou até mesmo vários sons. Muito legal, né?\nNOTA: Isso também pode ser acionado quando outros jogadores acertam um crítico, mas fora isso, é acionado sempre que um crítico aconteceria, mesmo se você errar."
 			},
 			"author": "JerryTheCrow",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/484",
@@ -18450,11 +18790,31 @@
 			"nexus_file_pattern": "retain",
 			"name": {
 				"en": "Retain Selection",
-				"ru": ""
+				"ru": "Сохранение выбора",
+				"zh-hans": "保留选择",
+				"zh-hant": "保留選擇",
+				"de": "Auswahl beibehalten",
+				"fr": "Conserver la sélection",
+				"ja": "選択を保持",
+				"ko": "선택 유지",
+				"it": "Mantieni selezione",
+				"pl": "Zachowaj zaznaczenie",
+				"es": "Mantener selección",
+				"pt-BR": "Manter seleção"
 			},
 			"description": {
-				"en": "Retain your item selection when entering inventory or crafting view",
-				"ru": ""
+				"en": "Retain your item selection when entering inventory or crafting view.",
+				"ru": "Retain Selection - Сохраняет выбор предмета при переходе в инвентарь или вид крафта.",
+				"zh-hans": "进入物品栏或制作视图时保留所选物品。",
+				"zh-hant": "進入物品欄或製作視圖時保留所選物品。",
+				"de": "Behält die Auswahl Ihres Gegenstands beim Wechsel zur Inventar- oder Handwerksansicht bei.",
+				"fr": "Conserve la sélection de votre objet lors de l'entrée dans l'inventaire ou la vue d'artisanat.",
+				"ja": "インベントリやクラフトビューに入るときに、アイテムの選択を保持します。",
+				"ko": "인벤토리 또는 제작 보기로 전환할 때 선택한 아이템을 유지합니다.",
+				"it": "Mantiene la selezione dell'oggetto quando si accede all'inventario o alla vista di creazione.",
+				"pl": "Zachowuje zaznaczenie przedmiotu podczas przechodzenia do ekwipunku lub widoku wytwarzania.",
+				"es": "Mantiene la selección del objeto al entrar en el inventario o la vista de fabricación.",
+				"pt-BR": "Mantém a seleção do item ao entrar no inventário ou na visualização de fabricação."
 			},
 			"author": "Antika",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/485",
@@ -18478,8 +18838,18 @@
 			"folder": "weapon_customization_chains",
 			"nexus_file_pattern": "weapon",
 			"name": {
-				"en": "DEPRECATED ------- Standalone Chains - Extended Weapon Customization Plugin",
-				"ru": ""
+				"en": "Standalone Chains - Weapon Customization Plugin",
+				"ru": "Автономные цепи — плагин настройки оружия",
+				"zh-hans": "独立链条 - 武器定制插件",
+				"zh-hant": "獨立鏈條 - 武器定製插件",
+				"de": "Eigenständige Ketten - Waffenanpassungs-Plugin",
+				"fr": "Chaînes autonomes - Plugin de personnalisation des armes",
+				"ja": "スタンドアロンチェーン - 武器カスタマイズプラグイン",
+				"ko": "독립 체인 - 무기 커스터마이즈 플러그인",
+				"it": "Catene autonome - Plugin personalizzazione armi",
+				"pl": "Niezależne łańcuchy - Wtyczka dostosowywania broni",
+				"es": "Cadenas independientes - Complemento de personalización de armas",
+				"pt-BR": "Correntes autônomas - Plugin de personalização de armas"
 			},
 			"description": {
 				"de": "VERALTET!",
@@ -18497,7 +18867,7 @@
 			},
 			"author": "Backup158",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/486",
-			"github_url": "",
+			"github_url": "https://github.com/Backup158/DarktideWeaponCustomizationChains",
 			"note": {
 				"de": "",
 				"en": "",
@@ -18517,29 +18887,49 @@
 			"folder": "ScannerSuccessSound",
 			"nexus_file_pattern": "scanning",
 			"name": {
-				"en": "Scanning Success Sounds - Standalone and Audio Plugin for Investigation Auspex Scanner Confirmation",
-				"ru": ""
+				"en": "Scanning Success Sounds",
+				"ru": "Звуки успешного сканирования",
+				"zh-hans": "扫描成功音效",
+				"zh-hant": "掃描成功音效",
+				"de": "Erfolgsgeräusche beim Scannen",
+				"fr": "Sons de réussite de scan",
+				"ja": "スキャン成功音",
+				"ko": "스캔 성공 사운드",
+				"it": "Suoni di scansione riuscita",
+				"pl": "Dźwięki udanego skanowania",
+				"es": "Sonidos de escaneo exitoso",
+				"pt-BR": "Sons de escaneamento bem-sucedido"
 			},
 			"description": {
 				"en": "Adds a noticable auspex scanning complete sound.",
-				"ru": ""
+				"ru": "Scanning Success Sounds - Добавляет заметный звук завершения сканирования ауспексом.",
+				"zh-hans": "添加一个明显的奥瑞克扫描完成音效。",
+				"zh-hant": "添加一個明顯的奧瑞克掃描完成音效。",
+				"de": "Fügt einen hörbaren Auspex-Scan-Abschlusston hinzu.",
+				"fr": "Ajoute un son notable de fin de scan Auspex.",
+				"ja": "Auspexスキャン完了音を追加します。",
+				"ko": "Auspex 스캔 완료 사운드를 추가합니다.",
+				"it": "Aggiunge un suono notevole di completamento della scansione Auspex.",
+				"pl": "Dodaje wyraźny dźwięk zakończenia skanowania Auspexem.",
+				"es": "Añade un sonido notable de finalización del escaneo Auspex.",
+				"pt-BR": "Adiciona um som notável de conclusão do escaneamento Auspex."
 			},
 			"author": "Backup158",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/487",
-			"github_url": "",
+			"github_url": "https://github.com/Backup158/DarktideScannerSuccessSound",
 			"note": {
-				"de": "",
-				"en": "",
-				"es": "",
-				"fr": "",
-				"it": "",
-				"ja": "",
-				"ko": "",
-				"pl": "",
-				"pt-BR": "",
-				"ru": "",
-				"zh-hans": "",
-				"zh-hant": ""
+				"de": "Erforderlich: Simple Audio.",
+				"en": "Required: Simple Audio.",
+				"es": "Requerido: Simple Audio.",
+				"fr": "Requis : Simple Audio.",
+				"it": "Richiede: Simple Audio.",
+				"ja": "必要条件: Simple Audio。",
+				"ko": "필요: Simple Audio.",
+				"pl": "Wymagane: Simple Audio.",
+				"pt-BR": "Requerido: Simple Audio.",
+				"ru": "Требуется: Simple Audio.",
+				"zh-hans": "需要：Simple Audio。",
+				"zh-hant": "需要：Simple Audio。"
 			}
 		},
 		{
@@ -18547,28 +18937,48 @@
 			"nexus_file_pattern": "do",
 			"name": {
 				"en": "Do I Know You",
-				"ru": ""
+				"ru": "Я тебя знаю?",
+				"zh-hans": "我认识你吗？",
+				"zh-hant": "我認識你嗎？",
+				"de": "Kenne ich dich?",
+				"fr": "Est-ce que je te connais ?",
+				"ja": "知ってる？",
+				"ko": "내가 너를 알아?",
+				"it": "Ti conosco?",
+				"pl": "Czy ja cię znam?",
+				"es": "¿Te conozco?",
+				"pt-BR": "Eu te conheço?"
 			},
 			"description": {
 				"en": "Tracks your wins and losses with other players, displaying the count next to each player's name (including your own). Easily see how often you've won or lost matches together.",
-				"ru": ""
+				"ru": "Do I Know You - Отслеживает ваши победы и поражения с другими игроками, отображая счёт рядом с именем каждого игрока (включая ваше). Наблюдайте, как часто вы выигрывали или проигрывали матчи вместе.",
+				"zh-hans": "追踪您与其他玩家的胜负记录，在每个玩家名字旁显示次数（包括您自己）。轻松查看您们一起赢或输了多少场比赛。",
+				"zh-hant": "追蹤您與其他玩家的勝負記錄，在每個玩家名字旁顯示次數（包括您自己）。輕鬆查看您們一起贏或輸了多少場比賽。",
+				"de": "Verfolgt Ihre Siege und Niederlagen mit anderen Spielern und zeigt die Anzahl neben dem Namen jedes Spielers an (einschließlich Ihres eigenen). Sehen Sie auf einen Blick, wie oft Sie gemeinsam gewonnen oder verloren haben.",
+				"fr": "Suit vos victoires et défaites avec d'autres joueurs, affichant le nombre à côté du nom de chaque joueur (y compris le vôtre). Voyez facilement combien de fois vous avez gagné ou perdu des parties ensemble.",
+				"ja": "他のプレイヤーとの勝敗を追跡し、各プレイヤーの名前の横にカウントを表示します（自分のも含む）。一緒に何回勝ち負けしたかが簡単にわかります。",
+				"ko": "다른 플레이어와의 승패를 추적하여 각 플레이어 이름 옆에 횟수를 표시합니다(자신 포함). 함께 얼마나 자주 승리했는지 또는 패배했는지 쉽게 확인할 수 있습니다.",
+				"it": "Tiene traccia delle tue vittorie e sconfitte con altri giocatori, mostrando il conteggio accanto al nome di ciascun giocatore (incluso il tuo). Vedi facilmente quante volte hai vinto o perso partite insieme.",
+				"pl": "Śledzi twoje zwycięstwa i porażki z innymi graczami, wyświetlając licznik obok nazwy każdego gracza (w tym twojej). Łatwo sprawdź, ile razy razem wygraliście lub przegraliście mecze.",
+				"es": "Realiza un seguimiento de tus victorias y derrotas con otros jugadores, mostrando el recuento junto al nombre de cada jugador (incluido el tuyo). Ve fácilmente cuántas veces han ganado o perdido partidas juntos.",
+				"pt-BR": "Rastreia suas vitórias e derrotas com outros jogadores, exibindo a contagem ao lado do nome de cada jogador (incluindo o seu). Veja facilmente quantas vezes vocês ganharam ou perderam partidas juntos."
 			},
 			"author": "tickbox",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/488",
 			"github_url": "",
 			"note": {
-				"de": "",
-				"en": "",
-				"es": "",
-				"fr": "",
-				"it": "",
-				"ja": "",
-				"ko": "",
-				"pl": "",
-				"pt-BR": "",
-				"ru": "",
-				"zh-hans": "",
-				"zh-hant": ""
+				"de": "Erforderlich: Power DI und True Level.",
+				"en": "Required: Power DI and True Level.",
+				"es": "Requerido: Power DI y True Level.",
+				"fr": "Requis : Power DI et True Level.",
+				"it": "Richiede: Power DI e True Level.",
+				"ja": "必要条件: Power DI と True Level。",
+				"ko": "필요: Power DI 및 True Level.",
+				"pl": "Wymagane: Power DI i True Level.",
+				"pt-BR": "Requerido: Power DI e True Level.",
+				"ru": "Требуется: Power DI и True Level.",
+				"zh-hans": "需要：Power DI 和 True Level。",
+				"zh-hant": "需要：Power DI 和 True Level。"
 			}
 		},
 		{
@@ -18576,11 +18986,31 @@
 			"nexus_file_pattern": "kickstart",
 			"name": {
 				"en": "Kickstart My Reject",
-				"ru": ""
+				"ru": "Заведи моего отступника",
+				"zh-hans": "启动我的弃子",
+				"zh-hant": "啟動我的棄子",
+				"de": "Kickstart meinen Abtrünnigen",
+				"fr": "Relancez mon rejet",
+				"ja": "キックスタート・マイ・リジェクト",
+				"ko": "내 배신자를 깨워라",
+				"it": "Avvia il mio reietto",
+				"pl": "Rozpędź mojego wyrzutka",
+				"es": "Arranca a mi renegado",
+				"pt-BR": "Dê a partida no meu rejeitado"
 			},
 			"description": {
 				"en": "Plays random parts of Mötley Crüe's \"Kickstart My Heart\" when activating Veteran's Executioner Stance, Ogryn's Point Blank Barrage, and Psyker's Scriers Gaze",
-				"ru": ""
+				"ru": "Kickstart My Reject - Воспроизводит случайные фрагменты песни Mötley Crüe «Kickstart My Heart» при активации способностей ветерана «Стойка палача», огрина «Беспощадный обстрел» и псайкера «Взор провидца».",
+				"zh-hans": "激活老兵「处决者姿态」、食人魔「近距离火力压制」和灵能者「先知之眼」时播放 Mötley Crüe 的《Kickstart My Heart》随机片段。",
+				"zh-hant": "激活老兵「處決者姿態」、食人魔「近距離火力壓制」和靈能者「先知之眼」時播放 Mötley Crüe 的《Kickstart My Heart》隨機片段。",
+				"de": "Spielt zufällige Teile von Mötley Crües \"Kickstart My Heart\" ab, wenn die Fähigkeiten \"Henker-Haltung\" des Veteranen, \"Punktgenauer Beschuss\" des Ogryns und \"Blick des Scriers\" des Psykers aktiviert werden.",
+				"fr": "Joue des parties aléatoires de « Kickstart My Heart » de Mötley Crüe lors de l'activation des capacités « Posture du bourreau » du Vétéran, « Barrage à bout portant » de l'Ogryn et « Regard du voyant » du Psyker.",
+				"ja": "ベテランの「処刑人の構え」、オグリンの「至近弾幕」、サイカーの「スカイアーズゲイズ」を発動したときに、Mötley Crüeの「Kickstart My Heart」のランダムな部分を再生します。",
+				"ko": "베테랑의 '처형자의 자세', 오그린의 '백색 탄막', 사이커의 '예언자의 시선' 능력 활성화 시 Mötley Crüe의 'Kickstart My Heart' 무작위 부분을 재생합니다.",
+				"it": "Riproduce parti casuali di \"Kickstart My Heart\" dei Mötley Crüe quando si attivano le abilità \"Posizione del boia\" del Veterano, \"Barrage a bruciapelo\" dell'Ogryn e \"Sguardo del veggente\" dello Psichico.",
+				"pl": "Odtwarza losowe fragmenty utworu Mötley Crüe \"Kickstart My Heart\" podczas aktywacji umiejętności \"Postawa kata\" Weterana, \"Bliski ostrzał\" Ogryna i \"Wzrok wróżbity\" Psychera.",
+				"es": "Reproduce partes aleatorias de \"Kickstart My Heart\" de Mötley Crüe al activar las habilidades \"Postura del verdugo\" del Veterano, \"Barrage a quemarropa\" del Ogryn y \"Mirada del vidente\" del Psíquico.",
+				"pt-BR": "Reproduz partes aleatórias de \"Kickstart My Heart\" do Mötley Crüe ao ativar as habilidades \"Postura do Carrasco\" do Veterano, \"Barragem a Queima-Roupa\" do Ogryn e \"Olhar do Vidente\" do Psíquico."
 			},
 			"author": "The Redshirt",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/489",
@@ -18605,15 +19035,35 @@
 			"nexus_file_pattern": "remember",
 			"name": {
 				"en": "Remember Difficulty",
-				"ru": ""
+				"ru": "Помни сложность",
+				"zh-hans": "记住难度",
+				"zh-hant": "記住難度",
+				"de": "Schwierigkeitsgrad merken",
+				"fr": "Mémoriser la difficulté",
+				"ja": "難易度を記憶",
+				"ko": "난이도 기억",
+				"it": "Ricorda difficoltà",
+				"pl": "Zapamiętaj poziom trudności",
+				"es": "Recordar dificultad",
+				"pt-BR": "Lembrar dificuldade"
 			},
 			"description": {
 				"en": "Remember the last selected difficulty level",
-				"ru": ""
+				"ru": "Remember Difficulty - Запоминает последний выбранный уровень сложности.",
+				"zh-hans": "记住上次选择的难度等级。",
+				"zh-hant": "記住上次選擇的難度等級。",
+				"de": "Merkt sich den zuletzt ausgewählten Schwierigkeitsgrad.",
+				"fr": "Mémorise le dernier niveau de difficulté sélectionné.",
+				"ja": "最後に選択した難易度を記憶します。",
+				"ko": "마지막으로 선택한 난이도를 기억합니다.",
+				"it": "Ricorda l'ultimo livello di difficoltà selezionato.",
+				"pl": "Zapamiętuje ostatni wybrany poziom trudności.",
+				"es": "Recuerda el último nivel de dificultad seleccionado.",
+				"pt-BR": "Lembra o último nível de dificuldade selecionado."
 			},
 			"author": "Zombine",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/490",
-			"github_url": "",
+			"github_url": "https://github.com/zombine04/darktide-mods/tree/main/RememberDifficulty",
 			"note": {
 				"de": "",
 				"en": "",
@@ -18633,12 +19083,32 @@
 			"folder": "RickAndMortis",
 			"nexus_file_pattern": "rick",
 			"name": {
-				"en": "RickAndMortis",
-				"ru": ""
+				"en": "Rick And Mortis",
+				"ru": "Рик и Мортис",
+				"zh-hans": "瑞克和莫蒂斯",
+				"zh-hant": "瑞克和莫蒂斯",
+				"de": "Rick And Mortis",
+				"fr": "Rick And Mortis",
+				"ja": "リックアンドモーティス",
+				"ko": "릭앤모티스",
+				"it": "Rick And Mortis",
+				"pl": "Rick And Mortis",
+				"es": "Rick And Mortis",
+				"pt-BR": "Rick And Mortis"
 			},
 			"description": {
 				"en": "Add Mortis Trial Indulgences/Buffs to try out in the psykhanium (meat grinder), exit and re-enter to clear (for now).",
-				"ru": ""
+				"ru": "Rick And Mortis - Добавляет индульгенции/баффы из испытаний Мортис для опробования в Псайканиуме (стрельбище). Для сброса выйдите и зайдите снова (пока что).",
+				"zh-hans": "在灵能室（绞肉机）中添加莫蒂斯试炼的赎罪券/增益供测试，暂时退出并重新进入以清除效果。",
+				"zh-hant": "在靈能室（絞肉機）中添加莫蒂斯試煉的贖罪券/增益供測試，暫時退出並重新進入以清除效果。",
+				"de": "Fügt Ablässe/Buffs aus der Mortis-Prüfung hinzu, um sie im Psykhanium zu testen. Verlassen und erneut betreten, um sie zu entfernen (vorerst).",
+				"fr": "Ajoute des indulgences/buffs de l'épreuve de Mortis à essayer dans le Psykhanium, quittez et rentrez pour les effacer (pour l'instant).",
+				"ja": "モーティスの試練の免罪符/バフをプシカニウムで試せるように追加します。リセットするには退出して再入場してください（現時点では）。",
+				"ko": "모르티스 시련의 면죄부/버프를 프시카니움에서 시험해볼 수 있도록 추가합니다. 초기화하려면 나갔다가 다시 들어오세요(현재는).",
+				"it": "Aggiunge indulgenze/buff della prova di Mortis da provare nel Psykhanium. Esci e rientra per cancellarli (per ora).",
+				"pl": "Dodaje odpusty/buffy z próby Mortisa do wypróbowania w Psykanium. Wyjdź i wejdź ponownie, aby je wyczyścić (na razie).",
+				"es": "Añade indulgencias/mejoras de la prueba de Mortis para probar en el Psykhanium. Sal y vuelve a entrar para limpiarlas (por ahora).",
+				"pt-BR": "Adiciona indulgências/buffs do julgamento de Mortis para testar no Psykhanium. Saia e entre novamente para limpar (por enquanto)."
 			},
 			"author": "gpk",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/491",
@@ -18663,28 +19133,48 @@
 			"nexus_file_pattern": "artificial",
 			"name": {
 				"en": "Artificial Latency",
-				"ru": ""
+				"ru": "Искусственная задержка",
+				"zh-hans": "人工延迟",
+				"zh-hant": "人工延遲",
+				"de": "Künstliche Latenz",
+				"fr": "Latence artificielle",
+				"ja": "人工遅延",
+				"ko": "인공 지연",
+				"it": "Latenza artificiale",
+				"pl": "Sztuczne opóźnienie",
+				"es": "Latencia artificial",
+				"pt-BR": "Latência artificial"
 			},
 			"description": {
 				"en": "Simulates network latency on enemy attacks. Solo offline only.",
-				"ru": ""
+				"ru": "Artificial Latency - Симулирует сетевую задержку при атаках врагов. Только офлайн-соло.",
+				"zh-hans": "模拟敌人攻击的网络延迟。仅限单人离线模式。",
+				"zh-hant": "模擬敵人攻擊的網路延遲。僅限單人離線模式。",
+				"de": "Simuliert Netzwerklatenz bei feindlichen Angriffen. Nur im Offline-Solo-Modus.",
+				"fr": "Simule la latence réseau sur les attaques ennemies. Solo hors ligne uniquement.",
+				"ja": "敵の攻撃にネットワーク遅延をシミュレートします。オフラインソロのみ。",
+				"ko": "적 공격에 네트워크 지연을 시뮬레이션합니다. 오프라인 솔로 전용.",
+				"it": "Simula la latenza di rete sugli attacchi nemici. Solo offline singolo.",
+				"pl": "Symuluje opóźnienie sieciowe w atakach wrogów. Tylko tryb offline solo.",
+				"es": "Simula la latencia de red en los ataques enemigos. Solo en modo solitario sin conexión.",
+				"pt-BR": "Simula latência de rede em ataques inimigos. Apenas offline solo."
 			},
 			"author": "SPEED-PRIEST",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/493",
-			"github_url": "",
+			"github_url": "https://github.com/sashimichefcat/ArtificialLatency",
 			"note": {
-				"de": "",
-				"en": "",
-				"es": "",
-				"fr": "",
-				"it": "",
-				"ja": "",
-				"ko": "",
-				"pl": "",
-				"pt-BR": "",
-				"ru": "",
-				"zh-hans": "",
-				"zh-hant": ""
+				"de": "Fix in den Kommentaren auf Nexus Mods.",
+				"en": "Fix in the comments on the Nexus Mods.",
+				"es": "Corrección en los comentarios de Nexus Mods.",
+				"fr": "Correctif dans les commentaires sur Nexus Mods.",
+				"it": "Correzione nei commenti su Nexus Mods.",
+				"ja": "Nexus Modsのコメント欄に修正があります。",
+				"ko": "Nexus Mods 댓글에 수정 사항이 있습니다.",
+				"pl": "Poprawka w komentarzach na Nexus Mods.",
+				"pt-BR": "Correção nos comentários do Nexus Mods.",
+				"ru": "Фикс в комментариях на Нексусе.",
+				"zh-hans": "修复方法见 Nexus Mods 评论区。",
+				"zh-hant": "修復方法見 Nexus Mods 評論區。"
 			}
 		},
 		{
@@ -18692,28 +19182,48 @@
 			"nexus_file_pattern": "solo",
 			"name": {
 				"en": "Solo Minigames",
-				"ru": ""
+				"ru": "Мини-игры в соло",
+				"zh-hans": "单人小游戏",
+				"zh-hant": "單人小遊戲",
+				"de": "Solo-Minispiele",
+				"fr": "Minijeux en solo",
+				"ja": "ソロミニゲーム",
+				"ko": "솔로 미니게임",
+				"it": "Minigiochi in solitario",
+				"pl": "Minigry solo",
+				"es": "Minijuegos en solitario",
+				"pt-BR": "Minijogos solo"
 			},
 			"description": {
 				"en": "Auto-completes auspex minigames, tweaks corruptor arm regrowth rate and skips hold-to-complete actions. Solo offline only.",
-				"ru": ""
+				"ru": "Solo Minigames - Автоматически завершает мини-игры ауспекса, настраивает скорость вырастания рук корруптора и пропускает действия с удержанием. Только офлайн-соло.",
+				"zh-hans": "自动完成奥瑞克小游戏，调整腐化者手臂再生速度，跳过按住完成动作。仅限单人离线模式。",
+				"zh-hant": "自動完成奧瑞克小遊戲，調整腐化者手臂再生速度，跳過按住完成動作。僅限單人離線模式。",
+				"de": "Schließt Auspex-Minispiele automatisch ab, passt die Regenerationsrate der Korruptor-Arme an und überspringt Halten-Aktionen. Nur Offline-Solo.",
+				"fr": "Termine automatiquement les mini-jeux Auspex, ajuste la vitesse de repousse des bras du corrupteur et saute les actions à maintenir. Solo hors ligne uniquement.",
+				"ja": "Auspexミニゲームを自動完了し、コラプターの腕の再生速度を調整し、ホールドアクションをスキップします。オフラインソロのみ。",
+				"ko": "Auspex 미니게임을 자동 완료하고, 코럽터 팔 재생 속도를 조정하며, 유지 작업을 건너뜁니다. 오프라인 솔로 전용.",
+				"it": "Completa automaticamente i minigiochi Auspex, regola la velocità di ricrescita dei bracci del Corruttore e salta le azioni con mantenimento. Solo offline singolo.",
+				"pl": "Automatycznie kończy minigry Auspex, dostosowuje tempo odrastania ramion skorumpowanych i pomija akcje przytrzymania. Tylko tryb offline solo.",
+				"es": "Completa automáticamente los minijuegos de Auspex, ajusta la velocidad de regeneración de los brazos del corruptor y omite las acciones de mantener pulsado. Solo en modo solitario sin conexión.",
+				"pt-BR": "Completa automaticamente minijogos Auspex, ajusta a velocidade de regeneração dos braços do corruptor e pula ações de manter pressionado. Apenas offline solo."
 			},
 			"author": "SPEED-PRIEST",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/494",
 			"github_url": "",
 			"note": {
-				"de": "",
-				"en": "",
-				"es": "",
-				"fr": "",
-				"it": "",
-				"ja": "",
-				"ko": "",
-				"pl": "",
-				"pt-BR": "",
-				"ru": "",
-				"zh-hans": "",
-				"zh-hant": ""
+				"de": "Fix in den Kommentaren auf Nexus Mods.",
+				"en": "Fix in the comments on the Nexus Mods.",
+				"es": "Corrección en los comentarios de Nexus Mods.",
+				"fr": "Correctif dans les commentaires sur Nexus Mods.",
+				"it": "Correzione nei commenti su Nexus Mods.",
+				"ja": "Nexus Modsのコメント欄に修正があります。",
+				"ko": "Nexus Mods 댓글에 수정 사항이 있습니다.",
+				"pl": "Poprawka w komentarzach na Nexus Mods.",
+				"pt-BR": "Correção nos comentários do Nexus Mods.",
+				"ru": "Фикс в комментариях на Нексусе.",
+				"zh-hans": "修复方法见 Nexus Mods 评论区。",
+				"zh-hant": "修復方法見 Nexus Mods 評論區。"
 			}
 		},
 		{
@@ -18721,28 +19231,48 @@
 			"nexus_file_pattern": "cameleoline",
 			"name": {
 				"en": "Cameleoline",
-				"ru": ""
+				"ru": "Камелеолайн",
+				"zh-hans": "变色龙涂料",
+				"zh-hant": "變色龍塗料",
+				"de": "Cameleoline",
+				"fr": "Cameleoline",
+				"ja": "カメレオンライト",
+				"ko": "카멜레올린",
+				"it": "Cameleoline",
+				"pl": "Kameleolina",
+				"es": "Cameleolina",
+				"pt-BR": "Cameleolina"
 			},
 			"description": {
 				"en": "Hides player equipment while in first person.",
-				"ru": ""
+				"ru": "Cameleoline - Скрывает экипировку игрока в режиме от первого лица.",
+				"zh-hans": "在第一人称视角下隐藏玩家装备。",
+				"zh-hant": "在第一人稱視角下隱藏玩家裝備。",
+				"de": "Blendet die Ausrüstung des Spielers in der First-Person-Ansicht aus.",
+				"fr": "Masque l'équipement du joueur en vue à la première personne.",
+				"ja": "ファーストパーソン時にプレイヤーの装備を非表示にします。",
+				"ko": "1인칭 시점에서 플레이어 장비를 숨깁니다.",
+				"it": "Nasconde l'equipaggiamento del giocatore in prima persona.",
+				"pl": "Ukrywa wyposażenie gracza w widoku pierwszej osoby.",
+				"es": "Oculta el equipamiento del jugador en primera persona.",
+				"pt-BR": "Oculta o equipamento do jogador em primeira pessoa."
 			},
 			"author": "Norkkom",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/495",
 			"github_url": "",
 			"note": {
-				"de": "",
-				"en": "",
-				"es": "",
-				"fr": "",
-				"it": "",
-				"ja": "",
-				"ko": "",
-				"pl": "",
-				"pt-BR": "",
-				"ru": "",
-				"zh-hans": "",
-				"zh-hant": ""
+				"de": "Wurde eine Weile nicht aktualisiert. Kann Abstürze verursachen.",
+				"en": "Hasn't been updated in a while. May cause crashes.",
+				"es": "No ha sido actualizado en un tiempo. Puede causar bloqueos.",
+				"fr": "N'a pas été mis à jour depuis un moment. Peut causer des crashs.",
+				"it": "Non è stato aggiornato per un po'. Potrebbe causare crash.",
+				"ja": "しばらく更新されていません。クラッシュを引き起こす可能性があります。",
+				"ko": "한동안 업데이트되지 않았습니다. 충돌을 일으킬 수 있습니다.",
+				"pl": "Od jakiegoś czasu nie był aktualizowany. Może powodować awarie.",
+				"pt-BR": "Não é atualizado há algum tempo. Pode causar travamentos.",
+				"ru": "Давно не обновляется. Может вызывать вылеты.",
+				"zh-hans": "已有一段时间未更新。可能导致崩溃。",
+				"zh-hant": "已有一段時間未更新。可能導致崩潰。"
 			}
 		},
 		{
@@ -18750,28 +19280,48 @@
 			"nexus_file_pattern": "helbore",
 			"name": {
 				"en": "Helbore passive charge",
-				"ru": ""
+				"ru": "Пассивная зарядка хельборской винтовки",
+				"zh-hans": "螺旋枪被动充能",
+				"zh-hant": "螺旋槍被動充能",
+				"de": "Passives Aufladen des Helbore",
+				"fr": "Charge passive du Helbore",
+				"ja": "ヘルボアのパッシブチャージ",
+				"ko": "헬보어 수동 충전",
+				"it": "Carica passiva Helbore",
+				"pl": "Pasywne ładowanie Helbore",
+				"es": "Carga pasiva de Helbore",
+				"pt-BR": "Carga passiva do Helbore"
 			},
 			"description": {
 				"en": "Makes helbore lasguns charge automatically when aiming down sights. Can be toggled.",
-				"ru": ""
+				"ru": "Helbore passive charge - Хельборские винтовки автоматически заряжаются при прицеливании. Можно переключать.",
+				"zh-hans": "使螺旋激光枪在瞄准时自动充能。可切换开关。",
+				"zh-hant": "使螺旋雷射槍在瞄準時自動充能。可切換開關。",
+				"de": "Lässt Helbore-Lasergewehre beim Zielen automatisch aufladen. Kann umgeschaltet werden.",
+				"fr": "Les fusils laser Helbore se chargent automatiquement en visant. Peut être activé/désactivé.",
+				"ja": "ヘルボアレーザーライフルが照準時に自動的にチャージされるようにします。切り替え可能。",
+				"ko": "헬보어 레이저 소총이 조준 시 자동으로 충전되도록 합니다. 전환 가능.",
+				"it": "Fa caricare automaticamente i fucili laser Helbore durante la mira. Attivabile/disattivabile.",
+				"pl": "Sprawia, że karabiny laserowe Helbore ładują się automatycznie podczas celowania. Można przełączać.",
+				"es": "Hace que los rifles láser Helbore se carguen automáticamente al apuntar. Se puede alternar.",
+				"pt-BR": "Faz com que os rifles laser Helbore carreguem automaticamente ao mirar. Pode ser alternado."
 			},
 			"author": "Ferrasick",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/496",
-			"github_url": "",
+			"github_url": "https://github.com/AlexFerras/darktide-mods/tree/main/helbore_passive_charge",
 			"note": {
-				"de": "",
-				"en": "",
-				"es": "",
-				"fr": "",
-				"it": "",
-				"ja": "",
-				"ko": "",
-				"pl": "",
-				"pt-BR": "",
-				"ru": "",
-				"zh-hans": "",
-				"zh-hant": ""
+				"de": "Wurde eine Weile nicht aktualisiert. Kann Abstürze verursachen.",
+				"en": "Hasn't been updated in a while. May cause crashes.",
+				"es": "No ha sido actualizado en un tiempo. Puede causar bloqueos.",
+				"fr": "N'a pas été mis à jour depuis un moment. Peut causer des crashs.",
+				"it": "Non è stato aggiornato per un po'. Potrebbe causare crash.",
+				"ja": "しばらく更新されていません。クラッシュを引き起こす可能性があります。",
+				"ko": "한동안 업데이트되지 않았습니다. 충돌을 일으킬 수 있습니다.",
+				"pl": "Od jakiegoś czasu nie był aktualizowany. Może powodować awarie.",
+				"pt-BR": "Não é atualizado há algum tempo. Pode causar travamentos.",
+				"ru": "Давно не обновляется. Может вызывать вылеты.",
+				"zh-hans": "已有一段时间未更新。可能导致崩溃。",
+				"zh-hant": "已有一段時間未更新。可能導致崩潰。"
 			}
 		},
 		{
@@ -18779,28 +19329,48 @@
 			"nexus_file_pattern": "audio",
 			"name": {
 				"en": "Audio Replacer",
-				"ru": ""
+				"ru": "Замена звуков",
+				"zh-hans": "音频替换器",
+				"zh-hant": "音訊替換器",
+				"de": "Audio-Ersetzer",
+				"fr": "Remplaceur audio",
+				"ja": "オーディオリプレイサー",
+				"ko": "오디오 교체기",
+				"it": "Sostituto audio",
+				"pl": "Zamiennik dźwięku",
+				"es": "Reemplazador de audio",
+				"pt-BR": "Substituidor de áudio"
 			},
 			"description": {
 				"en": "Allows you to easily replace many gameplay sound effects of enemies/abilities/equipment. (Prepackaged SFX are comedic and immersion breaking, be warned).",
-				"ru": ""
+				"ru": "Audio Replacer - Позволяет легко заменять множество звуковых эффектов в игре (враги, способности, экипировка). (Предупреждаю, встроенные звуки — юмористические и нарушают погружение).",
+				"zh-hans": "允许您轻松替换许多游戏音效（敌人、技能、装备）。（预置的音效是喜剧风格且破坏沉浸感，请注意。）",
+				"zh-hant": "允許您輕鬆替換許多遊戲音效（敵人、技能、裝備）。（預置的音效是喜劇風格且破壞沉浸感，請注意。）",
+				"de": "Ermöglicht das einfache Ersetzen vieler Spielgeräusche (Gegner, Fähigkeiten, Ausrüstung). (Die mitgelieferten SFX sind komödiantisch und stören die Immersion, Vorsicht).",
+				"fr": "Permet de remplacer facilement de nombreux effets sonores du jeu (ennemis, capacités, équipement). (Les SFX préemballés sont comiques et brisent l'immersion, soyez prévenu).",
+				"ja": "ゲーム内の多くのサウンドエフェクト（敵、アビリティ、装備）を簡単に置き換えることができます。（プリパッケージされたSFXはコメディーで没入感を損なうためご注意ください）。",
+				"ko": "게임 내 많은 사운드 효과(적, 능력, 장비)를 쉽게 교체할 수 있습니다. (사전 패키지된 SFX는 희극적이며 몰입감을 해치므로 주의하세요).",
+				"it": "Permette di sostituire facilmente molti effetti sonori del gioco (nemici, abilità, equipaggiamento). (Gli SFX preimpostati sono comici e rompono l'immersione, siate avvisati).",
+				"pl": "Pozwala łatwo zastąpić wiele efektów dźwiękowych w grze (wrogowie, umiejętności, wyposażenie). (Dołączone SFX są komediowe i niszczą immersję, ostrzegamy).",
+				"es": "Permite reemplazar fácilmente muchos efectos de sonido del juego (enemigos, habilidades, equipamiento). (Los SFX incluidos son cómicos y rompen la inmersión, tenga cuidado).",
+				"pt-BR": "Permite substituir facilmente muitos efeitos sonoros do jogo (inimigos, habilidades, equipamento). (Os SFX pré-embalados são cômicos e quebram a imersão, fique avisado)."
 			},
 			"author": "ClaytorYurnero",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/499",
 			"github_url": "",
 			"note": {
-				"de": "Erforderlich: Audio-Plugin.",
-				"en": "Required: Audio plugin.",
-				"es": "Requerido: Audio plugin.",
-				"fr": "Requis : Audio plugin.",
-				"it": "Richiede: Audio plugin.",
-				"ja": "必要条件: Audioプラグイン。",
-				"ko": "필요: Audio 플러그인.",
-				"pl": "Wymagane: Audio plugin.",
-				"pt-BR": "Requerido: Audio plugin.",
-				"ru": "Требуется: Audio плагин.",
-				"zh-hans": "需要：音频插件。",
-				"zh-hant": "需要：音訊插件。"
+				"de": "Erforderlich: Simple Audio.",
+				"en": "Required: Simple Audio.",
+				"es": "Requerido: Simple Audio.",
+				"fr": "Requis : Simple Audio.",
+				"it": "Richiede: Simple Audio.",
+				"ja": "必要条件: Simple Audio。",
+				"ko": "필요: Simple Audio.",
+				"pl": "Wymagane: Simple Audio.",
+				"pt-BR": "Requerido: Simple Audio.",
+				"ru": "Требуется: Simple Audio.",
+				"zh-hans": "需要：Simple Audio。",
+				"zh-hant": "需要：Simple Audio。"
 			}
 		},
 		{
@@ -18808,11 +19378,31 @@
 			"nexus_file_pattern": "improved",
 			"name": {
 				"en": "Improved Havoc Tags",
-				"ru": ""
+				"ru": "Улучшенные метки Хавока",
+				"zh-hans": "改进的浩劫标签",
+				"zh-hant": "改進的浩劫標籤",
+				"de": "Verbesserte Havoc-Markierungen",
+				"fr": "Étiquettes Havoc améliorées",
+				"ja": "改良されたハボックタグ",
+				"ko": "개선된 하복 태그",
+				"it": "Tag Havoc migliorati",
+				"pl": "Ulepszone tagi Havoc",
+				"es": "Etiquetas Havoc mejoradas",
+				"pt-BR": "Tags Havoc melhorados"
 			},
 			"description": {
 				"en": "Recolors certain Havoc modifiers to make them easier to identify at a glance in Party Finder.",
-				"ru": ""
+				"ru": "Improved Havoc Tags - Перекрашивает некоторые модификаторы Хавока, чтобы их было легче идентифицировать с первого взгляда в поиске группы.",
+				"zh-hans": "重新着色某些浩劫修饰符，使其在组队查找器中一目了然。",
+				"zh-hant": "重新著色某些浩劫修飾符，使其在組隊查找器中一目了然。",
+				"de": "Färbt bestimmte Havoc-Modifikatoren neu ein, um sie auf einen Blick im Party-Finder besser erkennbar zu machen.",
+				"fr": "Recolore certains modificateurs Havoc pour les rendre plus faciles à identifier en un coup d'œil dans le chercheur de groupe.",
+				"ja": "特定のハボックモディファイアを再着色し、パーティーファインダーで一目で識別できるようにします。",
+				"ko": "일부 하복 수정자를 다시 색칠하여 파티 찾기에서 한눈에 식별하기 쉽게 만듭니다.",
+				"it": "Ricolorisce alcuni modificatori Havoc per renderli più facili da identificare a colpo d'occhio nel cercatore di gruppo.",
+				"pl": "Przebarwia niektóre modyfikatory Havoc, aby były łatwiejsze do zidentyfikowania na pierwszy rzut oka w wyszukiwarce drużyny.",
+				"es": "Recolorea algunos modificadores de Havoc para que sean más fáciles de identificar de un vistazo en el buscador de grupo.",
+				"pt-BR": "Recolore alguns modificadores de Havoc para torná-los mais fáceis de identificar rapidamente no localizador de grupo."
 			},
 			"author": "Brunin",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/500",
@@ -18837,15 +19427,35 @@
 			"nexus_file_pattern": "cancel",
 			"name": {
 				"en": "Cancel Loading",
-				"ru": ""
+				"ru": "Отмена загрузки",
+				"zh-hans": "取消加载",
+				"zh-hant": "取消載入",
+				"de": "Laden abbrechen",
+				"fr": "Annuler le chargement",
+				"ja": "ロードをキャンセル",
+				"ko": "로딩 취소",
+				"it": "Annulla caricamento",
+				"pl": "Anuluj ładowanie",
+				"es": "Cancelar carga",
+				"pt-BR": "Cancelar carregamento"
 			},
 			"description": {
 				"en": "This mod adds a button to the mission loading screen that lets you leave the strike team and return to the main menu / morning star.",
-				"ru": ""
+				"ru": "Cancel Loading - Этот мод добавляет кнопку на экран загрузки миссии, которая позволяет покинуть ударную группу и вернуться в главное меню или в хаб.",
+				"zh-hans": "此模组在任务加载画面添加一个按钮，让您可以离开打击小队并返回主菜单/哀星号。",
+				"zh-hant": "此模組在任務載入畫面添加一個按鈕，讓您可以離開打擊小隊並返回主選單/哀星號。",
+				"de": "Fügt einen Button zum Missions-Ladebildschirm hinzu, mit dem du das Einsatzteam verlassen und zum Hauptmenü / Mourningstar zurückkehren kannst.",
+				"fr": "Ajoute un bouton à l'écran de chargement de la mission pour quitter l'équipe d'assaut et revenir au menu principal / au Mourningstar.",
+				"ja": "このMODはミッションロード画面にボタンを追加し、ストライクチームを離れてメインメニュー/モーニングスターに戻ることができます。",
+				"ko": "이 모드는 미션 로딩 화면에 버튼을 추가하여 스트라이크 팀을 떠나 메인 메뉴/모닝스타로 돌아갈 수 있게 합니다.",
+				"it": "Questo mod aggiunge un pulsante alla schermata di caricamento della missione per lasciare la squadra d'assalto e tornare al menu principale / al Mourningstar.",
+				"pl": "Ten mod dodaje przycisk do ekranu ładowania misji, który pozwala opuścić drużynę uderzeniową i wrócić do głównego menu / na Mourningstar.",
+				"es": "Este mod añade un botón a la pantalla de carga de la misión que te permite salir del equipo de ataque y volver al menú principal / al Mourningstar.",
+				"pt-BR": "Este mod adiciona um botão à tela de carregamento da missão que permite sair da equipe de ataque e retornar ao menu principal / ao Mourningstar."
 			},
 			"author": "grasmann",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/502",
-			"github_url": "",
+			"github_url": "https://github.com/grasmann/darktide-mods/tree/main/cancel_loading",
 			"note": {
 				"de": "",
 				"en": "",
@@ -18866,15 +19476,35 @@
 			"nexus_file_pattern": "servo friend-504",
 			"name": {
 				"en": "Servo Friend",
-				"ru": ""
+				"ru": "Серво-друг",
+				"zh-hans": "伺服朋友",
+				"zh-hant": "伺服朋友",
+				"de": "Servo-Freund",
+				"fr": "Ami servo",
+				"ja": "サーボフレンド",
+				"ko": "서보 친구",
+				"it": "Amico servo",
+				"pl": "Przyjaciel servo",
+				"es": "Amigo servo",
+				"pt-BR": "Amigo servo"
 			},
 			"description": {
 				"en": "A servo skull, a tool, a friend.",
-				"ru": ""
+				"ru": "Servo Friend - Серво-череп, инструмент, друг.",
+				"zh-hans": "一个伺服颅骨，一个工具，一个朋友。",
+				"zh-hant": "一個伺服顱骨，一個工具，一個朋友。",
+				"de": "Ein Servoschädel, ein Werkzeug, ein Freund.",
+				"fr": "Un crâne servo, un outil, un ami.",
+				"ja": "サーボスカル、ツール、友達。",
+				"ko": "서보 해골, 도구, 친구.",
+				"it": "Un teschio servo, uno strumento, un amico.",
+				"pl": "Servo-czaszka, narzędzie, przyjaciel.",
+				"es": "Un cráneo servo, una herramienta, un amigo.",
+				"pt-BR": "Um crânio servo, uma ferramenta, um amigo."
 			},
 			"author": "grasmann",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/504",
-			"github_url": "",
+			"github_url": "https://github.com/grasmann/darktide-mods/tree/main/servo_friend",
 			"note": {
 				"de": "",
 				"en": "",
@@ -18895,28 +19525,48 @@
 			"nexus_file_pattern": "servo friend ai generated voice plugin-504",
 			"name": {
 				"en": "Servo Friend Audio Plugin",
-				"ru": ""
+				"ru": "Серво-друг — аудиоплагин",
+				"zh-hans": "伺服朋友音频插件",
+				"zh-hant": "伺服朋友音訊插件",
+				"de": "Servo-Freund Audio-Plugin",
+				"fr": "Plugin audio Ami servo",
+				"ja": "サーボフレンド オーディオプラグイン",
+				"ko": "서보 친구 오디오 플러그인",
+				"it": "Plugin audio Amico servo",
+				"pl": "Wtyczka audio Przyjaciel servo",
+				"es": "Complemento de audio Amigo servo",
+				"pt-BR": "Plugin de áudio Amigo servo"
 			},
 			"description": {
 				"en": "A servo skull, a tool, a friend.",
-				"ru": ""
+				"ru": "Servo Friend Audio Plugin - Серво-череп, инструмент, друг.",
+				"zh-hans": "一个伺服颅骨，一个工具，一个朋友。",
+				"zh-hant": "一個伺服顱骨，一個工具，一個朋友。",
+				"de": "Ein Servoschädel, ein Werkzeug, ein Freund.",
+				"fr": "Un crâne servo, un outil, un ami.",
+				"ja": "サーボスカル、ツール、友達。",
+				"ko": "서보 해골, 도구, 친구.",
+				"it": "Un teschio servo, uno strumento, un amico.",
+				"pl": "Servo-czaszka, narzędzie, przyjaciel.",
+				"es": "Un cráneo servo, una herramienta, un amigo.",
+				"pt-BR": "Um crânio servo, uma ferramenta, um amigo."
 			},
 			"author": "grasmann",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/504",
-			"github_url": "",
+			"github_url": "https://github.com/grasmann/darktide-mods/tree/main/servo_friend_audio_server_plugin",
 			"note": {
-				"de": "",
-				"en": "",
-				"es": "",
-				"fr": "",
-				"it": "",
-				"ja": "",
-				"ko": "",
-				"pl": "",
-				"pt-BR": "",
-				"ru": "",
-				"zh-hans": "",
-				"zh-hant": ""
+				"de": "Erforderlich: Servo Friend.",
+				"en": "Required: Servo Friend.",
+				"es": "Requerido: Servo Friend.",
+				"fr": "Requis : Servo Friend.",
+				"it": "Richiede: Servo Friend.",
+				"ja": "必要条件: Servo Friend。",
+				"ko": "필요: Servo Friend.",
+				"pl": "Wymagane: Servo Friend.",
+				"pt-BR": "Requerido: Servo Friend.",
+				"ru": "Требуется: Servo Friend.",
+				"zh-hans": "需要：Servo Friend。",
+				"zh-hant": "需要：Servo Friend。"
 			}
 		},
 		{
@@ -18924,40 +19574,80 @@
 			"nexus_file_pattern": "servo friend example hat addon-504",
 			"name": {
 				"en": "Servo Friend Example Plugin",
-				"ru": ""
+				"ru": "Серво-друг — пример плагина",
+				"zh-hans": "伺服朋友示例插件",
+				"zh-hant": "伺服朋友範例插件",
+				"de": "Servo-Freund Beispiel-Plugin",
+				"fr": "Plugin exemple Ami servo",
+				"ja": "サーボフレンド サンプルプラグイン",
+				"ko": "서보 친구 예제 플러그인",
+				"it": "Plugin esempio Amico servo",
+				"pl": "Przykładowa wtyczka Przyjaciel servo",
+				"es": "Complemento de ejemplo Amigo servo",
+				"pt-BR": "Plugin de exemplo Amigo servo"
 			},
 			"description": {
 				"en": "A servo skull, a tool, a friend.",
-				"ru": ""
+				"ru": "Servo Friend Example Plugin - Серво-череп, инструмент, друг.",
+				"zh-hans": "一个伺服颅骨，一个工具，一个朋友。",
+				"zh-hant": "一個伺服顱骨，一個工具，一個朋友。",
+				"de": "Ein Servoschädel, ein Werkzeug, ein Freund.",
+				"fr": "Un crâne servo, un outil, un ami.",
+				"ja": "サーボスカル、ツール、友達。",
+				"ko": "서보 해골, 도구, 친구.",
+				"it": "Un teschio servo, uno strumento, un amico.",
+				"pl": "Servo-czaszka, narzędzie, przyjaciel.",
+				"es": "Un cráneo servo, una herramienta, un amigo.",
+				"pt-BR": "Um crânio servo, uma ferramenta, um amigo."
 			},
 			"author": "grasmann",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/504",
-			"github_url": "",
+			"github_url": "https://github.com/grasmann/darktide-mods/tree/main/servo_friend_plugin_hat_cables",
 			"note": {
-				"de": "",
-				"en": "",
-				"es": "",
-				"fr": "",
-				"it": "",
-				"ja": "",
-				"ko": "",
-				"pl": "",
-				"pt-BR": "",
-				"ru": "",
-				"zh-hans": "",
-				"zh-hant": ""
+				"de": "Erforderlich: Servo Friend.",
+				"en": "Required: Servo Friend.",
+				"es": "Requerido: Servo Friend.",
+				"fr": "Requis : Servo Friend.",
+				"it": "Richiede: Servo Friend.",
+				"ja": "必要条件: Servo Friend。",
+				"ko": "필요: Servo Friend.",
+				"pl": "Wymagane: Servo Friend.",
+				"pt-BR": "Requerido: Servo Friend.",
+				"ru": "Требуется: Servo Friend.",
+				"zh-hans": "需要：Servo Friend。",
+				"zh-hant": "需要：Servo Friend。"
 			}
 		},
 		{
 			"folder": "CustomColorChat",
 			"nexus_file_pattern": "custom",
 			"name": {
-				"en": "CustomColorChat",
-				"ru": ""
+				"en": "Custom Color Chat",
+				"ru": "Цветной чат",
+				"zh-hans": "自定义聊天颜色",
+				"zh-hant": "自訂聊天顏色",
+				"de": "Benutzerdefinierte Chat-Farben",
+				"fr": "Couleurs de chat personnalisées",
+				"ja": "カスタムカラーチャット",
+				"ko": "사용자 정의 채팅 색상",
+				"it": "Colori chat personalizzati",
+				"pl": "Niestandardowe kolory czatu",
+				"es": "Colores de chat personalizados",
+				"pt-BR": "Cores de chat personalizadas"
 			},
 			"description": {
 				"en": "Customize your chat color with many options!",
-				"ru": ""
+				"ru": "Custom Color Chat - Настройте цвет вашего чата с множеством вариантов!",
+				"zh-hans": "使用多种选项自定义您的聊天颜色！",
+				"zh-hant": "使用多種選項自訂您的聊天顏色！",
+				"de": "Passen Sie Ihre Chat-Farbe mit vielen Optionen an!",
+				"fr": "Personnalisez la couleur de votre chat avec de nombreuses options !",
+				"ja": "多くのオプションでチャットの色をカスタマイズしましょう！",
+				"ko": "다양한 옵션으로 채팅 색상을 사용자 정의하세요!",
+				"it": "Personalizza il colore della chat con molte opzioni!",
+				"pl": "Dostosuj kolor czatu za pomocą wielu opcji!",
+				"es": "¡Personaliza el color de tu chat con muchas opciones!",
+				"pt-BR": "Personalize a cor do seu chat com muitas opções!"
 			},
 			"author": "LukeGlitch",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/505",
@@ -18982,11 +19672,31 @@
 			"nexus_file_pattern": "no",
 			"name": {
 				"en": "No Chat Colours",
-				"ru": ""
+				"ru": "Нет цвета в чате",
+				"zh-hans": "无聊天颜色",
+				"zh-hant": "無聊天顏色",
+				"de": "Keine Chat-Farben",
+				"fr": "Pas de couleurs dans le chat",
+				"ja": "チャット色なし",
+				"ko": "채팅 색상 없음",
+				"it": "Niente colori in chat",
+				"pl": "Bez kolorów na czacie",
+				"es": "Sin colores en el chat",
+				"pt-BR": "Sem cores no chat"
 			},
 			"description": {
 				"en": "Removes any colours from chat messages, such as those added in Quick Chat",
-				"ru": ""
+				"ru": "No Chat Colours - Убирает все цвета из сообщений чата, например, те, что добавляются в быстром чате.",
+				"zh-hans": "移除聊天消息中的所有颜色，例如在快速聊天中添加的颜色。",
+				"zh-hant": "移除聊天訊息中的所有顏色，例如在快速聊天中添加的顏色。",
+				"de": "Entfernt alle Farben aus Chat-Nachrichten, wie sie beispielsweise im Schnellchat hinzugefügt werden.",
+				"fr": "Supprime toutes les couleurs des messages de chat, comme celles ajoutées dans le chat rapide.",
+				"ja": "クイックチャットなどで追加された色をすべて削除します。",
+				"ko": "빠른 채팅 등에서 추가된 모든 색상을 제거합니다.",
+				"it": "Rimuove tutti i colori dai messaggi in chat, come quelli aggiunti nella chat rapida.",
+				"pl": "Usuwa wszystkie kolory z wiadomości czatu, takie jak te dodawane w szybkim czacie.",
+				"es": "Elimina todos los colores de los mensajes de chat, como los añadidos en el chat rápido.",
+				"pt-BR": "Remove todas as cores das mensagens de chat, como as adicionadas no chat rápido."
 			},
 			"author": "raindish",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/506",
@@ -19011,11 +19721,31 @@
 			"nexus_file_pattern": "make",
 			"name": {
 				"en": "Make Me Special - A Loot Flavor Mod",
-				"ru": ""
+				"ru": "Сделай меня особенным — мод для лута",
+				"zh-hans": "让我与众不同 — 战利品风味模组",
+				"zh-hant": "讓我與眾不同 — 戰利品風味模組",
+				"de": "Mach mich besonders - Ein Loot-Flavor-Mod",
+				"fr": "Rends-moi spécial - Un mod de saveur de butin",
+				"ja": "私を特別に — 戦利品フレーバーMOD",
+				"ko": "나를 특별하게 — 전리품 스타일 모드",
+				"it": "Rendimi speciale - Un mod per il loot",
+				"pl": "Uczyń mnie wyjątkowym - mod smakowy dla łupów",
+				"es": "Hazme especial - Un mod de sabor para el botín",
+				"pt-BR": "Me faça especial - Um mod de sabor para saque"
 			},
 			"description": {
 				"en": "Customize the colors and names of item tiers based on a selection range. Share your styles with other users using the online style editor.",
-				"ru": ""
+				"ru": "Make Me Special - A Loot Flavor Mod - Настройте цвета и названия уровней предметов в зависимости от диапазона. Делитесь своими стилями с другими пользователями через онлайн-редактор стилей.",
+				"zh-hans": "根据选择范围自定义物品等级的颜色和名称。通过在线样式编辑器与其他用户分享您的样式。",
+				"zh-hant": "根據選擇範圍自訂物品等級的顏色和名稱。透過線上樣式編輯器與其他使用者分享您的樣式。",
+				"de": "Passen Sie die Farben und Namen von Gegenstandsstufen basierend auf einem Auswahlbereich an. Teilen Sie Ihre Stile mit anderen Benutzern über den Online-Stil-Editor.",
+				"fr": "Personnalisez les couleurs et les noms des niveaux d'objets en fonction d'une plage de sélection. Partagez vos styles avec d'autres utilisateurs via l'éditeur de style en ligne.",
+				"ja": "選択範囲に基づいてアイテムティアの色と名前をカスタマイズします。オンラインスタイルエディターを使用して他のユーザーとスタイルを共有できます。",
+				"ko": "선택 범위에 따라 아이템 등급의 색상과 이름을 사용자 정의합니다. 온라인 스타일 편집기를 사용하여 다른 사용자와 스타일을 공유하세요.",
+				"it": "Personalizza i colori e i nomi dei livelli degli oggetti in base a un intervallo di selezione. Condividi i tuoi stili con altri utenti utilizzando l'editor di stile online.",
+				"pl": "Dostosuj kolory i nazwy poziomów przedmiotów na podstawie zakresu wyboru. Udostępniaj swoje style innym użytkownikom za pomocą edytora stylów online.",
+				"es": "Personaliza los colores y nombres de los niveles de objetos según un rango de selección. Comparte tus estilos con otros usuarios a través del editor de estilos en línea.",
+				"pt-BR": "Personalize as cores e nomes dos níveis de itens com base em um intervalo de seleção. Compartilhe seus estilos com outros usuários usando o editor de estilos online."
 			},
 			"author": "ViLe",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/507",
@@ -19039,12 +19769,32 @@
 			"folder": "CaptainKillFeed",
 			"nexus_file_pattern": "captain",
 			"name": {
-				"en": "CaptainKillFeed",
-				"ru": ""
+				"en": "Captain Killfeed",
+				"ru": "Лента убийств капитанов",
+				"zh-hans": "队长击杀信息",
+				"zh-hant": "隊長擊殺資訊",
+				"de": "Captain-Killfeed",
+				"fr": "Fil d'élimination du capitaine",
+				"ja": "キャプテンキルフィード",
+				"ko": "캡틴 처치 피드",
+				"it": "Feed uccisioni capitano",
+				"pl": "Lista zabójstw kapitana",
+				"es": "Registro de muertes del capitán",
+				"pt-BR": "Feed de abates do capitão"
 			},
 			"description": {
 				"en": "Adds kill/combat feed messages for Captains (Scab, Dreg and Twins)",
-				"ru": ""
+				"ru": "Captain Killfeed - Добавляет сообщения в ленту убийств для капитанов (скаб, дрег и близнецы).",
+				"zh-hans": "为队长（疤脸、渣滓和双子）添加击杀/战斗信息。",
+				"zh-hant": "為隊長（疤臉、渣滓和雙子）添加擊殺/戰鬥資訊。",
+				"de": "Fügt Kill-/Kampf-Feed-Nachrichten für Kapitäne (Scab, Dreg und Zwillinge) hinzu.",
+				"fr": "Ajoute des messages de kill/combat pour les capitaines (Scab, Dreg et Jumeaux).",
+				"ja": "キャプテン（スカブ、ドレッグ、ツインズ）のキル/コンバットフィードメッセージを追加します。",
+				"ko": "캡틴(스캡, 드레그, 트윈스)에 대한 처치/전투 피드 메시지를 추가합니다.",
+				"it": "Aggiunge messaggi di uccisione/combattimento per i Capitani (Scab, Dreg e Gemelli).",
+				"pl": "Dodaje komunikaty o zabójstwach/walkach dla Kapitanów (Scab, Dreg i Bliźniaki).",
+				"es": "Añade mensajes de muerte/combate para los Capitanes (Scab, Dreg y Gemelos).",
+				"pt-BR": "Adiciona mensagens de abate/combate para Capitães (Scab, Dreg e Gêmeos)."
 			},
 			"author": "gpk",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/508",
@@ -19068,12 +19818,32 @@
 			"folder": "RadioGaga",
 			"nexus_file_pattern": "radio",
 			"name": {
-				"en": "RadioGaga",
-				"ru": ""
+				"en": "Radio Gaga",
+				"ru": "Радио Гага",
+				"zh-hans": "无线电嘎嘎",
+				"zh-hant": "無線電嘎嘎",
+				"de": "Radio Gaga",
+				"fr": "Radio Gaga",
+				"ja": "レディオガガ",
+				"ko": "라디오가가",
+				"it": "Radio Gaga",
+				"pl": "Radio Gaga",
+				"es": "Radio Gaga",
+				"pt-BR": "Radio Gaga"
 			},
 			"description": {
 				"en": "Spoiler: Adds the Corrupted Communication Device to your inventory (stimm slot)\nuse the /RadioGaga command in the chat window to spawn it, hit [Enter], type or paste the command.",
-				"ru": ""
+				"ru": "Radio Gaga - Спойлер: добавляет коммуникационное устройство в ваш инвентарь (слот стимулятора).\nИспользуйте команду /RadioGaga в окне чата, чтобы создать его, нажмите [Enter], введите или вставьте команду.",
+				"zh-hans": "剧透：将腐败通讯设备添加到您的物品栏（兴奋剂槽）。\n在聊天窗口中使用 /RadioGaga 命令生成它，按 [Enter]，输入或粘贴命令。",
+				"zh-hant": "劇透：將腐敗通訊設備添加到您的物品欄（興奮劑槽）。\n在聊天視窗中使用 /RadioGaga 命令生成它，按 [Enter]，輸入或貼上命令。",
+				"de": "Spoiler: Fügt das korrumpierte Kommunikationsgerät zu Ihrem Inventar hinzu (Stimm-Slot).\nVerwenden Sie den Befehl /RadioGaga im Chat-Fenster, um es zu spawnen, drücken Sie [Enter], geben Sie den Befehl ein oder fügen Sie ihn ein.",
+				"fr": "Spoiler : Ajoute le dispositif de communication corrompu à votre inventaire (emplacement stim).\nUtilisez la commande /RadioGaga dans la fenêtre de chat pour le faire apparaître, appuyez sur [Entrée], tapez ou collez la commande.",
+				"ja": "ネタバレ：破損した通信デバイスをインベントリ（スティムスロット）に追加します。\nチャットウィンドウで /RadioGaga コマンドを使用して出現させ、[Enter] を押してコマンドを入力または貼り付けます。",
+				"ko": "스포일러: 오염된 통신 장치를 인벤토리(스팀 슬롯)에 추가합니다.\n채팅 창에서 /RadioGaga 명령어를 사용하여 생성하고, [Enter]를 누르고 명령어를 입력하거나 붙여넣으세요.",
+				"it": "Spoiler: Aggiunge il dispositivo di comunicazione corrotto al tuo inventario (slot stimma).\nUsa il comando /RadioGaga nella finestra della chat per generarlo, premi [Invio], digita o incolla il comando.",
+				"pl": "Spoiler: Dodaje skorumpowane urządzenie komunikacyjne do twojego ekwipunku (slot stymulanta).\nUżyj polecenia /RadioGaga w oknie czatu, aby je wywołać, naciśnij [Enter], wpisz lub wklej polecenie.",
+				"es": "Spoiler: Agrega el dispositivo de comunicación corrupto a tu inventario (ranura de estimulante).\nUsa el comando /RadioGaga en la ventana de chat para generarlo, presiona [Enter], escribe o pega el comando.",
+				"pt-BR": "Spoiler: Adiciona o dispositivo de comunicação corrompido ao seu inventário (slot de estimulante).\nUse o comando /RadioGaga na janela de chat para gerá-lo, pressione [Enter], digite ou cole o comando."
 			},
 			"author": "gpk",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/509",
@@ -19098,15 +19868,35 @@
 			"nexus_file_pattern": "skitarius",
 			"name": {
 				"en": "Skitarius",
-				"ru": ""
+				"ru": "Скитарий",
+				"zh-hans": "机械教士兵",
+				"zh-hant": "機械教士兵",
+				"de": "Skitarius",
+				"fr": "Skitarius",
+				"ja": "スキタリウス",
+				"ko": "스키타리우스",
+				"it": "Skitarius",
+				"pl": "Skitarius",
+				"es": "Skitarius",
+				"pt-BR": "Skitarius"
 			},
 			"description": {
 				"en": "Melee and Ranged combat sequencer. Build custom melee combos or ranged fire-modes, and trigger them with a single button.",
-				"ru": ""
+				"ru": "Skitarius - Секвенсор ближнего и дальнего боя. Создавайте собственные комбо ближнего боя или режимы стрельбы и активируйте их одной кнопкой.",
+				"zh-hans": "近战和远程战斗序列器。构建自定义近战连击或远程射击模式，并用一个按钮触发它们。",
+				"zh-hant": "近戰和遠程戰鬥序列器。構建自訂近戰連擊或遠程射擊模式，並用一個按鈕觸發它們。",
+				"de": "Sequenzer für Nah- und Fernkampf. Erstellen Sie benutzerdefinierte Nahkampf-Kombos oder Fernkampf-Feuermodi und lösen Sie sie mit einer einzigen Taste aus.",
+				"fr": "Séquenceur de combat au corps à corps et à distance. Créez des combos de mêlée personnalisés ou des modes de tir à distance et déclenchez-les avec un seul bouton.",
+				"ja": "近接・遠隔戦闘シーケンサー。カスタム近接コンボや遠距離射撃モードを構築し、単一のボタンでトリガーします。",
+				"ko": "근접 및 원거리 전투 시퀀서. 사용자 정의 근접 콤보 또는 원거리 발사 모드를 만들고 단일 버튼으로 트리거합니다.",
+				"it": "Sequenziatore per combattimento corpo a corpo e a distanza. Crea combo da mischia personalizzate o modalità di fuoco a distanza e attivale con un solo pulsante.",
+				"pl": "Sekwencer walki wręcz i dystansowej. Twórz niestandardowe kombosy walki wręcz lub tryby ostrzału i wyzwalaj je jednym przyciskiem.",
+				"es": "Secuenciador de combate cuerpo a cuerpo y a distancia. Cree combos de cuerpo a cuerpo personalizados o modos de disparo a distancia y actívelos con un solo botón.",
+				"pt-BR": "Sequenciador de combate corpo a corpo e à distância. Crie combos corpo a corpo personalizados ou modos de disparo à distância e ative-os com um único botão."
 			},
 			"author": "Norkkom",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/510",
-			"github_url": "",
+			"github_url": "https://github.com/CATBIRDS/Skitarius",
 			"note": {
 				"de": "",
 				"en": "",
@@ -19127,11 +19917,31 @@
 			"nexus_file_pattern": "better",
 			"name": {
 				"en": "Better Hud Info View",
-				"ru": ""
+				"ru": "Улучшенный вид инфо в интерфейсе",
+				"zh-hans": "更好的HUD信息视图",
+				"zh-hant": "更好的HUD資訊視圖",
+				"de": "Bessere HUD-Infoansicht",
+				"fr": "Meilleure vue d'information HUD",
+				"ja": "より良いHUD情報ビュー",
+				"ko": "개선된 HUD 정보 보기",
+				"it": "Vista informazioni HUD migliorata",
+				"pl": "Lepszy widok informacji HUD",
+				"es": "Vista de información HUD mejorada",
+				"pt-BR": "Visualização de informações HUD melhorada"
 			},
 			"description": {
 				"en": "Remove left side buff, adjust HUD elements of overlay, including scoreboard. \n\nUseful for those who use scoreboard, since the mission information is obscured after recent updates.",
-				"ru": ""
+				"ru": "Better Hud Info View - Убирает баффы с левой стороны, настраивает элементы оверлея, включая таблицу результатов. \n\nПолезно для тех, кто использует таблицу результатов, поскольку информация о миссии после недавних обновлений перекрывается.",
+				"zh-hans": "移除左侧增益，调整覆盖层的HUD元素，包括记分板。\n\n对于使用记分板的人很有用，因为最近更新后任务信息被遮挡了。",
+				"zh-hant": "移除左側增益，調整覆蓋層的HUD元素，包括記分板。\n\n對於使用記分板的人很有用，因為最近更新後任務資訊被遮擋了。",
+				"de": "Entfernt den Buff auf der linken Seite, passt HUD-Elemente des Overlays an, einschließlich Scoreboard. \n\nNützlich für diejenigen, die das Scoreboard verwenden, da die Missionsinformationen nach aktuellen Updates verdeckt werden.",
+				"fr": "Supprime le buff à gauche, ajuste les éléments HUD de l'overlay, y compris le tableau des scores. \n\nUtile pour ceux qui utilisent le tableau des scores, car les informations de mission sont masquées après les dernières mises à jour.",
+				"ja": "左側のバフを削除し、スコアボードを含むオーバーレイのHUD要素を調整します。\n\n最近のアップデートでミッション情報が隠れてしまうため、スコアボードを使用する人に便利です。",
+				"ko": "왼쪽 버프를 제거하고, 스코어보드를 포함한 오버레이 HUD 요소를 조정합니다. \n\n최근 업데이트로 미션 정보가 가려지므로 스코어보드를 사용하는 사람들에게 유용합니다.",
+				"it": "Rimuove il buff sul lato sinistro, regola gli elementi HUD dell'overlay, incluso il tabellone punteggi. \n\nUtile per chi usa il tabellone punteggi, poiché le informazioni sulla missione sono oscurate dopo gli ultimi aggiornamenti.",
+				"pl": "Usuwa buff po lewej stronie, dostosowuje elementy HUD nakładki, w tym tablicę wyników. \n\nPrzydatne dla osób używających tablicy wyników, ponieważ informacje o misji są zasłonięte po ostatnich aktualizacjach.",
+				"es": "Elimina el beneficio del lado izquierdo, ajusta los elementos HUD de la superposición, incluido el marcador. \n\nÚtil para quienes usan el marcador, ya que la información de la misión se ve oscurecida después de las actualizaciones recientes.",
+				"pt-BR": "Remove o buff do lado esquerdo, ajusta os elementos HUD da sobreposição, incluindo o placar. \n\nÚtil para quem usa o placar, já que as informações da missão são obscurecidas após atualizações recentes."
 			},
 			"author": "BoffeeH",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/511",
@@ -19156,28 +19966,48 @@
 			"nexus_file_pattern": "ovenproof",
 			"name": {
 				"en": "Ovenproof's Scoreboard Plugin - Community Patch",
-				"ru": ""
+				"ru": "Плагин таблицы результатов от Ovenproof — патч сообщества",
+				"zh-hans": "Ovenproof的记分板插件 — 社区补丁",
+				"zh-hant": "Ovenproof的記分板插件 — 社群補丁",
+				"de": "Ovenproofs Scoreboard-Plugin - Community-Patch",
+				"fr": "Plugin de tableau des scores d'Ovenproof - Correctif communautaire",
+				"ja": "Ovenproofのスコアボードプラグイン - コミュニティパッチ",
+				"ko": "Ovenproof의 스코어보드 플러그인 - 커뮤니티 패치",
+				"it": "Plugin Scoreboard di Ovenproof - Patch community",
+				"pl": "Wtyczka Scoreboard Ovenproof - Poprawka społeczności",
+				"es": "Complemento de marcador de Ovenproof - Parche comunitario",
+				"pt-BR": "Plugin de placar do Ovenproof - Patch comunitário"
 			},
 			"description": {
 				"en": "A Patch for Ovenproof's Scoreboard Plugin that aims to fix the new types of enemies introduced with various game patches.",
-				"ru": ""
+				"ru": "Ovenproof's Scoreboard Plugin - Community Patch - Патч для плагина таблицы результатов от Ovenproof, направленный на исправление новых типов врагов, введённых различными обновлениями игры.",
+				"zh-hans": "针对Ovenproof记分板插件的补丁，旨在修复各种游戏补丁引入的新类型敌人。",
+				"zh-hant": "針對Ovenproof記分板插件的補丁，旨在修復各種遊戲補丁引入的新類型敵人。",
+				"de": "Ein Patch für Ovenproofs Scoreboard-Plugin, der darauf abzielt, die neuen Feindtypen zu beheben, die mit verschiedenen Spiel-Patches eingeführt wurden.",
+				"fr": "Un correctif pour le plugin de tableau des scores d'Ovenproof visant à corriger les nouveaux types d'ennemis introduits avec divers correctifs de jeu.",
+				"ja": "Ovenproofのスコアボードプラグインのパッチで、さまざまなゲームパッチで導入された新しい敵タイプを修正することを目的としています。",
+				"ko": "Ovenproof의 스코어보드 플러그인 패치로, 다양한 게임 패치로 도입된 새로운 적 유형을 수정하는 것을 목표로 합니다.",
+				"it": "Una patch per il plugin Scoreboard di Ovenproof che mira a correggere i nuovi tipi di nemici introdotti con vari aggiornamenti del gioco.",
+				"pl": "Poprawka do wtyczki Scoreboard Ovenproof, mająca na celu naprawienie nowych typów wrogów wprowadzonych z różnymi łatkami gry.",
+				"es": "Un parche para el complemento de marcador de Ovenproof que pretende corregir los nuevos tipos de enemigos introducidos con varios parches del juego.",
+				"pt-BR": "Um patch para o plugin de placar do Ovenproof que visa corrigir os novos tipos de inimigos introduzidos com vários patches do jogo."
 			},
 			"author": "backup158 - Saigofu",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/514",
 			"github_url": "",
 			"note": {
-				"de": "",
-				"en": "",
-				"es": "",
-				"fr": "",
-				"it": "",
-				"ja": "",
-				"ko": "",
-				"pl": "",
-				"pt-BR": "",
-				"ru": "",
-				"zh-hans": "",
-				"zh-hant": ""
+				"de": "Erforderlich: Scoreboard.",
+				"en": "Required: Scoreboard.",
+				"es": "Requerido: Scoreboard.",
+				"fr": "Requis : Scoreboard.",
+				"it": "Richiede: Scoreboard.",
+				"ja": "必要条件: Scoreboard。",
+				"ko": "필요: Scoreboard.",
+				"pl": "Wymagane: Scoreboard.",
+				"pt-BR": "Requerido: Scoreboard.",
+				"ru": "Требуется: Scoreboard.",
+				"zh-hans": "需要：Scoreboard。",
+				"zh-hant": "需要：Scoreboard。"
 			}
 		},
 		{
@@ -19185,11 +20015,31 @@
 			"nexus_file_pattern": "ancestors",
 			"name": {
 				"en": "Ancestor's Guidance - Audio Mod",
-				"ru": ""
+				"ru": "Наставление предков — аудио-мод",
+				"zh-hans": "先祖的指引 - 音频模组",
+				"zh-hant": "先祖的指引 - 音訊模組",
+				"de": "Führung der Vorfahren - Audio-Mod",
+				"fr": "Guidance des ancêtres - Mod audio",
+				"ja": "先祖の導き - オーディオMOD",
+				"ko": "조상의 인도 - 오디오 모드",
+				"it": "Guida degli Antenati - Mod audio",
+				"pl": "Wskazówki Przodków - Mod audio",
+				"es": "Guía de los Ancestros - Mod de audio",
+				"pt-BR": "Orientação dos Ancestrais - Mod de áudio"
 			},
 			"description": {
 				"en": "This mod replaces in-game event triggers with narration clips from the Ancestor from Darkest Dungeon I and II.",
-				"ru": ""
+				"ru": "Ancestor's Guidance - Audio Mod - Этот мод заменяет внутриигровые триггеры событий на аудио-фрагменты повествования предка из Darkest Dungeon I и II.",
+				"zh-hans": "此模组将游戏内事件触发器替换为《暗黑地牢》I 和 II 中先祖的旁白片段。",
+				"zh-hant": "此模組將遊戲內事件觸發器替換為《暗黑地牢》I 和 II 中先祖的旁白片段。",
+				"de": "Dieser Mod ersetzt die Auslöser von Spielereignissen durch Erzählsequenzen des Vorfahren aus Darkest Dungeon I und II.",
+				"fr": "Ce mod remplace les déclencheurs d'événements en jeu par des extraits de narration de l'Ancêtre de Darkest Dungeon I et II.",
+				"ja": "このMODは、ゲーム内イベントのトリガーを、Darkest Dungeon IおよびIIの先祖のナレーションクリップに置き換えます。",
+				"ko": "이 모드는 게임 내 이벤트 트리거를 Darkest Dungeon I 및 II의 조상 내레이션 클립으로 대체합니다.",
+				"it": "Questo mod sostituisce i trigger degli eventi di gioco con clip di narrazione dell'Antenato da Darkest Dungeon I e II.",
+				"pl": "Ten mod zastępuje wyzwalacze wydarzeń w grze fragmentami narracji Przodka z Darkest Dungeon I i II.",
+				"es": "Este mod reemplaza los desencadenantes de eventos del juego con fragmentos de narración del Ancestro de Darkest Dungeon I y II.",
+				"pt-BR": "Este mod substitui os gatilhos de eventos do jogo por clipes de narração do Ancestral de Darkest Dungeon I e II."
 			},
 			"author": "Brunin",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/515",
@@ -19628,7 +20478,7 @@
 			},
 			"author": "Norkkom",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/539",
-			"github_url": "",
+			"github_url": "https://github.com/CATBIRDS/DogWhistle",
 			"note": {
 				"de": "",
 				"en": "",
@@ -19918,7 +20768,7 @@
 			},
 			"author": "Norkkom",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/552",
-			"github_url": "",
+			"github_url": "https://github.com/CATBIRDS/PerfectIndicator",
 			"note": {
 				"de": "",
 				"en": "",
@@ -20179,7 +21029,7 @@
 			},
 			"author": "Norkkom",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/563",
-			"github_url": "",
+			"github_url": "https://github.com/CATBIRDS/Remembrancer",
 			"note": {
 				"de": "",
 				"en": "",
@@ -22365,7 +23215,7 @@
 			},
 			"author": "Ferrasick",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/667",
-			"github_url": "",
+			"github_url": "https://github.com/AlexFerras/darktide-mods/tree/main/hitbox_debug_draw",
 			"note": {
 				"de": "",
 				"en": "",
@@ -24158,7 +25008,7 @@
 				"ru": ""
 			},
 			"description": {
-				"en": "BetterBots makes Darktide bots use their combat abilities, throw grenades, revive intelligently, push poxbursters, and respond to your tags — instead of holding everything for the whole mission. Solo Play only: Darktide uses dedicated servers for public and matched games, so mods cannot change bot behavior there.",
+				"en": "BetterBots makes Darktide bots use their combat abilities, throw grenades, revive intelligently, push poxbursters, and respond to your tags - instead of holding everything for the whole mission. Solo Play only: Darktide uses dedicated servers for public and matched games, so mods cannot change bot behavior there.",
 				"ru": ""
 			},
 			"author": "hummat",
@@ -24545,7 +25395,7 @@
 				"ru": "Озвученное Время убивать"
 			},
 			"description": {
-				"en": "Choose from a list of in-game sounds or custom sound file (Audio Plugin required) to play when Time to Kill recharges.\n\nIf you're using the Creature Spawner mod and have the Sound Muffler option enabled in the Psykhanium, enemy sounds will be muted. This means if you've set your Audible Time to Kill in-game sound to use Plague Ogryn or Chaos Spawn sounds (from the dropdown options), they will not play in the Psykhanium while Sound Muffler is active. The mod is still working—just disable Sound Muffler to hear the Audible Time to Kill in-game sound while testing.",
+				"en": "Choose from a list of in-game sounds or custom sound file (Audio Plugin required) to play when Time to Kill recharges.\n\nIf you're using the Creature Spawner mod and have the Sound Muffler option enabled in the Psykhanium, enemy sounds will be muted. This means if you've set your Audible Time to Kill in-game sound to use Plague Ogryn or Chaos Spawn sounds (from the dropdown options), they will not play in the Psykhanium while Sound Muffler is active. The mod is still working-just disable Sound Muffler to hear the Audible Time to Kill in-game sound while testing.",
 				"ru": ""
 			},
 			"author": "demba",
@@ -24806,7 +25656,7 @@
 				"ru": "Озвученная Активная оборона"
 			},
 			"description": {
-				"en": "Choose from a list of in-game sounds or custom sound file (Audio Plugin required) to play when Retaliatory Defence recharges.\n\nIf you're using the Creature Spawner mod and have the Sound Muffler option enabled in the Psykhanium, enemy sounds will be muted. This means if you've set your Audible Retaliatory Defence in-game sound to use Plague Ogryn or Chaos Spawn sounds (from the dropdown options), they will not play in the Psykhanium while Sound Muffler is active. The mod is still working—just disable Sound Muffler to hear the Audible Retaliatory Defence in-game sound while testing.\n\nNote for Custom HUD/Better Buff Management Users:\nThis mod works by reading the HUD Icon for Retaliatory Defence, therefore if you are using any mods to hide the icon such as toggling the HUD OFF with Custom HUD or the Toggle Buff Bar option in Better Buff Management, the sounds from this mod will not play when the HUD Icon for Retaliatory Defence is hidden. I am still trying to find a workaround to this as I want the sounds to play while the HUD is toggled OFF/the buff icon is not present on your HUD but in the meantime... as long as the HUD Icon is present, this mod will work properly.",
+				"en": "Choose from a list of in-game sounds or custom sound file (Audio Plugin required) to play when Retaliatory Defence recharges.\n\nIf you're using the Creature Spawner mod and have the Sound Muffler option enabled in the Psykhanium, enemy sounds will be muted. This means if you've set your Audible Retaliatory Defence in-game sound to use Plague Ogryn or Chaos Spawn sounds (from the dropdown options), they will not play in the Psykhanium while Sound Muffler is active. The mod is still working-just disable Sound Muffler to hear the Audible Retaliatory Defence in-game sound while testing.\n\nNote for Custom HUD/Better Buff Management Users:\nThis mod works by reading the HUD Icon for Retaliatory Defence, therefore if you are using any mods to hide the icon such as toggling the HUD OFF with Custom HUD or the Toggle Buff Bar option in Better Buff Management, the sounds from this mod will not play when the HUD Icon for Retaliatory Defence is hidden. I am still trying to find a workaround to this as I want the sounds to play while the HUD is toggled OFF/the buff icon is not present on your HUD but in the meantime... as long as the HUD Icon is present, this mod will work properly.",
 				"ru": ""
 			},
 			"author": "demba",
@@ -25241,7 +26091,7 @@
 				"ru": ""
 			},
 			"description": {
-				"en": "A convenient radial menu for quick squad communication in missions—mission chat and optional voice lines, with customizable sectors and pages.",
+				"en": "A convenient radial menu for quick squad communication in missions-mission chat and optional voice lines, with customizable sectors and pages.",
 				"ru": ""
 			},
 			"author": "RRMLLNV",
@@ -25522,7 +26372,7 @@
 				"ru": ""
 			},
 			"description": {
-				"en": "Shows HUD notifications in Darktide when friends change status — coming online, going offline, entering a mission, started matchmaking, or returning to the hub.",
+				"en": "Shows HUD notifications in Darktide when friends change status - coming online, going offline, entering a mission, started matchmaking, or returning to the hub.",
 				"ru": ""
 			},
 			"author": "gir489",
@@ -25783,7 +26633,7 @@
 				"ru": ""
 			},
 			"description": {
-				"en": "Error Tracker is a crash diagnostics mod for Darktide that detects, logs, and helps identify which mods are causing issues.\nIt automatically captures Lua errors, tracks mod activity, and analyzes hard crashes to pinpoint the most likely culprit — so you can fix problems fast instead of guessing.",
+				"en": "Error Tracker is a crash diagnostics mod for Darktide that detects, logs, and helps identify which mods are causing issues.\nIt automatically captures Lua errors, tracks mod activity, and analyzes hard crashes to pinpoint the most likely culprit - so you can fix problems fast instead of guessing.",
 				"ru": ""
 			},
 			"author": "Capone",
@@ -26402,7 +27252,7 @@
 				"ru": ""
 			},
 			"description": {
-				"en": "Buy any weapon from Brunt's Armoury in large amounts and automatically upgrade its rarity, selects all new weapons — all in a few clicks.",
+				"en": "Buy any weapon from Brunt's Armoury in large amounts and automatically upgrade its rarity, selects all new weapons - all in a few clicks.",
 				"ru": ""
 			},
 			"author": "Darkyyyz",
@@ -29616,7 +30466,7 @@
 				"ru": ""
 			},
 			"description": {
-				"en": "Badges weapons and curios that rolled maximum (perfect) stats — visible in your inventory, on equipped gear, in every vendor and in crafting. Adds a silver \"already owned\" mark and an optional hide-trash filter in shops.",
+				"en": "Badges weapons and curios that rolled maximum (perfect) stats - visible in your inventory, on equipped gear, in every vendor and in crafting. Adds a silver \"already owned\" mark and an optional hide-trash filter in shops.",
 				"ru": ""
 			},
 			"author": "Metilar",
@@ -31385,7 +32235,7 @@
 			},
 			"description": {
 				"de": "",
-				"en": "Fixes the bug where party (strike team) chat dies when you get back to the Mourningstar after a mission — you're stuck with only the hub channel.",
+				"en": "Fixes the bug where party (strike team) chat dies when you get back to the Mourningstar after a mission - you're stuck with only the hub channel.",
 				"es": "",
 				"fr": "",
 				"it": "",
@@ -31826,7 +32676,7 @@
 			},
 			"description": {
 				"de": "",
-				"en": "Truly instant: the switch happens on the spot, with zero loading screens — this is not a shortcut to the vanilla character change and its Mourningstar reload.",
+				"en": "Truly instant: the switch happens on the spot, with zero loading screens - this is not a shortcut to the vanilla character change and its Mourningstar reload.",
 				"es": "",
 				"fr": "",
 				"it": "",
