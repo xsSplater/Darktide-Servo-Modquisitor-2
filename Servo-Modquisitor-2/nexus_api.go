@@ -549,7 +549,7 @@ func (app *App) autoAddModToDatabase(modID int, folderName string, fileName ...s
 	}
 }
 
-// getPremiumDownloadURL - для Premium-пользователей (v1, используется для nxm-ссылок обычных модов)
+// getPremiumDownloadURL - for Premium users (v1, used for nxm links of regular mods)
 func (app *App) getPremiumDownloadURL(modID, fileID string) (string, string, error) {
 	token := app.getAuthToken()
 	if token == "" {
@@ -589,11 +589,20 @@ func (app *App) getPremiumDownloadURL(modID, fileID string) (string, string, err
 	return downloadURL, fileName, nil
 }
 
-// getFreeDownloadURL - для бесплатных пользователей (v1, используется для nxm-ссылок обычных модов)
+// getFreeDownloadURL - for FREE users (v1, used for nxm links of regular mods)
 func (app *App) getFreeDownloadURL(modID, fileID, key, expires string) (string, string, error) {
-	urlStr := fmt.Sprintf(NexusV1DownLink, modID, fileID)
-	// ...
+	// Checking for the presence of required parameters
+	if key == "" || expires == "" {
+		return "", "", fmt.Errorf("missing key or expires in nxm link")
+	}
+
+	// Forming a URL with the key and expires parameters
+	urlStr := fmt.Sprintf(NexusV1DownLink, modID, fileID) +
+		"?key=" + url.QueryEscape(key) +
+		"&expires=" + url.QueryEscape(expires)
+
 	req, _ := http.NewRequest("GET", urlStr, nil)
+
 	token := app.getAuthToken()
 	if token != "" {
 		req.Header.Set("Authorization", "Bearer "+token)
@@ -619,6 +628,10 @@ func (app *App) getFreeDownloadURL(modID, fileID, key, expires string) (string, 
 
 	if resp.StatusCode != http.StatusOK {
 		return "", "", fmt.Errorf("API error %d: %s", resp.StatusCode, snippet)
+	}
+
+	if resp.StatusCode == 401 || resp.StatusCode == 403 {
+		return "", "", fmt.Errorf("download link expired or invalid (HTTP %d). Please generate a new link on Nexus.", resp.StatusCode)
 	}
 
 	var mirrors []struct {

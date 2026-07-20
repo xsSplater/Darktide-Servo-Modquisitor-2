@@ -430,7 +430,7 @@ func (app *App) updateAutopatcher() {
 	app.showAutopatcherDownloadDialog(directURL, filename, fileInfo)
 }
 
-// --- Обработка nxm-ссылок ---
+// --- Processing nxm links ---
 
 func (app *App) handleNXMLink(nxmURL string) {
 	now := time.Now()
@@ -475,9 +475,14 @@ func (app *App) handleNXMLink(nxmURL string) {
 			}
 			var directURL, filename string
 			var err error
-			if key != "" {
+			if key != "" && expires != "" {
+				// Free method - pass both parameters
 				directURL, filename, err = app.getFreeDownloadURL(modID, fileID, key, expires)
+			} else if key != "" && expires == "" {
+				// Incomplete link - missing expires
+				err = fmt.Errorf("incomplete nxm link: missing expires")
 			} else {
+				// Premium method (requires OAuth token and premium account)
 				directURL, filename, err = app.getPremiumDownloadURL(modID, fileID)
 			}
 			if err != nil {
@@ -501,9 +506,14 @@ func (app *App) handleNXMLink(nxmURL string) {
 			}
 			var directURL, filename string
 			var err error
-			if key != "" {
+			if key != "" && expires != "" {
+				// Free method - pass both parameters
 				directURL, filename, err = app.getFreeDownloadURL(modID, fileID, key, expires)
+			} else if key != "" && expires == "" {
+				// Incomplete link - missing expires
+				err = fmt.Errorf("incomplete nxm link: missing expires")
 			} else {
+				// Premium method (requires OAuth token and premium account)
 				directURL, filename, err = app.getPremiumDownloadURL(modID, fileID)
 			}
 			if err != nil {
@@ -520,9 +530,14 @@ func (app *App) handleNXMLink(nxmURL string) {
 	go func() {
 		var directURL, filename string
 		var err error
-		if key != "" {
+		if key != "" && expires != "" {
+			// Free method - pass both parameters
 			directURL, filename, err = app.getFreeDownloadURL(modID, fileID, key, expires)
+		} else if key != "" && expires == "" {
+			// Incomplete link - missing expires
+			err = fmt.Errorf("incomplete nxm link: missing expires")
 		} else {
+			// Premium method (requires OAuth token and premium account)
 			directURL, filename, err = app.getPremiumDownloadURL(modID, fileID)
 		}
 		if err != nil {
