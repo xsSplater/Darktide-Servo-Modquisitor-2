@@ -1,5 +1,5 @@
 {
-	"version": "1.1.4",
+	"version": "1.1.5",
 
 	"mandatory_order": [
 		"ErrorTracker",
@@ -462,6 +462,10 @@
 			"dependent": "Welcome_To_Catachan",
 				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/196"},
 
+		{"required": "BetterBots",
+			"dependent": "CustomCharacterBots",
+				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/745"},
+
 		{"required": "crosshairs_fix",
 			"dependent": "crosshairs_old_remap",
 				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/36"},
@@ -638,6 +642,9 @@
 				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/176"},
 		{"required": "SoloPlay",
 			"dependent": "CompanyOfRejects",
+				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/176"},
+		{"required": "SoloPlay",
+			"dependent": "CustomCharacterBots",
 				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/176"},
 		{"required": "SoloPlay",
 			"dependent": "DatatideTestSpawner",

@@ -1,5 +1,5 @@
 {
-	"version": "1.1.4",
+	"version": "1.1.5",
 	"mod_database": [
 		{
 			"folder": "for_the_drip",
@@ -2430,6 +2430,33 @@
 			}
 		},
 		{
+			"folder": "KOREAN_scoreboard_enhanced_defense_plugin",
+			"nexus_file_pattern": "scoreboard enhanced defense plugin-65",
+			"name": {
+				"en": "Scoreboard Enhanced Defense Plugin (ko-kr)"
+			},
+			"description": {
+				"en": "스코어보드 모드 한글 번역판"
+			},
+			"author": "hgcl2",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/65",
+			"github_url": "",
+			"note": {
+				"de": "",
+				"en": "",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			}
+		},
+		{
 			"folder": "KOREAN_ScoreboardAmmos",
 			"nexus_file_pattern": "scoreboard Ammunitions picked",
 			"name": {
@@ -2484,64 +2511,37 @@
 			}
 		},
 		{
-			"folder": "KOREAN_scoreboard",
-			"nexus_file_pattern": "scoreboard",
-			"name": {
-				"en": "Scoreboard (ko-kr)"
-			},
-			"description": {
-				"en": "스코어보드 모드 한글 번역판"
-			},
-			"author": "hgcl2",
-			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/65",
-			"github_url": "",
-			"note": {
-				"de": "",
-				"en": "",
-				"es": "",
-				"fr": "",
-				"it": "",
-				"ja": "",
-				"ko": "",
-				"pl": "",
-				"pt-BR": "",
-				"ru": "",
-				"zh-hans": "",
-				"zh-hant": ""
-			}
-		},
-		{
-			"folder": "KOREAN_scoreboard_enhanced_defense_plugin",
-			"nexus_file_pattern": "scoreboard enhanced defense plugin-65",
-			"name": {
-				"en": "Scoreboard Enhanced Defense Plugin (ko-kr)"
-			},
-			"description": {
-				"en": "스코어보드 모드 한글 번역판"
-			},
-			"author": "hgcl2",
-			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/65",
-			"github_url": "",
-			"note": {
-				"de": "",
-				"en": "",
-				"es": "",
-				"fr": "",
-				"it": "",
-				"ja": "",
-				"ko": "",
-				"pl": "",
-				"pt-BR": "",
-				"ru": "",
-				"zh-hans": "",
-				"zh-hant": ""
-			}
-		},
-		{
 			"folder": "KOREAN_ScoreboardDamage",
 			"nexus_file_pattern": "scoreboard Damage",
 			"name": {
 				"en": "Scoreboard Damage (ko-kr)"
+			},
+			"description": {
+				"en": "스코어보드 모드 한글 번역판"
+			},
+			"author": "hgcl2",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/65",
+			"github_url": "",
+			"note": {
+				"de": "",
+				"en": "",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			}
+		},
+		{
+			"folder": "KOREAN_scoreboard",
+			"nexus_file_pattern": "scoreboard",
+			"name": {
+				"en": "Scoreboard (ko-kr)"
 			},
 			"description": {
 				"en": "스코어보드 모드 한글 번역판"
@@ -4481,55 +4481,6 @@
 			}
 		},
 		{
-			"folder": "which_book",
-			"nexus_file_pattern": "which",
-			"name": {
-				"de": "",
-				"en": "Distinct Side Mission Icons (aka Which Book)",
-				"es": "",
-				"fr": "",
-				"it": "",
-				"ja": "",
-				"ko": "",
-				"pl": "",
-				"pt-BR": "",
-				"ru": "",
-				"zh-hans": "",
-				"zh-hant": ""
-			},
-			"description": {
-				"de": "",
-				"en": "Changes the side mission icons in the mission terminal to be distinguishable.",
-				"es": "",
-				"fr": "",
-				"it": "",
-				"ja": "",
-				"ko": "",
-				"pl": "",
-				"pt-BR": "",
-				"ru": "",
-				"zh-hans": "",
-				"zh-hant": ""
-			},
-			"author": "Zombine",
-			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/112",
-			"github_url": "",
-			"note": {
-				"de": "",
-				"en": "",
-				"es": "",
-				"fr": "",
-				"it": "",
-				"ja": "",
-				"ko": "",
-				"pl": "",
-				"pt-BR": "",
-				"ru": "",
-				"zh-hans": "",
-				"zh-hant": ""
-			}
-		},
-		{
 			"folder": "DistinctSideMissionIcons",
 			"nexus_file_pattern": "distinct",
 			"name": {
@@ -4563,6 +4514,55 @@
 			"author": "Zombine",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/112",
 			"github_url": "https://github.com/zombine04/darktide-mods/tree/main/DistinctSideMissionIcons",
+			"note": {
+				"de": "",
+				"en": "",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			}
+		},
+		{
+			"folder": "which_book",
+			"nexus_file_pattern": "which",
+			"name": {
+				"de": "",
+				"en": "Distinct Side Mission Icons (aka Which Book)",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"description": {
+				"de": "",
+				"en": "Changes the side mission icons in the mission terminal to be distinguishable.",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"author": "Zombine",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/112",
+			"github_url": "",
 			"note": {
 				"de": "",
 				"en": "",
@@ -11711,6 +11711,25 @@
 			}
 		},
 		{
+			"folder": "scripts",
+			"nexus_file_pattern": "Blessings Archive-310",
+			"name": {
+				"en": "Blessings Archive",
+				"ru": ""
+			},
+			"description": {
+				"en": "Adds a custom screen that displays detailed information about blessings, featuring filters by weapon category and tier (rarity).",
+				"ru": ""
+			},
+			"author": "Klavionik",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/310",
+			"github_url": "",
+			"note": {
+				"en": "",
+				"ru": ""
+			}
+		},
+		{
 			"folder": "blessings_archive",
 			"nexus_file_pattern": "blessings",
 			"name": {
@@ -11757,25 +11776,6 @@
 				"ru": "",
 				"zh-hans": "",
 				"zh-hant": ""
-			}
-		},
-		{
-			"folder": "scripts",
-			"nexus_file_pattern": "Blessings Archive-310",
-			"name": {
-				"en": "Blessings Archive",
-				"ru": ""
-			},
-			"description": {
-				"en": "Adds a custom screen that displays detailed information about blessings, featuring filters by weapon category and tier (rarity).",
-				"ru": ""
-			},
-			"author": "Klavionik",
-			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/310",
-			"github_url": "",
-			"note": {
-				"en": "",
-				"ru": ""
 			}
 		},
 		{
@@ -12857,7 +12857,7 @@
 			}
 		},
 		{
-			"folder": "PsykerCriticalPerilQuiet_Super_Quiet",
+			"folder": "PsykerCriticalPerilQuiet_Mute",
 			"nexus_file_pattern": "quieter",
 			"name": {
 				"de": "Leiserer kritischer Gefahrenhinweis des Psykers",
@@ -12955,7 +12955,7 @@
 			}
 		},
 		{
-			"folder": "PsykerCriticalPerilQuiet_Mute",
+			"folder": "PsykerCriticalPerilQuiet_Super_Quiet",
 			"nexus_file_pattern": "quieter",
 			"name": {
 				"de": "Leiserer kritischer Gefahrenhinweis des Psykers",
@@ -17561,55 +17561,6 @@
 			}
 		},
 		{
-			"folder": "___HUD",
-			"nexus_file_pattern": "___HUD-459",
-			"name": {
-				"de": "Mod-Listen-Trennzeichen - HUD",
-				"en": "Mod List Dividers - HUD",
-				"es": "Separadores de lista de mods - HUD",
-				"fr": "Séparateurs de liste de mods - HUD",
-				"it": "Separatori della lista mod - HUD",
-				"ja": "MODリスト区切り - HUD",
-				"ko": "모드 목록 구분선 - HUD",
-				"pl": "Separatory listy modów - HUD",
-				"pt-BR": "Separadores de lista de mods - HUD",
-				"ru": "Разделители списка модов - HUD",
-				"zh-hans": "模组列表分隔符 - HUD",
-				"zh-hant": "模組列表分隔符 - HUD"
-			},
-			"description": {
-				"de": "Fügt einen Trenner zur linken Liste hinzu. Diese Mod hat keinen Einfluss auf das Spiel.",
-				"en": "This mod adds a divider to the left list. This mod has no effect on the game.",
-				"es": "Añade un separador a la lista izquierda. Este mod no tiene efecto en el juego.",
-				"fr": "Ajoute un séparateur à la liste de gauche. Ce mod n'a aucun effet sur le jeu.",
-				"it": "Aggiunge un separatore all'elenco di sinistra. Questa mod non ha alcun effetto sul gioco.",
-				"ja": "左側のリストに区切りを追加します。このMODはゲームに影響を与えません。",
-				"ko": "왼쪽 목록에 구분선을 추가합니다. 이 모드는 게임에 영향을 미치지 않습니다.",
-				"pl": "Dodaje separator do lewej listy. Ten mod nie ma wpływu na grę.",
-				"pt-BR": "Adiciona um separador à lista esquerda. Este mod não tem efeito no jogo.",
-				"ru": "Mod List Dividers - HUD - Добавляет разделитель в левый список. Этот мод не влияет на игру.",
-				"zh-hans": "在左侧列表中添加一个分隔符。此模组对游戏没有影响。",
-				"zh-hant": "在左側列表中添加一個分隔符。此模組對遊戲沒有影響。"
-			},
-			"author": "hgcl2",
-			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/459",
-			"github_url": "",
-			"note": {
-				"de": "",
-				"en": "",
-				"es": "",
-				"fr": "",
-				"it": "",
-				"ja": "",
-				"ko": "",
-				"pl": "",
-				"pt-BR": "",
-				"ru": "",
-				"zh-hans": "",
-				"zh-hant": ""
-			}
-		},
-		{
 			"folder": "___GamePlay Improve",
 			"nexus_file_pattern": "___GamePlay Improve-459",
 			"name": {
@@ -17637,55 +17588,6 @@
 				"pl": "Dodaje separator do lewej listy. Ten mod nie ma wpływu na grę.",
 				"pt-BR": "Adiciona um separador à lista esquerda. Este mod não tem efeito no jogo.",
 				"ru": "Mod List Dividers - GamePlay Improve - Добавляет разделитель в левый список. Этот мод не влияет на игру.",
-				"zh-hans": "在左侧列表中添加一个分隔符。此模组对游戏没有影响。",
-				"zh-hant": "在左側列表中添加一個分隔符。此模組對遊戲沒有影響。"
-			},
-			"author": "hgcl2",
-			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/459",
-			"github_url": "",
-			"note": {
-				"de": "",
-				"en": "",
-				"es": "",
-				"fr": "",
-				"it": "",
-				"ja": "",
-				"ko": "",
-				"pl": "",
-				"pt-BR": "",
-				"ru": "",
-				"zh-hans": "",
-				"zh-hant": ""
-			}
-		},
-		{
-			"folder": "___Game Tools",
-			"nexus_file_pattern": "___Game Tools-459",
-			"name": {
-				"de": "Mod-Listen-Trennzeichen - Game Tools",
-				"en": "Mod List Dividers - Game Tools",
-				"es": "Separadores de lista de mods - Game Tools",
-				"fr": "Séparateurs de liste de mods - Game Tools",
-				"it": "Separatori della lista mod - Game Tools",
-				"ja": "MODリスト区切り - Game Tools",
-				"ko": "모드 목록 구분선 - Game Tools",
-				"pl": "Separatory listy modów - Game Tools",
-				"pt-BR": "Separadores de lista de mods - Game Tools",
-				"ru": "Разделители списка модов - Game Tools",
-				"zh-hans": "模组列表分隔符 - Game Tools",
-				"zh-hant": "模組列表分隔符 - Game Tools"
-			},
-			"description": {
-				"de": "Fügt einen Trenner zur linken Liste hinzu. Diese Mod hat keinen Einfluss auf das Spiel.",
-				"en": "This mod adds a divider to the left list. This mod has no effect on the game.",
-				"es": "Añade un separador a la lista izquierda. Este mod no tiene efecto en el juego.",
-				"fr": "Ajoute un séparateur à la liste de gauche. Ce mod n'a aucun effet sur le jeu.",
-				"it": "Aggiunge un separatore all'elenco di sinistra. Questa mod non ha alcun effetto sul gioco.",
-				"ja": "左側のリストに区切りを追加します。このMODはゲームに影響を与えません。",
-				"ko": "왼쪽 목록에 구분선을 추가합니다. 이 모드는 게임에 영향을 미치지 않습니다.",
-				"pl": "Dodaje separator do lewej listy. Ten mod nie ma wpływu na grę.",
-				"pt-BR": "Adiciona um separador à lista esquerda. Este mod não tem efeito no jogo.",
-				"ru": "Mod List Dividers - Game Tools - Добавляет разделитель в левый список. Этот мод не влияет на игру.",
 				"zh-hans": "在左侧列表中添加一个分隔符。此模组对游戏没有影响。",
 				"zh-hant": "在左側列表中添加一個分隔符。此模組對遊戲沒有影響。"
 			},
@@ -17757,21 +17659,21 @@
 			}
 		},
 		{
-			"folder": "___System",
-			"nexus_file_pattern": "___System-459",
+			"folder": "___HUD",
+			"nexus_file_pattern": "___HUD-459",
 			"name": {
-				"de": "Mod-Listen-Trennzeichen - System",
-				"en": "Mod List Dividers - System",
-				"es": "Separadores de lista de mods - System",
-				"fr": "Séparateurs de liste de mods - System",
-				"it": "Separatori della lista mod - System",
-				"ja": "MODリスト区切り - System",
-				"ko": "모드 목록 구분선 - System",
-				"pl": "Separatory listy modów - System",
-				"pt-BR": "Separadores de lista de mods - System",
-				"ru": "Разделители списка модов - System",
-				"zh-hans": "模组列表分隔符 - System",
-				"zh-hant": "模組列表分隔符 - System"
+				"de": "Mod-Listen-Trennzeichen - HUD",
+				"en": "Mod List Dividers - HUD",
+				"es": "Separadores de lista de mods - HUD",
+				"fr": "Séparateurs de liste de mods - HUD",
+				"it": "Separatori della lista mod - HUD",
+				"ja": "MODリスト区切り - HUD",
+				"ko": "모드 목록 구분선 - HUD",
+				"pl": "Separatory listy modów - HUD",
+				"pt-BR": "Separadores de lista de mods - HUD",
+				"ru": "Разделители списка модов - HUD",
+				"zh-hans": "模组列表分隔符 - HUD",
+				"zh-hant": "模組列表分隔符 - HUD"
 			},
 			"description": {
 				"de": "Fügt einen Trenner zur linken Liste hinzu. Diese Mod hat keinen Einfluss auf das Spiel.",
@@ -17783,7 +17685,7 @@
 				"ko": "왼쪽 목록에 구분선을 추가합니다. 이 모드는 게임에 영향을 미치지 않습니다.",
 				"pl": "Dodaje separator do lewej listy. Ten mod nie ma wpływu na grę.",
 				"pt-BR": "Adiciona um separador à lista esquerda. Este mod não tem efeito no jogo.",
-				"ru": "Mod List Dividers - System - Добавляет разделитель в левый список. Этот мод не влияет на игру.",
+				"ru": "Mod List Dividers - HUD - Добавляет разделитель в левый список. Этот мод не влияет на игру.",
 				"zh-hans": "在左侧列表中添加一个分隔符。此模组对游戏没有影响。",
 				"zh-hant": "在左側列表中添加一個分隔符。此模組對遊戲沒有影響。"
 			},
@@ -17833,6 +17735,104 @@
 				"pl": "Dodaje separator do lewej listy. Ten mod nie ma wpływu na grę.",
 				"pt-BR": "Adiciona um separador à lista esquerda. Este mod não tem efeito no jogo.",
 				"ru": "Mod List Dividers - GamePlay Utilities - Добавляет разделитель в левый список. Этот мод не влияет на игру.",
+				"zh-hans": "在左侧列表中添加一个分隔符。此模组对游戏没有影响。",
+				"zh-hant": "在左側列表中添加一個分隔符。此模組對遊戲沒有影響。"
+			},
+			"author": "hgcl2",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/459",
+			"github_url": "",
+			"note": {
+				"de": "",
+				"en": "",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			}
+		},
+		{
+			"folder": "___System",
+			"nexus_file_pattern": "___System-459",
+			"name": {
+				"de": "Mod-Listen-Trennzeichen - System",
+				"en": "Mod List Dividers - System",
+				"es": "Separadores de lista de mods - System",
+				"fr": "Séparateurs de liste de mods - System",
+				"it": "Separatori della lista mod - System",
+				"ja": "MODリスト区切り - System",
+				"ko": "모드 목록 구분선 - System",
+				"pl": "Separatory listy modów - System",
+				"pt-BR": "Separadores de lista de mods - System",
+				"ru": "Разделители списка модов - System",
+				"zh-hans": "模组列表分隔符 - System",
+				"zh-hant": "模組列表分隔符 - System"
+			},
+			"description": {
+				"de": "Fügt einen Trenner zur linken Liste hinzu. Diese Mod hat keinen Einfluss auf das Spiel.",
+				"en": "This mod adds a divider to the left list. This mod has no effect on the game.",
+				"es": "Añade un separador a la lista izquierda. Este mod no tiene efecto en el juego.",
+				"fr": "Ajoute un séparateur à la liste de gauche. Ce mod n'a aucun effet sur le jeu.",
+				"it": "Aggiunge un separatore all'elenco di sinistra. Questa mod non ha alcun effetto sul gioco.",
+				"ja": "左側のリストに区切りを追加します。このMODはゲームに影響を与えません。",
+				"ko": "왼쪽 목록에 구분선을 추가합니다. 이 모드는 게임에 영향을 미치지 않습니다.",
+				"pl": "Dodaje separator do lewej listy. Ten mod nie ma wpływu na grę.",
+				"pt-BR": "Adiciona um separador à lista esquerda. Este mod não tem efeito no jogo.",
+				"ru": "Mod List Dividers - System - Добавляет разделитель в левый список. Этот мод не влияет на игру.",
+				"zh-hans": "在左侧列表中添加一个分隔符。此模组对游戏没有影响。",
+				"zh-hant": "在左側列表中添加一個分隔符。此模組對遊戲沒有影響。"
+			},
+			"author": "hgcl2",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/459",
+			"github_url": "",
+			"note": {
+				"de": "",
+				"en": "",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			}
+		},
+		{
+			"folder": "___Game Tools",
+			"nexus_file_pattern": "___Game Tools-459",
+			"name": {
+				"de": "Mod-Listen-Trennzeichen - Game Tools",
+				"en": "Mod List Dividers - Game Tools",
+				"es": "Separadores de lista de mods - Game Tools",
+				"fr": "Séparateurs de liste de mods - Game Tools",
+				"it": "Separatori della lista mod - Game Tools",
+				"ja": "MODリスト区切り - Game Tools",
+				"ko": "모드 목록 구분선 - Game Tools",
+				"pl": "Separatory listy modów - Game Tools",
+				"pt-BR": "Separadores de lista de mods - Game Tools",
+				"ru": "Разделители списка модов - Game Tools",
+				"zh-hans": "模组列表分隔符 - Game Tools",
+				"zh-hant": "模組列表分隔符 - Game Tools"
+			},
+			"description": {
+				"de": "Fügt einen Trenner zur linken Liste hinzu. Diese Mod hat keinen Einfluss auf das Spiel.",
+				"en": "This mod adds a divider to the left list. This mod has no effect on the game.",
+				"es": "Añade un separador a la lista izquierda. Este mod no tiene efecto en el juego.",
+				"fr": "Ajoute un séparateur à la liste de gauche. Ce mod n'a aucun effet sur le jeu.",
+				"it": "Aggiunge un separatore all'elenco di sinistra. Questa mod non ha alcun effetto sul gioco.",
+				"ja": "左側のリストに区切りを追加します。このMODはゲームに影響を与えません。",
+				"ko": "왼쪽 목록에 구분선을 추가합니다. 이 모드는 게임에 영향을 미치지 않습니다.",
+				"pl": "Dodaje separator do lewej listy. Ten mod nie ma wpływu na grę.",
+				"pt-BR": "Adiciona um separador à lista esquerda. Este mod não tem efeito no jogo.",
+				"ru": "Mod List Dividers - Game Tools - Добавляет разделитель в левый список. Этот мод не влияет на игру.",
 				"zh-hans": "在左侧列表中添加一个分隔符。此模组对游戏没有影响。",
 				"zh-hant": "在左側列表中添加一個分隔符。此模組對遊戲沒有影響。"
 			},
@@ -19472,21 +19472,21 @@
 			}
 		},
 		{
-			"folder": "servo_friend",
-			"nexus_file_pattern": "servo friend-504",
+			"folder": "servo_friend_plugin_hat_cables",
+			"nexus_file_pattern": "servo friend example hat addon-504",
 			"name": {
-				"de": "Servo-Freund",
-				"en": "Servo Friend",
-				"es": "Amigo servo",
-				"fr": "Ami servo",
-				"it": "Amico servo",
-				"ja": "サーボフレンド",
-				"ko": "서보 친구",
-				"pl": "Przyjaciel servo",
-				"pt-BR": "Amigo servo",
-				"ru": "Серво-друг",
-				"zh-hans": "伺服朋友",
-				"zh-hant": "伺服朋友"
+				"de": "Servo-Freund Beispiel-Plugin",
+				"en": "Servo Friend Example Plugin",
+				"es": "Complemento de ejemplo Amigo servo",
+				"fr": "Plugin exemple Ami servo",
+				"it": "Plugin esempio Amico servo",
+				"ja": "サーボフレンド サンプルプラグイン",
+				"ko": "서보 친구 예제 플러그인",
+				"pl": "Przykładowa wtyczka Przyjaciel servo",
+				"pt-BR": "Plugin de exemplo Amigo servo",
+				"ru": "Серво-друг — пример плагина",
+				"zh-hans": "伺服朋友示例插件",
+				"zh-hant": "伺服朋友範例插件"
 			},
 			"description": {
 				"de": "Ein Servoschädel, ein Werkzeug, ein Freund.",
@@ -19498,26 +19498,26 @@
 				"ko": "서보 해골, 도구, 친구.",
 				"pl": "Servo-czaszka, narzędzie, przyjaciel.",
 				"pt-BR": "Um crânio servo, uma ferramenta, um amigo.",
-				"ru": "Servo Friend - Серво-череп, инструмент, друг.",
+				"ru": "Servo Friend Example Plugin - Серво-череп, инструмент, друг.",
 				"zh-hans": "一个伺服颅骨，一个工具，一个朋友。",
 				"zh-hant": "一個伺服顱骨，一個工具，一個朋友。"
 			},
 			"author": "grasmann",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/504",
-			"github_url": "https://github.com/grasmann/darktide-mods/tree/main/servo_friend",
+			"github_url": "https://github.com/grasmann/darktide-mods/tree/main/servo_friend_plugin_hat_cables",
 			"note": {
-				"de": "",
-				"en": "",
-				"es": "",
-				"fr": "",
-				"it": "",
-				"ja": "",
-				"ko": "",
-				"pl": "",
-				"pt-BR": "",
-				"ru": "",
-				"zh-hans": "",
-				"zh-hant": ""
+				"de": "Erforderlich: Servo Friend.",
+				"en": "Required: Servo Friend.",
+				"es": "Requerido: Servo Friend.",
+				"fr": "Requis : Servo Friend.",
+				"it": "Richiede: Servo Friend.",
+				"ja": "必要条件: Servo Friend。",
+				"ko": "필요: Servo Friend.",
+				"pl": "Wymagane: Servo Friend.",
+				"pt-BR": "Requerido: Servo Friend.",
+				"ru": "Требуется: Servo Friend.",
+				"zh-hans": "需要：Servo Friend。",
+				"zh-hant": "需要：Servo Friend。"
 			}
 		},
 		{
@@ -19570,21 +19570,21 @@
 			}
 		},
 		{
-			"folder": "servo_friend_plugin_hat_cables",
-			"nexus_file_pattern": "servo friend example hat addon-504",
+			"folder": "servo_friend",
+			"nexus_file_pattern": "servo friend-504",
 			"name": {
-				"de": "Servo-Freund Beispiel-Plugin",
-				"en": "Servo Friend Example Plugin",
-				"es": "Complemento de ejemplo Amigo servo",
-				"fr": "Plugin exemple Ami servo",
-				"it": "Plugin esempio Amico servo",
-				"ja": "サーボフレンド サンプルプラグイン",
-				"ko": "서보 친구 예제 플러그인",
-				"pl": "Przykładowa wtyczka Przyjaciel servo",
-				"pt-BR": "Plugin de exemplo Amigo servo",
-				"ru": "Серво-друг — пример плагина",
-				"zh-hans": "伺服朋友示例插件",
-				"zh-hant": "伺服朋友範例插件"
+				"de": "Servo-Freund",
+				"en": "Servo Friend",
+				"es": "Amigo servo",
+				"fr": "Ami servo",
+				"it": "Amico servo",
+				"ja": "サーボフレンド",
+				"ko": "서보 친구",
+				"pl": "Przyjaciel servo",
+				"pt-BR": "Amigo servo",
+				"ru": "Серво-друг",
+				"zh-hans": "伺服朋友",
+				"zh-hant": "伺服朋友"
 			},
 			"description": {
 				"de": "Ein Servoschädel, ein Werkzeug, ein Freund.",
@@ -19596,26 +19596,26 @@
 				"ko": "서보 해골, 도구, 친구.",
 				"pl": "Servo-czaszka, narzędzie, przyjaciel.",
 				"pt-BR": "Um crânio servo, uma ferramenta, um amigo.",
-				"ru": "Servo Friend Example Plugin - Серво-череп, инструмент, друг.",
+				"ru": "Servo Friend - Серво-череп, инструмент, друг.",
 				"zh-hans": "一个伺服颅骨，一个工具，一个朋友。",
 				"zh-hant": "一個伺服顱骨，一個工具，一個朋友。"
 			},
 			"author": "grasmann",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/504",
-			"github_url": "https://github.com/grasmann/darktide-mods/tree/main/servo_friend_plugin_hat_cables",
+			"github_url": "https://github.com/grasmann/darktide-mods/tree/main/servo_friend",
 			"note": {
-				"de": "Erforderlich: Servo Friend.",
-				"en": "Required: Servo Friend.",
-				"es": "Requerido: Servo Friend.",
-				"fr": "Requis : Servo Friend.",
-				"it": "Richiede: Servo Friend.",
-				"ja": "必要条件: Servo Friend。",
-				"ko": "필요: Servo Friend.",
-				"pl": "Wymagane: Servo Friend.",
-				"pt-BR": "Requerido: Servo Friend.",
-				"ru": "Требуется: Servo Friend.",
-				"zh-hans": "需要：Servo Friend。",
-				"zh-hant": "需要：Servo Friend。"
+				"de": "",
+				"en": "",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
 			}
 		},
 		{
@@ -20611,7 +20611,7 @@
 			}
 		},
 		{
-			"folder": "LessAnnoyingDogFootsteps",
+			"folder": "LessAnnoyingArbites",
 			"nexus_file_pattern": "less",
 			"name": {
 				"en": "LessAnnoyingArbites",
@@ -20640,7 +20640,7 @@
 			}
 		},
 		{
-			"folder": "LessAnnoyingArbites",
+			"folder": "LessAnnoyingDogFootsteps",
 			"nexus_file_pattern": "less",
 			"name": {
 				"en": "LessAnnoyingArbites",
@@ -23058,8 +23058,8 @@
 			}
 		},
 		{
-			"folder": "OrbEmitTest",
-			"nexus_file_pattern": "orb",
+			"folder": "DarktideLocalServer_MINIAUDIO",
+			"nexus_file_pattern": "darktide",
 			"name": {
 				"en": "MiniAudioAddon",
 				"ru": ""
@@ -23087,8 +23087,8 @@
 			}
 		},
 		{
-			"folder": "DarktideLocalServer_MINIAUDIO",
-			"nexus_file_pattern": "darktide",
+			"folder": "MiniAudioExample",
+			"nexus_file_pattern": "mini",
 			"name": {
 				"en": "MiniAudioAddon",
 				"ru": ""
@@ -23145,8 +23145,8 @@
 			}
 		},
 		{
-			"folder": "MiniAudioExample",
-			"nexus_file_pattern": "mini",
+			"folder": "OrbEmitTest",
+			"nexus_file_pattern": "orb",
 			"name": {
 				"en": "MiniAudioAddon",
 				"ru": ""
@@ -26742,6 +26742,35 @@
 			}
 		},
 		{
+			"folder": "NoPetsLeftBehind",
+			"nexus_file_pattern": "no",
+			"name": {
+				"en": "No Pets Left Behind",
+				"ru": ""
+			},
+			"description": {
+				"en": "Adds your and your allies' companions to the Valkyrie intro before the mission begins",
+				"ru": ""
+			},
+			"author": "leer",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/828",
+			"github_url": "",
+			"note": {
+				"de": "",
+				"en": "",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			}
+		},
+		{
 			"folder": "valkyrie_dog",
 			"nexus_file_pattern": "valkyrie",
 			"name": {
@@ -26778,35 +26807,6 @@
 				"ru": "No Pets Left Behind - мод-наследник.",
 				"zh-hans": "No Pets Left Behind 是其继承模组。",
 				"zh-hant": "No Pets Left Behind 是其繼承模組。"
-			}
-		},
-		{
-			"folder": "NoPetsLeftBehind",
-			"nexus_file_pattern": "no",
-			"name": {
-				"en": "No Pets Left Behind",
-				"ru": ""
-			},
-			"description": {
-				"en": "Adds your and your allies' companions to the Valkyrie intro before the mission begins",
-				"ru": ""
-			},
-			"author": "leer",
-			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/828",
-			"github_url": "",
-			"note": {
-				"de": "",
-				"en": "",
-				"es": "",
-				"fr": "",
-				"it": "",
-				"ja": "",
-				"ko": "",
-				"pl": "",
-				"pt-BR": "",
-				"ru": "",
-				"zh-hans": "",
-				"zh-hant": ""
 			}
 		},
 		{
@@ -31972,7 +31972,7 @@
 			}
 		},
 		{
-			"folder": "dynamic_settings_demo",
+			"folder": "dynamic_settings",
 			"nexus_file_pattern": "dynamic",
 			"name": {
 				"de": "",
@@ -32021,7 +32021,7 @@
 			}
 		},
 		{
-			"folder": "dynamic_settings",
+			"folder": "dynamic_settings_demo",
 			"nexus_file_pattern": "dynamic",
 			"name": {
 				"de": "",
@@ -32266,8 +32266,8 @@
 			}
 		},
 		{
-			"folder": "VoxChat",
-			"nexus_file_pattern": "voxchat 1030",
+			"folder": "player_voice_popup",
+			"nexus_file_pattern": "player voice popup 1030",
 			"name": {
 				"de": "",
 				"en": "Vox Chat",
@@ -32315,8 +32315,8 @@
 			}
 		},
 		{
-			"folder": "player_voice_popup",
-			"nexus_file_pattern": "player voice popup 1030",
+			"folder": "VoxChat",
+			"nexus_file_pattern": "voxchat 1030",
 			"name": {
 				"de": "",
 				"en": "Vox Chat",
@@ -33540,7 +33540,7 @@
 			}
 		},
 		{
-			"folder": "PenanceAdvisorTester",
+			"folder": "PenanceAdvisor",
 			"nexus_file_pattern": "penance",
 			"name": {
 				"de": "",
@@ -33589,7 +33589,7 @@
 			}
 		},
 		{
-			"folder": "PenanceAdvisor",
+			"folder": "PenanceAdvisorTester",
 			"nexus_file_pattern": "penance",
 			"name": {
 				"de": "",
@@ -34538,7 +34538,7 @@
 			},
 			"description": {
 				"de": "",
-				"en": "Updated look Adds a dynamic HUD above the stamina bar that tracks ammo, ability charge and count, toughness percentage with melee bleed though, and grenade charge and count. It matches the style of the game’s default bars to keep everything clean and easy to read. Every element can be recolored, and anything you do not want displayed can be hidde",
+				"en": "Updated look Adds a dynamic HUD above the stamina bar that tracks ammo, ability charge and count, toughness percentage with melee bleed though, and grenade charge and count. It matches the style of the game's default bars to keep everything clean and easy to read. Every element can be recolored, and anything you do not want displayed can be hidde",
 				"es": "",
 				"fr": "",
 				"it": "",
@@ -34846,6 +34846,202 @@
 			},
 			"author": "Sungrief",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1091",
+			"github_url": "",
+			"note": {
+				"de": "",
+				"en": "",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			}
+		},
+		{
+			"folder": "CharacterStats",
+			"nexus_file_pattern": "character",
+			"name": {
+				"de": "",
+				"en": "Character Stats",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"description": {
+				"de": "",
+				"en": "In-game character stats browser showing derived health, wounds, toughness, coherency regeneration, damage dealt/taken, mobility, crit, rending, and Havoc debuff effects.",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"author": "thedeathbeam",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1093",
+			"github_url": "",
+			"note": {
+				"de": "",
+				"en": "",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			}
+		},
+		{
+			"folder": "NPCLook",
+			"nexus_file_pattern": "npclook",
+			"name": {
+				"de": "",
+				"en": "NPC Look",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"description": {
+				"de": "",
+				"en": "Equip and search for any item. Preview NPC outfits, mix individual pieces, hide or replace slots, and share finished looks with importable codes.",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"author": "fviuff",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1094",
+			"github_url": "",
+			"note": {
+				"de": "",
+				"en": "",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			}
+		},
+		{
+			"folder": "OverflowMeter",
+			"nexus_file_pattern": "overflowmeter",
+			"name": {
+				"de": "",
+				"en": "Overflow Meter",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"description": {
+				"de": "",
+				"en": "Overflow Meter adds a HUD gauge for the Skitarius talent Power Overflow. It estimates in real time when and how effectively you are sharing Toughness with nearby teammates - showing your current sharing rate, how many allies are in Coherency, and whether anyone actually needs the Toughness you are offering.",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"author": "LucLeto",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1095",
+			"github_url": "https://github.com/LucLeto/darktide-mods-overflow-meter",
+			"note": {
+				"de": "",
+				"en": "",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			}
+		},
+		{
+			"folder": "CustomCharacterBots",
+			"nexus_file_pattern": "custom",
+			"name": {
+				"de": "",
+				"en": "Custom Character Bots",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"description": {
+				"de": "",
+				"en": "Custom Character Bots replaces Darktide's default bots with your own saved characters, complete with their appearance and profiles. Built to work alongside BetterBots, it lets your custom operatives fight beside you while keeping advanced AI behaviour separate for maximum compatibility.",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"author": "heartattackphil",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1096",
 			"github_url": "",
 			"note": {
 				"de": "",
