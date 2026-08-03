@@ -299,6 +299,22 @@
 		{ "mod1": "default_to_strike_team",	"mod2": "PartyChatFix",				"type": "same" },
 		{ "mod1": "DisplayPing",			"mod2": "PingMonitor" },
 		{ "mod1": "DogWhistle",				"mod2": "HoldToDogAttack",			"type": "same" },
+		{ "mod1": "DumpStatFinder",			"mod2": "extended_weapon_customization",
+			"desc": {
+				"en": "🔴 Conflict:\nDump Stat Finder  ⚔ Extended Weapon Customization.\nDumpStatFinder causes crashes upon customizing weapons through extended_weapon_customization. There is a fix in the mod page's posts.",
+				"ru": "🔴 Конфликт:\nDump Stat Finder  ⚔ Extended Weapon Customization.\nDumpStatFinder приводит к сбоям при настройке оружия через extended_weapon_customization. Исправление описано в сообщениях на странице мода.",
+				"fr": "🔴 Conflit :\nDump Stat Finder  ⚔ Extended Weapon Customization.\nDumpStatFinder provoque des plantages lors de la personnalisation des armes via extended_weapon_customization. Un correctif est disponible dans les messages de la page du mod.",
+				"zh-tw": "🔴 衝突：\nDump Stat Finder  ⚔ Extended Weapon Customization。\n當透過 extended_weapon_customization 自訂武器時，DumpStatFinder 會導致遊戲當機。模組頁面上的貼文中已有修復方法。",
+				"zh-cn": "🔴 冲突：\nDump Stat Finder  ⚔ Extended Weapon Customization。\n在通过 extended_weapon_customization 自定义武器时，DumpStatFinder 会导致游戏崩溃。模组页面中的帖子中提供了修复方法。",
+				"de": "🔴 Konflikt:\nDump Stat Finder  ⚔ Extended Weapon Customization.\nDumpStatFinder führt beim Anpassen von Waffen über extended_weapon_customization zu Abstürzen. Eine Lösung findet sich in den Beiträgen auf der Mod-Seite.",
+				"it": "🔴 Conflitto:\nDump Stat Finder  ⚔ Extended Weapon Customization.\nDumpStatFinder provoca arresti anomali quando si personalizzano le armi tramite extended_weapon_customization. Nei post della pagina della mod è disponibile una soluzione.",
+				"ja": "🔴 競合：\nDump Stat Finder  ⚔ Extended Weapon Customization。\nDumpStatFinderでは、extended_weapon_customization を通じて武器をカスタマイズするとクラッシュが発生します。MODページの投稿に修正方法が記載されています。",
+				"ko": "🔴 충돌:\nDump Stat Finder  ⚔ Extended Weapon Customization.\nDumpStatFinder는 extended_weapon_customization을 통해 무기를 커스터마이징할 때 게임이 강제 종료되는 현상을 일으킵니다. 모드 페이지의 게시글에 수정 방법이 나와 있습니다.",
+				"pl": "🔴 Konflikt:\nDump Stat Finder  ⚔ Extended Weapon Customization.\nMod DumpStatFinder powoduje awarie podczas dostosowywania broni za pomocą funkcji `extended_weapon_customization`. Poprawka znajduje się w postach na stronie modu.",
+				"pt-br": "🔴 Conflito:\nDump Stat Finder  ⚔ Extended Weapon Customization.\nO DumpStatFinder causa falhas ao personalizar armas por meio do `extended_weapon_customization`. Há uma correção nas postagens da página do mod.",
+				"es": "🔴 Conflicto:\nDump Stat Finder  ⚔ Extended Weapon Customization.\nDumpStatFinder provoca fallos al personalizar armas mediante «extended_weapon_customization». Hay una solución en las publicaciones de la página del mod."
+			}
+		},
 		{ "mod1": "enemies_improved",		"mod2": "AttackerOutlines" },
 		{ "mod1": "enemies_improved",		"mod2": "ColorCodedHealthbars" },
 		{ "mod1": "enemies_improved",		"mod2": "crusher_attack_indicator",
