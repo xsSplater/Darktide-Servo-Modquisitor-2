@@ -646,6 +646,9 @@
 			"dependent": "ScannerSuccessSound",
 				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/929"},
 		{"required": "SimpleAudio",
+			"dependent": "SimpleAudioTacticalSounds",
+				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/929"},
+		{"required": "SimpleAudio",
 			"dependent": "Wheeeee",
 				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/929"},
 
