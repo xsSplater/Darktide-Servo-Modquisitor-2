@@ -30080,6 +30080,54 @@
 			}
 		},
 		{
+			"folder": "SimpleAudioTacticalSounds",
+			"name": {
+				"de": "",
+				"en": "Tactical Foley",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"description": {
+				"de": "",
+				"en": "Plays various tactical sounds upon pressing hotkeys.",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"author": "Backup158",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/957",
+			"github_url": "https://github.com/Backup158/DarktideLittleMods/tree/main/SimpleAudioTacticalSounds",
+			"note": {
+				"de": "Erforderlich: Simple Audio.",
+				"en": "Required: Simple Audio.",
+				"es": "Requerido: Simple Audio.",
+				"fr": "Requis : Simple Audio.",
+				"it": "Richiede: Simple Audio.",
+				"ja": "必要条件: Simple Audio。",
+				"ko": "필요: Simple Audio.",
+				"pl": "Wymagane: Simple Audion.",
+				"pt-BR": "Requerido: Simple Audio.",
+				"ru": "Требуется: Simple Audio.",
+				"zh-hans": "需要：Simple Audion。",
+				"zh-hant": "需要：Simple Audio。"
+			}
+		},
+		{
 			"folder": "emperor_vision",
 			"nexus_file_pattern": "emperor",
 			"name": {
