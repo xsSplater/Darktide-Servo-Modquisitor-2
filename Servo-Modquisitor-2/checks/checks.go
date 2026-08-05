@@ -131,8 +131,12 @@ func ListModFolders() []string {
 			folders = append(folders, e.Name())
 			continue
 		}
-		// Символическая ссылка или junction point
-		if e.Type()&os.ModeSymlink != 0 {
+		// Символическая ссылка, junction point или другая reparse-точка.
+		// На Windows директория-junction (mklink /J) не имеет флага
+		// os.ModeSymlink и не проходит e.IsDir(), поэтому проверяем через
+		// os.Stat, который разыменовывает reparse-точку и возвращает
+		// сведения о целевой папке.
+		if e.Type()&(os.ModeSymlink|os.ModeIrregular) != 0 {
 			// Проверяем, куда ведёт ссылка
 			info, err := os.Stat(filepath.Join(modsDir, e.Name()))
 			if err == nil && info.IsDir() {
@@ -1135,3 +1139,4 @@ func getDisplayName(folder string, lang string) string {
 	}
 	return folder // fallback на техническое имя
 }
+
