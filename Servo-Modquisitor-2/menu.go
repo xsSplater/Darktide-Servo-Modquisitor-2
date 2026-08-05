@@ -12,7 +12,7 @@ import (
 )
 
 func (app *App) buildMainMenu() *fyne.MainMenu {
-	// --- Меню выбора языка ---
+	// Меню выбора языка
 	// Список всех поддерживаемых языков
 	languageCodes := []string{
 		"en", "ru", "zh-hans", "zh-hant", "de", "fr", "ja", "ko", "it", "pl", "es", "pt-BR",
@@ -121,7 +121,7 @@ func (app *App) buildMainMenu() *fyne.MainMenu {
 		app.mainWindow.SetMainMenu(app.buildMainMenu())
 	})
 
-	// --- Меню Nexus ---
+	// Меню Nexus
 	// Пункт входа/выхода
 	oauthActionLabel := app.messages["menu_nexus_login"]
 	if app.isLoggedIn() {
@@ -139,7 +139,7 @@ func (app *App) buildMainMenu() *fyne.MainMenu {
 		oauthActionItem,
 	)
 
-	// ---- Меню Обновления ----
+	// Меню Обновления
 	freqNames := map[string]string{
 		"every_start": app.messages["freq_every_start"],
 		"weekly":      app.messages["freq_weekly"],

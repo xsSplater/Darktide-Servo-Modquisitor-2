@@ -262,13 +262,13 @@ func (app *App) showThemeEditor() {
 
 		bgRect := canvas.NewRectangle(bgColor)
 
-		// ---- Заголовок ----
+		// Заголовок
 		headerLabel := canvas.NewText("Preview", fgColor)
 		headerLabel.TextSize = 16
 		headerLabel.TextStyle = fyne.TextStyle{Bold: true}
 		headerLabel.Alignment = fyne.TextAlignCenter
 
-		// ---- Ряд кнопок ----
+		// Ряд кнопок
 		normalBtn := widget.NewButton("Normal", nil)
 		hoverRect := canvas.NewRectangle(btnHover)
 		hoverRect.SetMinSize(fyne.NewSize(70, 30))
@@ -284,7 +284,7 @@ func (app *App) showThemeEditor() {
 			disabledBtn,
 		)
 
-		// ---- Поле ввода с Placeholder (размещаем справа от кнопок) ----
+		// Поле ввода с Placeholder (размещаем справа от кнопок)
 		placeholderEntry := widget.NewEntry()
 		placeholderEntry.SetPlaceHolder("Placeholder text longer")
 		placeholderSpacer := canvas.NewRectangle(color.Transparent)
@@ -296,7 +296,7 @@ func (app *App) showThemeEditor() {
 			container.NewPadded(placeholderContainerLocal),
 		)
 
-		// ---- Данные для таблицы ----
+		// Данные для таблицы
 		type rowData struct {
 			label    string
 			colorKey string
@@ -413,7 +413,7 @@ func (app *App) showThemeEditor() {
 		tableScroll := container.NewVScroll(table)
 		tableScroll.SetMinSize(fyne.NewSize(0, 220))
 
-		// ---- Консоль (имитация) ----
+		// Консоль
 		consoleHeader := canvas.NewText("Console", fgColor)
 		consoleHeader.TextSize = 14
 		consoleHeader.TextStyle = fyne.TextStyle{Bold: true}
@@ -436,7 +436,7 @@ func (app *App) showThemeEditor() {
 		consoleSpacer.SetMinSize(fyne.NewSize(0, 80))
 		consoleStack := container.NewStack(consoleSpacer, consoleBg, consolePanel)
 
-		// ---- Сборка всей превью ----
+		// Сборка всей превью
 		top := container.NewVBox(
 			headerLabel,
 			topRowButtons,

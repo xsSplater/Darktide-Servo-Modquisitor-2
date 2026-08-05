@@ -71,6 +71,9 @@ type App struct {
 	messages            map[string]string
 	nexusVersionCache   map[string]ModVersionInfo // локальная версия
 	nexusLatestVersions map[string]string         // последняя версия с сайта
+	changelogCache      map[string]string
+	changelogTexts      map[string]string
+	changelogExpanded   map[string]bool
 
 	selectedModIndex         atomic.Int32
 	orderDirty               bool
@@ -126,8 +129,9 @@ type App struct {
 	systemModsTableContainer *fyne.Container
 	tableBorderContainer     *fyne.Container
 	managePanel              *fyne.Container // Управление видимостью панели управления модами
-	nxmListener              net.Listener    // слушатель nxm-ссылок
-	logFile                  *os.File        // Логирование
+	descExtraContainer       *fyne.Container
+	nxmListener              net.Listener // слушатель nxm-ссылок
+	logFile                  *os.File     // Логирование
 	patcherType              PatcherType
 	gameRoot                 string
 	selectedModName          string
@@ -137,6 +141,7 @@ type App struct {
 	modsMutex                sync.RWMutex // защита allMods
 	cacheMutex               sync.RWMutex // для nexusVersionCache
 	latestMutex              sync.RWMutex // для nexusLatestVersions
+	changelogMutex           sync.RWMutex // для безопасного доступа к картам
 	lastNxmTime              time.Time
 	enrichDebounce           *time.Timer
 	tooltipStatus            *TooltipStatusManager
@@ -168,6 +173,9 @@ func NewApp(cfg *Config, myApp fyne.App) *App {
 		myApp:               myApp,
 		nexusVersionCache:   make(map[string]ModVersionInfo),
 		nexusLatestVersions: make(map[string]string),
+		changelogCache:      make(map[string]string),
+		changelogTexts:      make(map[string]string),
+		changelogExpanded:   make(map[string]bool),
 	}
 	app.selectedModIndex.Store(-1)
 	app.loadLanguage(cfg.Language)
@@ -378,7 +386,7 @@ func saveConfig(c *Config) {
 // syncVersionCache синхронизирует кэш версий с локальными файлами,
 // чтобы избежать ложных уведомлений об обновлении.
 func (app *App) syncVersionCache() {
-	// --- Программа ---
+	// Программа
 	exePath, err := os.Executable()
 	if err == nil {
 		if info, err := os.Stat(exePath); err == nil {
@@ -397,7 +405,7 @@ func (app *App) syncVersionCache() {
 		}
 	}
 
-	// --- Файлы сортировки (используем версию из mod_database.json) ---
+	// Файлы сортировки (используем версию из mod_database.json)
 	dbVersion := app.cfg.LastModDatabaseVersion
 	if dbVersion != "" {
 		dbPath := filepath.Join(app.cfg.ModsPath, FileNameModDatabase)
@@ -798,10 +806,10 @@ func (app *App) reloadAfterPathChange() {
 // loadDataAfterInit загружает все данные (базы, кэш, списки модов) и обновляет UI.
 // Вызывается из фоновой горутины после того, как пути определены.
 func (app *App) loadDataAfterInit() {
-	// ---- 1. Установить язык для checks ----
+	// 1. Установить язык для checks
 	checks.SetLanguage(app.cfg.Language)
 
-	// ---- 2. Инициализировать глобальные переменные checks ----
+	// 2. Инициализировать глобальные переменные checks
 	checks.InitGlobals(
 		func(text string) { app.appendLog(text) },
 		&app.messages,
@@ -818,7 +826,7 @@ func (app *App) loadDataAfterInit() {
 		func() { fyne.Do(app.refreshModList) },
 	)
 
-	// ---- 3. Настроить sorter с функциями checks ----
+	// 3. Настроить sorter с функциями checks
 	sorter.SetFolderExistsFunc(checks.FolderExists)
 	sorter.SetListModFoldersFunc(checks.ListModFolders)
 	sorter.SetLogFunc(func(text string) { app.appendLog(text) })
@@ -827,7 +835,7 @@ func (app *App) loadDataAfterInit() {
 	sorter.SetLoadOrderOutputPath(filepath.Join(app.cfg.ModsPath, FileNameLoadOrder))
 	sorter.SetLogMessages(app.messages["log_create_mlot"], app.messages["log_mlot_created"])
 
-	// ---- 4. Загрузить внешние списки (один раз) ----
+	// 4. Загрузить внешние списки (один раз)
 	if err := checks.LoadExternalLists(FileNameMandatoryRules); err != nil {
 		app.appendLog(app.messages["log_warn_moid_not_found"] + ": " + err.Error())
 	} else {
@@ -839,7 +847,7 @@ func (app *App) loadDataAfterInit() {
 	sorter.SetDependencies(convertDeps(checks.Dependencies))
 	sorter.SetLoadOrderRules(checks.LoadOrderRules)
 
-	// ---- 5. Загрузить mod_database ----
+	// 5. Загрузить mod_database
 	if err := app.loadModDatabase(FileNameModDatabase); err != nil {
 		app.modDatabase = []checks.ModDBEntry{}
 		app.appendLog(app.messages["log_mod_db_missing"] + ": " + err.Error())
@@ -847,7 +855,7 @@ func (app *App) loadDataAfterInit() {
 	}
 	checks.SetModDatabase(app.modDatabase)
 
-	// ---- 6. Синхронизировать кэш и записать версии в лог ----
+	// 6. Синхронизировать кэш и записать версии в лог
 	app.syncVersionCache()
 	if app.logFile != nil {
 		fmt.Fprintf(app.logFile, "Program version: %s\n", AppVersion)
@@ -856,7 +864,7 @@ func (app *App) loadDataAfterInit() {
 	}
 	sorter.LoadSortOrders()
 
-	// ---- 7. Инициализация лаунчера ----
+	// 7. Инициализация лаунчера
 	SetLauncherMessages(
 		app.messages["launcher_ver_unknown"],
 		app.messages["launcher_exe_not_found"],
@@ -870,7 +878,7 @@ func (app *App) loadDataAfterInit() {
 
 	app.syncModsEnabledState()
 
-	// ---- 8. ВСЕ ОПЕРАЦИИ С UI В ГЛАВНОМ ПОТОКЕ ----
+	// 8. ВСЕ ОПЕРАЦИИ С UI В ГЛАВНОМ ПОТОКЕ
 	fyne.Do(func() {
 		app.reloadAfterPathChange()
 
@@ -910,12 +918,12 @@ func (app *App) loadDataAfterInit() {
 		}
 	})
 
-	// ---- 9. Проверка специальных обновлений (один раз) ----
+	// 9. Проверка специальных обновлений (один раз)
 	if app.cfg.UpdateCheckFrequency != "never" && app.shouldCheckUpdates() {
 		go app.checkSpecialUpdates()
 	}
 
-	// ---- 10. Регистрация nxm и запуск слушателя ----
+	// 10. Регистрация nxm и запуск слушателя
 	if exePath, err := os.Executable(); err == nil {
 		registerNXMProtocol(exePath)
 	}
@@ -973,4 +981,25 @@ func (app *App) setLatestVersion(key string, version string) {
 	app.latestMutex.Lock()
 	defer app.latestMutex.Unlock()
 	app.nexusLatestVersions[key] = version
+}
+
+func (app *App) getChangelog(modID, fileID int) string {
+	key := fmt.Sprintf("%d:%d", modID, fileID)
+	app.changelogMutex.RLock()
+	if cached, ok := app.changelogCache[key]; ok {
+		app.changelogMutex.RUnlock()
+		return cached
+	}
+	app.changelogMutex.RUnlock()
+
+	changelog, err := app.FetchChangelog(modID, fileID)
+	if err != nil {
+		return "Changelog is unavailable"
+	}
+	clean := stripHTML(changelog)
+
+	app.changelogMutex.Lock()
+	app.changelogCache[key] = clean
+	app.changelogMutex.Unlock()
+	return clean
 }

@@ -333,7 +333,6 @@ func (app *App) buildUI() {
 
 	moveToGroup := container.NewHBox(app.moveLabel, app.moveToEntry)
 	navigationGroup := container.NewHBox(app.btnUp, app.btnDown, app.moveToTopBtn, app.moveToBottomBtn, app.removeSelectedBtn, app.removeAllBtn)
-	// navigationGroup := container.NewHBox(app.btnUp, app.btnDown, app.moveToTopBtn, app.moveToBottomBtn, app.removeSelectedBtn, app.removeAllBtn, app.btnAMLConfig)
 	selectGroup := container.NewHBox(app.selectAllBtn, app.deselectAllBtn, app.enableSelectedBtn, app.disableSelectedBtn)
 	allModsGroup := container.NewHBox(app.enableAllBtn, app.disableAllBtn, app.btnEditVersion)
 
@@ -814,6 +813,9 @@ func (app *App) buildUI() {
 	app.descConflict.Wrapping = fyne.TextWrapWord
 	app.descConflict.Hide()
 
+	// Инициализация контейнера для дополнительного содержимого (спойлер со списком обновлений)
+	app.descExtraContainer = container.NewVBox()
+
 	descHeader := container.NewBorder(
 		nil, nil, nil, nil,
 		container.NewVBox(
@@ -826,11 +828,18 @@ func (app *App) buildUI() {
 			app.descConflict,
 		),
 	)
+	// Отступ перед спойлером
+	spacer := canvas.NewRectangle(color.Transparent)
+	spacer.SetMinSize(fyne.NewSize(0, 20))
+
 	descCardContent := container.NewVBox(
 		descHeader,
 		widget.NewSeparator(),
 		app.descBody,
+		spacer,
+		app.descExtraContainer,
 	)
+
 	descCardScroll := container.NewScroll(descCardContent)
 	descCardScroll.SetMinSize(fyne.NewSize(DescScrollMinWidth, DescScrollMinHeight))
 	descCard := container.NewStack(
@@ -1170,6 +1179,10 @@ func (app *App) updateDescriptionForMod(name string) {
 		app.descURL.SetURL(nil)
 		app.descURL.SetText("")
 		app.descBody.SetText(app.messages["desc_placeholder"])
+		if app.descExtraContainer != nil {
+			app.descExtraContainer.Objects = nil
+			app.descExtraContainer.Refresh()
+		}
 		return
 	}
 	mod := app.findModByName(name)
@@ -1291,7 +1304,6 @@ func (app *App) updateDescriptionForMod(name string) {
 				if other == mod.Name {
 					other = pair.Mod2
 				}
-				// Показываем только если второй мод реально установлен
 				if !checks.FolderExists(other) {
 					continue
 				}
@@ -1308,6 +1320,93 @@ func (app *App) updateDescriptionForMod(name string) {
 	} else {
 		app.descConflict.Hide()
 		app.descConflict.SetText("")
+	}
+
+	// Спойлер с списком обновлений, если есть обновление
+	if app.descExtraContainer != nil {
+		app.descExtraContainer.Objects = nil
+		// Убираем условие mod.HasUpdate — показываем для всех модов с URL
+		if mod.URL != "" {
+			modID := helpers.ExtractModIDFromURL(mod.URL)
+			if modID != 0 {
+				key := fmt.Sprintf("%d:%s", modID, mod.Name)
+				app.changelogMutex.RLock()
+				savedText, hasText := app.changelogTexts[key]
+				expanded, hasExpanded := app.changelogExpanded[key]
+				app.changelogMutex.RUnlock()
+
+				changelogLabel := widget.NewLabel(app.messages["downloading_changelog"])
+				changelogLabel.Wrapping = fyne.TextWrapWord
+				changelogContainer := container.NewVBox(changelogLabel)
+				changelogContainer.Hide()
+
+				if hasText && savedText != "" && savedText != app.messages["downloading_changelog"] {
+					changelogLabel.SetText(savedText)
+				}
+				if hasExpanded && expanded {
+					changelogContainer.Show()
+				}
+
+				btnState := struct {
+					expanded bool
+					btn      *widget.Button
+				}{}
+				btnState.btn = widget.NewButton(app.messages["btn_show_changelog"], func() {
+					if !btnState.expanded {
+						// Загружаем список обновлений, если ещё не загружен
+						if changelogLabel.Text == app.messages["downloading_changelog"] {
+							go func() {
+								fileInfo, err := app.getLatestFileInfoForMod(modID, mod.Name)
+								if err != nil {
+									fyne.Do(func() {
+										changelogLabel.SetText(app.messages["changelog_load_failed"])
+									})
+									return
+								}
+								changelog, err := app.FetchChangelog(modID, fileInfo.ID)
+								clean := app.messages["changelog_unavailable"]
+								if err == nil && changelog != "" {
+									clean = stripHTML(changelog)
+								}
+								fyne.Do(func() {
+									app.changelogMutex.Lock()
+									app.changelogTexts[key] = clean
+									app.changelogMutex.Unlock()
+									changelogLabel.SetText(clean)
+								})
+							}()
+						}
+						btnState.expanded = true
+						changelogContainer.Show()
+						btnState.btn.SetText(app.messages["btn_hide_changelog"])
+						app.changelogMutex.Lock()
+						app.changelogExpanded[key] = true
+						app.changelogMutex.Unlock()
+					} else {
+						btnState.expanded = false
+						changelogContainer.Hide()
+						btnState.btn.SetText(app.messages["btn_show_changelog"])
+						app.changelogMutex.Lock()
+						app.changelogExpanded[key] = false
+						app.changelogMutex.Unlock()
+					}
+				})
+
+				if hasExpanded && expanded {
+					btnState.btn.SetText(app.messages["btn_hide_changelog"])
+					btnState.expanded = true
+				}
+
+				app.descExtraContainer.Objects = []fyne.CanvasObject{
+					widget.NewSeparator(),
+					btnState.btn,
+					changelogContainer,
+				}
+				app.descExtraContainer.Refresh()
+			}
+		} else {
+			app.descExtraContainer.Refresh()
+		}
 	}
 }
 

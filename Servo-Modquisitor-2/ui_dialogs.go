@@ -9,6 +9,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strconv"
 	"strings"
 	"sync"
@@ -20,6 +21,14 @@ import (
 	"fyne.io/fyne/v2/driver/desktop"
 	"fyne.io/fyne/v2/widget"
 )
+
+// ModUpdateChoice представляет один мод в диалоге выбора обновлений.
+type ModUpdateChoice struct {
+	Mod       *checks.ModInfo
+	FileInfo  *FileInfo
+	Changelog string
+	Selected  bool
+}
 
 // showInfoDialog показывает информационный диалог с кнопкой OK.
 func (app *App) showInfoDialog(title, message string) {
@@ -109,7 +118,7 @@ func (app *App) applyTooltip(btn *CustomButton, tipKey string) {
 	}
 }
 
-// --- Основной диалог скачивания (для обычных модов) ---
+// Основной диалог скачивания (для обычных модов)
 func (app *App) showDownloadDialog(downloadURL, filename string, modName string, fileInfo *FileInfo, modID string) {
 
 	displayFilename := filename
@@ -214,7 +223,7 @@ func (app *App) startDownload(downloadURL, filename, modName string, fileInfo *F
 	}()
 }
 
-// --- Специальные диалоги для системных модов ---
+// Специальные диалоги для системных модов
 
 func (app *App) showDMLDownloadDialog(downloadURL, filename string, fileInfo *FileInfo) {
 	displayFilename := filename
@@ -338,7 +347,7 @@ func (app *App) startSystemDownload(downloadURL, filename, displayName string, f
 	}()
 }
 
-// --- Функции обновления системных модов (вызываются из кнопок) ---
+// Функции обновления системных модов (вызываются из кнопок)
 
 func (app *App) updateDML() {
 	if app.getAuthToken() == "" {
@@ -430,7 +439,7 @@ func (app *App) updateAutopatcher() {
 	app.showAutopatcherDownloadDialog(directURL, filename, fileInfo)
 }
 
-// --- Processing nxm links ---
+// Processing nxm links
 
 func (app *App) handleNXMLink(nxmURL string) {
 	now := time.Now()
@@ -563,7 +572,7 @@ func (app *App) handleNXMLink(nxmURL string) {
 	}()
 }
 
-// --- Остальные функции (showEditVersionDialog) ---
+// Остальные функции (showEditVersionDialog)
 
 func (app *App) showEditVersionDialog(mod *checks.ModInfo) {
 	var cacheKey string
@@ -641,9 +650,8 @@ func (app *App) showProgressDialog(title, message string) (*widget.ProgressBar, 
 
 	content := container.NewVBox(label, bar)
 
-	// ВСЕ ОПЕРАЦИИ С UI В ГЛАВНОМ ПОТОКЕ
 	var dlg *dialog.CustomDialog
-	var cancelChan chan struct{}
+	cancelChan := make(chan struct{})
 	var once sync.Once
 	var closeDialogFunc func()
 
@@ -651,19 +659,172 @@ func (app *App) showProgressDialog(title, message string) (*widget.ProgressBar, 
 		dlg = dialog.NewCustom(title, app.messages["btn_cancel"], content, app.mainWindow)
 		dlg.Resize(fyne.NewSize(400, 120))
 
-		cancelChan = make(chan struct{})
 		dlg.SetOnClosed(func() {
 			once.Do(func() {
 				close(cancelChan)
 			})
 		})
 
-		closeDialogFunc = func() {
-			dlg.Hide()
-		}
-
 		dlg.Show()
 	})
 
+	closeDialogFunc = func() {
+		if dlg != nil {
+			fyne.Do(func() {
+				dlg.Hide()
+			})
+		}
+	}
+
 	return bar, label, cancelChan, closeDialogFunc
+}
+
+// showUpdateChoiceDialog показывает диалог со списком обновлений и чекбоксами.
+// Результат отправляется в канал resultChan.
+func (app *App) showUpdateChoiceDialog(updates []*ModUpdateChoice, resultChan chan<- struct {
+	indices []int
+	ok      bool
+}) {
+	if len(updates) == 0 {
+		resultChan <- struct {
+			indices []int
+			ok      bool
+		}{nil, false}
+		return
+	}
+	if app.mainWindow == nil || app.mainWindow.Canvas() == nil {
+		// app.appendLog("[DEBUG] showUpdateChoiceDialog: mainWindow or Canvas is nil")
+		resultChan <- struct {
+			indices []int
+			ok      bool
+		}{nil, false}
+		return
+	}
+
+	var popUp *widget.PopUp
+	var items []fyne.CanvasObject
+
+	for _, update := range updates {
+		// Чекбокс выбора мода
+		check := widget.NewCheck("", func(checked bool) {
+			update.Selected = checked
+		})
+		check.SetChecked(update.Selected)
+
+		// Название мода и версии
+		displayName := update.Mod.DisplayName
+		if displayName == "" {
+			displayName = update.Mod.Name
+		}
+		cacheKey := fmt.Sprintf("%d:%s", helpers.ExtractModIDFromURL(update.Mod.URL), update.Mod.Name)
+		currentVersion := "?"
+		if info, ok := app.nexusVersionCache[cacheKey]; ok {
+			currentVersion = info.Version
+		}
+		titleText := fmt.Sprintf("%s  %s → %s", displayName, currentVersion, update.FileInfo.Version)
+		titleLabel := widget.NewLabel(titleText)
+		titleLabel.TextStyle = fyne.TextStyle{Bold: true}
+
+		// Список изменений (изначально скрыт)
+		changelogText := update.Changelog
+		if changelogText == "" {
+			changelogText = app.messages["changelog_unavailable"]
+		} else {
+			changelogText = stripHTML(changelogText)
+		}
+		changelogLabel := widget.NewLabel(changelogText)
+		changelogLabel.Wrapping = fyne.TextWrapWord
+
+		changelogContainer := container.NewVBox(changelogLabel)
+		changelogContainer.Hide()
+
+		// Кнопка-спойлер с явным состоянием
+		btnState := struct {
+			expanded bool
+			btn      *widget.Button
+		}{}
+		btnState.btn = widget.NewButton(app.messages["btn_show_changelog"], func() {
+			btnState.expanded = !btnState.expanded
+			if btnState.expanded {
+				changelogContainer.Show()
+				btnState.btn.SetText(app.messages["btn_hide_changelog"])
+			} else {
+				changelogContainer.Hide()
+				btnState.btn.SetText(app.messages["btn_show_changelog"])
+			}
+		})
+
+		// Строка: чекбокс + название + кнопка
+		row := container.NewHBox(check, titleLabel, btnState.btn)
+
+		// Весь элемент (строка + список изменений + разделитель)
+		item := container.NewVBox(row, changelogContainer, widget.NewSeparator())
+		items = append(items, item)
+	}
+
+	listContainer := container.NewVBox(items...)
+	scroll := container.NewVScroll(listContainer)
+	scroll.SetMinSize(fyne.NewSize(600, 400))
+
+	titleLabel := widget.NewLabelWithStyle(
+		fmt.Sprintf(app.messages["update_available_x"], len(updates)),
+		fyne.TextAlignCenter,
+		fyne.TextStyle{Bold: true},
+	)
+
+	confirmBtn := widget.NewButton(app.messages["btn_update_mods"], func() {
+		if popUp != nil {
+			popUp.Hide()
+		}
+		var idxs []int
+		for i, u := range updates {
+			if u.Selected {
+				idxs = append(idxs, i)
+			}
+		}
+		resultChan <- struct {
+			indices []int
+			ok      bool
+		}{idxs, true}
+	})
+	cancelBtn := widget.NewButton(app.messages["btn_cancel"], func() {
+		if popUp != nil {
+			popUp.Hide()
+		}
+		resultChan <- struct {
+			indices []int
+			ok      bool
+		}{nil, false}
+	})
+
+	btnContainer := container.NewHBox(
+		container.NewCenter(confirmBtn),
+		container.NewCenter(cancelBtn),
+	)
+
+	content := container.NewBorder(
+		container.NewVBox(titleLabel, widget.NewSeparator()),
+		btnContainer,
+		nil, nil,
+		scroll,
+	)
+
+	popUp = widget.NewModalPopUp(content, app.mainWindow.Canvas())
+	popUp.Resize(fyne.NewSize(700, 500))
+	popUp.Show()
+}
+
+// stripHTML удаляет HTML-теги и преобразует <br> и <li> в переносы строк.
+func stripHTML(html string) string {
+	replacer := strings.NewReplacer(
+		"<br>", "\n",
+		"<br/>", "\n",
+		"<br />", "\n",
+		"</li>", "\n",
+		"<li>", "- ",
+	)
+	text := replacer.Replace(html)
+	re := regexp.MustCompile(`<[^>]*>`)
+	text = re.ReplaceAllString(text, "")
+	return strings.TrimSpace(text)
 }
