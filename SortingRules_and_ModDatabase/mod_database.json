@@ -18967,18 +18967,18 @@
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/487",
 			"github_url": "https://github.com/Backup158/DarktideScannerSuccessSound",
 			"note": {
-				"de": "Erforderlich: Simple Audio.",
-				"en": "Required: Simple Audio.",
-				"es": "Requerido: Simple Audio.",
-				"fr": "Requis : Simple Audio.",
-				"it": "Richiede: Simple Audio.",
-				"ja": "必要条件: Simple Audio。",
-				"ko": "필요: Simple Audio.",
-				"pl": "Wymagane: Simple Audio.",
-				"pt-BR": "Requerido: Simple Audio.",
-				"ru": "Требуется: Simple Audio.",
-				"zh-hans": "需要：Simple Audio。",
-				"zh-hant": "需要：Simple Audio。"
+				"de": "Erforderlich: Simple Audio oder Audio Plugin.",
+				"en": "Required: Simple Audio or Audio Plugin.",
+				"es": "Requerido: Simple Audio o Audio Plugin.",
+				"fr": "Requis : Simple Audio ou Audio Plugin.",
+				"it": "Richiede: Simple Audio oppure Audio Plugin.",
+				"ja": "必要条件: Simple Audio または Audio Plugin。",
+				"ko": "필요: Simple Audio 또는 Audio Plugin.",
+				"pl": "Wymagane: Simple Audio lub Audio Plugin.",
+				"pt-BR": "Requerido: Simple Audio ou Audio Plugin.",
+				"ru": "Требуется: Simple Audio или Audio Plugin.",
+				"zh-hans": "需要：Simple Audio 或 Audio Plugin。",
+				"zh-hant": "需要：Simple Audio 或 Audio Plugin。"
 			}
 		},
 		{
@@ -20324,20 +20324,20 @@
 			},
 			"author": "Backup158",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/523",
-			"github_url": "",
+			"github_url": "https://github.com/Backup158/DarktideBackstabEarDestruction",
 			"note": {
-				"de": "Erforderlich: Audio-Plugin.",
-				"en": "Required: Audio plugin.",
-				"es": "Requerido: Audio plugin.",
-				"fr": "Requis : Audio plugin.",
-				"it": "Richiede: Audio plugin.",
-				"ja": "必要条件: Audioプラグイン。",
-				"ko": "필요: Audio 플러그인.",
-				"pl": "Wymagane: Audio plugin.",
-				"pt-BR": "Requerido: Audio plugin.",
-				"ru": "Требуется: Audio плагин.",
-				"zh-hans": "需要：音频插件。",
-				"zh-hant": "需要：音訊插件。"
+				"de": "Erforderlich: Simple Audio oder Audio Plugin.",
+				"en": "Required: Simple Audio or Audio Plugin.",
+				"es": "Requerido: Simple Audio o Audio Plugin.",
+				"fr": "Requis : Simple Audio ou Audio Plugin.",
+				"it": "Richiede: Simple Audio oppure Audio Plugin.",
+				"ja": "必要条件: Simple Audio または Audio Plugin。",
+				"ko": "필요: Simple Audio 또는 Audio Plugin.",
+				"pl": "Wymagane: Simple Audio lub Audio Plugin.",
+				"pt-BR": "Requerido: Simple Audio ou Audio Plugin.",
+				"ru": "Требуется: Simple Audio или Audio Plugin.",
+				"zh-hans": "需要：Simple Audio 或 Audio Plugin。",
+				"zh-hant": "需要：Simple Audio 或 Audio Plugin。"
 			}
 		},
 		{
@@ -23400,20 +23400,20 @@
 			},
 			"author": "Backup158",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/671",
-			"github_url": "",
+			"github_url": "github.com/Backup158/MuteImpacts",
 			"note": {
-				"de": "Erforderlich: Audio-Plugin.",
-				"en": "Required: Audio plugin.",
-				"es": "Requerido: Audio plugin.",
-				"fr": "Requis : Audio plugin.",
-				"it": "Richiede: Audio plugin.",
-				"ja": "必要条件: Audioプラグイン。",
-				"ko": "필요: Audio 플러그인.",
-				"pl": "Wymagane: Audio plugin.",
-				"pt-BR": "Requerido: Audio plugin.",
-				"ru": "Требуется: Audio плагин.",
-				"zh-hans": "需要：音频插件。",
-				"zh-hant": "需要：音訊插件。"
+				"de": "Erforderlich: Simple Audio oder Audio Plugin.",
+				"en": "Required: Simple Audio or Audio Plugin.",
+				"es": "Requerido: Simple Audio o Audio Plugin.",
+				"fr": "Requis : Simple Audio ou Audio Plugin.",
+				"it": "Richiede: Simple Audio oppure Audio Plugin.",
+				"ja": "必要条件: Simple Audio または Audio Plugin。",
+				"ko": "필요: Simple Audio 또는 Audio Plugin.",
+				"pl": "Wymagane: Simple Audio lub Audio Plugin.",
+				"pt-BR": "Requerido: Simple Audio ou Audio Plugin.",
+				"ru": "Требуется: Simple Audio или Audio Plugin.",
+				"zh-hans": "需要：Simple Audio 或 Audio Plugin。",
+				"zh-hant": "需要：Simple Audio 或 Audio Plugin。"
 			}
 		},
 		{
@@ -29532,7 +29532,7 @@
 			},
 			"author": "deluxghost",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/929",
-			"github_url": "",
+			"github_url": "https://github.com/deluxghost/darktide-mods/tree/main/SimpleAudio",
 			"note": {
 				"de": "",
 				"en": "",
@@ -30166,6 +30166,54 @@
 				"ru": "",
 				"zh-hans": "",
 				"zh-hant": ""
+			}
+		},
+		{
+			"folder": "SimpleAudioTacticalSounds",
+			"name": {
+				"de": "Taktisches Foley",
+				"en": "Tactical Foley",
+				"es": "Efectos de sonido tácticos",
+				"fr": "Effets sonores tactiques",
+				"it": "Foley tattico",
+				"ja": "戦術的フォーリー",
+				"ko": "전술적 폴리",
+				"pl": "Foley taktyczny",
+				"pt-BR": "Efeitos sonoros táticos",
+				"ru": "Тактический Фоли",
+				"zh-hans": "战术音效",
+				"zh-hant": "戰術性音效設計"
+			},
+			"description": {
+				"de": "Spielt beim Drücken von Hotkeys verschiedene taktische Sounds ab.",
+				"en": "Plays various tactical sounds upon pressing hotkeys.",
+				"es": "Reproduce diversos sonidos tácticos al pulsar las teclas de acceso rápido.",
+				"fr": "Émet divers sons tactiques lorsque l'on appuie sur les touches de raccourci.",
+				"it": "Riproduce vari suoni tattici quando si premono i tasti di scelta rapida.",
+				"ja": "ホットキーを押すと、さまざまな戦術的な効果音が再生されます。",
+				"ko": "단축키를 누르면 다양한 전술 효과를 재생합니다.",
+				"pl": "Po naciśnięciu klawiszy skrótów odtwarza różne dźwięki taktyczne.",
+				"pt-BR": "Reproduz vários sons táticos ao pressionar as teclas de atalho.",
+				"ru": "При нажатии горячих клавиш воспроизводит различные тактические звуки.",
+				"zh-hans": "按下热键时播放各种战术音效。",
+				"zh-hant": "按下熱鍵時，會播放各種戰術音效。"
+			},
+			"author": "Backup158",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/957",
+			"github_url": "https://github.com/Backup158/DarktideLittleMods/tree/main/SimpleAudioTacticalSounds",
+			"note": {
+				"de": "Erforderlich: Simple Audio.",
+				"en": "Required: Simple Audio.",
+				"es": "Requerido: Simple Audio.",
+				"fr": "Requis : Simple Audio.",
+				"it": "Richiede: Simple Audio.",
+				"ja": "必要条件: Simple Audio。",
+				"ko": "필요: Simple Audio.",
+				"pl": "Wymagane: Simple Audion.",
+				"pt-BR": "Requerido: Simple Audio.",
+				"ru": "Требуется: Simple Audio.",
+				"zh-hans": "需要：Simple Audion。",
+				"zh-hant": "需要：Simple Audio。"
 			}
 		},
 		{
