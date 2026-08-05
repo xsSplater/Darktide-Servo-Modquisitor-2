@@ -909,6 +909,20 @@
 		"es": "🔧 Arreglar todo",
 	 "pt-BR": "🔧 Corrigir tudo"
 	},
+	"btn_hide_changelog": {
+		"en": "▼ Hide changelog",
+		"ru": "▼ Скрыть последние изменения",
+   "zh-hans": "▼ 隐藏更新日志",
+   "zh-hant": "▼ 隱藏更新日誌",
+		"de": "▼ Changelog ausblenden",
+		"fr": "▼ Masquer le journal des modifications",
+		"ja": "▼ 変更履歴を隠す",
+		"ko": "▼ 변경 로그 숨기기",
+		"it": "▼ Nascondi changelog",
+		"pl": "▼ Ukryj dziennik zmian",
+		"es": "▼ Ocultar registro de cambios",
+	 "pt-BR": "▼ Ocultar changelog"
+	},
 	"btn_install": {
 		"en": "⏬ Install Mod",
 		"ru": "⏬ Установить мод",
@@ -1174,6 +1188,20 @@
 		"pl": "📘 Otwórz przewodnik Steam",
 		"es": "📘 Abrir guía de Steam",
 	 "pt-BR": "📘 Abrir guia do Steam"
+	},
+	"btn_show_changelog": {
+		"en": "▶ Show changelog",
+		"ru": "▶ Показать последние изменения",
+   "zh-hans": "▶ 显示更新日志",
+   "zh-hant": "▶ 顯示更新日誌",
+		"de": "▶ Changelog anzeigen",
+		"fr": "▶ Afficher le journal des modifications",
+		"ja": "▶ 変更履歴を表示",
+		"ko": "▶ 변경 로그 표시",
+		"it": "▶ Mostra changelog",
+		"pl": "▶ Pokaż dziennik zmian",
+		"es": "▶ Mostrar registro de cambios",
+	 "pt-BR": "▶ Mostrar changelog"
 	},
 	"btn_quit": {
 		"en": "🚪 Quit",
@@ -1595,6 +1623,20 @@
 		"es": "Actualiza un mod actualmente seleccionado en la lista.",
 	 "pt-BR": "Atualiza um mod atualmente selecionado na lista."
 	},
+	"btn_update_mods": {
+		"en": "Update Selected",
+		"ru": "Обновить выбранные",
+   "zh-hans": "更新所选",
+   "zh-hant": "更新所選",
+		"de": "Ausgewählte aktualisieren",
+		"fr": "Mettre à jour les sélectionnés",
+		"ja": "選択したものを更新",
+		"ko": "선택한 항목 업데이트",
+		"it": "Aggiorna selezionati",
+		"pl": "Zaktualizuj wybrane",
+		"es": "Actualizar seleccionados",
+	 "pt-BR": "Atualizar selecionados"
+	},
 	"btn_yes": {
 		"en": " ✔ Yes ",
 		"ru": " ✔ Да  ",
@@ -1664,6 +1706,48 @@
 		"pl": "Nie można wyodrębnić ID moda z URL: %s",
 		"es": "No se puede extraer la ID del mod de la URL: %s",
 	 "pt-BR": "Não é possível extrair o ID do mod da URL: %s"
+	},
+	"changelog_load_failed": {
+		"en": "Failed to load changelog",
+		"ru": "Не удалось загрузить изменения",
+   "zh-hans": "加载更新日志失败",
+   "zh-hant": "載入更新日誌失敗",
+		"de": "Changelog konnte nicht geladen werden",
+		"fr": "Échec du chargement du journal des modifications",
+		"ja": "変更履歴の読み込みに失敗しました",
+		"ko": "변경 로그를 불러오지 못했습니다",
+		"it": "Impossibile caricare il changelog",
+		"pl": "Nie udało się załadować dziennika zmian",
+		"es": "Error al cargar el registro de cambios",
+	 "pt-BR": "Falha ao carregar changelog"
+	},
+	"changelog_unavailable": {
+		"en": "Changelog unavailable",
+		"ru": "Список изменений недоступен",
+   "zh-hans": "更新日志不可用",
+   "zh-hant": "更新日誌不可用",
+		"de": "Changelog nicht verfügbar",
+		"fr": "Journal des modifications indisponible",
+		"ja": "変更履歴は利用できません",
+		"ko": "변경 로그를 사용할 수 없음",
+		"it": "Changelog non disponibile",
+		"pl": "Dziennik zmian niedostępny",
+		"es": "Registro de cambios no disponible",
+	 "pt-BR": "Changelog indisponível"
+	},
+	"checked_x_y": {
+		"en": "Checked: %d / %d",
+		"ru": "Проверено: %d / %d",
+   "zh-hans": "已检查：%d / %d",
+   "zh-hant": "已檢查：%d / %d",
+		"de": "Geprüft: %d / %d",
+		"fr": "Vérifié : %d / %d",
+		"ja": "確認済み: %d / %d",
+		"ko": "확인됨: %d / %d",
+		"it": "Verificati: %d / %d",
+		"pl": "Sprawdzone: %d / %d",
+		"es": "Verificados: %d / %d",
+	 "pt-BR": "Verificados: %d / %d"
 	},
 	"checking_nexus_update": {
 		"en": "Checking for program updates on Nexus...",
@@ -1762,6 +1846,48 @@
 		"pl": "Status",
 		"es": "Estado",
 	 "pt-BR": "Status"
+	},
+	"collecting_mods_x_y": {
+		"en": "Collecting mods: %d / %d",
+		"ru": "Сбор модов: %d / %d",
+   "zh-hans": "正在收集模组：%d / %d",
+   "zh-hant": "正在收集模組：%d / %d",
+		"de": "Sammle Mods: %d / %d",
+		"fr": "Collecte des mods : %d / %d",
+		"ja": "MODを収集中: %d / %d",
+		"ko": "모드 수집 중: %d / %d",
+		"it": "Raccolta mod: %d / %d",
+		"pl": "Zbieranie modów: %d / %d",
+		"es": "Recopilando mods: %d / %d",
+	 "pt-BR": "Coletando mods: %d / %d"
+	},
+	"collecting_mods_cancelled": {
+		"en": "Mod collection cancelled.",
+		"ru": "Сбор модов отменён.",
+   "zh-hans": "已取消收集模组。",
+   "zh-hant": "已取消收集模組。",
+		"de": "Mod-Sammlung abgebrochen.",
+		"fr": "Collecte des mods annulée.",
+		"ja": "MODの収集がキャンセルされました。",
+		"ko": "모드 수집이 취소되었습니다.",
+		"it": "Raccolta dei mod annullata.",
+		"pl": "Zbieranie modów anulowane.",
+		"es": "Recopilación de mods cancelada.",
+	 "pt-BR": "Coleta de mods cancelada."
+	},
+	"collecting_mods_for_update": {
+		"en": "Collecting mods for the update...",
+		"ru": "Сбор модов для обновления...",
+   "zh-hans": "正在收集要更新的模组...",
+   "zh-hant": "正在收集要更新的模組...",
+		"de": "Sammle Mods für das Update...",
+		"fr": "Collecte des mods à mettre à jour...",
+		"ja": "更新するMODを収集中...",
+		"ko": "업데이트할 모드를 수집하는 중...",
+		"it": "Raccolta mod da aggiornare...",
+		"pl": "Zbieranie modów do aktualizacji...",
+		"es": "Recopilando mods para actualizar...",
+	 "pt-BR": "Coletando mods para atualizar..."
 	},
 	"confirm_delete_text": {
 		"en": "Delete '%s' folder?",
@@ -2589,6 +2715,34 @@
 		"es": "Descargando: %s",
 	 "pt-BR": "Baixando: %s"
 	},
+	"downloading_changelog": {
+		"en": "Downloading changelog...",
+		"ru": "Загрузка списков изменений...",
+   "zh-hans": "正在下载更新日志...",
+   "zh-hant": "正在下載更新日誌...",
+		"de": "Lade Changelog herunter...",
+		"fr": "Téléchargement du journal des modifications...",
+		"ja": "変更履歴をダウンロード中...",
+		"ko": "변경 로그 다운로드 중...",
+		"it": "Download del changelog in corso...",
+		"pl": "Pobieranie dziennika zmian...",
+		"es": "Descargando registro de cambios...",
+	 "pt-BR": "Baixando changelog..."
+	},
+	"downloading_changelog_x_y": {
+		"en": "Downloading changelogs: %d / %d",
+		"ru": "Загрузка списков изменений: %d / %d",
+   "zh-hans": "正在下载更新日志：%d / %d",
+   "zh-hant": "正在下載更新日誌：%d / %d",
+		"de": "Lade Changelogs herunter: %d / %d",
+		"fr": "Téléchargement des journaux des modifications : %d / %d",
+		"ja": "変更履歴をダウンロード中：%d / %d",
+		"ko": "변경 로그 다운로드 중: %d / %d",
+		"it": "Download dei changelog in corso: %d / %d",
+		"pl": "Pobieranie dzienników zmian: %d / %d",
+		"es": "Descargando registros de cambios: %d / %d",
+	 "pt-BR": "Baixando changelogs: %d / %d"
+	},
 	"downloading_dmf": {
 		"en": "Downloading DMF: %s",
 		"ru": "Загрузка DMF: %s",
@@ -2742,6 +2896,20 @@
 		"pl": "Nie można określić wersji moda '%s'.\nWprowadź wersję ręcznie:",
 		"es": "No se puede determinar la versión del mod '%s'.\nIngrese la versión manualmente:",
 	 "pt-BR": "Não foi possível determinar a versão do mod '%s'.\nDigite a versão manualmente:"
+	},
+	"failed_fetch_changlog_for": {
+		"en": "Failed to fetch changelog for %s: %v",
+		"ru": "Не удалось получить список изменений для %s: %v",
+   "zh-hans": "获取 %s 的更新日志失败：%v",
+   "zh-hant": "獲取 %s 的更新日誌失敗：%v",
+		"de": "Fehler beim Abrufen des Changelogs für %s: %v",
+		"fr": "Échec de récupération du journal des modifications pour %s : %v",
+		"ja": "%s の変更履歴の取得に失敗しました：%v",
+		"ko": "%s에 대한 변경 로그를 가져오지 못했습니다: %v",
+		"it": "Impossibile recuperare il changelog per %s: %v",
+		"pl": "Nie udało się pobrać dziennika zmian dla %s: %v",
+		"es": "Error al obtener el registro de cambios para %s: %v",
+	 "pt-BR": "Falha ao obter o changelog para %s: %v"
 	},
 	"filter_active": {
 		"en": "✔ Active",
@@ -3470,6 +3638,34 @@
 		"pl": "Zbieranie modów do aktualizacji...",
 		"es": "Recopilando mods para actualizar...",
 	 "pt-BR": "Coletando mods para atualizar..."
+	},
+	"log_copy_binaries": {
+		"en": "Copying binaries to game root: %s -> %s",
+		"ru": "Копирование бинарных файлов в корневую папку игры: %s -> %s",
+   "zh-hans": "正在将二进制文件复制到游戏根目录：%s -> %s",
+   "zh-hant": "正在將二進位檔案複製到遊戲根目錄：%s -> %s",
+		"de": "Kopiere Binärdateien in das Spielverzeichnis: %s -> %s",
+		"fr": "Copie des fichiers binaires vers le dossier du jeu : %s -> %s",
+		"ja": "バイナリファイルをゲームルートにコピーしています：%s -> %s",
+		"ko": "바이너리 파일을 게임 루트에 복사 중: %s -> %s",
+		"it": "Copia dei file binari nella cartella principale del gioco: %s -> %s",
+		"pl": "Kopiowanie plików binarnych do katalogu głównego gry: %s -> %s",
+		"es": "Copiando archivos binarios a la raíz del juego: %s -> %s",
+	 "pt-BR": "Copiando arquivos binários para a pasta raiz do jogo: %s -> %s"
+	},
+	"log_copy_binaries_failed": {
+		"en": "Failed to copy binaries: %v",
+		"ru": "Не удалось скопировать бинарные файлы: %v",
+   "zh-hans": "复制二进制文件失败：%v",
+   "zh-hant": "複製二進位檔案失敗：%v",
+		"de": "Kopieren der Binärdateien fehlgeschlagen: %v",
+		"fr": "Échec de la copie des fichiers binaires : %v",
+		"ja": "バイナリファイルのコピーに失敗しました：%v",
+		"ko": "바이너리 파일 복사 실패: %v",
+		"it": "Impossibile copiare i file binari: %v",
+		"pl": "Nie udało się skopiować plików binarnych: %v",
+		"es": "Error al copiar los archivos binarios: %v",
+	 "pt-BR": "Falha ao copiar arquivos binários: %v"
 	},
 	"log_create_mlot": {
 		"en": "Creating new mod_load_order.txt...",
@@ -4325,6 +4521,20 @@
 		"es": "¡No se encontró carpeta de mods en el archivo!",
 	 "pt-BR": "Nenhuma pasta de mod encontrada no arquivo!"
 	},
+	"log_no_mods_selected_update": {
+		"en": "No mods selected for update (not found in current list).",
+		"ru": "Для обновления не выбрано ни одного мода (не найдены в текущем списке).",
+   "zh-hans": "未选择任何模组进行更新（在当前列表中未找到）。",
+   "zh-hant": "未選擇任何模組進行更新（在目前清單中未找到）。",
+		"de": "Keine Mods für das Update ausgewählt (nicht in der aktuellen Liste gefunden).",
+		"fr": "Aucun mod sélectionné pour la mise à jour (introuvable dans la liste actuelle).",
+		"ja": "更新するMODが選択されていません（現在のリストに見つかりません）。",
+		"ko": "업데이트할 모드가 선택되지 않았습니다(현재 목록에서 찾을 수 없음).",
+		"it": "Nessun mod selezionato per l'aggiornamento (non trovato nell'elenco corrente).",
+		"pl": "Nie wybrano żadnych modów do aktualizacji (nie znaleziono na bieżącej liście).",
+		"es": "No se seleccionaron mods para actualizar (no encontrados en la lista actual).",
+	 "pt-BR": "Nenhum mod selecionado para atualização (não encontrado na lista atual)."
+	},
 	"log_no_patcher": {
 		"en": "Error: no patcher found. Install DML or autopatcher.",
 		"ru": "Ошибка: патчер не найден. Установите DML или автопатчер.",
@@ -4450,6 +4660,20 @@
 		"pl": "Zaznaczone mody zostały usunięte.",
 		"es": "Se han eliminado los mods seleccionados.",
 	 "pt-BR": "Os mods selecionados foram removidos."
+	},
+	"log_skipping_symlink": {
+		"en": "Skipping %s: folder is a symlink",
+		"ru": "Пропускаем %s: папка является симлинком",
+   "zh-hans": "跳过 %s：文件夹是符号链接",
+   "zh-hant": "跳過 %s：資料夾是符號連結",
+		"de": "Überspringe %s: Ordner ist ein Symlink",
+		"fr": "Ignorer %s : le dossier est un lien symbolique",
+		"ja": "スキップ中 %s: フォルダはシンボリックリンクです",
+		"ko": "%s 건너뜀: 폴더가 심볼릭 링크입니다",
+		"it": "Salto %s: la cartella è un link simbolico",
+		"pl": "Pomijanie %s: folder jest dowiązaniem symbolicznym",
+		"es": "Omitiendo %s: la carpeta es un enlace simbólico",
+	 "pt-BR": "Pulando %s: a pasta é um link simbólico"
 	},
 	"log_skipping_sys_folder": {
 		"en": "Skipping system folder %s",
@@ -4662,18 +4886,46 @@
 	 "pt-BR": "Falha ao alternar o patcher: %v"
 	},
 	"log_update_available": {
-		"en": "Update available for %s: %s -> %s",
-		"ru": "Доступно обновление для %s: %s -> %s",
-   "zh-hans": "%s 有可用更新：%s -> %s",
-   "zh-hant": "%s 有可用更新：%s -> %s",
-		"de": "Update verfügbar für %s: %s -> %s",
-		"fr": "Mise à jour disponible pour %s : %s -> %s",
-		"ja": "%s のアップデートが利用可能です: %s -> %s",
-		"ko": "%s 업데이트 가능: %s -> %s",
-		"it": "Aggiornamento disponibile per %s: %s -> %s",
-		"pl": "Aktualizacja dostępna dla %s: %s -> %s",
-		"es": "Actualización disponible para %s: %s -> %s",
-	 "pt-BR": "Atualização disponível para %s: %s -> %s"
+		"en": "⬆ Update available for %s: %s -> %s",
+		"ru": "⬆ Доступно обновление для %s: %s -> %s",
+   "zh-hans": "⬆ %s 有可用更新：%s -> %s",
+   "zh-hant": "⬆ %s 有可用更新：%s -> %s",
+		"de": "⬆ Update verfügbar für %s: %s -> %s",
+		"fr": "⬆ Mise à jour disponible pour %s : %s -> %s",
+		"ja": "⬆ %s のアップデートが利用可能です: %s -> %s",
+		"ko": "⬆ %s 업데이트 가능: %s -> %s",
+		"it": "⬆ Aggiornamento disponibile per %s: %s -> %s",
+		"pl": "⬆ Aktualizacja dostępna dla %s: %s -> %s",
+		"es": "⬆ Actualización disponible para %s: %s -> %s",
+	 "pt-BR": "⬆ Atualização disponível para %s: %s -> %s"
+	},
+	"log_update_available_x": {
+		"en": "⬆ Update available for %s: ? -> %s",
+		"ru": "⬆ Доступно обновление для %s: ? -> %s",
+   "zh-hans": "⬆ %s 有可用更新：? -> %s",
+   "zh-hant": "⬆ %s 有可用更新：? -> %s",
+		"de": "⬆ Update verfügbar für %s: ? -> %s",
+		"fr": "⬆ Mise à jour disponible pour %s : ? -> %s",
+		"ja": "⬆ %s のアップデートが利用可能です: ? -> %s",
+		"ko": "⬆ %s 업데이트 가능: ? -> %s",
+		"it": "⬆ Aggiornamento disponibile per %s: ? -> %s",
+		"pl": "⬆ Aktualizacja dostępna dla %s: ? -> %s",
+		"es": "⬆ Actualización disponible para %s: ? -> %s",
+	 "pt-BR": "⬆ Atualização disponível para %s: ? -> %s"
+	},
+	"log_update_cancelled": {
+		"en": "Update cancelled by user.",
+		"ru": "Обновление отменено пользователем.",
+   "zh-hans": "用户取消了更新。",
+   "zh-hant": "用戶取消了更新。",
+		"de": "Update vom Benutzer abgebrochen.",
+		"fr": "Mise à jour annulée par l'utilisateur.",
+		"ja": "ユーザーによって更新がキャンセルされました。",
+		"ko": "사용자가 업데이트를 취소했습니다.",
+		"it": "Aggiornamento annullato dall'utente.",
+		"pl": "Aktualizacja anulowana przez użytkownika.",
+		"es": "Actualización cancelada por el usuario.",
+	 "pt-BR": "Atualização cancelada pelo usuário."
 	},
 	"log_update_check_completed": {
 		"en": "✅ Update check completed",
@@ -5480,6 +5732,20 @@
 		"pl": "Nie znaleziono folderu 'DMF'!\n\nJeśli program nie jest zainstalowany w folderze 'MODS', przenieś go tam.\n\nJeśli nie zainstalowałeś jeszcze modów lub przypadkowo usunąłeś ten folder, zainstaluj mod 'Darktide Mod Framework'.",
 		"es": "¡No se encontró la carpeta 'DMF'!\n\nSi el programa no está instalado en la carpeta 'MODS', muévalo allí.\n\nSi aún no ha instalado ningún mod o eliminó accidentalmente esta carpeta, instale el mod 'Darktide Mod Framework'.",
 	 "pt-BR": "Pasta 'DMF' não encontrada!\n\nSe o programa não estiver instalado na pasta 'MODS', mova-o para lá.\n\nSe você ainda não instalou nenhum mod ou excluiu acidentalmente esta pasta, instale o mod 'Darktide Mod Framework'."
+	},
+	"mod_already_has_id": {
+		"en": "⚠️ Mod %s already has a different Nexus ID (%d) and is complete, skipping update with ID %d",
+		"ru": "⚠️ Мод %s уже имеет другой ID на Nexus (%d) и является полным, пропускаем обновление с ID %d",
+   "zh-hans": "⚠️ 模组 %s 已有不同的 Nexus ID（%d）且已完成，跳过 ID %d 的更新",
+   "zh-hant": "⚠️ 模組 %s 已有不同的 Nexus ID（%d）且已完成，跳過 ID %d 的更新",
+		"de": "⚠️ Mod %s hat bereits eine andere Nexus-ID (%d) und ist vollständig, Update mit ID %d wird übersprungen",
+		"fr": "⚠️ Le mod %s a déjà un identifiant Nexus différent (%d) et est complet, mise à jour avec l'ID %d ignorée",
+		"ja": "⚠️ Mod %s は既に別の Nexus ID（%d）を持っており、完了しているため、ID %d での更新をスキップします",
+		"ko": "⚠️ 모드 %s에 이미 다른 Nexus ID(%d)가 있으며 완료되었으므로 ID %d 업데이트를 건너뜁니다",
+		"it": "⚠️ Il mod %s ha già un ID Nexus diverso (%d) ed è completo, salto l'aggiornamento con ID %d",
+		"pl": "⚠️ Mod %s ma już inny identyfikator Nexus (%d) i jest kompletny, pomijam aktualizację z ID %d",
+		"es": "⚠️ El mod %s ya tiene un ID de Nexus diferente (%d) y está completo, se omite la actualización con ID %d",
+	 "pt-BR": "⚠️ O mod %s já possui um ID Nexus diferente (%d) e está completo, pulando atualização com ID %d"
 	},
 	"mod_load_order_created": {
 		"en": "✅ mod_load_order.txt has been created.",
@@ -6335,6 +6601,34 @@
 		"es": "Tiene cambios sin guardar.\nActualizarlos los descartará.\n\n¿Qué desea hacer?",
 	 "pt-BR": "Você tem alterações não salvas.\nAtualizar as descartará.\n\nO que você gostaria de fazer?"
 	},
+	"removed_cache_for": {
+		"en": "ℹ️ Removed stale cache entry for %s (old ID: %d), will save with new ID: %d",
+		"ru": "ℹ️ Удалена устаревшая запись в кэше для %s (старый ID: %d), будет сохранена с новым ID: %d",
+   "zh-hans": "ℹ️ 已移除 %s 的过时缓存条目（旧 ID：%d），将以新 ID：%d 保存",
+   "zh-hant": "ℹ️ 已移除 %s 的過時快取條目（舊 ID：%d），將以新 ID：%d 保存",
+		"de": "ℹ️ Veralteten Cache-Eintrag für %s entfernt (alte ID: %d), wird mit neuer ID: %d gespeichert",
+		"fr": "ℹ️ Entrée de cache obsolète supprimée pour %s (ancien ID : %d), sera enregistrée avec le nouvel ID : %d",
+		"ja": "ℹ️ %s の古いキャッシュエントリを削除しました（旧ID: %d）、新しいID: %d で保存されます",
+		"ko": "ℹ️ %s의 오래된 캐시 항목을 제거했습니다(이전 ID: %d), 새 ID: %d로 저장됩니다",
+		"it": "ℹ️ Rimossa voce cache obsoleta per %s (vecchio ID: %d), verrà salvata con nuovo ID: %d",
+		"pl": "ℹ️ Usunięto nieaktualny wpis pamięci podręcznej dla %s (stary ID: %d), zostanie zapisany z nowym ID: %d",
+		"es": "ℹ️ Entrada de caché obsoleta eliminada para %s (ID antiguo: %d), se guardará con el nuevo ID: %d",
+	 "pt-BR": "ℹ️ Entrada de cache obsoleta removida para %s (ID antigo: %d), será salva com novo ID: %d"
+	},
+	"removed_old_folder": {
+		"en": "Removed old folder for update: %s",
+		"ru": "Удалена старая папка перед обновлением: %s",
+   "zh-hans": "已删除用于更新的旧文件夹：%s",
+   "zh-hant": "已刪除用於更新的舊資料夾：%s",
+		"de": "Alter Ordner für Update entfernt: %s",
+		"fr": "Ancien dossier supprimé pour la mise à jour : %s",
+		"ja": "更新用の古いフォルダを削除しました：%s",
+		"ko": "업데이트용 이전 폴더 제거됨: %s",
+		"it": "Vecchia cartella rimossa per l'aggiornamento: %s",
+		"pl": "Usunięto stary folder aktualizacji: %s",
+		"es": "Carpeta antigua eliminada para la actualización: %s",
+	 "pt-BR": "Pasta antiga removida para atualização: %s"
+	},
 	"rules_update_unavailable": {
 		"en": "Servo-ModQuisitor sorting rules are not available on Nexus (removed or hidden).",
 		"ru": "Файлы сортировки Servo-ModQuisitor недоступны на Nexus (удалены или скрыты).",
@@ -6348,6 +6642,20 @@
 		"pl": "Pliki sortowania Servo-ModQuisitor nie są dostępne na Nexus (usunięte lub ukryte).",
 		"es": "Los archivos de ordenamiento de Servo-ModQuisitor no están disponibles en Nexus (eliminados u ocultos).",
 	 "pt-BR": "Os arquivos de classificação do Servo-ModQuisitor não estão disponíveis no Nexus (removidos ou ocultos)."
+	},
+	"save_mod_db_failed": {
+		"en": "Failed to save mod database (language keys): %v",
+		"ru": "Не удалось сохранить базу данных модов (ключи языков): %v",
+   "zh-hans": "保存模组数据库（语言键）失败：%v",
+   "zh-hant": "儲存模組資料庫（語言鍵）失敗：%v",
+		"de": "Speichern der Mod-Datenbank (Sprachschlüssel) fehlgeschlagen: %v",
+		"fr": "Échec de l'enregistrement de la base de données des mods (clés de langue) : %v",
+		"ja": "MODデータベース（言語キー）の保存に失敗しました：%v",
+		"ko": "모드 데이터베이스(언어 키) 저장 실패: %v",
+		"it": "Impossibile salvare il database dei mod (chiavi lingua): %v",
+		"pl": "Nie udało się zapisać bazy danych modów (klucze języków): %v",
+		"es": "Error al guardar la base de datos de mods (claves de idioma): %v",
+	 "pt-BR": "Falha ao salvar o banco de dados de mods (chaves de idioma): %v"
 	},
 	"search_placeholder": {
 		"en": "🔍 Search...",
@@ -6784,7 +7092,7 @@
 	 "pt-BR": "Atualizado: %s"
 	},
 	"update_title": {
-		"en": "🔄 Updates Available 🔄",
+		"en": "🔄 Updates available 🔄",
 		"ru": "🔄 Доступны обновления 🔄",
    "zh-hans": "🔄 有可用更新 🔄",
    "zh-hant": "🔄 有可用更新 🔄",
@@ -6796,6 +7104,34 @@
 		"pl": "🔄 Aktualizacje dostępne 🔄",
 		"es": "🔄 Actualizaciones disponibles 🔄",
 	 "pt-BR": "🔄 Atualizações disponíveis 🔄"
+	},
+	"update_available_x": {
+		"en": "⬆ Updates available for %d mods",
+		"ru": "⬆ Доступны обновления для %d модов",
+   "zh-hans": "⬆ %d 个模组有更新",
+   "zh-hant": "⬆ %d 個模組有更新",
+		"de": "⬆ Updates für %d Mods verfügbar",
+		"fr": "⬆ Mises à jour disponibles pour %d mods",
+		"ja": "⬆ %d 個のMODに更新があります",
+		"ko": "⬆ %d개의 모드에 업데이트가 있습니다",
+		"it": "⬆ Aggiornamenti disponibili per %d mod",
+		"pl": "⬆ Aktualizacje dostępne dla %d modów",
+		"es": "⬆ Actualizaciones disponibles para %d mods",
+	 "pt-BR": "⬆ Atualizações disponíveis para %d mods"
+	},
+	"update_available_x_a_b": {
+		"en": "⬆ Update available for %s: %s → %s",
+		"ru": "⬆ Доступно обновление для %s: %s → %s",
+   "zh-hans": "⬆ %s 有更新：%s → %s",
+   "zh-hant": "⬆ %s 有更新：%s → %s",
+		"de": "⬆ Updates für %s verfügbar: %s → %s",
+		"fr": "⬆ Mises à jour disponibles pour %s : %s → %s",
+		"ja": "⬆ %s の更新があります：%s → %s",
+		"ko": "⬆ %s 업데이트 사용 가능: %s → %s",
+		"it": "⬆ Aggiornamenti disponibili per %s: %s → %s",
+		"pl": "⬆ Aktualizacje dostępne dla %s: %s → %s",
+		"es": "⬆ Actualizaciones disponibles para %s: %s → %s",
+	 "pt-BR": "⬆ Atualizações disponíveis para %s: %s → %s"
 	},
 	"updates_found_count": {
 		"en": "Updates found: %d",
@@ -6810,6 +7146,20 @@
 		"pl": "Znaleziono aktualizacji: %d",
 		"es": "Actualizaciones encontradas: %d",
 	 "pt-BR": "Atualizações encontradas: %d"
+	},
+	"updates_found_no": {
+		"en": "Updates not found",
+		"ru": "Обновлений не найдено",
+   "zh-hans": "未找到更新",
+   "zh-hant": "未找到更新",
+		"de": "Keine Updates gefunden",
+		"fr": "Aucune mise à jour trouvée",
+		"ja": "更新が見つかりません",
+		"ko": "업데이트를 찾을 수 없음",
+		"it": "Nessun aggiornamento trovato",
+		"pl": "Nie znaleziono aktualizacji",
+		"es": "No se encontraron actualizaciones",
+	 "pt-BR": "Nenhuma atualização encontrada"
 	},
 	"updates_found_count_update": {
 		"en": "Updates found: %d.\n\nUpdate all?",

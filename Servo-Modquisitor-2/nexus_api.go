@@ -149,21 +149,46 @@ func (app *App) checkNexusUpdates() {
 	}
 
 	app.appendLog(app.messages["log_checking_updates"])
-	total := len(app.allMods)
+
+	// Показываем прогресс
+	bar, label, cancelChan, closeDialog := app.showProgressDialog(
+		app.messages["update_title"],
+		app.messages["collecting_mods_for_update"],
+	)
+	defer closeDialog()
+
+	totalMods := 0
 	processed := 0
 	updatesFound := 0
 
-	for i := range app.allMods {
-		mod := &app.allMods[i]
-		if mod.URL == "" {
+	app.modsMutex.RLock()
+	allModsCopy := make([]checks.ModInfo, len(app.allMods))
+	copy(allModsCopy, app.allMods)
+	app.modsMutex.RUnlock()
+
+	for _, mod := range allModsCopy {
+		if mod.URL != "" && !mod.IsSystem {
+			totalMods++
+		}
+	}
+
+	for i := range allModsCopy {
+		select {
+		case <-cancelChan:
+			app.appendLog(app.messages["collecting_mods_cancelled"])
+			return
+		default:
+		}
+
+		mod := &allModsCopy[i]
+		if mod.URL == "" || mod.IsSystem {
 			continue
 		}
 		modID := helpers.ExtractModIDFromURL(mod.URL)
 		if modID == 0 {
+			processed++
 			continue
 		}
-
-		// Проверка на симлинк
 		if app.isSymlinkFolder(mod.Name) {
 			app.appendLog(fmt.Sprintf(app.messages["log_skipping_update_check_symlink"], mod.Name))
 			processed++
@@ -173,27 +198,30 @@ func (app *App) checkNexusUpdates() {
 		fileInfo, err := app.getLatestFileInfoForMod(modID, mod.Name)
 		if err != nil {
 			app.logNexusError(err, mod.Name)
+			processed++
 			continue
 		}
 
-		modIDStr := fmt.Sprintf("%d", modID)
-		cacheKey := modIDStr + ":" + mod.Name
+		cacheKey := fmt.Sprintf("%d:%s", modID, mod.Name)
 		app.setLatestVersion(cacheKey, fileInfo.Version)
 
 		saved, exists := app.getCachedVersion(cacheKey)
-		if !exists || saved.Source == "manual" {
+		if !exists || saved.Source == "manual" || saved.Version == "" {
 			processed++
 			continue
 		}
 
 		if fileInfo.UploadedTimestamp > saved.Timestamp {
-			app.appendLog(fmt.Sprintf(app.messages["log_update_available"], mod.Name, saved.Version, fileInfo.Version))
+			app.appendLog(fmt.Sprintf(app.messages["update_available_x_a_b"], mod.Name, saved.Version, fileInfo.Version))
 			updatesFound++
 		}
 
 		processed++
-		if processed%10 == 0 {
-			app.appendLog(fmt.Sprintf(app.messages["log_mods_checked_progress"], processed, total))
+		if processed%5 == 0 || processed == totalMods {
+			fyne.Do(func() {
+				bar.SetValue(float64(processed) / float64(totalMods))
+				label.SetText(fmt.Sprintf(app.messages["checked_x_y"], processed, totalMods))
+			})
 		}
 	}
 
@@ -445,11 +473,11 @@ func (app *App) autoAddModToDatabase(modID int, folderName string, fileName ...s
 				delete(app.nexusVersionCache, oldCacheKey)
 				app.cacheMutex.Unlock()
 				app.saveNexusVersionCache()
-				app.appendLog(fmt.Sprintf("ℹ️ Removed stale cache entry for %s (old ID: %d), will save with new ID: %d", folderName, existingModID, modID))
+				app.appendLog(fmt.Sprintf(app.messages["removed_cache_for"], folderName, existingModID, modID))
 				// Далее создадим новую запись с нуля
 				existing = nil // чтобы не копировать старую
 			} else {
-				app.appendLog(fmt.Sprintf("⚠️ Mod %s already has a different Nexus ID (%d) and is complete, skipping update with ID %d", folderName, existingModID, modID))
+				app.appendLog(fmt.Sprintf(app.messages["mod_already_has_id"], folderName, existingModID, modID))
 				return
 			}
 		}
@@ -469,7 +497,7 @@ func (app *App) autoAddModToDatabase(modID int, folderName string, fileName ...s
 		// Запись уже полная, но добавим недостающие языковые ключи (если они отсутствуют)
 		ensureAllLanguageKeys(existing)
 		if err := checks.SaveModDatabase(); err != nil {
-			app.appendLog(fmt.Sprintf("Failed to save mod database (language keys): %v", err))
+			app.appendLog(fmt.Sprintf(app.messages["save_mod_db_failed"], err))
 		}
 		return
 	}
@@ -672,4 +700,45 @@ func ensureAllLanguageKeys(entry *checks.ModDBEntry) {
 			entry.Note[lang] = ""
 		}
 	}
+}
+
+// FetchChangelog получает список изменений для конкретного файла мода
+func (app *App) FetchChangelog(modID int, fileID int) (string, error) {
+	if modID == 0 || fileID == 0 {
+		return "", fmt.Errorf("invalid modID or fileID: %d, %d", modID, fileID)
+	}
+	token := app.getAuthToken()
+	if token == "" {
+		return "", fmt.Errorf("no authentication token")
+	}
+	url := fmt.Sprintf("%s/games/warhammer40kdarktide/mods/%d/files/%d.json", nexusAPIBase, modID, fileID)
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return "", err
+	}
+	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set("Application-Name", appName)
+	req.Header.Set("Application-Version", appVersion)
+	req.Header.Set("Referer", NexusMainURL)
+
+	client := &http.Client{Timeout: 10 * time.Second}
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("HTTP %d", resp.StatusCode)
+	}
+	var result struct {
+		ChangelogHTML string `json:"changelog_html"`
+		Changelog     string `json:"changelog"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return "", err
+	}
+	if result.ChangelogHTML != "" {
+		return result.ChangelogHTML, nil
+	}
+	return result.Changelog, nil
 }

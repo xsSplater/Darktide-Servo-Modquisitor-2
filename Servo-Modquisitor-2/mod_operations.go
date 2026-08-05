@@ -750,7 +750,7 @@ func (app *App) InstallModFromArchive(archivePath string, activate bool, knownVe
 	// Если это обновление - удаляем старую папку
 	if modNameToUpdate != "" {
 		checks.RemoveMod(modNameToUpdate)
-		app.appendLog(fmt.Sprintf("Removed old folder for update: %s", modNameToUpdate))
+		app.appendLog(fmt.Sprintf(app.messages["removed_old_folder"], modNameToUpdate))
 	}
 
 	tmpDir, err := os.MkdirTemp("", "servo-mod-")
@@ -846,9 +846,9 @@ func (app *App) InstallModFromArchive(archivePath string, activate bool, knownVe
 		binariesSrc := filepath.Join(tmpDir, "binaries")
 		if info, err := os.Stat(binariesSrc); err == nil && info.IsDir() {
 			binariesDst := filepath.Join(app.gameRoot, "binaries")
-			app.appendLog(fmt.Sprintf("Copying binaries to game root: %s -> %s", binariesSrc, binariesDst))
+			app.appendLog(fmt.Sprintf(app.messages["log_copy_binaries"], binariesSrc, binariesDst))
 			if err := copyPath(binariesSrc, binariesDst); err != nil {
-				app.appendLog(fmt.Sprintf("Failed to copy binaries: %v", err))
+				app.appendLog(fmt.Sprintf(app.messages["log_copy_binaries_failed"], err))
 			} else {
 				app.appendLog(app.messages["log_binaries_installed_success"])
 			}
@@ -1053,41 +1053,60 @@ func (app *App) doUpdateModFromNexus(mod *checks.ModInfo, modID int, modIDStr, c
 
 // Обновление всех модов (только те, у которых есть обновление). Только для Premium-пользователей!
 func (app *App) updateAllModsFromNexus() {
-	if app.allMods == nil {
-		app.appendLog("No mods loaded, cannot update.")
-		return
-	}
+	// app.appendLog("[DEBUG] updateAllModsFromNexus: starting batch update")
 	app.appendLog(app.messages["log_starting_batch_update"])
 	if app.getAuthToken() == "" {
 		app.appendLog(app.messages["nexus_api_key_missing"])
 		return
 	}
 
+	// 1. Сбор модов с обновлениями
 	app.appendLog(app.messages["log_collecting_mods"])
-	var modsToUpdate []*checks.ModInfo
+	type modUpdateItem struct {
+		ModName  string
+		ModID    int
+		FileInfo *FileInfo
+	}
+	var modsToUpdate []modUpdateItem
+
+	bar, label, cancelChan, closeDialog := app.showProgressDialog(
+		app.messages["update_title"],
+		app.messages["collecting_mods_for_update"],
+	)
+	defer closeDialog()
+
 	totalMods := 0
 	processed := 0
+	app.modsMutex.RLock()
+	allModsCopy := make([]checks.ModInfo, len(app.allMods))
+	copy(allModsCopy, app.allMods)
+	app.modsMutex.RUnlock()
 
-	// Считаем общее количество модов, которые будем проверять (исключаем системные и без URL)
-	for _, mod := range app.allMods {
+	for _, mod := range allModsCopy {
 		if mod.URL != "" && !mod.IsSystem {
 			totalMods++
 		}
 	}
 
-	for i := range app.allMods {
-		mod := &app.allMods[i]
+	for i := range allModsCopy {
+		select {
+		case <-cancelChan:
+			app.appendLog(app.messages["collecting_mods_cancelled"])
+			return
+		default:
+		}
+
+		mod := &allModsCopy[i]
 		if mod.URL == "" || mod.IsSystem {
 			continue
 		}
-
 		modID := helpers.ExtractModIDFromURL(mod.URL)
 		if modID == 0 {
 			processed++
 			continue
 		}
 		if app.isSymlinkFolder(mod.Name) {
-			app.appendLog(fmt.Sprintf("Skipping %s: folder is a symlink", mod.Name))
+			app.appendLog(fmt.Sprintf(app.messages["log_skipping_symlink"], mod.Name))
 			processed++
 			continue
 		}
@@ -1098,55 +1117,169 @@ func (app *App) updateAllModsFromNexus() {
 			processed++
 			continue
 		}
+		if fileInfo == nil {
+			processed++
+			continue
+		}
+
 		cacheKey := fmt.Sprintf("%d:%s", modID, mod.Name)
-		saved, exists := app.getCachedVersion(cacheKey)
+		saved, exists := app.nexusVersionCache[cacheKey]
 		if !exists || saved.Source == "" || saved.Source == "manual" {
 			processed++
 			continue
 		}
 		if saved.Timestamp == 0 || fileInfo.UploadedTimestamp > saved.Timestamp {
-			modsToUpdate = append(modsToUpdate, mod)
+			modsToUpdate = append(modsToUpdate, modUpdateItem{
+				ModName:  mod.Name,
+				ModID:    modID,
+				FileInfo: fileInfo,
+			})
+			if saved, ok := app.nexusVersionCache[cacheKey]; ok && saved.Version != "" {
+				app.appendLog(fmt.Sprintf(app.messages["log_update_available"], mod.Name, saved.Version, fileInfo.Version))
+			} else {
+				app.appendLog(fmt.Sprintf(app.messages["log_update_available_x"], mod.Name, fileInfo.Version))
+			}
 		}
 		processed++
-		if processed%10 == 0 {
-			app.appendLog(fmt.Sprintf("Progress: %d of %d mods checked", processed, totalMods))
+
+		if processed%5 == 0 || processed == totalMods {
+			fyne.Do(func() {
+				bar.SetValue(float64(processed) / float64(totalMods))
+				label.SetText(fmt.Sprintf(app.messages["collecting_mods_x_y"], processed, totalMods))
+			})
 		}
 	}
 
 	if len(modsToUpdate) == 0 {
 		app.appendLog(app.messages["no_updates_found"])
+		fyne.Do(func() {
+			label.SetText(app.messages["updates_found_no"])
+			bar.SetValue(1.0)
+		})
+		time.Sleep(1 * time.Second)
 		return
 	}
 
-	// Диалог подтверждения
-	choice := app.showChoiceDialogSync(
-		app.mainWindow,
+	// 2. Получение списков изменений
+	// app.appendLog("[DEBUG] updateAllModsFromNexus: fetching changelogs")
+	fyne.Do(func() {
+		label.SetText(app.messages["downloading_changelog"])
+		bar.SetValue(0)
+	})
+
+	var updateChoices []*ModUpdateChoice
+	for idx, item := range modsToUpdate {
+		select {
+		case <-cancelChan:
+			app.appendLog(app.messages["collecting_mods_cancelled"])
+			return
+		default:
+		}
+
+		changelog, err := app.FetchChangelog(item.ModID, item.FileInfo.ID)
+		if err != nil {
+			app.appendLog(fmt.Sprintf(app.messages["failed_fetch_changlog_for"], item.ModName, err))
+			changelog = ""
+		}
+		modInfo := &checks.ModInfo{
+			Name:        item.ModName,
+			DisplayName: item.ModName,
+			URL:         fmt.Sprintf(NexusModIDLink, item.ModID),
+		}
+		updateChoices = append(updateChoices, &ModUpdateChoice{
+			Mod:       modInfo,
+			FileInfo:  item.FileInfo,
+			Changelog: changelog,
+			Selected:  true,
+		})
+
+		fyne.Do(func() {
+			bar.SetValue(float64(idx+1) / float64(len(modsToUpdate)))
+			label.SetText(fmt.Sprintf(app.messages["downloading_changelog_x_y"], idx+1, len(modsToUpdate)))
+		})
+	}
+
+	// Закрываем диалог прогресса перед показом выбора
+	closeDialog()
+
+	// 3. Диалог выбора - синхронно в главном потоке
+	resultChan := make(chan struct {
+		indices []int
+		ok      bool
+	}, 1)
+
+	fyne.DoAndWait(func() {
+		app.showUpdateChoiceDialog(updateChoices, resultChan)
+	})
+
+	res := <-resultChan
+	// app.appendLog(fmt.Sprintf("[DEBUG] updateAllModsFromNexus: dialog choice completed, confirmed=%v, selected=%d", res.ok, len(res.indices)))
+
+	if !res.ok || len(res.indices) == 0 {
+		// app.appendLog("[DEBUG] updateAllModsFromNexus: user cancelled or no selection")
+		return
+	}
+
+	// 4. Обновление выбранных модов
+	app.modsMutex.RLock()
+	currentMods := make([]checks.ModInfo, len(app.allMods))
+	copy(currentMods, app.allMods)
+	app.modsMutex.RUnlock()
+
+	var selectedMods []*checks.ModInfo
+	for _, idx := range res.indices {
+		if idx < 0 || idx >= len(modsToUpdate) {
+			continue
+		}
+		item := modsToUpdate[idx]
+		for i := range currentMods {
+			if currentMods[i].Name == item.ModName {
+				selectedMods = append(selectedMods, &currentMods[i])
+				break
+			}
+		}
+	}
+
+	if len(selectedMods) == 0 {
+		app.appendLog(app.messages["log_no_mods_selected_update"])
+		return
+	}
+
+	// Показываем прогресс обновления
+	bar2, label2, cancelChan2, closeDialog2 := app.showProgressDialog(
 		app.messages["update_title"],
-		fmt.Sprintf(app.messages["updates_found_count_update"], len(modsToUpdate)),
-		app.messages["btn_yes"],
-		app.messages["btn_cancel"],
+		fmt.Sprintf("0 / %d", len(selectedMods)),
 	)
-	if choice != 0 {
-		app.appendLog("Batch update cancelled by user.")
-		return
+	defer closeDialog2()
+
+	updatedCount := 0
+	for _, mod := range selectedMods {
+		select {
+		case <-cancelChan2:
+			app.appendLog(app.messages["log_update_cancelled"])
+			return
+		default:
+		}
+
+		app.appendLog(fmt.Sprintf(app.messages["updating_mod"], mod.Name))
+		app.updateModFromNexus(mod, true)
+		updatedCount++
+
+		fyne.Do(func() {
+			bar2.SetValue(float64(updatedCount) / float64(len(selectedMods)))
+			label2.SetText(fmt.Sprintf("%d / %d - %s", updatedCount, len(selectedMods), mod.Name))
+		})
+
+		time.Sleep(500 * time.Millisecond)
 	}
 
-	// Обновляем
-	updatedCount := 0
-	for _, mod := range modsToUpdate {
-		app.appendLog(fmt.Sprintf(app.messages["updating_mod"], mod.Name))
-		app.updateModFromNexus(mod, true) // skipConfirm = true
-		updatedCount++
-		time.Sleep(500 * time.Millisecond)
-		app.appendLog(fmt.Sprintf("Progress: %d of %d mods updated", updatedCount, len(modsToUpdate)))
-	}
+	fyne.Do(func() {
+		bar2.SetValue(1.0)
+		label2.SetText(fmt.Sprintf("%d / %d - ✅", updatedCount, len(selectedMods)))
+	})
 
 	app.appendLog(fmt.Sprintf(app.messages["update_all_finished"], updatedCount))
-
-	// Финальное обновление UI
-	fyne.Do(func() {
-		app.refreshModList()
-	})
+	time.Sleep(1 * time.Second)
 }
 
 // Удалить выбранные моды
@@ -1481,6 +1614,7 @@ func (app *App) updateModCounter() {
 // 1. Автор пошёл во все тяжкие и закинул даже папку mods в другую папку Folder/mods/ModName/, что даёт папку Folder в mods. Убираем всё до ModName/.
 // 2. Лишняя папка mods в архиве - mods/ModName, что даёт mods/mods/ModName в итоге. Поднимаем содержимое на уровень выше.
 // 3. Отсутствие корневой папки мода ModName/, что даёт папку "scripts" вместе с файлом "ModName.mod" в mods. Cоздаём папку по имени ".mod" файла и перемещает туда всё.
+// 4. Если есть .mod файл в корне, но нет папки с именем этого .mod файла (без расширения), создаём такую папку и перемещаем туда всё содержимое.
 func (app *App) normalizeArchiveStructure(tmpDir string) error {
 	// Этап 1: убираем внешние обёртки вида "Folder/mods/..."
 	for {
@@ -1547,7 +1681,7 @@ func (app *App) normalizeArchiveStructure(tmpDir string) error {
 			}
 		}
 		os.Remove(modsDir)
-		entries, err = os.ReadDir(tmpDir) // обновляем список
+		entries, err = os.ReadDir(tmpDir)
 		if err != nil {
 			return err
 		}
@@ -1586,7 +1720,49 @@ func (app *App) normalizeArchiveStructure(tmpDir string) error {
 				os.RemoveAll(src)
 			}
 		}
+		// обновляем список
+		entries, err = os.ReadDir(tmpDir)
+		if err != nil {
+			return err
+		}
 	}
+
+	// Этап 4: если есть .mod файл в корне, но нет папки с именем этого .mod файла (без расширения),
+	// создаём такую папку и перемещаем туда всё содержимое (включая .mod файл и все подпапки).
+	var modFileInRoot string
+	var hasModFolder bool
+	var modNameFromFile string
+	for _, e := range entries {
+		if !e.IsDir() && strings.HasSuffix(strings.ToLower(e.Name()), ".mod") {
+			modFileInRoot = e.Name()
+			modNameFromFile = strings.TrimSuffix(modFileInRoot, ".mod")
+		}
+		if e.IsDir() && e.Name() == modNameFromFile {
+			hasModFolder = true
+		}
+	}
+	if modFileInRoot != "" && !hasModFolder {
+		newDir := filepath.Join(tmpDir, modNameFromFile)
+		if err := os.Mkdir(newDir, 0755); err != nil {
+			return err
+		}
+		for _, e := range entries {
+			src := filepath.Join(tmpDir, e.Name())
+			dst := filepath.Join(newDir, e.Name())
+			// пропускаем, если это уже созданная папка (но её нет в entries)
+			if e.Name() == modNameFromFile {
+				continue
+			}
+			if err := os.Rename(src, dst); err != nil {
+				if err := copyPath(src, dst); err != nil {
+					return err
+				}
+				os.RemoveAll(src)
+			}
+		}
+		// обновлять entries не обязательно, так как дальнейшего использования нет
+	}
+
 	return nil
 }
 

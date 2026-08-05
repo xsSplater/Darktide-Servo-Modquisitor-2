@@ -186,7 +186,7 @@ func GetModsInfo(lang string, forceEnglish bool) []ModInfo {
 	folders := ListModFolders()
 	var mods []ModInfo
 
-	// --- 1. Добавляем виртуальные моды (из mod_load_order.txt) ---
+	// 1. Добавляем виртуальные моды (из mod_load_order.txt)
 	loadOrderEntries := ReadLoadOrder()
 	if loadOrderEntries != nil {
 		existing := make(map[string]bool)
@@ -226,7 +226,7 @@ func GetModsInfo(lang string, forceEnglish bool) []ModInfo {
 		}
 	}
 
-	// --- 2. Реальные папки ---
+	// 2. Реальные папки
 	for _, name := range folders {
 		fullPath := filepath.Join(modsDir, name)
 		fi, err := os.Stat(fullPath)
