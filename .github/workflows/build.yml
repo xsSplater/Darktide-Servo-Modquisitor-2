@@ -2,13 +2,11 @@ name: Build
 
 on:
   push:
-    branches: [ main ]
     tags:
       - 'v*'
-  pull_request:
-  workflow_dispatch:
   release:
-    types: [ published ]
+    types: [ published, prereleased ]
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -17,7 +15,6 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
-  # === Сборка для Windows ===
   build-windows:
     runs-on: windows-latest
     defaults:
@@ -37,7 +34,7 @@ jobs:
         run: go mod download
 
       - name: Build
-        run: go build -ldflags="-s -w" -o servo-modquisitor.exe .
+        run: go build -ldflags="-s -w -H=windowsgui" -o servo-modquisitor.exe .
 
       - name: Prepare files for packaging (Windows)
         run: |
@@ -56,7 +53,6 @@ jobs:
           name: servo-modquisitor-windows
           path: ./Servo-Modquisitor-2/Servo-Modquisitor-2-windows.zip
 
-  # === Сборка для Linux ===
   build-linux:
     runs-on: ubuntu-latest
     defaults:
@@ -72,7 +68,6 @@ jobs:
           go-version: '1.26'
           cache-dependency-path: ./Servo-Modquisitor-2/go.sum
 
-      # ВАЖНО: Установка графических библиотек для Fyne
       - name: Install dependencies (Linux)
         run: |
           sudo apt-get update
@@ -101,7 +96,6 @@ jobs:
           name: servo-modquisitor-linux
           path: ./Servo-Modquisitor-2/Servo-Modquisitor-2-linux.tar.gz
 
-  # === Загрузка архивов в релиз (при публикации) ===
   release:
     needs: [build-windows, build-linux]
     runs-on: ubuntu-latest
@@ -120,3 +114,4 @@ jobs:
             artifacts/servo-modquisitor-linux/Servo-Modquisitor-2-linux.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
