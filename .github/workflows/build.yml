@@ -1,12 +1,12 @@
 name: Build
 
 on:
+  release:
+    types: [ published, prereleased ]
   push:
     tags:
       - 'v*'
-  release:
-    types: [ published, prereleased ]
-  workflow_dispatch:
+  workflow_dispatch:   # ручной запуск (опционально)
 
 permissions:
   contents: write
@@ -15,6 +15,7 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
+  # === Сборка для Windows ===
   build-windows:
     runs-on: windows-latest
     defaults:
@@ -30,11 +31,20 @@ jobs:
           go-version: '1.26'
           cache-dependency-path: ./Servo-Modquisitor-2/go.sum
 
+      - name: Install go-winres
+        run: go install github.com/tc-hib/go-winres@latest
+
+      - name: Generate resources (icon + version info)
+        run: go-winres make
+        # go-winres найдёт winres.json в текущей папке (./Servo-Modquisitor-2)
+        # и иконку по пути из winres.json (у вас assets/icon.ico)
+
       - name: Download dependencies
         run: go mod download
 
       - name: Build
         run: go build -ldflags="-s -w -H=windowsgui" -o servo-modquisitor.exe .
+        # -H=windowsgui гарантирует, что окно консоли не появится
 
       - name: Prepare files for packaging (Windows)
         run: |
@@ -53,6 +63,7 @@ jobs:
           name: servo-modquisitor-windows
           path: ./Servo-Modquisitor-2/Servo-Modquisitor-2-windows.zip
 
+  # === Сборка для Linux ===
   build-linux:
     runs-on: ubuntu-latest
     defaults:
@@ -96,10 +107,11 @@ jobs:
           name: servo-modquisitor-linux
           path: ./Servo-Modquisitor-2/Servo-Modquisitor-2-linux.tar.gz
 
+  # === Загрузка архивов в релиз (при публикации) ===
   release:
     needs: [build-windows, build-linux]
     runs-on: ubuntu-latest
-    if: github.event_name == 'release' && github.event.action == 'published'
+    if: github.event_name == 'release' && (github.event.action == 'published' || github.event.action == 'prereleased')
     steps:
       - name: Download all artifacts
         uses: actions/download-artifact@v4
@@ -114,4 +126,4 @@ jobs:
             artifacts/servo-modquisitor-linux/Servo-Modquisitor-2-linux.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
+  
