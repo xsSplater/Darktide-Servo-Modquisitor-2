@@ -1,14 +1,12 @@
 name: Build
 
 on:
+  release:
+    types: [ published, prereleased ]
   push:
-    branches: [ main ]
     tags:
       - 'v*'
-  pull_request:
-  workflow_dispatch:
-  release:
-    types: [ published ]
+  workflow_dispatch:   # ручной запуск (опционально)
 
 permissions:
   contents: write
@@ -33,11 +31,20 @@ jobs:
           go-version: '1.26'
           cache-dependency-path: ./Servo-Modquisitor-2/go.sum
 
+      - name: Install go-winres
+        run: go install github.com/tc-hib/go-winres@latest
+
+      - name: Generate resources (icon + version info)
+        run: go-winres make
+        # go-winres найдёт winres.json в текущей папке (./Servo-Modquisitor-2)
+        # и иконку по пути из winres.json (у вас assets/icon.ico)
+
       - name: Download dependencies
         run: go mod download
 
       - name: Build
-        run: go build -ldflags="-s -w" -o servo-modquisitor.exe .
+        run: go build -ldflags="-s -w -H=windowsgui" -o servo-modquisitor.exe .
+        # -H=windowsgui гарантирует, что окно консоли не появится
 
       - name: Prepare files for packaging (Windows)
         run: |
@@ -72,7 +79,6 @@ jobs:
           go-version: '1.26'
           cache-dependency-path: ./Servo-Modquisitor-2/go.sum
 
-      # ВАЖНО: Установка графических библиотек для Fyne
       - name: Install dependencies (Linux)
         run: |
           sudo apt-get update
@@ -105,7 +111,7 @@ jobs:
   release:
     needs: [build-windows, build-linux]
     runs-on: ubuntu-latest
-    if: github.event_name == 'release' && github.event.action == 'published'
+    if: github.event_name == 'release' && (github.event.action == 'published' || github.event.action == 'prereleased')
     steps:
       - name: Download all artifacts
         uses: actions/download-artifact@v4
@@ -120,3 +126,4 @@ jobs:
             artifacts/servo-modquisitor-linux/Servo-Modquisitor-2-linux.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  
