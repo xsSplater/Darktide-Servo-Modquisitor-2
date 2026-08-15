@@ -1,5 +1,5 @@
 {
-	"version": "1.2.2",
+	"version": "1.2.5",
 
 	"mandatory_order": [
 		"ModPerformanceMonitor",
@@ -53,7 +53,8 @@
 		{"before": "ToggleAltFire",					"after": "hybrid_sprint"},
 		{"before": "true_level",					"after": "teammate_tracker"},
 		{"before": "true_level",					"after": "ColorSelection"},
-		{"before": "who_are_you",					"after": "ColorSelection"}
+		{"before": "who_are_you",					"after": "ColorSelection"},
+		{"before": "Vox Manifold",					"after": "Servo Mortis"}
 	],
 
 	"obsolete_mods": [
@@ -232,6 +233,7 @@
 				"es": "🔴 Conflicto:\nAutoTag  ⚔ Less Annoying Arbites.\nAutoTag reemplaza una pulsación de botón, mientras que el mod Less Annoying Arbites espera un doble toque manual."
 			}
 		},
+		{ "mod1": "background_fps_limiter",	"mod2": "limit_background_fps" },
 		{ "mod1": "BetterEnemyTag",			"mod2": "RemoveTagSkulls",
 			"desc": {
 				"en": "🔴 Conflict:\nBetter Enemy Tag  ⚔ Remove Tag Skulls.\nMutually exclusive mods.",
@@ -255,8 +257,10 @@
 		{ "mod1": "BetterMovement",			"mod2": "hybrid_sprint" },
 		{ "mod1": "BetterMovement",			"mod2": "keep_dodging" },
 		{ "mod1": "BetterMovement",			"mod2": "no_dodge_jump" },
+		{ "mod1": "BetterMovement",			"mod2": "SimpleMovement" },
 		{ "mod1": "BetterMovement",			"mod2": "StickySprint" },
 		{ "mod1": "BetterMovement",			"mod2": "Walk" },
+		{ "mod1": "BornReady",				"mod2": "SkipRewards" },
 		{ "mod1": "ChatGremlin",			"mod2": "CustomColorChat",		"type": "same" },
 		{ "mod1": "ChatGremlin",			"mod2": "NoChatColours",
 			"desc": {
@@ -298,6 +302,7 @@
 		{ "mod1": "custom_hud",				"mod2": "ToggleHUD" },
 		{ "mod1": "CustomUIColors",			"mod2": "DarkMode",					"type": "same" },
 		{ "mod1": "default_to_strike_team",	"mod2": "PartyChatFix",				"type": "same" },
+		{ "mod1": "DisableScreenEffects",	"mod2": "NoPerilFX" },
 		{ "mod1": "DisplayPing",			"mod2": "PingMonitor" },
 		{ "mod1": "DogWhistle",				"mod2": "HoldToDogAttack",			"type": "same" },
 		{ "mod1": "DumpStatFinder",			"mod2": "extended_weapon_customization",
@@ -371,7 +376,11 @@
 		{ "mod1": "KillfeedUnhinged",		"mod2": "Killfeed_Reborn",			"type": "same" },
 		{ "mod1": "LessAnnoyingArbites",	"mod2": "DogWhistle" },
 		{ "mod1": "LessAnnoyingArbites",	"mod2": "LessAnnoyingDog" },
+		{ "mod1": "Many Mission Terminal",	"mod2": "BoardScan" },
+		{ "mod1": "Many Mission Terminal",	"mod2": "MissionGrid" },
+		{ "mod1": "Many Mission Terminal",	"mod2": "sorted_mission_grid" },
 		{ "mod1": "markers_aio",			"mod2": "CollectibleFinder" },
+		{ "mod1": "markers_aio",			"mod2": "CollectiblesPing" },
 		{ "mod1": "markers_aio",			"mod2": "FoundYa" },
 		{ "mod1": "markers_aio",			"mod2": "Ration Pack" },
 		{ "mod1": "markers_aio",			"mod2": "StimmsPickupIcon" },
@@ -380,6 +389,7 @@
 		{ "mod1": "menu_hotkeys",			"mod2": "ExpeditionsHotkey" },
 		{ "mod1": "menu_hotkeys",			"mod2": "hub_hotkey_menus" },
 		{ "mod1": "MenuUIHider",			"mod2": "InventoryHider" },
+		{ "mod1": "MissionGrid",			"mod2": "BoardScan" },
 		{ "mod1": "modular_menu_buttons",	"mod2": "hub_shortcuts",			"type": "same" },
 		{ "mod1": "PenanceAdvisor",			"mod2": "PenancesForTheMission" },
 		{ "mod1": "Perspectives",			"mod2": "ThirdPerson" },
@@ -390,6 +400,13 @@
 		{ "mod1": "scoreboard",				"mod2": "vt2_scoreboard",			"type": "same" },
 		{ "mod1": "ShowEquippedInLobby",	"mod2": "Mission Lobby - Show Ranged Weapons" },
 		{ "mod1": "simple_scoreboard",		"mod2": "vt2_scoreboard",			"type": "same" },
+		{ "mod1": "SimpleCharging",			"mod2": "PlasmaChargebar" },
+		{ "mod1": "SimpleMovement",			"mod2": "AutoVault" },
+		{ "mod1": "SimpleMovement",			"mod2": "DefaultSprint" },
+		{ "mod1": "SimpleMovement",			"mod2": "DodgeSlide" },
+		{ "mod1": "SimpleMovement",			"mod2": "keep_dodging" },
+		{ "mod1": "SimpleMovement",			"mod2": "StickySprint" },
+		{ "mod1": "SimpleMovement",			"mod2": "Walk" },
 		{ "mod1": "Skitarius",				"mod2": "AutoSwing" },
 		{ "mod1": "Skitarius",				"mod2": "FullAuto" },
 		{ "mod1": "Skitarius",				"mod2": "KeepSwinging" },
@@ -586,6 +603,10 @@
 			"dependent": "ScoreboardTagCounter",
 				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/22"},
 
+		{"required": "scores",
+			"dependent": "improve-yourself",
+				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/872"},
+
 		{"required": "servo_friend",
 			"dependent": "servo_friend_audio_server_plugin",
 				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/504"},
@@ -619,6 +640,9 @@
 			"dependent": "AncestorsGuidance",
 				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/929"},
 		{"required": "SimpleAudio",
+			"dependent": "audible_full_bore",
+				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/929"},
+		{"required": "SimpleAudio",
 			"dependent": "AudioReplacer",
 				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/929"},
 		{"required": "SimpleAudio",
@@ -635,6 +659,9 @@
 				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/929"},
 		{"required": "SimpleAudio",
 			"dependent": "HitmarkerSFX",
+				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/929"},
+		{"required": "SimpleAudio",
+			"dependent": "I_AM_THE_LEX",
 				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/929"},
 		{"required": "SimpleAudio",
 			"dependent": "M1GalvanicRifle",
