@@ -42327,6 +42327,55 @@
 			}
 		},
 		{
+			"folder": "NPCLookLoadouts",
+			"nexus_file_pattern": "NPCLookLoadouts",
+			"name": {
+				"de": "",
+				"en": "NPC Look Loadouts",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"description": {
+				"de": "VERALTET! Dies wurde in NPC Look v2.0.0+ integriert.",
+				"en": "OBSOLETE! This has been integrated into NPC Look v2.0.0+",
+				"es": "¡OBSOLETO! Esto se ha integrado en NPC Look v2.0.0+.",
+				"fr": "OBSOLÈTE ! Cela a été intégré dans NPC Look v2.0.0+.",
+				"it": "OBSOLETO! Questo è stato integrato in NPC Look v2.0.0+.",
+				"ja": "廃止！ これはNPC Look v2.0.0+に統合されました。",
+				"ko": "구식!이것은 NPC Look v2.0.0+에 통합되었습니다.",
+				"pl": "PRZESTARZAŁY! Zostało to zintegrowane z NPC Look v2.0.0+.",
+				"pt-BR": "OBSOLETO! Isso foi integrado ao NPC Look v2.0.0+.",
+				"ru": "УСТАРЕЛ! Это было интегрировано в NPC Look v2.0.0+.",
+				"zh-hans": "已过时！ 这已集成到 NPC Look v2.0.0+ 中。",
+				"zh-hant": "已過時！ 這已集成到 NPC Look v2.0.0+ 中。"
+			},
+			"author": "Kaizen2137",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1094",
+			"github_url": "",
+			"note": {
+				"de": "",
+				"en": "",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			}
+		},
+		{
 			"folder": "OverflowMeter",
 			"nexus_file_pattern": "overflowmeter",
 			"name": {
