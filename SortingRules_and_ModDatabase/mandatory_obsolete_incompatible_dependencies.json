@@ -550,6 +550,11 @@
 			"dependent": "extended_weapon_customization_syn_edits",
 				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/277"},
 
+
+		{"required": "extended_weapon_customization_base_additions",
+			"dependent": "extended_weapon_customization_empty_scopes",
+				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/277"},
+
 		{"required": "for_the_drip",
 			"dependent": "for_the_drip_extra",
 				"url": "https://github.com/Adspartan/For_the_Drip/releases"},

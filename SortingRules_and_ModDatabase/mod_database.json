@@ -10896,6 +10896,54 @@
 			}
 		},
 		{
+			"folder": "extended_weapon_customization_empty_scopes",
+			"name": {
+				"de": "",
+				"en": "Extended Weapon Customization - Empty Scopes",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"description": {
+				"de": "",
+				"en": "Includes copies of reflex sights with the reticles removed.",
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
+			},
+			"author": "grasmann - Backup158",
+			"url": "",
+			"github_url": "https://github.com/Backup158/DarktideWeaponCustomizationEmptySights/",
+			"note": {
+				"de": "Erforderlich: Extended Weapon Customization, Extended Weapon Customization Base Additions.",
+				"en": "Required: Extended Weapon Customization, Extended Weapon Customization Base Additions.",
+				"es": "Requerido: Extended Weapon Customization, Extended Weapon Customization Base Additions.",
+				"fr": "Requis : Extended Weapon Customization, Extended Weapon Customization Base Additions.",
+				"it": "Richiede: Extended Weapon Customization, Extended Weapon Customization Base Additions.",
+				"ja": "必要条件: Extended Weapon Customization, Extended Weapon Customization Base Additions.",
+				"ko": "필요: Extended Weapon Customization, Extended Weapon Customization Base Additions.",
+				"pl": "Wymagane: Extended Weapon Customization, Extended Weapon Customization Base Additions.",
+				"pt-BR": "Requerido: Extended Weapon Customization, Extended Weapon Customization Base Additions.",
+				"ru": "Требуется: Extended Weapon Customization, Extended Weapon Customization Base Additions.",
+				"zh-hans": "需要：Extended Weapon Customization, Extended Weapon Customization Base Additions。",
+				"zh-hant": "需要：Extended Weapon Customization, Extended Weapon Customization Base Additions。"
+			}
+		},
+		{
 			"folder": "show_crit_chance",
 			"nexus_file_pattern": "show",
 			"name": {
