@@ -1,5 +1,5 @@
 {
-	"version": "2.0.0",
+	"version": "2.0.1",
 
 	"mandatory_order": [
 		"ModPerformanceMonitor",
@@ -32,17 +32,6 @@
 		{"before": "crosshair_remap",				"after": "CrosshairSwitcher"},
 		{"before": "custom_hud",					"after": "DivisionHUD"},
 		{"before": "custom_hud",					"after": "SquadHud"},
-		{"before": "extended_weapon_customization",	"after": "enhanced_character_selection"},
-		{"before": "extended_weapon_customization",	"after": "for_the_drip"},
-		{"before": "extended_weapon_customization",	"after": "GoToMastery"},
-		{"before": "extended_weapon_customization",	"after": "guarantee_special_action"},
-		{"before": "extended_weapon_customization_no_gun", "after": "extended_weapon_customization"},
-		{"before": "extended_weapon_customization_base_additions", "after": "extended_weapon_customization_owo"},
-		{"before": "extended_weapon_customization_base_additions", "after": "extended_weapon_customization_syn_edits"},
-		{"before": "extended_weapon_customization_base_additions", "after": "extended_weapon_customization_more_dakka"},
-		{"before": "extended_weapon_customization_owo", "after": "extended_weapon_customization_syn_edits"},
-		{"before": "extended_weapon_customization_owo", "after": "extended_weapon_customization_more_dakka"},
-		{"before": "extended_weapon_customization_syn_edits", "after": "extended_weapon_customization_more_dakka"},
 		{"before": "GlobalStore",					"after": "FilterTrash"},
 		{"before": "MultiBind",						"after": "guarantee_ability_activation"},
 		{"before": "MultiBind",						"after": "guarantee_special_action"},
@@ -61,7 +50,27 @@
 		{"before": "true_level",					"after": "teammate_tracker"},
 		{"before": "true_level",					"after": "ColorSelection"},
 		{"before": "who_are_you",					"after": "ColorSelection"},
-		{"before": "Vox Manifold",					"after": "Servo Mortis"}
+		{"before": "Vox Manifold",					"after": "Servo Mortis"},
+
+		{"before": "extended_weapon_customization",	"after": "enhanced_character_selection"},
+		{"before": "extended_weapon_customization",	"after": "for_the_drip"},
+		{"before": "extended_weapon_customization",	"after": "GoToMastery"},
+		{"before": "extended_weapon_customization",	"after": "guarantee_special_action"},
+
+		{"before": "extended_weapon_customization_no_gun",
+											"after": "extended_weapon_customization"},
+		{"before": "extended_weapon_customization_base_additions",
+											"after": "extended_weapon_customization_owo"},
+		{"before": "extended_weapon_customization_base_additions",
+											"after": "extended_weapon_customization_syn_edits"},
+		{"before": "extended_weapon_customization_base_additions",
+											"after": "extended_weapon_customization_more_dakka"},
+		{"before": "extended_weapon_customization_owo",
+											"after": "extended_weapon_customization_syn_edits"},
+		{"before": "extended_weapon_customization_owo",
+											"after": "extended_weapon_customization_more_dakka"},
+		{"before": "extended_weapon_customization_syn_edits",
+											"after": "extended_weapon_customization_more_dakka"}
 	],
 
 	"obsolete_mods": [
@@ -373,6 +382,7 @@
 			}
 		},
 		{ "mod1": "enemies_improved",		"mod2": "outline_colours" },
+		{ "mod1": "enemies_improved",		"mod2": "simple_healthbars" },
 		{ "mod1": "extra_keybindings",		"mod2": "MultiBind",				"type": "same" },
 		{ "mod1": "flame_fx_reducer",		"mod2": "i_wanna_see" },
 		{ "mod1": "FpsDoctor",				"mod2": "MemLeakFix" },
@@ -429,6 +439,9 @@
 		{ "mod1": "scoreboard",				"mod2": "SimplySimpleScoreboard",	"type": "same" },
 		{ "mod1": "scoreboard",				"mod2": "vt2_scoreboard",			"type": "same" },
 		{ "mod1": "ShowEquippedInLobby",	"mod2": "Mission Lobby - Show Ranged Weapons" },
+		{ "mod1": "simple_healthbars",		"mod2": "ColorCodedHealthbars",		"type": "same" },
+		{ "mod1": "simple_healthbars",		"mod2": "Healthbars",				"type": "same" },
+		{ "mod1": "simple_healthbars",		"mod2": "HostileVitals",			"type": "same" },
 		{ "mod1": "simple_scoreboard",		"mod2": "AnotherScoreboard",		"type": "same" },
 		{ "mod1": "simple_scoreboard",		"mod2": "SimplySimpleScoreboard",	"type": "same" },
 		{ "mod1": "simple_scoreboard",		"mod2": "vt2_scoreboard",			"type": "same" },
@@ -574,7 +587,6 @@
 		{"required": "extended_weapon_customization",
 			"dependent": "extended_weapon_customization_syn_edits",
 				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/277"},
-
 		{"required": "extended_weapon_customization_base_additions",
 			"dependent": "extended_weapon_customization_empty_scopes",
 				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/277"},
