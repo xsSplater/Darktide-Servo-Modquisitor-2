@@ -3851,7 +3851,7 @@
 				"zh-hant": "將機器人的囚犯服裝替換為預設或隨機的老兵外觀。\n厭倦了醜陋的囚犯機器人？現在你可以用真正的裝備替換他們的衣服。"
 			},
 			"author": "Aussiemon",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/92",
 			"github_url": "https://github.com/Aussiemon/Darktide-Mods/tree/master/fancy_bots",
 			"note": {
@@ -4329,7 +4329,7 @@
 				"zh-hant": "移除力場劍的格擋和推動特效。"
 			},
 			"author": "deluxghost",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/104",
 			"github_url": "https://github.com/deluxghost/darktide-mods/tree/main/CleanForceBlocking",
 			"note": {
@@ -4579,7 +4579,7 @@
 				"zh-hant": "在第一人稱和第三人稱視角之間切換。"
 			},
 			"author": "ItsAlxl",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/111",
 			"github_url": "https://github.com/ItsAlxl/darktide-mods/tree/main/Perspectives",
 			"note": {
@@ -6079,7 +6079,7 @@
 				"zh-hant": "對食人魔一直沒有雷射武器感到失望？\n這個模組將重型機槍的子彈替換為雷射齊射和等離子爆擊射擊！\n雷射的大小和強度也會隨著某些祝福（如「烈火」）而增加！\n注意：純視覺效果，完全不影響遊戲玩法。"
 			},
 			"author": "Sephirothphoenix",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/146",
 			"github_url": "",
 			"note": {
@@ -6529,7 +6529,7 @@
 				"zh-hant": "通過選擇不同的樣式和顏色來自定義火焰噴射器和火焰法杖！\n減少視覺效果，讓你和隊友的火焰不那麼刺眼或更加刺眼。\n從五種火焰風格中選擇：狂熱者橙色、靈能者藍色、邪教徒綠色、痂皮橙色和納垢嘔吐物！"
 			},
 			"author": "Sephirothphoenix",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/157",
 			"github_url": "",
 			"note": {
@@ -6579,7 +6579,7 @@
 				"zh-hant": "防止攝影機靠近時玩家模型淡出消失。"
 			},
 			"author": "SeventeenDucks",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/159",
 			"github_url": "https://github.com/ronvoluted/darktide-mods/tree/main/PreventPlayerFade",
 			"note": {
@@ -6729,7 +6729,7 @@
 				"zh-hant": "為主播移除血液效果。"
 			},
 			"author": "Antika",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/162",
 			"github_url": "",
 			"note": {
@@ -7879,7 +7879,7 @@
 				"zh-hant": "強制敵人肢解，並可選擇在其死亡時添加視覺效果/音效。你想看到更多的血，不是嗎？"
 			},
 			"author": "Zombine",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/189",
 			"github_url": "https://github.com/zombine04/darktide-mods/tree/main/ForTheBloodGod",
 			"note": {
@@ -8029,7 +8029,7 @@
 				"zh-hant": "已過時！"
 			},
 			"author": "Nikita",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/195",
 			"github_url": "",
 			"note": {
@@ -8329,7 +8329,7 @@
 				"zh-hant": "已過時！"
 			},
 			"author": "Adspartan",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/206",
 			"github_url": "",
 			"note": {
@@ -8829,7 +8829,7 @@
 				"zh-hant": "武器視野 - 更改武器的視野範圍和遠程武器的縮放程度。"
 			},
 			"author": "Adspartan",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/222",
 			"github_url": "",
 			"note": {
@@ -9179,7 +9179,7 @@
 				"zh-hant": "已過時！"
 			},
 			"author": "SeventeenDucks",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/229",
 			"github_url": "https://github.com/ronvoluted/darktide-mods/tree/main/CThruShields",
 			"note": {
@@ -9229,7 +9229,7 @@
 				"zh-hant": "狂熱者火焰粒子替換 - 將火焰手榴彈的殘留火焰粒子替換為其他粒子，既有趣又提高可見性。某些選項可能比原版更明顯（取決於是否友方以及環境），其他選項只是為了好玩。"
 			},
 			"author": "JCaleb",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/230",
 			"github_url": "https://github.com/JCalebBR/BetterFireGrenade",
 			"note": {
@@ -10357,7 +10357,7 @@
 				"zh-hant": "將《實習醫生風雲》和 Vermintide 的元素帶入你的暗潮。輸入 `/scrubsvermin` 觀看鼠鼠跳舞！"
 			},
 			"author": "SeventeenDucks",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/261",
 			"github_url": "https://github.com/ronvoluted/darktide-mods/tree/main/ScrubsVermin",
 			"note": {
@@ -10857,7 +10857,7 @@
 				"zh-hant": "將食人魔的岩石變成一塊煤炭。"
 			},
 			"author": "SeventeenDucks",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/273",
 			"github_url": "https://github.com/ronvoluted/darktide-mods/tree/main/Coal",
 			"note": {
@@ -11007,7 +11007,7 @@
 				"zh-hant": "武器定製、手電筒、準星、瞄準鏡、背部裝備。添加各種生活品質改進和沉浸感增強。還有很多其他內容。"
 			},
 			"author": "grasmann",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/277",
 			"github_url": "https://github.com/grasmann/darktide-mods/tree/main/extended_weapon_customization_base_additions",
 			"note": {
@@ -11057,7 +11057,7 @@
 				"zh-hant": "武器定製、手電筒、準星、瞄準鏡、背部裝備。添加各種生活品質改進和沉浸感增強。還有很多其他內容。"
 			},
 			"author": "grasmann",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/277",
 			"github_url": "https://github.com/grasmann/darktide-mods/tree/main/extended_weapon_customization",
 			"note": {
@@ -11107,7 +11107,7 @@
 				"zh-hant": "武器定製的無瞄準鏡插件。需要武器定製基礎模組。"
 			},
 			"author": "JasperOfTheDawn",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/278",
 			"github_url": "",
 			"note": {
@@ -11557,7 +11557,7 @@
 				"zh-hant": "移除一些惱人且有潛在危害的頻閃/閃爍視覺效果。這有助於減輕眼睛疲勞、頭痛以及更嚴重的光敏性問題（對我有用）。"
 			},
 			"author": "gpk",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/293",
 			"github_url": "",
 			"note": {
@@ -12807,7 +12807,7 @@
 				"zh-hant": "模仿叛變艦長的韌性護盾，帶有視覺和聲音效果！\n為玩家提供一個完全可自訂的防護罩。\n在格擋時提供護盾效果，以及在格擋被破壞時的效果。"
 			},
 			"author": "Sephirothphoenix",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/326",
 			"github_url": "",
 			"note": {
@@ -14157,7 +14157,7 @@
 				"zh-hant": "已過時！"
 			},
 			"author": "yinhaox",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/356",
 			"github_url": "",
 			"note": {
@@ -16407,7 +16407,7 @@
 				"zh-hant": "厭倦了厚板試圖緊貼你並阻擋你的視線？或者僅僅是阻擋視線？那麼這個模組就是為你準備的！"
 			},
 			"author": "WMA",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/416",
 			"github_url": "",
 			"note": {
@@ -16507,7 +16507,7 @@
 				"zh-hant": "以不同的眼光看世界！\n用你選擇的 RGB 顏色環繞你的周圍，或使用特別的銳舞模式來開派對吧！\n在電源中斷時效果大幅降低。"
 			},
 			"author": "Sephirothphoenix",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/419",
 			"github_url": "",
 			"note": {
@@ -16907,7 +16907,7 @@
 				"zh-hant": "Ostracized without Objection (OwO) - 擴展武器定製插件 - 添加各種部件，通常受歷史武器啟發。"
 			},
 			"author": "Backup158",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/429",
 			"github_url": "https://github.com/Backup158/DarktideWeaponCustomizationOwO",
 			"note": {
@@ -17307,7 +17307,7 @@
 				"zh-hant": "琳達·卡納克備受尊崇的巨劍。\n包含她已故兄弟的靈魂。\n真正的異端武器。"
 			},
 			"author": "Seph",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/441",
 			"github_url": "",
 			"note": {
@@ -18307,7 +18307,7 @@
 				"zh-hant": "添加瞄準時隱藏武器的瞄準鏡選項。"
 			},
 			"author": "Backup158",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/461",
 			"github_url": "https://github.com/Backup158/DarktideWeaponCustomizationNoGun",
 			"note": {
@@ -18357,7 +18357,7 @@
 				"zh-hant": "此模組允許你將預設載入畫面背景更改為本地或線上儲存的隨機圖像。"
 			},
 			"author": "tickbox",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/462",
 			"github_url": "https://github.com/tickbox/DarktideMods/tree/main/CustomLoadingBackground",
 			"note": {
@@ -18407,7 +18407,7 @@
 				"zh-hant": "即使你已達到30級，也讓叛徒回到軍需官商店。"
 			},
 			"author": "deluxghost",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/463",
 			"github_url": "https://github.com/deluxghost/darktide-mods/tree/main/ReturnOfTheTraitor",
 			"note": {
@@ -19307,7 +19307,7 @@
 				"zh-hant": "已過時！"
 			},
 			"author": "Backup158",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/486",
 			"github_url": "https://github.com/Backup158/DarktideWeaponCustomizationChains",
 			"note": {
@@ -19707,7 +19707,7 @@
 				"zh-hant": "在第一人稱視角下隱藏玩家裝備。"
 			},
 			"author": "Norkkom",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/495",
 			"github_url": "",
 			"note": {
@@ -19957,7 +19957,7 @@
 				"zh-hant": "一個伺服顱骨，一個工具，一個朋友。"
 			},
 			"author": "grasmann",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/504",
 			"github_url": "https://github.com/grasmann/darktide-mods/tree/main/servo_friend_plugin_hat_cables",
 			"note": {
@@ -20057,7 +20057,7 @@
 				"zh-hant": "一個伺服顱骨，一個工具，一個朋友。"
 			},
 			"author": "grasmann",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/504",
 			"github_url": "https://github.com/grasmann/darktide-mods/tree/main/servo_friend",
 			"note": {
@@ -21357,7 +21357,7 @@
 				"zh-hant": "已過時！"
 			},
 			"author": "Pfhoenix",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/542",
 			"github_url": "https://github.com/Pfhoenix/BetterDogTargets",
 			"note": {
@@ -21407,7 +21407,7 @@
 				"zh-hant": "將寵物目標標記的輪廓重新著色為發出標記的玩家的顏色。現在你將能夠分辨誰的狗（或伺服頭骨）被設置到哪些目標上。"
 			},
 			"author": "Pfhoenix",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/542",
 			"github_url": "https://github.com/Pfhoenix/BetterDogTargets",
 			"note": {
@@ -23230,17 +23230,17 @@
 			"nexus_file_pattern": "hound",
 			"name": {
 				"de": "Hound Zero",
-				"en": "Hound Zero - Arbites Hound Explosion Range Indicator",
+				"en": "Hound Zero",
 				"es": "Hound Zero",
 				"fr": "Hound Zero",
 				"it": "Hound Zero",
-				"ja": "ハウンドゼロ - アービターハウンド爆発範囲インジケーター",
-				"ko": "하운드 제로 - 아비트레스 하운드 폭발 범위 표시기",
-				"pl": "Hound Zero - Wskaźnik zasięgu eksplozji psa Arbitrów",
+				"ja": "ハウンドゼロ",
+				"ko": "하운드 제로",
+				"pl": "Hound Zero",
 				"pt-BR": "Hound Zero",
 				"ru": "Гончая зеро",
-				"zh-hans": "Hound Zero - 仲裁者猎犬爆炸范围指示器",
-				"zh-hant": "Hound Zero - 仲裁者獵犬爆炸範圍指示器"
+				"zh-hans": "Hound Zero",
+				"zh-hant": "Hound Zero"
 			},
 			"description": {
 				"de": "Hound Zero fügt visuelle Indikatoren für Feinde im Explosionsradius von Fernzündung hinzu, wenn der Spieler die Fähigkeit zielt.",
@@ -24257,7 +24257,7 @@
 				"zh-hant": "一個按武器調整視角模型參數（偏移、FOV）的模組。還允許將玩家 FOV 調整到超過遊戲正常限制。"
 			},
 			"author": "Norkkom",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/628",
 			"github_url": "",
 			"note": {
@@ -27307,7 +27307,7 @@
 				"zh-hant": "爆炸桶通過脈衝顯示離爆炸還有多近，隨著倒計時脈衝會急劇增強。"
 			},
 			"author": "Paimon",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/697",
 			"github_url": "",
 			"note": {
@@ -28007,7 +28007,7 @@
 				"zh-hant": "暴力自動化模組，快速觸發武器檢視輸入，以查找和播放罕見的特殊檢視動畫。"
 			},
 			"author": "bsuddreams",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/716",
 			"github_url": "",
 			"note": {
@@ -29307,7 +29307,7 @@
 				"zh-hant": "一種消焰器，用於壓制槍械發射時的槍口閃光。"
 			},
 			"author": "AFKING1551",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/748",
 			"github_url": "",
 			"note": {
@@ -29757,7 +29757,7 @@
 				"zh-hant": "在標記敵人時播放指向動畫。可選擇將動畫綁定到按鍵，指向任何你想要的東西。"
 			},
 			"author": "Faith",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/767",
 			"github_url": "",
 			"note": {
@@ -30007,7 +30007,7 @@
 				"zh-hant": "這是一個簡單的模組，禁用由\"亞空間火焰\"減益效果引起的燃燒材質效果、燃燒音效以及敵人身上的火焰。"
 			},
 			"author": "wubaishijie",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/774",
 			"github_url": "",
 			"note": {
@@ -31557,7 +31557,7 @@
 				"zh-hant": "是否覺得你的夥伴有點過於普通？此模組讓你完全控制你的機械獒犬體型。將你的\"好男孩\"從口袋大小的獵犬擴大到令食人魔都自愧不如的巨型戰獸。"
 			},
 			"author": "leer",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/814",
 			"github_url": "",
 			"note": {
@@ -32107,7 +32107,7 @@
 				"zh-hant": "在任務開始前將你和盟友的夥伴添加到女武神開場動畫中。"
 			},
 			"author": "leer",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/828",
 			"github_url": "",
 			"note": {
@@ -32157,7 +32157,7 @@
 				"zh-hant": "已過時！"
 			},
 			"author": "leer",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/828",
 			"github_url": "",
 			"note": {
@@ -32907,7 +32907,7 @@
 				"zh-hant": "角色選擇界面的視覺大修，同時顯示所有已創建的角色，而不是一次只顯示一個。"
 			},
 			"author": "leer",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/845",
 			"github_url": "",
 			"note": {
@@ -33207,7 +33207,7 @@
 				"zh-hant": "在角色身體上顯示裝備。\n自定義菜單選擇不同位置。\n允許在各種菜單中旋轉角色模型。"
 			},
 			"author": "Grasmann",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/852",
 			"github_url": "https://github.com/grasmann/darktide-mods/tree/main/visible_equipment",
 			"note": {
@@ -33307,7 +33307,7 @@
 				"zh-hant": "Visible Equipment插件 - 添加我認為很酷的武器放置位置。主要是戰術和惡搞風格。"
 			},
 			"author": "backup158",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/854",
 			"github_url": "https://github.com/Backup158/Darktide_Visible_Equipment_UwU",
 			"note": {
@@ -34107,7 +34107,7 @@
 				"zh-hant": "獨立調整主要、次要、手榴彈和特殊物品的可見度，可選條件觸發。"
 			},
 			"author": "xsSplater",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/871",
 			"github_url": "https://github.com/xsSplater/Darktide-Phantom_Arsenal",
 			"note": {
@@ -34257,7 +34257,7 @@
 				"zh-hant": "更真實的食人魔運輸 - 女武神版 - 為女武神運輸食人魔增添一些真實感。"
 			},
 			"author": "wobin",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/873",
 			"github_url": "https://github.com/Wobin/Exceeds-Payload",
 			"note": {
@@ -34907,7 +34907,7 @@
 				"zh-hant": "將任何噁心、發臭、血腥的血塊效果變成充滿樂趣的紫色雲朵派對！"
 			},
 			"author": "tdopz",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/888",
 			"github_url": "",
 			"note": {
@@ -34957,7 +34957,7 @@
 				"zh-hant": "為玩家的伺服朋友寵物添加政委/軍官外觀選項。"
 			},
 			"author": "GideonAriphael",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/889",
 			"github_url": "",
 			"note": {
@@ -35007,7 +35007,7 @@
 				"zh-hant": "為玩家的伺服朋友寵物添加宗教蠟燭/頭冠外觀選項。"
 			},
 			"author": "GideonAriphael",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/890",
 			"github_url": "",
 			"note": {
@@ -36157,7 +36157,7 @@
 				"zh-hant": "使用激光雷達獲得夜視，改變伽馬值，玩得開心 :)"
 			},
 			"author": "fviuff",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/917",
 			"github_url": "",
 			"note": {
@@ -36207,7 +36207,7 @@
 				"zh-hant": "在武器自定義中添加多種近戰刀刃，將法杖變成鐮刀。收割開始！"
 			},
 			"author": "xsSplater",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/918",
 			"github_url": "https://github.com/xsSplater/Darktide-EWC-xsScythe",
 			"note": {
@@ -36357,7 +36357,7 @@
 				"zh-hant": "在一次常規任務後，你發現一個小腐蝕之眼跟著你回到了晨星號。它似乎喜歡上了你，每當你不注意時就跟著你。偶爾它會感到被忽視並試圖腐蝕你，但當你花點時間撫摸它時就會停止。"
 			},
 			"author": "xxBellatrix",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/922",
 			"github_url": "",
 			"note": {
@@ -36857,7 +36857,7 @@
 				"zh-hant": "此模組使毒氣視覺效果與其效果持續時間匹配。沒有它，毒氣會殘留幾秒鐘，讓人難以判斷何時真正可以安全通過。"
 			},
 			"author": "Hypnolepsy",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/935",
 			"github_url": "",
 			"note": {
@@ -37007,7 +37007,7 @@
 				"zh-hant": "調整Skitarii伺服頭骨同伴的透明度，以保持視野清晰。較高的FOV會將頭骨推離屏幕中心，以防止遮擋。"
 			},
 			"author": "litool",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/942",
 			"github_url": "",
 			"note": {
@@ -37807,7 +37807,7 @@
 				"zh-hant": "在反裝甲模式下使你的成對跨音速刀刃變為紅色。"
 			},
 			"author": "ExtraLargeBaconPizza",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/960",
 			"github_url": "",
 			"note": {
@@ -39157,7 +39157,7 @@
 				"zh-hant": "將通過一系列移動的虛線指示敵方狙擊手的射擊方向。"
 			},
 			"author": "wobin",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/994",
 			"github_url": "https://github.com/Wobin/Redshift",
 			"note": {
@@ -41357,7 +41357,7 @@
 				"zh-hant": "遊戲採用第三人稱視角，允許您自由切換鏡頭視角，提供更好的遊戲體驗。"
 			},
 			"author": "abd147369",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1042",
 			"github_url": "",
 			"note": {
@@ -41457,7 +41457,7 @@
 				"zh-hant": "視覺上縮小或放大您的角色、隊友和食人魔閃電投射物（岩石/破片炸彈/Bombs Away!）。對第三人稱玩家有用。"
 			},
 			"author": "friday1956",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1044",
 			"github_url": "",
 			"note": {
@@ -41957,7 +41957,7 @@
 				"zh-hant": "移除食人魔轟擊炮、手雷手套和手雷的視覺爆炸效果。"
 			},
 			"author": "wobin",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1055",
 			"github_url": "https://github.com/Wobin/Clear-Da-Boom",
 			"note": {
@@ -42257,7 +42257,7 @@
 				"zh-hant": "改變成對跨音速刀刃發光顏色的輕量實現。每種模式可以為左右刀刃設置自己的自定義顏色。"
 			},
 			"author": "NotKerillian",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1061",
 			"github_url": "",
 			"note": {
@@ -43357,7 +43357,7 @@
 				"zh-hant": "你殺了足夠多的隊長、遠程雙子和等離子槍手... 終於，其中一人掉落了一把能用的叛徒等離子槍，現在你撿起了它..."
 			},
 			"author": "tdopz",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1089",
 			"github_url": "",
 			"note": {
@@ -43757,7 +43757,7 @@
 				"zh-hant": "此模組允許您調整停電等任務中的照明。還可以移除通風淨化中的霧氣和視覺地獄火特效。"
 			},
 			"author": "aftensleuken",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1099",
 			"github_url": "",
 			"note": {
@@ -43807,7 +43807,7 @@
 				"zh-hant": "在熄燈或狙擊手通風任務中，為食人魔和仲裁者使用的護盾添加聚光燈。"
 			},
 			"author": "wobin",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1100",
 			"github_url": "https://github.com/Wobin/NightwatchProtocol",
 			"note": {
@@ -44707,7 +44707,7 @@
 				"zh-hant": "當枯萎蔓延時，不要讓腳變臟。"
 			},
 			"author": "xxBellatrix",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1120",
 			"github_url": "",
 			"note": {
@@ -45107,7 +45107,7 @@
 				"zh-hant": "將您的機械獒犬替換為瘟疫食人魔或混沌獵犬 - 更多生物即將到來。它們擁有與生物相關的聲音和攻擊動畫，也可以靜音。"
 			},
 			"author": "Diamantine",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1128",
 			"github_url": "",
 			"note": {
@@ -45207,7 +45207,7 @@
 				"zh-hant": "簡單的資源查看器網格，點擊即可複製路徑，用於構建更美觀的HUD。"
 			},
 			"author": "malevhf",
-			"category": "Tools",
+			"category": "Debug",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1132",
 			"github_url": "",
 			"note": {
@@ -45357,7 +45357,7 @@
 				"zh-hant": "在第一人稱中看到自己的腿。"
 			},
 			"author": "Kaizen2137",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1135",
 			"github_url": "",
 			"note": {
@@ -45607,7 +45607,7 @@
 				"zh-hant": "高度可自定義的視角模型編輯器。"
 			},
 			"author": "justaguy125",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1143",
 			"github_url": "",
 			"note": {
@@ -46379,18 +46379,18 @@
 			"folder": "ChaosWastesAtHome",
 			"nexus_file_pattern": "chaoswastesathome",
 			"name": {
-				"de": "Chaos-Ödland zu Hause (NUR SOLO)",
-				"en": "Chaos Wastes at Home (SOLO Only)",
-				"es": "Yermos del Caos en casa (Solo SOLO)",
-				"fr": "Terres du Chaos à la maison (SOLO uniquement)",
-				"it": "Terre del Caos a casa (SOLO)",
-				"ja": "カオスウェイスト・アットホーム（ソロ専用）",
-				"ko": "집에서 즐기는 카오스 황무지 (솔로 전용)",
-				"pl": "Chaos Wastes w domu (TYLKO SOLO)",
-				"pt-BR": "Terras do Caos em casa (SOMENTE SOLO)",
-				"ru": "Хаос Пустоши дома (ТОЛЬКО СОЛО)",
-				"zh-hans": "在家中的混沌废土（仅限单人）",
-				"zh-hant": "在家中的混沌廢土（僅限單人）"
+				"de": "Chaos-Ödland zu Hause",
+				"en": "Chaos Wastes at Home",
+				"es": "Yermos del Caos en casa",
+				"fr": "Terres du Chaos à la maison",
+				"it": "Terre del Caos a casa",
+				"ja": "カオスウェイスト・アットホーム",
+				"ko": "집에서 즐기는 카오스 황무지",
+				"pl": "Chaos Wastes w domu",
+				"pt-BR": "Terras do Caos em casa",
+				"ru": "Хаос Пустоши дома",
+				"zh-hans": "在家中的混沌废土",
+				"zh-hant": "在家中的混沌廢土"
 			},
 			"description": {
 				"de": "Gut. Ich mache es selbst. Wählbare Buffs in SoloPlay-Missionen. Zufällig generierte verkettete Missionen. Buffs werden auf verkettete Missionen übertragen.",
@@ -46457,7 +46457,7 @@
 				"zh-hant": "禁用靈能者的所有屏幕危難特效。"
 			},
 			"author": "amonodrama",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1164",
 			"github_url": "",
 			"note": {
@@ -47357,7 +47357,7 @@
 				"zh-hant": "將Darktide的視覺效果分解為18組共80多個開關 - 隱藏爆炸、火焰、毒氣、狙擊手激光、血液、屏幕特效等；帶有RGB顏色的範圍圈；其餘保持原版。作者josef0464。"
 			},
 			"author": "josef0464",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1186",
 			"github_url": "",
 			"note": {
@@ -47607,7 +47607,7 @@
 				"zh-hant": "更改敵人的默認燈光顏色以改善CVD可見性。"
 			},
 			"author": "wobin",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1191",
 			"github_url": "https://github.com/Wobin/Chromatic-Auspex",
 			"note": {
@@ -47757,7 +47757,7 @@
 				"zh-hant": "此模組啟用與死亡布娃娃的碰撞，當您走近時它們會被推開/移開。"
 			},
 			"author": "VAXIStaa",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1195",
 			"github_url": "",
 			"note": {
@@ -47857,7 +47857,7 @@
 				"zh-hant": "將靈能者的火焰法杖變成連鎖閃電。電弧從法杖躍出，撞擊時爆發並從一名敵人連鎖到下一名。更喜歡火焰？可以用其他遊戲內火焰重新著色。默認為原始，直到您選擇為止。作者josef0464。"
 			},
 			"author": "q6666666q",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1198",
 			"github_url": "",
 			"note": {
@@ -48107,7 +48107,7 @@
 				"zh-hant": "移除黑暗任務修改器，提高房間照明，攜帶強力手電筒，並使菜單背景透明。"
 			},
 			"author": "ItzRaiken",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1204",
 			"github_url": "",
 			"note": {
@@ -48357,7 +48357,7 @@
 				"zh-hant": "移除衝擊粒子、貼花和血液效果，同時保留衝擊音效。一種輕量級的替代方案，代替將衝擊特效限制器設置為0。"
 			},
 			"author": "alphago42",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1210",
 			"github_url": "",
 			"note": {
@@ -48407,7 +48407,7 @@
 				"zh-hant": "使食人魔和仲裁者的護盾變得透明。您可以使用滑塊選擇透明度。"
 			},
 			"author": "ItzRaiken",
-			"category": "Visual",
+			"category": "Visuals",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1211",
 			"github_url": "",
 			"note": {
