@@ -11126,6 +11126,54 @@
 			}
 		},
 		{
+			"folder": "extended_weapon_customization_empty_scopes",
+			"name": {
+				"de": "Erweiterte Waffenanpassung - Leere Zielfernrohre",
+				"en": "Extended Weapon Customization - Empty Scopes",
+				"es": "Personalización de armas extendida - Miras vacías",
+				"fr": "Personnalisation avancée des armes - Lunettes vides",
+				"it": "Personalizzazione armi estesa - Mirini vuoti",
+				"ja": "拡張武器カスタマイズ - 空のスコープ",
+				"ko": "확장 무기 커스터마이즈 - 빈 스코프",
+				"pl": "Rozszerzone dostosowywanie broni - Puste lunety",
+				"pt-BR": "Personalização de armas estendida - Miras vazias",
+				"ru": "Расширенная настройка оружия - Пустые прицелы",
+				"zh-hans": "扩展武器定制 - 空瞄具",
+				"zh-hant": "擴展武器定製 - 空瞄具"
+			},
+			"description": {
+				"de": "Enthält Kopien von Reflexvisieren mit entfernten Absehen.",
+				"en": "Includes copies of reflex sights with the reticles removed.",
+				"es": "Incluye copias de miras réflex con las retículas retiradas.",
+				"fr": "Comprend des copies de viseurs reflex avec les réticules retirés.",
+				"it": "Include copie di mirini reflex con i reticoli rimossi.",
+				"ja": "レティクルを取り外したリフレックスサイトのコピーが含まれます。",
+				"ko": "레티클이 제거된 리플렉스 사이트의 복사본이 포함됩니다.",
+				"pl": "Obejmuje kopie celowników refleksyjnych z usuniętymi siatkami celowniczymi.",
+				"pt-BR": "Inclui cópias de miras reflex com os retículos removidos.",
+				"ru": "Включает копии коллиматорных прицелов со снятыми прицельными сетками.",
+				"zh-hans": "包括拆除了分划板的反射式瞄准镜的复制品。",
+				"zh-hant": "包括拆除了分劃板的反射式瞄準鏡的複製品。"
+			},
+			"author": "grasmann - Backup158",
+			"url": "",
+			"github_url": "https://github.com/Backup158/DarktideWeaponCustomizationEmptySights/",
+			"note": {
+				"de": "Erforderlich: Extended Weapon Customization, Extended Weapon Customization Base Additions.",
+				"en": "Required: Extended Weapon Customization, Extended Weapon Customization Base Additions.",
+				"es": "Requerido: Extended Weapon Customization, Extended Weapon Customization Base Additions.",
+				"fr": "Requis : Extended Weapon Customization, Extended Weapon Customization Base Additions.",
+				"it": "Richiede: Extended Weapon Customization, Extended Weapon Customization Base Additions.",
+				"ja": "必要条件: Extended Weapon Customization, Extended Weapon Customization Base Additions.",
+				"ko": "필요: Extended Weapon Customization, Extended Weapon Customization Base Additions.",
+				"pl": "Wymagane: Extended Weapon Customization, Extended Weapon Customization Base Additions.",
+				"pt-BR": "Requerido: Extended Weapon Customization, Extended Weapon Customization Base Additions.",
+				"ru": "Требуется: Extended Weapon Customization, Extended Weapon Customization Base Additions.",
+				"zh-hans": "需要：Extended Weapon Customization, Extended Weapon Customization Base Additions。",
+				"zh-hant": "需要：Extended Weapon Customization, Extended Weapon Customization Base Additions。"
+			}
+		},
+		{
 			"folder": "show_crit_chance",
 			"nexus_file_pattern": "show",
 			"name": {
@@ -43493,21 +43541,20 @@
 				"zh-hant": "NPC外觀"
 			},
 			"description": {
-				"de": "Rüste jeden Gegenstand aus und suche danach. Zeige NPC-Outfits in der Vorschau, mische einzelne Teile, verberge oder ersetze Slots und teile fertige Looks mit importierbaren Codes.",
+				"de": "",
 				"en": "Equip and search for any item. Preview NPC outfits, mix individual pieces, hide or replace slots, and share finished looks with importable codes.",
-				"es": "Equipa y busca cualquier objeto. Previsualiza atuendos de NPC, mezcla piezas individuales, oculta o reemplaza ranuras y comparte looks completos con códigos importables.",
-				"fr": "Équipez et recherchez n'importe quel objet. Aperçu des tenues de PNJ, mélangez des pièces individuelles, masquez ou remplacez des emplacements et partagez des looks finis avec des codes importables.",
-				"it": "Equipaggia e cerca qualsiasi oggetto. Visualizza in anteprima gli outfit degli NPC, mescola singoli pezzi, nascondi o sostituisci slot e condividi look completi con codici importabili.",
-				"ja": "任意のアイテムを装備して検索。NPCの衣装をプレビュー、個々のパーツを混ぜたり、スロットを非表示または置き換え、完成したルックをインポート可能なコードで共有できます。",
-				"ko": "모든 아이템을 장비하고 검색합니다. NPC 의상을 미리보기하고, 개별 부품을 혼합하거나 슬롯을 숨기거나 교체하며, 가져오기 가능한 코드로 완성된 룩을 공유할 수 있습니다.",
-				"pl": "Wyposaż i wyszukuj dowolny przedmiot. Podgląd strojów NPC, mieszaj poszczególne elementy, ukrywaj lub zastępuj sloty i udostępniaj gotowe looki za pomocą kodów do importu.",
-				"pt-BR": "Equipe e pesquise qualquer item. Visualize roupas de NPC, misture peças individuais, oculte ou substitua slots e compartilhe visuais completos com códigos importáveis.",
-				"ru": "NPC Look - Экипируйте и ищите любые предметы. Предпросмотр одежды НИП, смешивание отдельных частей, скрытие или замена слотов и обмен готовыми образами с помощью импортируемых кодов.",
-				"zh-hans": "装备和搜索任何物品。预览NPC服装，混合单个部件，隐藏或替换槽位，并使用可导入代码分享完成的造型。",
-				"zh-hant": "裝備和搜索任何物品。預覽NPC服裝，混合單個部件，隱藏或替換槽位，並使用可導入代碼分享完成的造型。"
+				"es": "",
+				"fr": "",
+				"it": "",
+				"ja": "",
+				"ko": "",
+				"pl": "",
+				"pt-BR": "",
+				"ru": "",
+				"zh-hans": "",
+				"zh-hant": ""
 			},
 			"author": "fviuff",
-			"category": "Cosmetics",
 			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1094",
 			"github_url": "",
 			"note": {
@@ -46543,26 +46590,8 @@
 				"zh-hant": "DMF按鍵綁定修復"
 			},
 			"description": {
-				"de": "Behebt das Problem, dass Mod-Tastenbelegungen auf Maustasten nach einem Neustart des Spiels nicht mehr funktionieren. Ein temporärer Patch für einen Fehler im Darktide Mod Framework.",
-				"en": "Fixes mod keybinds set to mouse buttons breaking after a game restart. A temporary patch for a Darktide Mod Framework bug.",
-				"es": "Corrige las teclas de mods asignadas a botones del mouse que se rompen después de reiniciar el juego. Un parche temporal para un error del Framework de mods de Darktide.",
-				"fr": "Corrige les touches de mods définies sur les boutons de la souris qui se cassent après un redémarrage du jeu. Un correctif temporaire pour un bug du Darktide Mod Framework.",
-				"it": "Corregge i tasti dei mod impostati sui pulsanti del mouse che si rompono dopo un riavvio del gioco. Una patch temporanea per un bug del Darktide Mod Framework.",
-				"ja": "ゲーム再起動後にマウスボタンに設定したModキーバインドが壊れる問題を修正します。Darktide Mod Frameworkのバグに対する一時的なパッチです。",
-				"ko": "게임 재시작 후 마우스 버튼에 설정된 모드 키바인드가 깨지는 문제를 수정합니다. Darktide Mod Framework 버그에 대한 임시 패치입니다.",
-				"pl": "Naprawia skróty modów przypisane do przycisków myszy, które psują się po restarcie gry. Tymczasowa łatka dla błędu Darktide Mod Framework.",
-				"pt-BR": "Corrige teclas de mods definidas em botões do mouse que quebram após reiniciar o jogo. Um patch temporário para um bug do Darktide Mod Framework.",
-				"ru": "DMF Keybind Fix - Исправляет поломку привязки клавиш модов к кнопкам мыши после перезапуска игры. Временный патч для бага Darktide Mod Framework.",
-				"zh-hans": "修复游戏重启后设置为鼠标按钮的模组按键绑定失效的问题。Darktide Mod Framework错误的临时补丁。",
-				"zh-hant": "修復遊戲重啟後設置為鼠標按鈕的模組按鍵綁定失效的問題。Darktide Mod Framework錯誤的臨時補丁。"
-			},
-			"author": "LilyMods",
-			"category": "Fixes",
-			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1166",
-			"github_url": "",
-			"note": {
 				"de": "",
-				"en": "",
+				"en": "Fixes mod keybinds set to mouse buttons breaking after a game restart. A temporary patch for a Darktide Mod Framework bug.",
 				"es": "",
 				"fr": "",
 				"it": "",
@@ -46573,6 +46602,24 @@
 				"ru": "",
 				"zh-hans": "",
 				"zh-hant": ""
+			},
+			"author": "LilyMods",
+			"category": "Fixes",
+			"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1166",
+			"github_url": "",
+			"note": {
+				"de": "Veraltet durch DMF v26-08-19+",
+				"en": "Made obsolete by DMF v26-08-19+",
+				"es": "Obsoleto por DMF v26-08-19+",
+				"fr": "Rendu obsolète par DMF v26-08-19+",
+				"it": "Reso obsoleto da DMF v26-08-19+",
+				"ja": "DMF v26-08-19+ により廃止されました",
+				"ko": "DMF v26-08-19+로 인해 더 이상 사용되지 않음",
+				"pl": "Unieważnione przez DMF v26-08-19+",
+				"pt-BR": "Tornado obsoleto pelo DMF v26-08-19+",
+				"ru": "Устарело из-за DMF v26-08-19+",
+				"zh-Hans": "由 DMF v26-08-19+ 废弃",
+				"zh-Hant": "由 DMF v26-08-19+ 廢棄"
 			}
 		},
 		{
