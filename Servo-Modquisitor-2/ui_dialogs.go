@@ -203,7 +203,7 @@ func (app *App) startDownload(downloadURL, filename, modName string, fileInfo *F
 				os.Remove(dest)
 				if modID != "" && installedName != "" {
 					cacheKey := modID + ":" + installedName
-					app.cacheModVersion(cacheKey, installedName, installedVersion, fileInfo.UploadedTimestamp, "nexus")
+					app.cacheModVersion(cacheKey, installedName, installedVersion, fileInfo.UploadedTimestamp, "nexus", 0)
 				}
 				if installedName != "" {
 					app.selectAndScrollToMod(installedName)
@@ -333,10 +333,11 @@ func (app *App) startSystemDownload(downloadURL, filename, displayName string, f
 			} else {
 				if fileInfo != nil {
 					app.setCachedVersion(cacheKey, ModVersionInfo{
-						Timestamp: fileInfo.UploadedTimestamp,
-						Version:   fileInfo.Version,
-						Folder:    displayName,
-						Source:    "nexus",
+						Timestamp:   fileInfo.UploadedTimestamp,
+						Version:     fileInfo.Version,
+						Folder:      displayName,
+						Source:      "nexus",
+						InstalledAt: time.Now().Unix(),
 					})
 					app.saveNexusVersionCache()
 				}
@@ -363,13 +364,14 @@ func (app *App) updateDML() {
 	}
 	cacheKey := "19:base"
 	saved, exists := app.getCachedVersion(cacheKey)
-	if exists && saved.Source == "manual" {
-		app.appendLog(app.messages["log_dml_installed_manual"])
-		return
-	}
+	// Проверяем только актуальность по дате, игнорируем source
 	if exists && saved.Timestamp != 0 && fileInfo.UploadedTimestamp <= saved.Timestamp {
 		app.appendLog(fmt.Sprintf(app.messages["already_latest"], "DML", fileInfo.Version))
 		return
+	}
+	// Если был ручной, сообщим об этом (опционально)
+	if exists && saved.Source == "manual" {
+		app.appendLog("DML was installed manually, but you chose to update - overwriting with Nexus version.")
 	}
 	directURL, filename, err := app.getPremiumDownloadURL("19", fmt.Sprintf("%d", fileInfo.ID))
 	if err != nil {
@@ -393,13 +395,12 @@ func (app *App) updateDMF() {
 	}
 	cacheKey := "8:dmf"
 	saved, exists := app.getCachedVersion(cacheKey)
-	if exists && saved.Source == "manual" {
-		app.appendLog(app.messages["log_dmf_installed_manual"])
-		return
-	}
 	if exists && saved.Timestamp != 0 && fileInfo.UploadedTimestamp <= saved.Timestamp {
 		app.appendLog(fmt.Sprintf(app.messages["already_latest"], "DMF", fileInfo.Version))
 		return
+	}
+	if exists && saved.Source == "manual" {
+		app.appendLog("DMF was installed manually, but you chose to update - overwriting with Nexus version.")
 	}
 	directURL, filename, err := app.getPremiumDownloadURL("8", fmt.Sprintf("%d", fileInfo.ID))
 	if err != nil {
@@ -423,13 +424,12 @@ func (app *App) updateAutopatcher() {
 	}
 	cacheKey := "709:autopatch"
 	saved, exists := app.getCachedVersion(cacheKey)
-	if exists && saved.Source == "manual" {
-		app.appendLog(app.messages["log_autopatcher_manual"])
-		return
-	}
 	if exists && saved.Timestamp != 0 && fileInfo.UploadedTimestamp <= saved.Timestamp {
 		app.appendLog(fmt.Sprintf(app.messages["already_latest"], "Autopatcher", fileInfo.Version))
 		return
+	}
+	if exists && saved.Source == "manual" {
+		app.appendLog("Autopatcher was installed manually, but you chose to update - overwriting with Nexus version.")
 	}
 	directURL, filename, err := app.getPremiumDownloadURL("709", fmt.Sprintf("%d", fileInfo.ID))
 	if err != nil {

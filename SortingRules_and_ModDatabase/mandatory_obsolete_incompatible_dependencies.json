@@ -1,5 +1,5 @@
 {
-	"version": "2.0.2",
+	"version": "2.0.3",
 
 	"mandatory_order": [
 		"ModPerformanceMonitor",
@@ -183,9 +183,11 @@
 		{ "mod1": "Archivum Messelina",		"mod2": "ImprovedPenanceTracking" },
 		{ "mod1": "AuspexHelper",			"mod2": "MatchingMinigameSolver" },
 		{ "mod1": "AutoBackup",				"mod2": "swagger",					"type": "same" },
+		{ "mod1": "AutoBackup",				"mod2": "mod_shrine",				"type": "same" },
 		{ "mod1": "AutoLoot",				"mod2": "auto_rations" },
 		{ "mod1": "AutoMark",				"mod2": "AutoPing",					"type": "same" },
 		{ "mod1": "AutoMark",				"mod2": "AutoTag",					"type": "same" },
+		{ "mod1": "AutoMark",				"mod2": "AutoTag_Survey",			"type": "same" },
 		{ "mod1": "AutoMark",				"mod2": "DogWhistle"},
 		{ "mod1": "AutoMark",				"mod2": "LessAnnoyingArbites",
 			"desc": {
@@ -204,6 +206,7 @@
 			}
 		},
 		{ "mod1": "AutoPing",				"mod2": "AutoTag",					"type": "same" },
+		{ "mod1": "AutoPing",				"mod2": "AutoTag_Survey",			"type": "same" },
 		{ "mod1": "AutoPing",				"mod2": "DogWhistle" },
 		{ "mod1": "AutoPing",				"mod2": "LessAnnoyingArbites",
 			"desc": {
@@ -221,6 +224,7 @@
 				"es": "🔴 Conflicto:\nAutoPing  ⚔ Less Annoying Arbites.\nAmbos los mods cambian la lógica de detección de objetivos bajo la mira."
 			}
 		},
+		{ "mod1": "AutoTag",				"mod2": "AutoTag_Survey",			"type": "same" },
 		{ "mod1": "AutoTag",				"mod2": "DogWhistle",
 			"desc": {
 				"en": "🔴 Conflict:\nAutoTag  ⚔ Dog Whistle.\nDog Whistle fully controls tag types (dog or veteran), while AutoTag simply places a regular tag.",
@@ -277,6 +281,7 @@
 		{ "mod1": "BetterMovement",			"mod2": "Grace" },
 		{ "mod1": "BetterMovement",			"mod2": "hybrid_sprint" },
 		{ "mod1": "BetterMovement",			"mod2": "keep_dodging" },
+		{ "mod1": "BetterMovement",			"mod2": "MeSecurumFacio" },
 		{ "mod1": "BetterMovement",			"mod2": "no_dodge_jump" },
 		{ "mod1": "BetterMovement",			"mod2": "SimpleMovement" },
 		{ "mod1": "BetterMovement",			"mod2": "StickySprint" },
@@ -423,7 +428,21 @@
 		{ "mod1": "menu_hotkeys",			"mod2": "ExpeditionsHotkey" },
 		{ "mod1": "menu_hotkeys",			"mod2": "hub_hotkey_menus" },
 		{ "mod1": "MenuUIHider",			"mod2": "InventoryHider" },
+		{ "mod1": "MeSecurumFacio",			"mod2": "AutoVault" },
+		{ "mod1": "MeSecurumFacio",			"mod2": "DefaultSprint" },
+		{ "mod1": "MeSecurumFacio",			"mod2": "DodgeSlide" },
+		{ "mod1": "MeSecurumFacio",			"mod2": "Grace" },
+		{ "mod1": "MeSecurumFacio",			"mod2": "guarantee_ability_activation" },
+		{ "mod1": "MeSecurumFacio",			"mod2": "guarantee_special_action" },
+		{ "mod1": "MeSecurumFacio",			"mod2": "guarantee_weapon_swap" },
+		{ "mod1": "MeSecurumFacio",			"mod2": "hybrid_sprint" },
+		{ "mod1": "MeSecurumFacio",			"mod2": "keep_dodging" },
+		{ "mod1": "MeSecurumFacio",			"mod2": "no_dodge_jump" },
+		{ "mod1": "MeSecurumFacio",			"mod2": "SimpleMovement" },
+		{ "mod1": "MeSecurumFacio",			"mod2": "StickySprint" },
+		{ "mod1": "MeSecurumFacio",			"mod2": "Walk" },
 		{ "mod1": "MissionGrid",			"mod2": "BoardScan" },
+		{ "mod1": "mod_shrine",				"mod2": "swagger",					"type": "same" },
 		{ "mod1": "modular_menu_buttons",	"mod2": "hub_shortcuts",			"type": "same" },
 		{ "mod1": "NoBrainer",				"mod2": "AuspexHelper" },
 		{ "mod1": "NoBrainer",				"mod2": "Expeditions Auto-marker" },
@@ -467,6 +486,7 @@
 		{ "mod1": "state_your_name",		"mod2": "current_havoc" },
 		{ "mod1": "state_your_name",		"mod2": "InspectFromPartyFinder" },
 		{ "mod1": "state_your_name",		"mod2": "InspectFromSocial" },
+		{ "mod1": "state_your_name",		"mod2": "HavocPeek" },
 		{ "mod1": "state_your_name",		"mod2": "teammate_tracker" },
 		{ "mod1": "state_your_name",		"mod2": "true_level" },
 		{ "mod1": "state_your_name",		"mod2": "who_are_you" },
@@ -485,6 +505,10 @@
 	],
 
 	"dependencies": [
+		{"required": "animation_events",
+			"dependent": "what_stats",
+				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/21"},
+
 		{"required": "Archivum Messelina",
 			"dependent": "penances_improved",
 				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/355"},

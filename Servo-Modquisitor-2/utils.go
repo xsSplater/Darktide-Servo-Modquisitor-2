@@ -436,7 +436,6 @@ func toggleModsAutoPatch(gameRoot string) error {
 	return nil
 }
 
-// toggleModsLegacy теперь принимает gameRoot.
 func toggleModsLegacy(gameRoot string) error {
 	if gameRoot == "" {
 		return fmt.Errorf("%s", errGameRootNotFound)
@@ -451,7 +450,10 @@ func toggleModsLegacy(gameRoot string) error {
 		return fmt.Errorf("no supported patcher found")
 	}
 	cmd := exec.Command(bat)
-	return cmd.Run()
+	if err := cmd.Run(); err != nil {
+		return err
+	}
+	return nil
 }
 
 // closeApp безопасно закрывает главное окно и завершает программу.
@@ -536,4 +538,52 @@ func (app *App) getUserSettingsPath() string {
 	}
 	// fallback: рядом с mods (если не нашли в стандартных местах)
 	return filepath.Join(app.cfg.ModsPath, "..", "user_settings.config")
+}
+
+// ensureDir создаёт папку по указанному пути, удаляя файлы, мешающие созданию папок.
+// Защищает .mod файлы от удаления.
+func (app *App) ensureDir(path string) error {
+	// app.appendLog(fmt.Sprintf("ensureDir: checking path %s", path))
+
+	// Проверяем, существует ли путь
+	info, err := os.Stat(path)
+	if err == nil && info.IsDir() {
+		// app.appendLog(fmt.Sprintf("ensureDir: %s already exists as directory", path))
+		return nil
+	}
+	if err == nil && !info.IsDir() {
+		// app.appendLog(fmt.Sprintf("ensureDir: %s exists as file, removing", path))
+		if !strings.HasSuffix(strings.ToLower(path), ".mod") {
+			if removeErr := os.Remove(path); removeErr != nil {
+				// app.appendLog(fmt.Sprintf("ensureDir: failed to remove file %s: %v", path, removeErr))
+				return fmt.Errorf("cannot remove file %s: %w", path, removeErr)
+			}
+			// app.appendLog(fmt.Sprintf("ensureDir: file %s removed", path))
+		} else {
+			// app.appendLog(fmt.Sprintf("ensureDir: refusing to remove .mod file %s", path))
+			return fmt.Errorf("cannot remove .mod file %s", path)
+		}
+	}
+
+	// Рекурсивно обрабатываем родителя
+	parent := filepath.Dir(path)
+	if parent != path {
+		// app.appendLog(fmt.Sprintf("ensureDir: recursively processing parent %s", parent))
+		if err := app.ensureDir(parent); err != nil {
+			return err
+		}
+	}
+
+	// app.appendLog(fmt.Sprintf("ensureDir: creating directory %s", path))
+	return os.MkdirAll(path, 0755)
+}
+
+// isModsEnabledLegacy определяет, включены ли моды для Legacy-патчера (toggle_darktide_mods.bat).
+// Возвращает true, если моды включены (бэкап-файл отсутствует).
+func isModsEnabledLegacy(gameRoot string) bool {
+	if gameRoot == "" {
+		return false
+	}
+	_, err := os.Stat(filepath.Join(gameRoot, "bundle", "bundle_database.data.bak"))
+	return err == nil // true если бэкап есть (моды включены)
 }

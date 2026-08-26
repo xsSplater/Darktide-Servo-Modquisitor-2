@@ -8,7 +8,10 @@ import (
 	"fmt"
 	"image/color"
 	"net/url"
+	"os"
+	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"time"
 
@@ -16,6 +19,7 @@ import (
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
+	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/storage"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
@@ -244,7 +248,15 @@ func (app *App) buildUI() {
 	app.applyTooltip(app.btnUp, "btn_up_tooltip")
 	app.btnDown = NewCustomButton(app.messages["btn_down"], func() { app.moveSelected(1) })
 	app.applyTooltip(app.btnDown, "btn_down_tooltip")
-	app.btnSaveOrder = NewCustomButton(app.messages["btn_save_order"], func() {
+
+	// Save List
+	saveImgData, err := embeddedFiles.ReadFile("assets/buttons/save.png")
+	if err != nil {
+		app.appendLog("Could not load save icon: " + err.Error())
+	}
+	saveRes := fyne.NewStaticResource("save", saveImgData)
+
+	app.btnSaveOrder = NewIconButton(saveRes, func() {
 		if app.orderDirty {
 			app.saveCurrentOrder()
 			app.orderDirty = false
@@ -257,7 +269,15 @@ func (app *App) buildUI() {
 		}
 	})
 	app.applyTooltip(app.btnSaveOrder, "btn_save_order_tooltip")
-	app.btnRefresh = NewCustomButton(app.messages["btn_refresh"], func() {
+
+	// Refresh List
+	refreshImgData, err := embeddedFiles.ReadFile("assets/buttons/refresh.png")
+	if err != nil {
+		app.appendLog("Could not load refresh icon: " + err.Error())
+	}
+	refreshRes := fyne.NewStaticResource("refresh", refreshImgData)
+
+	app.btnRefresh = NewIconButton(refreshRes, func() {
 		go func() {
 			if app.orderDirty {
 				choice := app.showChoiceDialogSync(app.mainWindow,
@@ -278,6 +298,7 @@ func (app *App) buildUI() {
 						app.refreshModList()
 						app.appendLog(app.messages["log_list_refreshed"])
 					case 1:
+						// Отмена
 					case 2:
 						app.orderDirty = false
 						app.stopBlinkSaveButton()
@@ -295,12 +316,32 @@ func (app *App) buildUI() {
 		}()
 	})
 	app.applyTooltip(app.btnRefresh, "btn_refresh_tooltip")
-	app.btnToggle = NewCustomButton(app.messages["btn_disable_mods"], func() { app.toggleGlobalMods() })
+
+	// Toggle Mods - иконки on.png / off_red.png
+	onImgData, err := embeddedFiles.ReadFile("assets/buttons/on.png")
+	if err != nil {
+		app.appendLog("Could not load on icon: " + err.Error())
+	}
+	app.toggleOnIcon = fyne.NewStaticResource("on", onImgData)
+
+	offImgData, err := embeddedFiles.ReadFile("assets/buttons/off_red.png")
+	if err != nil {
+		app.appendLog("Could not load off icon: " + err.Error())
+	}
+	app.toggleOffIcon = fyne.NewStaticResource("off", offImgData)
+
+	app.btnToggle = NewIconButton(app.toggleOnIcon, func() { app.toggleGlobalMods() })
 	app.applyTooltip(app.btnToggle, "btn_toggle_tooltip")
 	app.updateToggleButtonText(app.btnToggle)
 
 	// Кнопка управления модами и панель
-	app.manageBtn = NewCustomButton(app.messages["btn_manage_mods"], func() {
+	cogImgData, err := embeddedFiles.ReadFile("assets/buttons/cog_check.png")
+	if err != nil {
+		app.appendLog("Could not load cog icon: " + err.Error())
+	}
+	cogRes := fyne.NewStaticResource("cog", cogImgData)
+
+	app.manageBtn = NewIconButton(cogRes, func() {
 		if app.managePanel.Visible() {
 			app.managePanel.Hide()
 			app.showSelectColumn = false
@@ -356,9 +397,135 @@ func (app *App) buildUI() {
 	}
 	app.managePanel.Hide()
 
+	// Install Mod - иконка add.png
+	addImgData, err := embeddedFiles.ReadFile("assets/buttons/add.png")
+	if err != nil {
+		app.appendLog("Could not load add icon: " + err.Error())
+	}
+	addRes := fyne.NewStaticResource("add", addImgData)
+
+	app.btnInstall = NewIconButton(addRes, func() {
+		fd := dialog.NewFileOpen(func(reader fyne.URIReadCloser, err error) {
+			if err == nil && reader != nil {
+				defer reader.Close()
+				path := reader.URI().Path()
+				if strings.HasSuffix(strings.ToLower(path), ".zip") {
+					go func(p string) {
+						installedName, _, err := app.InstallModFromArchive(p, true, "", "")
+						fyne.Do(func() {
+							if err != nil {
+								app.appendLog(fmt.Sprintf(app.messages["log_extract_error"], err))
+								return
+							}
+							checks.AutoFixMalformed()
+							app.refreshModList()
+							app.selectAndScrollToMod(installedName)
+							app.appendLog(fmt.Sprintf(app.messages["log_installed"], filepath.Base(p)))
+						})
+					}(path)
+				} else {
+					app.appendLog(app.messages["log_zip_only"])
+				}
+			}
+		}, app.mainWindow)
+		fd.SetFilter(storage.NewExtensionFileFilter([]string{".zip", ".rar", ".7z"}))
+		fd.Resize(fyne.NewSize(FileDialogWidth, FileDialogHeight))
+		fd.Show()
+	})
+	app.applyTooltip(app.btnInstall, "btn_install_tooltip")
+
+	// Auto-Sort - иконка sort.png
+	autosortImgData, err := embeddedFiles.ReadFile("assets/buttons/sort.png")
+	if err != nil {
+		app.appendLog("Could not load autosort icon: " + err.Error())
+	}
+	autosortRes := fyne.NewStaticResource("autosort", autosortImgData)
+
+	app.btnSortChecks = NewIconButton(autosortRes, func() { go app.runAllChecks() })
+	app.btnSortChecks.SetIconSize(32) // увеличенный размер
+	app.applyTooltip(app.btnSortChecks, "btn_sort_checks_tooltip")
+
+	if app.amlDetected {
+		app.applyTooltip(app.btnSaveOrder, "aml_save_warning_tooltip")
+		app.applyTooltip(app.btnSortChecks, "aml_sort_warning_tooltip")
+	}
+
+	// Check updates
+	checkUpdatesImgData, err := embeddedFiles.ReadFile("assets/buttons/check_updates_blue.png")
+	if err != nil {
+		app.appendLog("Could not load check updates icon: " + err.Error())
+	}
+	checkUpdatesRes := fyne.NewStaticResource("check_updates", checkUpdatesImgData)
+
+	app.btnCheckUpdates = NewIconButton(checkUpdatesRes, func() {
+		go app.checkNexusUpdates()
+	})
+	app.applyTooltip(app.btnCheckUpdates, "btn_check_updates_tooltip")
+
+	// Update All Mods
+	updateAllImgData, err := embeddedFiles.ReadFile("assets/buttons/update_all_mods_blue_p.png")
+	if err != nil {
+		app.appendLog("Could not load update all icon: " + err.Error())
+	}
+	updateAllRes := fyne.NewStaticResource("update_all", updateAllImgData)
+
+	app.btnUpdateAll = NewIconButton(updateAllRes, func() {
+		go app.updateAllModsFromNexus()
+	})
+	app.applyTooltip(app.btnUpdateAll, "btn_update_all_premium_only")
+
+	playImgData, err := embeddedFiles.ReadFile("assets/buttons/play.png")
+	if err != nil {
+		app.appendLog("Could not load play icon: " + err.Error())
+	}
+	playRes := fyne.NewStaticResource("play", playImgData)
+
+	gameVer := detectGameVersion(app.gameRoot)
+	if gameVer == VersionUnknown {
+		app.btnLaunchNormal.Hide()
+		app.btnLaunchNoLauncher.Hide()
+	}
+
+	app.btnLaunchNormal = NewIconButton(playRes, func() {
+		go func() {
+			if isDarktideRunning() {
+				app.appendLog(app.messages["game_already_running"])
+				return
+			}
+			ver := detectGameVersion(app.gameRoot)
+			err := app.launchGameFunc(ver, app.gameRoot, false)
+			if err != nil {
+				app.appendLog(fmt.Sprintf(app.messages["launch_error"], err))
+			}
+		}()
+	})
+	app.applyTooltip(app.btnLaunchNormal, "btn_launch_game_tooltip")
+
+	playFastImgData, err := embeddedFiles.ReadFile("assets/buttons/play_fast.png")
+	if err != nil {
+		app.appendLog("Could not load play_fast icon: " + err.Error())
+	}
+	playFastRes := fyne.NewStaticResource("play_fast", playFastImgData)
+
+	app.btnLaunchNoLauncher = NewIconButton(playFastRes, func() {
+		app.btnLaunchNoLauncher.SetIconSize(32)
+		go func() {
+			if isDarktideRunning() {
+				app.appendLog(app.messages["game_already_running"])
+				return
+			}
+			ver := detectGameVersion(app.gameRoot)
+			err := app.launchGameFunc(ver, app.gameRoot, true)
+			if err != nil {
+				app.appendLog(fmt.Sprintf(app.messages["launch_error"], err))
+			}
+		}()
+	})
+	app.applyTooltip(app.btnLaunchNoLauncher, "btn_launch_nolauncher_long_tooltip")
+
 	// Верхняя панель
 	app.topPanelBgRect = canvas.NewRectangle(th.Color(themes.ColorTopPanelBg, variant))
-	topPanelContent := container.NewHBox(app.manageBtn, app.filterLabel, filterSelectWithSize, searchBar, app.btnRefresh, app.btnSaveOrder)
+	topPanelContent := container.NewHBox(app.btnInstall, app.btnRefresh, app.btnSaveOrder, widget.NewSeparator(), app.btnCheckUpdates, app.btnUpdateAll, widget.NewSeparator(), app.btnSortChecks, widget.NewSeparator(), app.manageBtn, widget.NewSeparator(), app.filterLabel, filterSelectWithSize, searchBar, widget.NewSeparator(), app.btnToggle, widget.NewSeparator(), app.btnLaunchNormal, app.btnLaunchNoLauncher)
 	topPanelWithBg := container.NewStack(app.topPanelBgRect, topPanelContent)
 
 	// Таблица заголовков
@@ -789,8 +956,48 @@ func (app *App) buildUI() {
 
 	// Описание в карточке
 	app.descTitle = canvas.NewText(app.messages["select_mod"], th.Color(theme.ColorNameForeground, variant))
-	app.descTitle.TextSize = theme.TextSize() + 2
+	app.descTitle.TextSize = theme.TextSize() + 5
 	app.descTitle.TextStyle = fyne.TextStyle{Bold: true}
+
+	// Кнопка открытия папки мода
+	// Загрузка иконки папки
+	folderImgData, err := embeddedFiles.ReadFile("assets/buttons/folder_open.png")
+	if err != nil {
+		app.appendLog("Could not load folder icon: " + err.Error())
+	}
+	folderRes := fyne.NewStaticResource("folder", folderImgData)
+
+	app.openFolderBtn = NewIconButton(folderRes, func() {
+		if app.selectedModName == "" {
+			return
+		}
+		mod := app.findModByName(app.selectedModName)
+		if mod == nil || mod.MissingFolder {
+			return
+		}
+		modPath := filepath.Join(app.cfg.ModsPath, mod.Name)
+		if _, err := os.Stat(modPath); err == nil {
+			var cmd *exec.Cmd
+			switch runtime.GOOS {
+			case "windows":
+				cmd = exec.Command("explorer", modPath)
+			case "linux":
+				cmd = exec.Command("xdg-open", modPath)
+			case "darwin":
+				cmd = exec.Command("open", modPath)
+			default:
+				u, _ := url.Parse("file://" + filepath.ToSlash(modPath))
+				_ = app.myApp.OpenURL(u)
+				return
+			}
+			if cmd != nil {
+				cmd.Start()
+			}
+		}
+	})
+	app.openFolderBtn.Importance = widget.MediumImportance
+	app.applyTooltip(app.openFolderBtn, "open_mod_folder_tooltip")
+
 	app.descAuthor = widget.NewLabel("-")
 	app.descInstalled = widget.NewLabel("")
 	app.descBody = widget.NewLabel(app.messages["desc_placeholder"])
@@ -809,87 +1016,19 @@ func (app *App) buildUI() {
 
 	app.descLocalVersion = widget.NewLabel("")
 	app.descLatestVersion = widget.NewLabel("")
+	app.descLastUpdated = widget.NewLabel("")
+	app.descOriginalUpload = widget.NewLabel("")
 	app.descConflict = widget.NewLabel("")
 	app.descConflict.Wrapping = fyne.TextWrapWord
 	app.descConflict.Hide()
 
-	// Инициализация контейнера для дополнительного содержимого (спойлер со списком обновлений)
-	app.descExtraContainer = container.NewVBox()
-
-	descHeader := container.NewBorder(
-		nil, nil, nil, nil,
-		container.NewVBox(
-			app.descTitle,
-			app.descAuthor,
-			container.NewHBox(widget.NewLabel(""), app.descURL),
-			container.NewHBox(widget.NewLabel(""), app.githubLink),
-			widget.NewSeparator(),
-			container.NewHBox(widget.NewLabel(""), app.descLocalVersion, app.descLatestVersion),
-			app.descConflict,
-		),
-	)
-	// Отступ перед спойлером
-	spacer := canvas.NewRectangle(color.Transparent)
-	spacer.SetMinSize(fyne.NewSize(0, 20))
-
-	descCardContent := container.NewVBox(
-		descHeader,
-		widget.NewSeparator(),
-		app.descBody,
-		spacer,
-		app.descExtraContainer,
-	)
-
-	descCardScroll := container.NewScroll(descCardContent)
-	descCardScroll.SetMinSize(fyne.NewSize(DescScrollMinWidth, DescScrollMinHeight))
-	descCard := container.NewStack(
-		descCardBg,
-		container.NewPadded(descCardScroll),
-	)
-
-	app.btnSortChecks = NewCustomButton(app.messages["btn_sort_checks"], func() { go app.runAllChecks() })
-	app.applyTooltip(app.btnSortChecks, "btn_sort_checks_tooltip")
-	if app.amlDetected {
-		app.btnSaveOrder.SetText(app.messages["btn_save_order_aml"])
-		app.btnSortChecks.SetText(app.messages["btn_sort_checks_aml"])
-		app.applyTooltip(app.btnSaveOrder, "aml_save_warning_tooltip")
-		app.applyTooltip(app.btnSortChecks, "aml_sort_warning_tooltip")
-	}
-
-	app.btnInstall = NewCustomButton(app.messages["btn_install"], func() {
-		fd := dialog.NewFileOpen(func(reader fyne.URIReadCloser, err error) {
-			if err == nil && reader != nil {
-				defer reader.Close()
-				path := reader.URI().Path()
-				if strings.HasSuffix(strings.ToLower(path), ".zip") {
-					// Запускаем установку в отдельной горутине, чтобы не блокировать UI
-					go func(p string) {
-						installedName, _, err := app.InstallModFromArchive(p, true, "", "")
-						fyne.Do(func() {
-							if err != nil {
-								app.appendLog(fmt.Sprintf(app.messages["log_extract_error"], err))
-								return
-							}
-							checks.AutoFixMalformed()
-							app.refreshModList()
-							app.selectAndScrollToMod(installedName)
-
-							app.appendLog(fmt.Sprintf(app.messages["log_installed"], filepath.Base(p)))
-						})
-					}(path)
-				} else {
-					app.appendLog(app.messages["log_zip_only"])
-				}
-			}
-		}, app.mainWindow)
-		fd.SetFilter(storage.NewExtensionFileFilter([]string{".zip", ".rar", ".7z"}))
-		fd.Resize(fyne.NewSize(FileDialogWidth, FileDialogHeight))
-		fd.Show()
-	})
-	app.applyTooltip(app.btnInstall, "btn_install_tooltip")
-
 	// В обработчике btnRemove замените блок удаления на следующий:
-	app.btnRemove = NewCustomButton(app.messages["btn_remove"], func() {
+	ImgPngData, err := embeddedFiles.ReadFile("assets/buttons/trashcan_red_x.png")
+	if err != nil {
+		app.appendLog("Could not load trash icon: " + err.Error())
+	}
+	trashRes := fyne.NewStaticResource("trash", ImgPngData)
+	app.btnRemove = NewIconButton(trashRes, func() {
 		if app.selectedModName == "" {
 			return
 		}
@@ -960,37 +1099,14 @@ func (app *App) buildUI() {
 	})
 	app.applyTooltip(app.btnRemove, "btn_remove_tooltip")
 
-	gameVer := detectGameVersion(app.gameRoot)
-	app.btnLaunchNormal = NewCustomButton(app.messages["btn_launch_game"], func() {
-		go func() {
-			if isDarktideRunning() {
-				app.appendLog(app.messages["game_already_running"])
-				return
-			}
-			ver := detectGameVersion(app.gameRoot)
-			err := app.launchGameFunc(ver, app.gameRoot, false)
-			if err != nil {
-				app.appendLog(fmt.Sprintf(app.messages["launch_error"], err))
-			}
-		}()
-	})
-	app.applyTooltip(app.btnLaunchNormal, "btn_launch_game_tooltip")
-	app.btnLaunchNoLauncher = NewCustomButton(app.messages["btn_launch_nolauncher_long"], func() {
-		go func() {
-			if isDarktideRunning() {
-				app.appendLog(app.messages["game_already_running"])
-				return
-			}
-			ver := detectGameVersion(app.gameRoot)
-			err := app.launchGameFunc(ver, app.gameRoot, true)
-			if err != nil {
-				app.appendLog(fmt.Sprintf(app.messages["launch_error"], err))
-			}
-		}()
-	})
-	app.applyTooltip(app.btnLaunchNoLauncher, "btn_launch_nolauncher_long_tooltip")
+	// Загрузка иконки обновления
+	updateImgData, err := embeddedFiles.ReadFile("assets/buttons/upd_download_blue_p.png")
+	if err != nil {
+		app.appendLog("Could not load update icon: " + err.Error())
+	}
+	updateRes := fyne.NewStaticResource("update", updateImgData)
 
-	app.btnUpdateMod = NewCustomButton(app.messages["btn_update_mod"], func() {
+	app.btnUpdateMod = NewIconButton(updateRes, func() {
 		if app.selectedModName == "" {
 			return
 		}
@@ -1024,28 +1140,66 @@ func (app *App) buildUI() {
 		}()
 	})
 	app.applyTooltip(app.btnUpdateMod, "btn_update_mod_premium_only")
-	app.btnUpdateAll = NewCustomButton(app.messages["btn_update_all"], func() {
-		go app.updateAllModsFromNexus()
-	})
-	app.applyTooltip(app.btnUpdateAll, "btn_update_all_premium_only")
-	app.btnCheckUpdates = NewCustomButton(app.messages["btn_check_updates"], func() {
-		go app.checkNexusUpdates()
-	})
-	app.applyTooltip(app.btnCheckUpdates, "btn_check_updates_tooltip")
 
-	if gameVer == VersionUnknown {
-		app.btnLaunchNormal.Hide()
-		app.btnLaunchNoLauncher.Hide()
-	}
+	// Инициализация контейнера для дополнительного содержимого (спойлер со списком обновлений)
+	app.descExtraContainer = container.NewVBox()
 
-	topRight := container.NewVBox(
-		container.NewHBox(app.btnSortChecks, app.btnInstall, app.btnRemove),
-		container.NewHBox(app.btnLaunchNormal, app.btnLaunchNoLauncher, app.btnToggle),
-		container.NewHBox(app.btnCheckUpdates, app.btnUpdateMod, app.btnUpdateAll),
+	btnRow := container.NewHBox(
+		layout.NewSpacer(),
+		app.btnUpdateMod,
+		app.openFolderBtn,
+		app.btnRemove,
 	)
+
+	// Строка с названием мода
+	nameRow := container.NewHBox(
+		app.descTitle,
+	)
+
+	descHeader := container.NewBorder(
+		nil, nil, nil, nil,
+		container.NewVBox(
+			btnRow,
+			widget.NewSeparator(),
+			nameRow,
+			widget.NewSeparator(),
+			app.descAuthor,
+			widget.NewSeparator(),
+			container.NewHBox(widget.NewLabel(""), app.descURL, widget.NewLabel("  "), app.githubLink),
+			widget.NewSeparator(),
+			container.NewHBox(widget.NewLabel(""), app.descLocalVersion),
+			widget.NewSeparator(),
+			app.descConflict,
+		),
+	)
+	// Отступ перед спойлером
+	spacer := canvas.NewRectangle(color.Transparent)
+	spacer.SetMinSize(fyne.NewSize(0, 20))
+
+	descCardContent := container.NewVBox(
+		descHeader,
+		widget.NewSeparator(),
+		app.descBody,
+		spacer,
+		app.descExtraContainer,
+	)
+
+	descCardScroll := container.NewScroll(descCardContent)
+	descCardScroll.SetMinSize(fyne.NewSize(DescScrollMinWidth, DescScrollMinHeight))
+	descCard := container.NewStack(
+		descCardBg,
+		container.NewPadded(descCardScroll),
+	)
+
+	app.descCardContent = descCardContent
+	app.descCardScroll = descCardScroll
+
+	// topRight := container.NewVBox(
+	// container.NewHBox(app.btnLaunchNormal, app.btnLaunchNoLauncher),
+	// )
 	rightContent := container.NewVSplit(descCard, app.consoleScroll)
 	rightContent.Offset = 0.65
-	rightPanel := container.NewBorder(topRight, nil, nil, nil, rightContent)
+	rightPanel := container.NewBorder(nil, nil, nil, nil, rightContent)
 	split := container.NewHSplit(leftPanel, rightPanel)
 	split.Offset = SplitOffset
 	content := container.NewBorder(nil, nil, nil, nil, split)
@@ -1172,6 +1326,7 @@ func (app *App) appendCenteredLog(text string) {
 }
 
 func (app *App) updateDescriptionForMod(name string) {
+	// Если мод не выбран — очищаем описание
 	if name == "" {
 		app.descTitle.Text = app.messages["select_mod"]
 		app.descTitle.Refresh()
@@ -1183,25 +1338,53 @@ func (app *App) updateDescriptionForMod(name string) {
 			app.descExtraContainer.Objects = nil
 			app.descExtraContainer.Refresh()
 		}
+		// Обновляем контейнеры, чтобы пересчитать layout
+		if app.descCardContent != nil {
+			app.descCardContent.Refresh()
+		}
+		if app.descCardScroll != nil {
+			app.descCardScroll.Refresh()
+		}
 		return
 	}
+
 	mod := app.findModByName(name)
 	if mod == nil {
 		return
 	}
+
+	// Обновляем состояние кнопки открытия папки
+	if app.openFolderBtn != nil {
+		if mod.MissingFolder || mod.Name == "" {
+			app.openFolderBtn.Disable()
+		} else {
+			app.openFolderBtn.Enable()
+		}
+	}
+
+	// --- Название мода ---
 	display := mod.DisplayName
 	if display == "" {
 		display = mod.Name
 	}
 	app.descTitle.Text = display
 	app.descTitle.Refresh()
+
+	// --- Автор с датой Original Upload (если есть) ---
 	author := mod.Author
 	if author == "" {
 		author = app.messages["author_unknown"]
 	}
-	app.descAuthor.SetText(fmt.Sprintf(app.messages["author_label"], author))
+	authorText := fmt.Sprintf(app.messages["author_label"], author)
+	if !mod.OriginalUpload.IsZero() {
+		authorText += fmt.Sprintf("          %s: %s", app.messages["original_upload_label"], app.formatDate(mod.OriginalUpload, app.cfg.DateFormat))
+	}
+	app.descAuthor.SetText(authorText)
+
+	// --- Дата установки (Installed) ---
 	app.descInstalled.SetText(fmt.Sprintf(app.messages["installed_label"], app.formatDate(mod.ModTime, app.cfg.DateFormat)))
 
+	// --- Локальная версия с датой Last Updated ---
 	if app.descLocalVersion != nil {
 		var cacheKey string
 		switch mod.Name {
@@ -1219,9 +1402,23 @@ func (app *App) updateDescriptionForMod(name string) {
 				}
 			}
 		}
+
 		if cacheKey != "" {
 			if info, ok := app.getCachedVersion(cacheKey); ok && info.Version != "" {
-				app.descLocalVersion.SetText(fmt.Sprintf(app.messages["nexus_local_version_label"], info.Version))
+				// Начинаем с локальной версии
+				localText := fmt.Sprintf(app.messages["nexus_local_version_label"], info.Version)
+
+				// Добавляем Latest (если есть)
+				if latest, ok := app.getLatestVersion(cacheKey); ok {
+					localText += "          " + fmt.Sprintf(app.messages["nexus_latest_version_label"], latest)
+				}
+
+				// Добавляем Last Updated (если есть)
+				if !mod.LastUpdated.IsZero() {
+					localText += fmt.Sprintf("          %s: %s", app.messages["last_updated_label"], app.formatDate(mod.LastUpdated, app.cfg.DateFormat))
+				}
+
+				app.descLocalVersion.SetText(localText)
 			} else {
 				app.descLocalVersion.SetText(app.messages["nexus_local_version_unknown"])
 			}
@@ -1230,6 +1427,25 @@ func (app *App) updateDescriptionForMod(name string) {
 		}
 	}
 
+	// --- Last Updated (отдельная строка) ---
+	if app.descLastUpdated != nil {
+		if !mod.LastUpdated.IsZero() {
+			app.descLastUpdated.SetText(fmt.Sprintf("Last updated: %s", app.formatDate(mod.LastUpdated, app.cfg.DateFormat)))
+		} else {
+			app.descLastUpdated.SetText("")
+		}
+	}
+
+	// --- Original Upload (отдельная строка) ---
+	if app.descOriginalUpload != nil {
+		if !mod.OriginalUpload.IsZero() {
+			app.descOriginalUpload.SetText(fmt.Sprintf("Original upload: %s", app.formatDate(mod.OriginalUpload, app.cfg.DateFormat)))
+		} else {
+			app.descOriginalUpload.SetText("")
+		}
+	}
+
+	// --- Последняя версия (Latest) — без даты (она уже есть в локальной) ---
 	if app.descLatestVersion != nil {
 		var cacheKey string
 		switch mod.Name {
@@ -1247,6 +1463,7 @@ func (app *App) updateDescriptionForMod(name string) {
 				}
 			}
 		}
+
 		if cacheKey != "" {
 			if latest, ok := app.getLatestVersion(cacheKey); ok {
 				app.descLatestVersion.SetText(fmt.Sprintf(app.messages["nexus_latest_version_label"], latest))
@@ -1258,6 +1475,7 @@ func (app *App) updateDescriptionForMod(name string) {
 		}
 	}
 
+	// --- Описание ---
 	desc := strings.TrimSpace(mod.Description)
 	if mod.MissingFolder {
 		desc = app.messages["desc_missing"] + desc
@@ -1267,9 +1485,9 @@ func (app *App) updateDescriptionForMod(name string) {
 	}
 	app.descBody.SetText(desc)
 
+	// --- Ссылка на мод (Nexus) ---
 	if mod.URL != "" {
-		u, err := url.Parse(mod.URL)
-		if err == nil {
+		if u, err := url.Parse(mod.URL); err == nil {
 			app.descURL.SetURL(u)
 			app.descURL.SetText(app.messages["mod_url_label"])
 		} else {
@@ -1281,10 +1499,10 @@ func (app *App) updateDescriptionForMod(name string) {
 		app.descURL.SetText("")
 	}
 
+	// --- Ссылка на GitHub (если есть) ---
 	if app.githubLink != nil {
 		if mod.GitHubURL != "" {
-			u, err := url.Parse(mod.GitHubURL)
-			if err == nil {
+			if u, err := url.Parse(mod.GitHubURL); err == nil {
 				app.githubLink.SetURL(u)
 				app.githubLink.SetText(app.messages["github_url_label"])
 			} else {
@@ -1297,6 +1515,7 @@ func (app *App) updateDescriptionForMod(name string) {
 		}
 	}
 
+	// --- Конфликты ---
 	if mod.Incompatible {
 		for _, pair := range checks.IncompatiblePairs {
 			if pair.Mod1 == mod.Name || pair.Mod2 == mod.Name {
@@ -1307,8 +1526,7 @@ func (app *App) updateDescriptionForMod(name string) {
 				if !checks.FolderExists(other) {
 					continue
 				}
-				desc := checks.GetIncompatibleDesc(pair.Mod1, pair.Mod2)
-				if desc != "" {
+				if desc := checks.GetIncompatibleDesc(pair.Mod1, pair.Mod2); desc != "" {
 					app.descConflict.SetText(desc)
 				} else {
 					app.descConflict.SetText("")
@@ -1322,10 +1540,9 @@ func (app *App) updateDescriptionForMod(name string) {
 		app.descConflict.SetText("")
 	}
 
-	// Спойлер с списком обновлений, если есть обновление
+	// --- Спойлер со списком изменений (changelog) ---
 	if app.descExtraContainer != nil {
 		app.descExtraContainer.Objects = nil
-		// Убираем условие mod.HasUpdate — показываем для всех модов с URL
 		if mod.URL != "" {
 			modID := helpers.ExtractModIDFromURL(mod.URL)
 			if modID != 0 {
@@ -1353,7 +1570,6 @@ func (app *App) updateDescriptionForMod(name string) {
 				}{}
 				btnState.btn = widget.NewButton(app.messages["btn_show_changelog"], func() {
 					if !btnState.expanded {
-						// Загружаем список обновлений, если ещё не загружен
 						if changelogLabel.Text == app.messages["downloading_changelog"] {
 							go func() {
 								fileInfo, err := app.getLatestFileInfoForMod(modID, mod.Name)
@@ -1408,6 +1624,14 @@ func (app *App) updateDescriptionForMod(name string) {
 			app.descExtraContainer.Refresh()
 		}
 	}
+
+	// --- Принудительное обновление контейнеров для пересчёта layout ---
+	if app.descCardContent != nil {
+		app.descCardContent.Refresh()
+	}
+	if app.descCardScroll != nil {
+		app.descCardScroll.Refresh()
+	}
 }
 
 func (app *App) enrichModFromNexus(mod *checks.ModInfo) {
@@ -1432,7 +1656,30 @@ func (app *App) enrichModFromNexus(mod *checks.ModInfo) {
 			return
 		}
 		cacheKey := fmt.Sprintf("%d:%s", modID, mod.Name)
-		app.setLatestVersion(cacheKey, fileInfo.Version) // <-- замена
+		app.setLatestVersion(cacheKey, fileInfo.Version)
+
+		// Last Updated
+		if fileInfo != nil && fileInfo.UploadedTimestamp > 0 {
+			mod.LastUpdated = time.Unix(fileInfo.UploadedTimestamp, 0)
+		}
+
+		// Original Upload (самый старый файл)
+		oldestInfo, err := app.getOldestFileInfo(modID)
+		if err == nil && oldestInfo != nil && oldestInfo.UploadedTimestamp > 0 {
+			mod.OriginalUpload = time.Unix(oldestInfo.UploadedTimestamp, 0)
+		}
+
+		// Синхронизируем с основным списком allMods
+		app.modsMutex.Lock()
+		for i := range app.allMods {
+			if app.allMods[i].Name == mod.Name {
+				app.allMods[i].LastUpdated = mod.LastUpdated
+				app.allMods[i].OriginalUpload = mod.OriginalUpload
+				break
+			}
+		}
+		app.modsMutex.Unlock()
+
 		if fileInfo.FileName != "" {
 			entry := checks.GetModDBEntry(mod.Name)
 			if entry != nil && entry.NexusFilePattern == "" {
@@ -1457,24 +1704,24 @@ func (app *App) updateToggleButtonText(btn *CustomButton) {
 	switch app.patcherType {
 	case PatcherAutoPatch:
 		if isModsEnabledAutoPatch(app.gameRoot) {
-			btn.SetText(app.messages["btn_disable_mods"])
+			btn.icon = app.toggleOnIcon
 		} else {
-			btn.SetText(app.messages["btn_enable_mods"])
+			btn.icon = app.toggleOffIcon
 		}
 	case PatcherLegacy:
-		if app.cfg.ModsGloballyEnabled {
-			btn.SetText(app.messages["btn_disable_mods"])
+		if isModsEnabledLegacy(app.gameRoot) {
+			btn.icon = app.toggleOnIcon
 		} else {
-			btn.SetText(app.messages["btn_enable_mods"])
+			btn.icon = app.toggleOffIcon
 		}
 	default:
 		btn.SetText(app.messages["btn_no_patcher"])
 		btn.Disable()
+		return
 	}
+	btn.text = ""
+	btn.Enable()
 	btn.Refresh()
-	if app.mainWindow != nil {
-		app.mainWindow.Canvas().Refresh(btn)
-	}
 }
 
 func (app *App) updateUpDownButtons() {

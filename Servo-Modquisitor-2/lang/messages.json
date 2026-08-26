@@ -1274,18 +1274,18 @@
 	 "pt-BR": "🗑 Remover mod"
 	},
 	"btn_remove_tooltip": {
-		"en": "Removes one mod currently selected in the list.",
-		"ru": "Удаляет один мод выбранный прямо сейчас в списке.",
-   "zh-hans": "移除列表中当前选中的一个模组。",
-   "zh-hant": "移除列表中當前選中的一個模組。",
-		"de": "Entfernt einen derzeit in der Liste ausgewählten Mod.",
-		"fr": "Supprime un mod actuellement sélectionné dans la liste.",
-		"ja": "現在リストで選択されている1つのMODを削除します。",
-		"ko": "현재 목록에서 선택한 하나의 모드를 제거합니다.",
-		"it": "Rimuove una mod attualmente selezionata nella lista.",
-		"pl": "Usuwa jeden aktualnie zaznaczony mod na liście.",
-		"es": "Elimina un mod actualmente seleccionado en la lista.",
-	 "pt-BR": "Remove um mod atualmente selecionado na lista."
+		"de": "Entfernt diesen Mod.",
+		"en": "Removes this mod.",
+		"es": "Elimina este mod.",
+		"fr": "Supprime ce mod.",
+		"it": "Rimuove questo mod.",
+		"ja": "このModを削除します。",
+		"ko": "이 모드를 제거합니다.",
+		"pl": "Usuwa ten mod.",
+	 "pt-BR": "Remove este mod.",
+		"ru": "Удаляет данный мод.",
+   "zh-hans": "删除此模组。",
+   "zh-hant": "刪除此模組。"
 	},
 	"btn_remove_all_mods": {
 		"en": "🗑 Remove All Mods",
@@ -1596,18 +1596,18 @@
 	 "pt-BR": "🔄 Atualizar mod"
 	},
 	"btn_update_mod_premium_only": {
-		"en": "Updates one mod currently selected in the list. Requires a Premium!",
-		"ru": "Обновляет один мод выбранный прямо сейчас в списке. Требуется премиум!",
-   "zh-hans": "更新列表中当前选中的一个模组。需要高级会员！",
-   "zh-hant": "更新列表中當前選中的一個模組。需要高級會員！",
-		"de": "Aktualisiert einen derzeit in der Liste ausgewählten Mod. Premium erforderlich!",
-		"fr": "Met à jour un mod actuellement sélectionné dans la liste. Nécessite un compte Premium !",
-		"ja": "現在リストで選択されている1つのMODを更新します。プレミアムが必要です！",
-		"ko": "현재 목록에서 선택한 하나의 모드를 업데이트합니다. 프리미엄 필요!",
-		"it": "Aggiorna una mod attualmente selezionata nella lista. Richiede un account Premium!",
-		"pl": "Aktualizuje jeden aktualnie zaznaczony mod na liście. Wymaga konta Premium!",
-		"es": "Actualiza un mod actualmente seleccionado en la lista. ¡Requiere Premium!",
-	 "pt-BR": "Atualiza um mod atualmente selecionado na lista. Requer uma conta Premium!"
+		"de": "Mod schnell aktualisieren. Premium erforderlich!",
+		"en": "Updates mod quickly. Requires a Premium!",
+		"es": "Actualiza el mod rápidamente. ¡Requiere Premium!",
+		"fr": "Met à jour le mod rapidement. Nécessite un Premium !",
+		"it": "Aggiorna il mod rapidamente. Richiede Premium!",
+		"ja": "Modを素早く更新。プレミアムが必要です！",
+		"ko": "모드를 빠르게 업데이트합니다. 프리미엄이 필요합니다!",
+		"pl": "Szybko aktualizuje moda. Wymaga Premium!",
+	 "pt-BR": "Atualiza o mod rapidamente. Requer Premium!",
+		"ru": "Быстро обновляет мод. Требуется премиум!",
+   "zh-hans": "快速更新模组。需要高级版！",
+   "zh-hant": "快速更新模組。需要高級版！"
 	},
 	"btn_update_mod_tooltip": {
 		"en": "Updates one mod currently selected in the list.",
@@ -7646,5 +7646,61 @@
 		"pl": "Opis",
 		"es": "Descripción",
 	 "pt-BR": "Descrição"
+	},
+	"last_updated_label": {
+		"en": "Last updated",
+		"ru": "Последнее обновление",
+   "zh-hans": "最后更新",
+   "zh-hant": "最後更新",
+		"de": "Letzte Aktualisierung",
+		"fr": "Dernière mise à jour",
+		"ja": "最終更新",
+		"ko": "마지막 업데이트",
+		"it": "Ultimo aggiornamento",
+		"pl": "Ostatnia aktualizacja",
+		"es": "Última actualización",
+	 "pt-BR": "Última atualização"
+	},
+	"original_upload_label": {
+		"en": "Original upload",
+		"ru": "Первая загрузка",
+   "zh-hans": "首次上传",
+   "zh-hant": "首次上傳",
+		"de": "Erster Upload",
+		"fr": "Premier téléchargement",
+		"ja": "初回アップロード",
+		"ko": "최초 업로드",
+		"it": "Primo upload",
+		"pl": "Pierwszy upload",
+		"es": "Primera subida",
+	 "pt-BR": "Primeiro upload"
+	},
+	"open_mod_folder": {
+		"de": "📂 Ordner öffnen",
+		"en": "📂 Open folder",
+		"es": "📂 Abrir carpeta",
+		"fr": "📂 Ouvrir le dossier",
+		"it": "📂 Apri cartella",
+		"ja": "📂 フォルダを開く",
+		"ko": "📂 폴더 열기",
+		"pl": "📂 Otwórz folder",
+	 "pt-BR": "📂 Abrir pasta",
+		"ru": "📂 Открыть папку",
+   "zh-hans": "📂 打开文件夹",
+   "zh-hant": "📂 打開資料夾"
+	},
+	"open_mod_folder_tooltip": {
+		"de": "Öffnet den Mod-Ordner im Ordner 'mods'.",
+		"en": "Opens the mod folder in the 'mods' folder.",
+		"es": "Abre la carpeta de mods en la carpeta 'mods'.",
+		"fr": "Ouvre le dossier des mods dans le dossier 'mods'.",
+		"it": "Apre la cartella dei mod nella cartella 'mods'.",
+		"ja": "「mods」フォルダ内のModフォルダを開きます。",
+		"ko": "'mods' 폴더 내의 모드 폴더를 엽니다.",
+		"pl": "Otwiera folder modów w folderze 'mods'.",
+	 "pt-BR": "Abre a pasta de mods na pasta 'mods'.",
+		"ru": "Открывает папку мода в папке «mods».",
+   "zh-hans": "打开'mods'文件夹中的模组文件夹。",
+   "zh-hant": "打開「mods」資料夾中的模組資料夾。"
 	}
 }

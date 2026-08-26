@@ -742,3 +742,55 @@ func (app *App) FetchChangelog(modID int, fileID int) (string, error) {
 	}
 	return result.Changelog, nil
 }
+
+// getOldestFileInfo возвращает информацию о самом старом файле мода (по дате загрузки).
+func (app *App) getOldestFileInfo(modID int) (*FileInfo, error) {
+	token := app.getAuthToken()
+	if token == "" {
+		return nil, fmt.Errorf("no authentication token")
+	}
+	url := fmt.Sprintf(NexusV1Files, modID)
+	req, _ := http.NewRequest("GET", url, nil)
+	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set("Application-Name", appName)
+	req.Header.Set("Application-Version", appVersion)
+	req.Header.Set("Referer", NexusMainURL)
+
+	client := &http.Client{Timeout: 10 * time.Second}
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	body, _ := io.ReadAll(resp.Body)
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("HTTP %d: %s", resp.StatusCode, string(body))
+	}
+
+	var result struct {
+		Files []struct {
+			FileID            int    `json:"file_id"`
+			Version           string `json:"version"`
+			UploadedTimestamp int64  `json:"uploaded_timestamp"`
+			FileName          string `json:"file_name"`
+		} `json:"files"`
+	}
+	if err := json.Unmarshal(body, &result); err != nil {
+		return nil, err
+	}
+	if len(result.Files) == 0 {
+		return nil, fmt.Errorf("no files found for mod %d", modID)
+	}
+	oldest := result.Files[0]
+	for _, f := range result.Files {
+		if f.UploadedTimestamp < oldest.UploadedTimestamp {
+			oldest = f
+		}
+	}
+	return &FileInfo{
+		ID:                oldest.FileID,
+		Version:           oldest.Version,
+		UploadedTimestamp: oldest.UploadedTimestamp,
+		FileName:          oldest.FileName,
+	}, nil
+}

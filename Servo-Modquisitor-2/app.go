@@ -60,10 +60,11 @@ type Config struct {
 }
 
 type ModVersionInfo struct {
-	Timestamp int64  `json:"timestamp"`
-	Version   string `json:"version"`
-	Folder    string `json:"folder"`           // Название папки мода в nexus_versions.json
-	Source    string `json:"source,omitempty"` // "nexus" или "manual"
+	Timestamp   int64  `json:"timestamp"`
+	Version     string `json:"version"`
+	Folder      string `json:"folder"`                 // Название папки мода в nexus_versions.json
+	Source      string `json:"source,omitempty"`       // "nexus" или "manual"
+	InstalledAt int64  `json:"installed_at,omitempty"` // время установки/обновления
 }
 
 type App struct {
@@ -96,6 +97,8 @@ type App struct {
 	modDatabase              []checks.ModDBEntry
 	cfg                      *Config
 	consoleScroll            *container.Scroll
+	descCardContent          *fyne.Container   // контейнер с описанием
+	descCardScroll           *container.Scroll // скроллер описания
 	manageBtn                *CustomButton
 	selectAllBtn             *CustomButton
 	deselectAllBtn           *CustomButton
@@ -107,6 +110,7 @@ type App struct {
 	removeSelectedBtn        *CustomButton
 	moveToTopBtn             *CustomButton
 	moveToBottomBtn          *CustomButton
+	openFolderBtn            *CustomButton
 	btnToggle                *CustomButton
 	btnSaveOrder             *CustomButton
 	btnRefresh               *CustomButton
@@ -126,6 +130,8 @@ type App struct {
 	myApp                    fyne.App
 	mainWindow               fyne.Window
 	selectColumnBgRes        fyne.Resource
+	toggleOffIcon            fyne.Resource
+	toggleOnIcon             fyne.Resource
 	systemModsTableContainer *fyne.Container
 	tableBorderContainer     *fyne.Container
 	managePanel              *fyne.Container // Управление видимостью панели управления модами
@@ -154,6 +160,8 @@ type App struct {
 	counterLabel             *widget.Label
 	descLocalVersion         *widget.Label
 	descLatestVersion        *widget.Label
+	descLastUpdated          *widget.Label
+	descOriginalUpload       *widget.Label
 	descConflict             *widget.Label // под descStatus
 	moveToEntry              *widget.Entry
 	searchEntry              *widget.Entry
@@ -313,6 +321,9 @@ func (app *App) saveNexusVersionCache() {
 		buf.WriteString(",\n")
 		buf.WriteString("\t\t\"source\": ")
 		buf.WriteString(strconv.Quote(val.Source))
+		buf.WriteString(",\n")
+		buf.WriteString("\t\t\"installed_at\": ")
+		buf.WriteString(strconv.FormatInt(val.InstalledAt, 10))
 		buf.WriteString("\n")
 		buf.WriteString("\t}")
 		if i < len(keys)-1 {
@@ -776,7 +787,7 @@ func (app *App) reloadAfterPathChange() {
 	if app.btnToggle != nil {
 		app.updateToggleButtonText(app.btnToggle)
 	}
-	app.updateLaunchButtonTexts()
+	// app.updateLaunchButtonTexts()
 	app.updateDescriptionForMod(app.selectedModName)
 	app.forceRefreshTable()
 
@@ -824,6 +835,12 @@ func (app *App) loadDataAfterInit() {
 			return app.isModActive(modName)
 		},
 		func() { fyne.Do(app.refreshModList) },
+		func(key string) int64 {
+			if info, ok := app.getCachedVersion(key); ok {
+				return info.InstalledAt
+			}
+			return 0
+		},
 	)
 
 	// 3. Настроить sorter с функциями checks
