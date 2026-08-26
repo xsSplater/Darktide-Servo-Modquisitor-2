@@ -34,11 +34,8 @@ jobs:
       - name: Install go-winres
         run: go install github.com/tc-hib/go-winres@latest
 
-      - name: Copy winres.json to root (fix for go-winres)
-        run: copy winres\winres.json .
-
       - name: Generate resources (icon + version info)
-        run: go-winres make
+        run: go-winres make -f winres/winres.json
 
       - name: Download dependencies
         run: go mod download
