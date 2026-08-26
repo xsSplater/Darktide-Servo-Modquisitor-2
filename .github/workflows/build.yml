@@ -175,13 +175,36 @@ jobs:
           WIN_ZIP=$(find artifacts -name "*.zip" ! -name "*linux*" | head -n 1)
           echo "win_zip=$WIN_ZIP" >> $GITHUB_OUTPUT
 
-      - name: Upload to Nexus Mods
-        uses: Nexus-Mods/upload-action@v1
-        with:
-          api_key: ${{ secrets.NEXUSMODS_APIKEY }}
-          game_id: ${{ vars.NEXUS_GAME_ID }}
-          mod_id: ${{ vars.NEXUS_MOD_ID }}
-          files: |
-            ${{ steps.find_win.outputs.win_zip }}:Servo-Modquisitor-2-windows.zip
-            Servo-Modquisitor-2-linux.zip:Servo-Modquisitor-2-linux.zip
-          file_name: Servo-Modquisitor-2-windows.zip, Servo-Modquisitor-2-linux.zip
+      - name: Upload to Nexus Mods via API
+        env:
+          NEXUS_API_KEY: ${{ secrets.NEXUSMODS_APIKEY }}
+        run: |
+          GAME_ID=${{ vars.NEXUS_GAME_ID }}
+          MOD_ID=${{ vars.NEXUS_MOD_ID }}
+          WIN_ZIP="${{ steps.find_win.outputs.win_zip }}"
+          LINUX_ZIP="Servo-Modquisitor-2-linux.zip"
+
+          # Проверяем, что файлы существуют
+          if [ ! -f "$WIN_ZIP" ]; then
+            echo "Windows zip not found: $WIN_ZIP"
+            exit 1
+          fi
+          if [ ! -f "$LINUX_ZIP" ]; then
+            echo "Linux zip not found: $LINUX_ZIP"
+            exit 1
+          fi
+
+          upload_file() {
+            local file_path="$1"
+            local file_name="$2"
+            echo "Uploading $file_name..."
+            curl -X POST \
+              -H "apikey: $NEXUS_API_KEY" \
+              -F "file=@$file_path;filename=$file_name" \
+              "https://api.nexusmods.com/v1/games/$GAME_ID/mods/$MOD_ID/files" \
+              -w "\nHTTP Status: %{http_code}\n" \
+              --fail-with-body
+          }
+
+          upload_file "$WIN_ZIP" "Servo-Modquisitor-2-windows.zip"
+          upload_file "$LINUX_ZIP" "Servo-Modquisitor-2-linux.zip"
