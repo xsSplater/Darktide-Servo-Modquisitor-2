@@ -12,8 +12,5 @@ rsrc_windows_*.syso
 # Временные файлы fyne
 fyne_metadata_init.go
 
-# Папка с ресурсами go-winres
-winres/
-
 # Папка для vscode
 .vscode/

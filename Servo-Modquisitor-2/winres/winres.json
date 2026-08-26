@@ -1,0 +1,25 @@
+{
+  "RT_GROUP_ICON": {
+    "#1": {
+      "0001": "assets/icon.ico"
+    }
+  },
+  "RT_VERSION": {
+    "#1": {
+      "0000": {
+        "fixed": {
+          "file_version": "2.9.21.0",
+          "product_version": "2.9.21.0"
+        },
+        "info": {
+          "0409": {
+            "FileDescription": "Servo-Modquisitor-2",
+            "ProductName": "Servo-Modquisitor-2",
+            "LegalCopyright": "© 2026 xsSplater",
+            "OriginalFilename": "Servo-Modquisitor-2.exe"
+          }
+        }
+      }
+    }
+  }
+}
