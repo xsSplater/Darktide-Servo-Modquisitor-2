@@ -31,8 +31,28 @@ jobs:
           go-version: '1.26'
           cache-dependency-path: ./Servo-Modquisitor-2/go.sum
 
+      # === Диагностика: показать структуру папок ===
+      - name: List files for debugging
+        run: |
+          echo "Current directory:"
+          dir
+          echo "winres directory:"
+          if exist winres dir winres
+        shell: cmd
+
       - name: Install go-winres
         run: go install github.com/tc-hib/go-winres@latest
+
+      # === Копируем winres.json в корень (если он есть) ===
+      - name: Copy winres.json to root (fix)
+        run: |
+          if exist winres\winres.json (
+            copy winres\winres.json .
+          ) else (
+            echo "winres/winres.json not found!"
+            exit 1
+          )
+        shell: cmd
 
       - name: Generate resources (icon + version info)
         run: go-winres make
