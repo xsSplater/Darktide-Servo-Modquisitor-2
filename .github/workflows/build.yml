@@ -6,7 +6,7 @@ on:
   push:
     tags:
       - 'v*'
-  workflow_dispatch:   # ручной запуск (опционально)
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -35,16 +35,13 @@ jobs:
         run: go install github.com/tc-hib/go-winres@latest
 
       - name: Generate resources (icon + version info)
-        run: go-winres make
-        # go-winres найдёт winres.json в текущей папке (./Servo-Modquisitor-2)
-        # и иконку по пути из winres.json (у вас assets/icon.ico)
+        run: go-winres make -f winres/winres.json
 
       - name: Download dependencies
         run: go mod download
 
       - name: Build
         run: go build -ldflags="-s -w -H=windowsgui" -o servo-modquisitor.exe .
-        # -H=windowsgui гарантирует, что окно консоли не появится
 
       - name: Prepare files for packaging (Windows)
         run: |
@@ -126,4 +123,45 @@ jobs:
             artifacts/servo-modquisitor-linux/Servo-Modquisitor-2-linux.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  
+
+  # === Публикация на Nexus Mods ===
+  upload-nexus:
+    name: Upload to Nexus Mods
+    runs-on: ubuntu-latest
+    needs: release
+    # Только для полноценных релизов (не пре-релизов)
+    if: github.event_name == 'release' && github.event.action == 'published'
+    permissions:
+      contents: read
+    steps:
+      - name: Download artifacts from release
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Prepare Linux tar.gz inside zip (for Nexus)
+        run: |
+          # Находим Linux tar.gz
+          linux_tar=$(find artifacts -name "*.tar.gz" | head -n 1)
+          if [ -n "$linux_tar" ]; then
+            # Копируем tar.gz как есть, но упаковываем в zip
+            cp "$linux_tar" ./Servo-Modquisitor-2-linux.tar.gz
+            zip Servo-Modquisitor-2-linux.zip Servo-Modquisitor-2-linux.tar.gz
+          fi
+
+      - name: Find Windows zip
+        id: find_win
+        run: |
+          WIN_ZIP=$(find artifacts -name "*.zip" ! -name "*linux*" | head -n 1)
+          echo "win_zip=$WIN_ZIP" >> $GITHUB_OUTPUT
+
+      - name: Upload to Nexus Mods
+        uses: Nexus-Mods/upload-action@v1
+        with:
+          api_key: ${{ secrets.NEXUSMODS_APIKEY }}
+          game_id: ${{ vars.NEXUS_GAME_ID }}
+          mod_id: ${{ vars.NEXUS_MOD_ID }}
+          files: |
+            ${{ steps.find_win.outputs.win_zip }}:Servo-Modquisitor-2-windows.zip
+            Servo-Modquisitor-2-linux.zip:Servo-Modquisitor-2-linux.zip
+          file_name: Servo-Modquisitor-2-windows.zip, Servo-Modquisitor-2-linux.zip
