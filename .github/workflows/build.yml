@@ -31,7 +31,6 @@ jobs:
           go-version: '1.26'
           cache-dependency-path: ./Servo-Modquisitor-2/go.sum
 
-      # === Диагностика: показать структуру папок ===
       - name: List files for debugging
         run: |
           echo "Current directory:"
@@ -43,7 +42,6 @@ jobs:
       - name: Install go-winres
         run: go install github.com/tc-hib/go-winres@latest
 
-      # === Копируем winres.json в корень (если он есть) ===
       - name: Copy winres.json to root (fix)
         run: |
           if exist winres\winres.json (
@@ -149,7 +147,6 @@ jobs:
     name: Upload to Nexus Mods
     runs-on: ubuntu-latest
     needs: release
-    # Только для полноценных релизов (не пре-релизов)
     if: github.event_name == 'release' && github.event.action == 'published'
     permissions:
       contents: read
@@ -161,10 +158,8 @@ jobs:
 
       - name: Prepare Linux tar.gz inside zip (for Nexus)
         run: |
-          # Находим Linux tar.gz
           linux_tar=$(find artifacts -name "*.tar.gz" | head -n 1)
           if [ -n "$linux_tar" ]; then
-            # Копируем tar.gz как есть, но упаковываем в zip
             cp "$linux_tar" ./Servo-Modquisitor-2-linux.tar.gz
             zip Servo-Modquisitor-2-linux.zip Servo-Modquisitor-2-linux.tar.gz
           fi
@@ -175,29 +170,39 @@ jobs:
           WIN_ZIP=$(find artifacts -name "*.zip" ! -name "*linux*" | head -n 1)
           echo "win_zip=$WIN_ZIP" >> $GITHUB_OUTPUT
 
-      - name: Install NexusUploader
-        run: dotnet tool install --global BUTR.NexusUploader
-
-      - name: Upload Windows to Nexus
+      - name: Upload to Nexus Mods via v3 API
         env:
-          UNEX_APIKEY: ${{ secrets.NEXUSMODS_APIKEY }}
+          NEXUS_API_KEY: ${{ secrets.NEXUSMODS_APIKEY }}
         run: |
-          butr-nexusuploader upload \
-            --game "warhammer40kdarktide" \
-            --mod ${{ vars.NEXUS_MOD_ID }} \
-            --file "${{ steps.find_win.outputs.win_zip }}" \
-            --version "2.9.21" \
-            --name "Servo-Modquisitor-2-windows.zip" \
-            --changelog "See changelog"
+          GAME_ID="warhammer40kdarktide"
+          MOD_ID="139"
+          VERSION="2.9.21"
+          WIN_ZIP="${{ steps.find_win.outputs.win_zip }}"
+          LINUX_ZIP="Servo-Modquisitor-2-linux.zip"
 
-      - name: Upload Linux to Nexus
-        env:
-          UNEX_APIKEY: ${{ secrets.NEXUSMODS_APIKEY }}
-        run: |
-          butr-nexusuploader upload \
-            --game "warhammer40kdarktide" \
-            --mod ${{ vars.NEXUS_MOD_ID }} \
-            --file "Servo-Modquisitor-2-linux.zip" \
-            --version "2.9.21" \
-            --name "Servo-Modquisitor-2-linux.zip" \
-            --changelog "See changelog"
+          if [ ! -f "$WIN_ZIP" ]; then
+            echo "❌ Windows zip not found: $WIN_ZIP"
+            exit 1
+          fi
+          if [ ! -f "$LINUX_ZIP" ]; then
+            echo "❌ Linux zip not found: $LINUX_ZIP"
+            exit 1
+          fi
+
+          upload_file() {
+            local file_path="$1"
+            local file_name="$2"
+            echo "⬆ Uploading $file_name (version $VERSION)..."
+            curl -X POST \
+              -H "apikey: $NEXUS_API_KEY" \
+              -F "file=@$file_path" \
+              -F "version=$VERSION" \
+              -F "name=$file_name" \
+              -F "changelog=Automated release $VERSION" \
+              "https://api.nexusmods.com/v3/mod-files?game_id=$GAME_ID&mod_id=$MOD_ID" \
+              -w "\n✅ HTTP Status: %{http_code}\n" \
+              --fail-with-body
+          }
+
+          upload_file "$WIN_ZIP" "Servo-Modquisitor-2-windows.zip"
+          upload_file "$LINUX_ZIP" "Servo-Modquisitor-2-linux.zip"
