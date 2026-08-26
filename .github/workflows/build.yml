@@ -35,7 +35,7 @@ jobs:
         run: go install github.com/tc-hib/go-winres@latest
 
       - name: Generate resources (icon + version info)
-        run: go-winres make --in winres/winres.json
+        run: go-winres make
 
       - name: Download dependencies
         run: go mod download
