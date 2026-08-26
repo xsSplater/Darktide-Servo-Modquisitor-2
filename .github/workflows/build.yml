@@ -170,7 +170,7 @@ jobs:
           WIN_ZIP=$(find artifacts -name "*.zip" ! -name "*linux*" | head -n 1)
           echo "win_zip=$WIN_ZIP" >> $GITHUB_OUTPUT
 
-      - name: Upload to Nexus Mods via v3 API
+      - name: Upload to Nexus Mods via v1 API
         env:
           NEXUS_API_KEY: ${{ secrets.NEXUSMODS_APIKEY }}
         run: |
@@ -195,11 +195,11 @@ jobs:
             echo "⬆ Uploading $file_name (version $VERSION)..."
             curl -X POST \
               -H "apikey: $NEXUS_API_KEY" \
+              -H "Content-Type: multipart/form-data" \
               -F "file=@$file_path" \
               -F "version=$VERSION" \
               -F "name=$file_name" \
-              -F "changelog=Automated release $VERSION" \
-              "https://api.nexusmods.com/v3/mod-files?game_id=$GAME_ID&mod_id=$MOD_ID" \
+              "https://api.nexusmods.com/v1/games/$GAME_ID/mods/$MOD_ID/files" \
               -w "\n✅ HTTP Status: %{http_code}\n" \
               --fail-with-body
           }
