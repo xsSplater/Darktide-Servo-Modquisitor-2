@@ -47,9 +47,9 @@ var (
 	openURL          func(string)
 	modsDir          string
 	isModActiveFunc  func(string) bool
-
-	modDBMap        map[string]*ModDBEntry
-	externalVersion string
+	modDBMap         map[string]*ModDBEntry
+	externalVersion  string
+	getInstalledAt   func(string) int64
 )
 
 func InitGlobals(
@@ -60,6 +60,7 @@ func InitGlobals(
 	modsDirPath string,
 	isActiveFn func(string) bool,
 	refreshFn func(),
+	installedAtGetter func(string) int64,
 ) {
 	appendLog = logger
 	messages = msg
@@ -68,6 +69,7 @@ func InitGlobals(
 	modsDir = modsDirPath
 	isModActiveFunc = isActiveFn
 	refreshModListFunc = refreshFn
+	getInstalledAt = installedAtGetter
 }
 
 var refreshModListFunc func()
@@ -132,7 +134,7 @@ func ListModFolders() []string {
 			continue
 		}
 		// Символическая ссылка, junction point или другая reparse-точка.
-		// На Windows директория-junction (mklink /J) не имеет флага
+		// На Windows junction-папка (mklink /J) не имеет флага
 		// os.ModeSymlink и не проходит e.IsDir(), поэтому проверяем через
 		// os.Stat, который разыменовывает reparse-точку и возвращает
 		// сведения о целевой папке.
@@ -168,11 +170,14 @@ type ModInfo struct {
 	Note              string
 	URL               string
 	GitHubURL         string
+	Category          string
 	NexusVersion      string
 	NexusSummary      string
 	NexusPictureURL   string
 	Source            string // "nexus" или "manual"
 	ModTime           time.Time
+	LastUpdated       time.Time `json:"-"` // дата последнего обновления (из последнего файла)
+	OriginalUpload    time.Time `json:"-"` // дата первой загрузки (из самого старого файла)
 }
 
 type ModDBEntry struct {
@@ -181,6 +186,7 @@ type ModDBEntry struct {
 	Name             map[string]string `json:"name"`
 	Description      map[string]string `json:"description"`
 	Author           string            `json:"author"`
+	Category         string            `json:"category"` // Категория мода	// Category         string            `json:"category,omitempty"` // Категория мода
 	URL              string            `json:"url"`
 	GitHubURL        string            `json:"github_url"`
 	Note             map[string]string `json:"note"`
@@ -214,6 +220,7 @@ func GetModsInfo(lang string, forceEnglish bool) []ModInfo {
 				mod.Author = db.Author
 				mod.URL = db.URL
 				mod.GitHubURL = db.GitHubURL
+				mod.Category = db.Category
 				mod.Description = PickLocalized(db.Description, lang)
 				mod.Note = PickLocalized(db.Note, lang)
 				if forceEnglish {
@@ -261,52 +268,80 @@ func GetModsInfo(lang string, forceEnglish bool) []ModInfo {
 
 		mod.VortexDeployed = fileExists(filepath.Join(fullPath, "__folder_managed_by_vortex"))
 
-		switch {
-		case name == "base":
-			mod.IsSystem = true
-			mod.Active = false
-			mod.ModTime = getModTimeFromFile(filepath.Join(fullPath, "mod_manager.lua"))
-		case name == "dmf":
-			mod.IsSystem = true
-			mod.Active = false
-			mod.ModTime = getModTimeFromFile(filepath.Join(fullPath, "scripts", "mods", "dmf", "dmf_loader.lua"))
+		// --- Вычисляем cacheKey для проверки installed_at ---
+		var cacheKey string
+		switch name {
+		case "base":
+			cacheKey = "19:base"
+		case "dmf":
+			cacheKey = "8:dmf"
+		case "autopatch":
+			cacheKey = "709:autopatch"
 		default:
-			luaPaths := []string{
-				filepath.Join(fullPath, name+".lua"),
-				filepath.Join(fullPath, "scripts", "mods", name, name+".lua"),
-			}
-			foundLua := false
-			for _, lp := range luaPaths {
-				if t := getModTimeFromFile(lp); !t.IsZero() {
-					mod.ModTime = t
-					foundLua = true
-					break
+			if db, ok := modDBMap[strings.ToLower(name)]; ok && db.URL != "" {
+				if id := helpers.ExtractModIDFromURL(db.URL); id != 0 {
+					cacheKey = fmt.Sprintf("%d:%s", id, name)
 				}
 			}
-			if !foundLua {
-				modFilePath := filepath.Join(fullPath, name+".mod")
-				// Проверяем .mod файл уже с учётом возможного переименования
-				if !fileExists(modFilePath) {
-					mod.Broken = true
-				} else {
-					mod.Broken = false
-				}
-				// Если папка отключена префиксом - не считаем её сломанной
-				if strings.HasPrefix(mod.Name, "_") || strings.HasPrefix(mod.Name, "__") || strings.HasPrefix(mod.Name, "--") {
-					mod.Broken = false
-				}
+		}
 
-				// Устанавливаем время модификации, если ещё не установлено
-				if mod.ModTime.IsZero() {
-					if modFileInfo, err := os.Stat(modFilePath); err == nil {
-						mod.ModTime = modFileInfo.ModTime()
+		// --- Флаг, чтобы не переопределять ModTime, если есть installed_at ---
+		modTimeSet := false
+
+		// --- Проверяем installed_at в кэше ---
+		if cacheKey != "" && getInstalledAt != nil {
+			if installed := getInstalledAt(cacheKey); installed > 0 {
+				mod.ModTime = time.Unix(installed, 0)
+				modTimeSet = true
+			}
+		}
+
+		// --- Если installed_at нет, вычисляем ModTime по файлам ---
+		if !modTimeSet {
+			switch {
+			case name == "base":
+				mod.IsSystem = true
+				mod.Active = false
+				mod.ModTime = getModTimeFromFile(filepath.Join(fullPath, "mod_manager.lua"))
+			case name == "dmf":
+				mod.IsSystem = true
+				mod.Active = false
+				mod.ModTime = getModTimeFromFile(filepath.Join(fullPath, "scripts", "mods", "dmf", "dmf_loader.lua"))
+			default:
+				luaPaths := []string{
+					filepath.Join(fullPath, name+".lua"),
+					filepath.Join(fullPath, "scripts", "mods", name, name+".lua"),
+				}
+				foundLua := false
+				for _, lp := range luaPaths {
+					if t := getModTimeFromFile(lp); !t.IsZero() {
+						mod.ModTime = t
+						foundLua = true
+						break
+					}
+				}
+				if !foundLua {
+					modFilePath := filepath.Join(fullPath, name+".mod")
+					if !fileExists(modFilePath) {
+						mod.Broken = true
 					} else {
-						mod.ModTime = fi.ModTime()
+						mod.Broken = false
+					}
+					if strings.HasPrefix(mod.Name, "_") || strings.HasPrefix(mod.Name, "__") || strings.HasPrefix(mod.Name, "--") {
+						mod.Broken = false
+					}
+					if mod.ModTime.IsZero() {
+						if modFileInfo, err := os.Stat(modFilePath); err == nil {
+							mod.ModTime = modFileInfo.ModTime()
+						} else {
+							mod.ModTime = fi.ModTime()
+						}
 					}
 				}
 			}
 		}
 
+		// Заполняем из базы данных
 		if db, ok := modDBMap[strings.ToLower(name)]; ok && db.Folder != "" {
 			mod.Author = db.Author
 			mod.URL = db.URL
@@ -384,6 +419,10 @@ func TryFixMismatchedModFolder(folderPath, currentName string) string {
 	expectedName := strings.TrimSuffix(modFile, ".mod")
 	if expectedName == currentName {
 		return "" // уже правильно
+	}
+	if strings.Contains(modFile, string(os.PathSeparator)) {
+		// если вдруг findSingleModFile вернул путь с подпапкой (такого не должно быть)
+		return ""
 	}
 	// Переименовываем папку
 	newPath := filepath.Join(filepath.Dir(folderPath), expectedName)
@@ -794,7 +833,20 @@ func CheckBrokenMods(window fyne.Window) bool {
 		if folder == "base" || folder == "dmf" || isDisabledByNaming(folder) {
 			continue
 		}
-		if !fileExists(filepath.Join(modsDir, folder, folder+".mod")) {
+		// Проверяем, есть ли в папке хотя бы один .mod файл
+		fullPath := filepath.Join(modsDir, folder)
+		entries, err := os.ReadDir(fullPath)
+		if err != nil {
+			continue
+		}
+		hasModFile := false
+		for _, e := range entries {
+			if !e.IsDir() && strings.HasSuffix(strings.ToLower(e.Name()), ".mod") {
+				hasModFile = true
+				break
+			}
+		}
+		if !hasModFile {
 			broken = append(broken, folder)
 		}
 	}
@@ -1139,4 +1191,3 @@ func getDisplayName(folder string, lang string) string {
 	}
 	return folder // fallback на техническое имя
 }
-

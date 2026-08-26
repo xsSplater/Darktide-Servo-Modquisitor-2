@@ -6,7 +6,7 @@ on:
   push:
     tags:
       - 'v*'
-  workflow_dispatch:   # ручной запуск (опционально)
+  workflow_dispatch:
 
 permissions:
   contents: write

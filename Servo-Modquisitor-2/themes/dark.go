@@ -59,6 +59,8 @@ func (t ForcedDarkTheme) Color(name fyne.ThemeColorName, variant fyne.ThemeVaria
 	// Цвет гиперссылок (в Fyne они могут отображаться как текст)
 	case theme.ColorNameHyperlink:
 		return color.NRGBA{R: 80, G: 140, B: 220, A: 255}
+	case ColorHighlightData:
+		return color.NRGBA{R: 255, G: 200, B: 80, A: 255} // светло-оранжевый
 
 	// ================== СКРОЛЛБАРЫ ==================
 	// Цвет ползунка скроллбара

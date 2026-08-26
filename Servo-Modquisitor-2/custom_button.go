@@ -14,14 +14,14 @@ import (
 
 type _CustomButtonRenderer struct {
 	btn     *CustomButton
-	shadow  *canvas.Rectangle // тень
-	bg      *canvas.Rectangle // основной фон
-	bgImage *canvas.Image     // фоновое изображение (опционально)
+	shadow  *canvas.Rectangle
+	bg      *canvas.Rectangle
+	bgImage *canvas.Image
 	text    *canvas.Text
+	icon    *canvas.Image
 }
 
 func (r *_CustomButtonRenderer) Layout(size fyne.Size) {
-	// Тень: чуть смещена вниз‑вправо, чуть меньше фона
 	shadowPad := float32(1)
 	r.shadow.Resize(fyne.NewSize(size.Width+shadowPad, size.Height+shadowPad))
 	r.shadow.Move(fyne.NewPos(shadowPad, shadowPad+1))
@@ -30,6 +30,20 @@ func (r *_CustomButtonRenderer) Layout(size fyne.Size) {
 	if r.bgImage != nil {
 		r.bgImage.Resize(size)
 	}
+
+	// Размещаем иконку
+	if r.icon != nil {
+		iconSize := r.btn.iconSize // обычный размер
+		if r.btn.hovered && !r.btn.disabled {
+			iconSize = iconSize * 1.33 // увеличиваем на 33% при наведении
+		}
+		x := (size.Width - iconSize) / 2
+		y := (size.Height - iconSize) / 2
+		r.icon.Resize(fyne.NewSize(iconSize, iconSize))
+		r.icon.Move(fyne.NewPos(x, y))
+		r.icon.Refresh()
+	}
+
 	r.text.Resize(size)
 	r.text.Alignment = fyne.TextAlignCenter
 	r.updateColors()
@@ -37,18 +51,43 @@ func (r *_CustomButtonRenderer) Layout(size fyne.Size) {
 
 func (r *_CustomButtonRenderer) MinSize() fyne.Size {
 	min := r.text.MinSize()
+	if r.icon != nil {
+		iconMin := r.icon.MinSize()
+		if iconMin.Width > min.Width {
+			min.Width = iconMin.Width
+		}
+		if iconMin.Height > min.Height {
+			min.Height = iconMin.Height
+		}
+	}
 	min.Width += 2*theme.Padding() + 8
 	min.Height += 2*theme.Padding() + 8
 	return min
 }
 
+func (r *_CustomButtonRenderer) updateIcon() {
+	if r.icon == nil {
+		return
+	}
+	if r.btn.icon != nil {
+		r.icon.Resource = r.btn.icon
+		r.icon.Refresh()
+	}
+}
+
 func (r *_CustomButtonRenderer) Refresh() {
 	r.text.Text = r.btn.text
+	r.updateIcon()
+	// Принудительно пересчитываем Layout, чтобы изменить размер иконки
+	r.Layout(r.btn.Size())
 	r.updateColors()
 	r.text.Refresh()
 	r.bg.Refresh()
 	if r.bgImage != nil {
 		r.bgImage.Refresh()
+	}
+	if r.icon != nil {
+		r.icon.Refresh()
 	}
 	r.shadow.Refresh()
 }
@@ -58,7 +97,11 @@ func (r *_CustomButtonRenderer) Objects() []fyne.CanvasObject {
 	if r.bgImage != nil {
 		objs = append(objs, r.bgImage)
 	}
-	objs = append(objs, r.bg, r.text)
+	objs = append(objs, r.bg)
+	if r.icon != nil {
+		objs = append(objs, r.icon)
+	}
+	objs = append(objs, r.text)
 	return objs
 }
 
@@ -69,7 +112,6 @@ func (r *_CustomButtonRenderer) updateColors() {
 	th := fyne.CurrentApp().Settings().Theme()
 	variant := fyne.CurrentApp().Settings().ThemeVariant()
 
-	// Тень
 	if btn.disabled {
 		r.shadow.FillColor = th.Color(themes.ColorButtonShadowDisabled, variant)
 	} else {
@@ -95,7 +137,6 @@ func (r *_CustomButtonRenderer) updateColors() {
 		return
 	}
 
-	// Обычные состояния
 	switch {
 	case btn.pressed && btn.hovered:
 		r.bg.FillColor = th.Color(theme.ColorNamePressed, variant)
@@ -117,6 +158,7 @@ func (r *_CustomButtonRenderer) updateColors() {
 type CustomButton struct {
 	widget.BaseWidget
 	text       string
+	icon       fyne.Resource
 	OnTapped   func()
 	Importance widget.Importance
 
@@ -130,6 +172,8 @@ type CustomButton struct {
 	OnMouseMoved func(*desktop.MouseEvent)
 
 	bgImage *canvas.Image
+
+	iconSize float32 // размер иконки
 }
 
 func NewCustomButton(label string, tapped func()) *CustomButton {
@@ -141,7 +185,23 @@ func NewCustomButton(label string, tapped func()) *CustomButton {
 	return b
 }
 
-// SetBackgroundImage задаёт фоновое изображение для кнопки.
+func NewIconButton(icon fyne.Resource, tapped func()) *CustomButton {
+	b := &CustomButton{
+		icon:     icon,
+		OnTapped: tapped,
+
+		iconSize: 24, // по умолчанию
+	}
+	b.ExtendBaseWidget(b)
+	return b
+}
+
+// Метод для установки размера иконки
+func (b *CustomButton) SetIconSize(size float32) {
+	b.iconSize = size
+	b.Refresh()
+}
+
 func (b *CustomButton) SetBackgroundImage(img *canvas.Image) {
 	b.bgImage = img
 	b.Refresh()
@@ -215,11 +275,19 @@ func (b *CustomButton) CreateRenderer() fyne.WidgetRenderer {
 	txt.Alignment = fyne.TextAlignCenter
 	txt.TextStyle.Bold = true
 
+	var iconImg *canvas.Image
+	if b.icon != nil {
+		iconImg = canvas.NewImageFromResource(b.icon)
+		iconImg.FillMode = canvas.ImageFillContain
+		iconImg.SetMinSize(fyne.NewSize(24, 24))
+	}
+
 	renderer := &_CustomButtonRenderer{
 		btn:    b,
 		shadow: shadow,
 		bg:     bg,
 		text:   txt,
+		icon:   iconImg,
 	}
 	if b.bgImage != nil {
 		renderer.bgImage = b.bgImage

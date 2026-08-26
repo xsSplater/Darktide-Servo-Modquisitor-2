@@ -52,6 +52,8 @@ func (t ForcedLightTheme) Color(name fyne.ThemeColorName, variant fyne.ThemeVari
 	case theme.ColorNameHyperlink:
 		// Оставляем синий для привычности, но можно заменить на #2E7D32 при желании
 		return color.NRGBA{R: 33, G: 150, B: 243, A: 255} // синий (#2196F3)
+	case ColorHighlightData:
+		return color.NRGBA{R: 255, G: 180, B: 50, A: 255}
 
 	// ================== СКРОЛЛБАРЫ ==================
 	case theme.ColorNameScrollBar:

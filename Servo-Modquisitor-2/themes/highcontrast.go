@@ -49,6 +49,8 @@ func (t HighContrastTheme) Color(name fyne.ThemeColorName, variant fyne.ThemeVar
 		return color.NRGBA{R: 0, G: 0, B: 255, A: 255} // синий акцент
 	case theme.ColorNameHyperlink:
 		return color.NRGBA{R: 0, G: 0, B: 200, A: 255}
+	case ColorHighlightData:
+		return color.NRGBA{R: 255, G: 200, B: 80, A: 255}
 
 	// ================== СКРОЛЛБАРЫ ==================
 	case theme.ColorNameScrollBar:

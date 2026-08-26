@@ -52,5 +52,6 @@ func launchGame(version GameVersion, gameRoot string, skipLauncher bool) error {
 
 	cmd := exec.Command(exePath, args...)
 	cmd.Dir = filepath.Dir(exePath)
+
 	return cmd.Start()
 }

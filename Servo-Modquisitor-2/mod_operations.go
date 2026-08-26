@@ -362,11 +362,12 @@ func (app *App) toggleGlobalMods() {
 			app.appendLog(state + app.messages["log_autopatcher"])
 		}
 	case PatcherLegacy:
-		err := toggleModsLegacy(app.gameRoot) // передаём gameRoot
+		err := toggleModsLegacy(app.gameRoot)
 		if err != nil {
 			app.appendLog(fmt.Sprintf(app.messages["log_toggle_fail"], err))
 		} else {
-			app.cfg.ModsGloballyEnabled = !app.cfg.ModsGloballyEnabled
+			app.syncModsEnabledState()
+			app.updateToggleButtonText(app.btnToggle)
 			state := app.messages["log_mods_enabled"]
 			if !app.cfg.ModsGloballyEnabled {
 				state = app.messages["log_mods_disabled"]
@@ -490,27 +491,38 @@ func (app *App) extractArchiveTo(archivePath, destDir string) error {
 		if err != nil {
 			return err
 		}
+
 		if fi.IsDir() {
-			return os.MkdirAll(targetPath, 0755)
+			if err := app.ensureDir(targetPath); err != nil {
+				app.appendLog(fmt.Sprintf("ensureDir failed for %s: %v", targetPath, err))
+				return err
+			}
+			return nil
 		}
-		if err := os.MkdirAll(filepath.Dir(targetPath), 0755); err != nil {
+
+		// Для файлов создаём родительскую папку
+		parentDir := filepath.Dir(targetPath)
+		if err := app.ensureDir(parentDir); err != nil {
+			app.appendLog(fmt.Sprintf("ensureDir failed for parent %s: %v", parentDir, err))
 			return err
 		}
+
 		out, err := os.Create(targetPath)
 		if err != nil {
 			return err
 		}
 		defer out.Close()
+
 		rc, err := fi.Open()
 		if err != nil {
 			return err
 		}
 		defer rc.Close()
+
 		_, err = io.Copy(out, rc)
-		if err != nil {
-		}
 		fileCount++
 		if fileCount%10 == 0 {
+			// Можно добавить прогресс
 		}
 		return err
 	})
@@ -518,6 +530,7 @@ func (app *App) extractArchiveTo(archivePath, destDir string) error {
 		return err
 	}
 
+	// Копируем содержимое временной папки в destDir
 	entries, err := os.ReadDir(tmpDir)
 	if err != nil {
 		return err
@@ -558,6 +571,7 @@ func (app *App) syncModsEnabledState() {
 	case PatcherAutoPatch:
 		app.cfg.ModsGloballyEnabled = isModsEnabledAutoPatch(app.gameRoot)
 	case PatcherLegacy:
+		app.cfg.ModsGloballyEnabled = isModsEnabledLegacy(app.gameRoot)
 	}
 	saveConfig(app.cfg)
 }
@@ -877,7 +891,7 @@ func (app *App) InstallModFromArchive(archivePath string, activate bool, knownVe
 		}
 	}
 
-	// Получаем список оставшихся папок (обычные моды) — ПРИСВАИВАНИЕ, без объявления
+	// Получаем список оставшихся папок (обычные моды) - ПРИСВАИВАНИЕ, без объявления
 	entries, err = os.ReadDir(tmpDir)
 	if err != nil {
 		return "", "", err
@@ -973,7 +987,7 @@ func (app *App) InstallModFromArchive(archivePath string, activate bool, knownVe
 	// Кэшируем версию для первого мода, если есть modID и версия
 	if version != "" && modID != 0 {
 		cacheKey := fmt.Sprintf("%d:%s", modID, installedName)
-		app.cacheModVersion(cacheKey, installedName, version, 0, "manual")
+		app.cacheModVersion(cacheKey, installedName, version, 0, "manual", 0)
 	}
 
 	// Синхронизируем кэш версий с локальными файлами (особенно для правил)
@@ -1466,7 +1480,7 @@ func extractVersionAndModIDFromFilename(filename string) (modID int, version str
 		return 0, "", false
 	}
 
-	// Версия — первая часть после ID, которая является числом или числом с точками
+	// Версия - первая часть после ID, которая является числом или числом с точками
 	var versionParts []string
 	for i := idIdx + 1; i < len(parts); i++ {
 		part := parts[i]
@@ -1474,7 +1488,7 @@ func extractVersionAndModIDFromFilename(filename string) (modID int, version str
 		if isNumeric(strings.ReplaceAll(part, ".", "")) {
 			versionParts = append(versionParts, part)
 		} else {
-			// если встретили нечисловой элемент — это дата или хэш, останавливаемся
+			// если встретили нечисловой элемент - это дата или хэш, останавливаемся
 			break
 		}
 	}
@@ -1556,18 +1570,22 @@ func (app *App) promptUserForVersion(modName string) string {
 	return <-resultChan
 }
 
-func (app *App) cacheModVersion(cacheKey, folderName, version string, timestamp int64, source string) {
+func (app *App) cacheModVersion(cacheKey, folderName, version string, timestamp int64, source string, installedAt int64) {
 	if version == "" {
 		return
 	}
 	if source == "" {
 		source = "manual"
 	}
+	if installedAt == 0 {
+		installedAt = time.Now().Unix()
+	}
 	app.setCachedVersion(cacheKey, ModVersionInfo{
-		Timestamp: timestamp,
-		Version:   version,
-		Folder:    folderName,
-		Source:    source,
+		Timestamp:   timestamp,
+		Version:     version,
+		Folder:      folderName,
+		Source:      source,
+		InstalledAt: installedAt,
 	})
 	app.saveNexusVersionCache()
 }
@@ -1610,18 +1628,19 @@ func (app *App) updateModCounter() {
 	app.counterLabel.SetText(fmt.Sprintf(app.messages["mods_counter"], len(app.displayedMods), len(app.allMods), activeCount))
 }
 
-// normalizeArchiveStructure исправляет типичные ошибки упаковки модов:
-// 1. Автор пошёл во все тяжкие и закинул даже папку mods в другую папку Folder/mods/ModName/, что даёт папку Folder в mods. Убираем всё до ModName/.
-// 2. Лишняя папка mods в архиве - mods/ModName, что даёт mods/mods/ModName в итоге. Поднимаем содержимое на уровень выше.
-// 3. Отсутствие корневой папки мода ModName/, что даёт папку "scripts" вместе с файлом "ModName.mod" в mods. Cоздаём папку по имени ".mod" файла и перемещает туда всё.
-// 4. Если есть .mod файл в корне, но нет папки с именем этого .mod файла (без расширения), создаём такую папку и перемещаем туда всё содержимое.
+// normalizeArchiveStructure исправляет типичные ошибки упаковки модов.
 func (app *App) normalizeArchiveStructure(tmpDir string) error {
-	// Этап 1: убираем внешние обёртки вида "Folder/mods/..."
+	readEntries := func() ([]os.DirEntry, error) {
+		return os.ReadDir(tmpDir)
+	}
+
+	entries, err := readEntries()
+	if err != nil {
+		return err
+	}
+
+	// --- Этап 1: убираем внешние обёртки вида "Folder/mods/..." ---
 	for {
-		entries, err := os.ReadDir(tmpDir)
-		if err != nil {
-			break
-		}
 		if len(entries) != 1 || !entries[0].IsDir() {
 			break
 		}
@@ -1641,7 +1660,6 @@ func (app *App) normalizeArchiveStructure(tmpDir string) error {
 		if modsPath == "" {
 			break
 		}
-		// Перемещаем всё содержимое modsPath в tmpDir
 		subEntries, err := os.ReadDir(modsPath)
 		if err != nil {
 			break
@@ -1657,13 +1675,13 @@ func (app *App) normalizeArchiveStructure(tmpDir string) error {
 			}
 		}
 		os.RemoveAll(outerPath)
+		entries, err = readEntries()
+		if err != nil {
+			return err
+		}
 	}
 
-	// Этап 2: если в корне единственная папка "mods" - поднимаем её содержимое
-	entries, err := os.ReadDir(tmpDir)
-	if err != nil {
-		return err
-	}
+	// --- Этап 2: если в корне единственная папка "mods" - поднимаем её содержимое ---
 	if len(entries) == 1 && entries[0].IsDir() && strings.EqualFold(entries[0].Name(), "mods") {
 		modsDir := filepath.Join(tmpDir, entries[0].Name())
 		subEntries, err := os.ReadDir(modsDir)
@@ -1681,13 +1699,13 @@ func (app *App) normalizeArchiveStructure(tmpDir string) error {
 			}
 		}
 		os.Remove(modsDir)
-		entries, err = os.ReadDir(tmpDir)
+		entries, err = readEntries()
 		if err != nil {
 			return err
 		}
 	}
 
-	// Этап 3: если нет ни одной папки, но есть .mod файл - создаём папку мода и перемещаем всё в неё
+	// --- Этап 3: если нет ни одной папки, но есть .mod файл - создаём папку мода ---
 	hasFolder := false
 	var modFile string
 	for _, e := range entries {
@@ -1704,15 +1722,17 @@ func (app *App) normalizeArchiveStructure(tmpDir string) error {
 	if !hasFolder && modFile != "" {
 		modName := strings.TrimSuffix(modFile, ".mod")
 		newDir := filepath.Join(tmpDir, modName)
-		if err := os.Mkdir(newDir, 0755); err != nil {
-			return err
+		if _, err := os.Stat(newDir); os.IsNotExist(err) {
+			if err := os.Mkdir(newDir, 0755); err != nil {
+				return err
+			}
 		}
 		for _, e := range entries {
 			src := filepath.Join(tmpDir, e.Name())
-			dst := filepath.Join(newDir, e.Name())
-			if e.Name() == modName {
+			if e.Name() == modFile && e.Name() == modName+".mod" {
 				continue
 			}
+			dst := filepath.Join(newDir, e.Name())
 			if err := os.Rename(src, dst); err != nil {
 				if err := copyPath(src, dst); err != nil {
 					return err
@@ -1720,47 +1740,114 @@ func (app *App) normalizeArchiveStructure(tmpDir string) error {
 				os.RemoveAll(src)
 			}
 		}
-		// обновляем список
-		entries, err = os.ReadDir(tmpDir)
+		entries, err = readEntries()
 		if err != nil {
 			return err
 		}
 	}
 
-	// Этап 4: если есть .mod файл в корне, но нет папки с именем этого .mod файла (без расширения),
-	// создаём такую папку и перемещаем туда всё содержимое (включая .mod файл и все подпапки).
+	// --- Этап 4: если есть .mod файл в корне, но нет папки с его именем ---
 	var modFileInRoot string
-	var hasModFolder bool
 	var modNameFromFile string
 	for _, e := range entries {
 		if !e.IsDir() && strings.HasSuffix(strings.ToLower(e.Name()), ".mod") {
 			modFileInRoot = e.Name()
 			modNameFromFile = strings.TrimSuffix(modFileInRoot, ".mod")
-		}
-		if e.IsDir() && e.Name() == modNameFromFile {
-			hasModFolder = true
+			break
 		}
 	}
-	if modFileInRoot != "" && !hasModFolder {
-		newDir := filepath.Join(tmpDir, modNameFromFile)
-		if err := os.Mkdir(newDir, 0755); err != nil {
-			return err
-		}
+	if modFileInRoot != "" {
+		hasModFolder := false
 		for _, e := range entries {
-			src := filepath.Join(tmpDir, e.Name())
-			dst := filepath.Join(newDir, e.Name())
-			// пропускаем, если это уже созданная папка (но её нет в entries)
-			if e.Name() == modNameFromFile {
-				continue
+			if e.IsDir() && e.Name() == modNameFromFile {
+				hasModFolder = true
+				break
 			}
-			if err := os.Rename(src, dst); err != nil {
-				if err := copyPath(src, dst); err != nil {
+		}
+		if !hasModFolder {
+			newDir := filepath.Join(tmpDir, modNameFromFile)
+			if _, err := os.Stat(newDir); os.IsNotExist(err) {
+				if err := os.Mkdir(newDir, 0755); err != nil {
 					return err
 				}
-				os.RemoveAll(src)
+			}
+			for _, e := range entries {
+				src := filepath.Join(tmpDir, e.Name())
+				if e.Name() == modFileInRoot {
+					dst := filepath.Join(newDir, e.Name())
+					if err := os.Rename(src, dst); err != nil {
+						if err := copyPath(src, dst); err != nil {
+							return err
+						}
+						os.RemoveAll(src)
+					}
+				} else if e.IsDir() && e.Name() != modNameFromFile {
+					dst := filepath.Join(newDir, e.Name())
+					if err := os.Rename(src, dst); err != nil {
+						if err := copyPath(src, dst); err != nil {
+							return err
+						}
+						os.RemoveAll(src)
+					}
+				}
+			}
+			entries, err = readEntries()
+			if err != nil {
+				return err
 			}
 		}
-		// обновлять entries не обязательно, так как дальнейшего использования нет
+	}
+
+	// --- Этап 5: если есть папка, имя которой совпадает с именем .mod файла (без расширения), но внутри папки нет .mod файла - перемещаем .mod файл внутрь папки ---
+	// Это исправляет случай, когда автор положил .mod файл рядом с папкой мода, а не внутри неё.
+	var modFileInRoot2 string
+	var modNameFromFile2 string
+	for _, e := range entries {
+		if !e.IsDir() && strings.HasSuffix(strings.ToLower(e.Name()), ".mod") {
+			modFileInRoot2 = e.Name()
+			modNameFromFile2 = strings.TrimSuffix(modFileInRoot2, ".mod")
+			break
+		}
+	}
+	if modFileInRoot2 != "" {
+		// Ищем папку с таким же именем
+		var targetFolder string
+		for _, e := range entries {
+			if e.IsDir() && e.Name() == modNameFromFile2 {
+				targetFolder = e.Name()
+				break
+			}
+		}
+		if targetFolder != "" {
+			// Проверяем, есть ли внутри папки .mod файл
+			folderPath := filepath.Join(tmpDir, targetFolder)
+			innerEntries, err := os.ReadDir(folderPath)
+			if err == nil {
+				hasModInside := false
+				for _, inner := range innerEntries {
+					if !inner.IsDir() && strings.HasSuffix(strings.ToLower(inner.Name()), ".mod") {
+						hasModInside = true
+						break
+					}
+				}
+				if !hasModInside {
+					// Перемещаем .mod файл внутрь папки
+					src := filepath.Join(tmpDir, modFileInRoot2)
+					dst := filepath.Join(folderPath, modFileInRoot2)
+					if err := os.Rename(src, dst); err != nil {
+						if err := copyPath(src, dst); err != nil {
+							return err
+						}
+						os.RemoveAll(src)
+					}
+					// Обновляем entries
+					entries, err = readEntries()
+					if err != nil {
+						return err
+					}
+				}
+			}
+		}
 	}
 
 	return nil

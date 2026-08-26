@@ -43,6 +43,7 @@ const (
 	ColorManagePanelBg  = "color-manage-panel-bg"
 	ColorTopPanelBg     = "color-top-panel-bg"
 	ColorTipBg          = "color-tip-bg"
+	ColorHighlightData  = "color-highlight-data"
 
 	// Кастомная кнопка
 	ColorButtonShadow         = "color-button-shadow"
