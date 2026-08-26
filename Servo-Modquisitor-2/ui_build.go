@@ -525,7 +525,7 @@ func (app *App) buildUI() {
 
 	// Верхняя панель
 	app.topPanelBgRect = canvas.NewRectangle(th.Color(themes.ColorTopPanelBg, variant))
-	topPanelContent := container.NewHBox(app.btnInstall, app.btnRefresh, app.btnSaveOrder, widget.NewSeparator(), app.btnCheckUpdates, app.btnUpdateAll, widget.NewSeparator(), app.btnSortChecks, widget.NewSeparator(), app.manageBtn, widget.NewSeparator(), app.filterLabel, filterSelectWithSize, searchBar, widget.NewSeparator(), app.btnToggle, widget.NewSeparator(), app.btnLaunchNormal, app.btnLaunchNoLauncher)
+	topPanelContent := container.NewHBox(app.btnInstall, app.btnRefresh, app.btnSaveOrder, widget.NewSeparator(), app.btnSortChecks, widget.NewSeparator(), app.manageBtn, widget.NewSeparator(), app.filterLabel, filterSelectWithSize, searchBar, widget.NewSeparator(), app.btnCheckUpdates, app.btnUpdateAll, widget.NewSeparator(), app.btnToggle, widget.NewSeparator(), app.btnLaunchNormal, app.btnLaunchNoLauncher)
 	topPanelWithBg := container.NewStack(app.topPanelBgRect, topPanelContent)
 
 	// Таблица заголовков
