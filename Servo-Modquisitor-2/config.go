@@ -11,7 +11,7 @@ import (
 // ───────────── Программа ─────────────────────────────────────────
 const (
 	AppName         = "Servo-Modquisitor-2"
-	AppVersion      = "2.9.21"
+	AppVersion      = "2.9.22"
 	AppID           = "com.xssplater.servo-modquisitor"
 	AppIcon         = "assets/icon.png"
 	СonfigFolderSMQ = "Servo-Modquisitor"
@@ -197,7 +197,7 @@ const (
 // ───────────── Поиск и Фильтр ────────────────────────────────────
 const (
 	AMLSearchMinWidth = 600
-	SearchMinWidth    = 350
+	SearchMinWidth    = 300
 
 	AMLFilterMinWidth = 200
 	FilterMinWidth    = 200

@@ -16,7 +16,7 @@ import (
 	"fyne.io/fyne/v2/dialog"
 )
 
-//go:embed lang/messages.json assets/CRT_BlackBG.jpg assets/Yellow_BG.jpg assets/Yellow_BG_button.jpg assets/Yellow_BG_col.jpg assets/icon.png assets/mechanicus.png assets/buttons/trashcan_red.png assets/buttons/trashcan_red_x.png assets/buttons/upd_download_blue_p.png assets/buttons/folder_open.png assets/buttons/refresh.png assets/buttons/save.png assets/buttons/check_updates_blue.png assets/buttons/update_all_mods_blue_p.png assets/buttons/add.png assets/buttons/sort.png assets/buttons/on.png assets/buttons/off_red.png assets/buttons/cog_check.png assets/buttons/play.png assets/buttons/play_fast.png
+//go:embed lang/messages.json assets/CRT_BlackBG.jpg assets/Yellow_BG.jpg assets/Yellow_BG_button.jpg assets/Yellow_BG_col.jpg assets/icon.png assets/mechanicus.png assets/buttons/trashcan_red.png assets/buttons/trashcan_red_x.png assets/buttons/trashcan_red_sel.png assets/buttons/upd_download_blue_p.png assets/buttons/folder_open.png assets/buttons/refresh.png assets/buttons/save.png assets/buttons/check_updates_blue.png assets/buttons/update_all_mods_blue_p.png assets/buttons/add.png assets/buttons/sort.png assets/buttons/on.png assets/buttons/off_red.png assets/buttons/cog_check.png assets/buttons/play.png assets/buttons/play_fast.png assets/buttons/up.png assets/buttons/down.png assets/buttons/bottom.png assets/buttons/top.png assets/buttons/v_v2.png assets/buttons/v_.png
 var embeddedFiles embed.FS
 
 func main() {

@@ -170,39 +170,25 @@ jobs:
           WIN_ZIP=$(find artifacts -name "*.zip" ! -name "*linux*" | head -n 1)
           echo "win_zip=$WIN_ZIP" >> $GITHUB_OUTPUT
 
-      - name: Upload to Nexus Mods via v1 API
-        env:
-          NEXUS_API_KEY: ${{ secrets.NEXUSMODS_APIKEY }}
-        run: |
-          GAME_ID="warhammer40kdarktide"
-          MOD_ID="139"
-          VERSION="2.9.21"
-          WIN_ZIP="${{ steps.find_win.outputs.win_zip }}"
-          LINUX_ZIP="Servo-Modquisitor-2-linux.zip"
+      - name: Upload Windows to Nexus
+        uses: Nexus-Mods/upload-action@v1.0.0-beta.10
+        with:
+          api_key: ${{ secrets.NEXUSMODS_APIKEY }}
+          file_id: 7798
+          filename: ${{ steps.find_win.outputs.win_zip }}
+          version: 2.9.22
+          display_name: Servo-Modquisitor-2-windows.zip
+          category: main
+          mod_id: 139
+          update_mod_version: true
 
-          if [ ! -f "$WIN_ZIP" ]; then
-            echo "❌ Windows zip not found: $WIN_ZIP"
-            exit 1
-          fi
-          if [ ! -f "$LINUX_ZIP" ]; then
-            echo "❌ Linux zip not found: $LINUX_ZIP"
-            exit 1
-          fi
-
-          upload_file() {
-            local file_path="$1"
-            local file_name="$2"
-            echo "⬆ Uploading $file_name (version $VERSION)..."
-            curl -X POST \
-              -H "apikey: $NEXUS_API_KEY" \
-              -H "Content-Type: multipart/form-data" \
-              -F "file=@$file_path" \
-              -F "version=$VERSION" \
-              -F "name=$file_name" \
-              "https://api.nexusmods.com/v1/games/$GAME_ID/mods/$MOD_ID/files" \
-              -w "\n✅ HTTP Status: %{http_code}\n" \
-              --fail-with-body
-          }
-
-          upload_file "$WIN_ZIP" "Servo-Modquisitor-2-windows.zip"
-          upload_file "$LINUX_ZIP" "Servo-Modquisitor-2-linux.zip"
+      - name: Upload Linux to Nexus
+        uses: Nexus-Mods/upload-action@v1.0.0-beta.10
+        with:
+          api_key: ${{ secrets.NEXUSMODS_APIKEY }}
+          file_id: 7799
+          filename: Servo-Modquisitor-2-linux.zip
+          version: 2.9.22
+          display_name: Servo-Modquisitor-2-linux.zip
+          category: main
+          mod_id: 139

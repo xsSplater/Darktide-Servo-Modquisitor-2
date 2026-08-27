@@ -184,10 +184,56 @@ func (app *App) buildUI() {
 	statusContainer := container.NewStack(app.tipBgRect, app.statusLabel)
 
 	// Кнопки быстрого перемещения
-	app.moveToTopBtn = NewCustomButton(app.messages["btn_move_to_top"], func() { app.moveSelectedToTop() })
+	upImgData, err := embeddedFiles.ReadFile("assets/buttons/up.png")
+	if err != nil {
+		app.appendLog("Could not load up icon: " + err.Error())
+	}
+	upRes := fyne.NewStaticResource("up", upImgData)
+
+	downImgData, err := embeddedFiles.ReadFile("assets/buttons/down.png")
+	if err != nil {
+		app.appendLog("Could not load down icon: " + err.Error())
+	}
+	downRes := fyne.NewStaticResource("down", downImgData)
+
+	topImgData, err := embeddedFiles.ReadFile("assets/buttons/top.png")
+	if err != nil {
+		app.appendLog("Could not load top icon: " + err.Error())
+	}
+	topRes := fyne.NewStaticResource("top", topImgData)
+
+	bottomImgData, err := embeddedFiles.ReadFile("assets/buttons/bottom.png")
+	if err != nil {
+		app.appendLog("Could not load bottom icon: " + err.Error())
+	}
+	bottomRes := fyne.NewStaticResource("bottom", bottomImgData)
+
+	// Иконка для Remove Selected
+	selTrashImgData, err := embeddedFiles.ReadFile("assets/buttons/trashcan_red_sel.png")
+	if err != nil {
+		app.appendLog("Could not load selected trash icon: " + err.Error())
+	}
+	selTrashRes := fyne.NewStaticResource("trash_sel", selTrashImgData)
+
+	ImgPngData, err := embeddedFiles.ReadFile("assets/buttons/trashcan_red.png")
+	if err != nil {
+		app.appendLog("Could not load trash icon: " + err.Error())
+	}
+	trashRes := fyne.NewStaticResource("trash", ImgPngData)
+
+	// Иконка для Remove All (красная корзина с крестиком)
+	trashXImgData, err := embeddedFiles.ReadFile("assets/buttons/trashcan_red_x.png")
+	if err != nil {
+		app.appendLog("Could not load trash_x icon: " + err.Error())
+	}
+	trashXRes := fyne.NewStaticResource("trash_x", trashXImgData)
+
+	app.moveToTopBtn = NewIconButton(topRes, func() { app.moveSelectedToTop() })
 	app.applyTooltip(app.moveToTopBtn, "btn_move_to_top_tooltip")
-	app.moveToBottomBtn = NewCustomButton(app.messages["btn_move_to_bottom"], func() { app.moveSelectedToBottom() })
+
+	app.moveToBottomBtn = NewIconButton(bottomRes, func() { app.moveSelectedToBottom() })
 	app.applyTooltip(app.moveToBottomBtn, "btn_move_to_bottom_tooltip")
+
 	app.moveToEntry = widget.NewEntry()
 	app.moveToEntry.SetPlaceHolder(app.messages["col_number"])
 	app.moveToEntry.OnSubmitted = func(text string) { app.moveSelectedToPosition() }
@@ -206,7 +252,8 @@ func (app *App) buildUI() {
 	app.applyTooltip(app.enableAllBtn, "btn_enable_all_tooltip")
 	app.disableAllBtn = NewCustomButton(app.messages["btn_disable_all_mods"], func() { app.setAllModsActive(false) })
 	app.applyTooltip(app.disableAllBtn, "btn_disable_all_tooltip")
-	app.removeAllBtn = NewCustomButton(app.messages["btn_remove_all_mods"], func() {
+
+	app.removeAllBtn = NewIconButton(trashXRes, func() {
 		app.showConfirmDialog(
 			app.messages["confirm_remove_all_title"],
 			app.messages["confirm_remove_all_text"],
@@ -216,7 +263,8 @@ func (app *App) buildUI() {
 		)
 	})
 	app.applyTooltip(app.removeAllBtn, "btn_remove_all_tooltip")
-	app.removeSelectedBtn = NewCustomButton(app.messages["btn_remove_selected"], func() {
+
+	app.removeSelectedBtn = NewIconButton(selTrashRes, func() {
 		sel := app.selectedMods()
 		if len(sel) == 0 {
 			app.appendLog(app.messages["no_mods_selected"])
@@ -231,6 +279,7 @@ func (app *App) buildUI() {
 		)
 	})
 	app.applyTooltip(app.removeSelectedBtn, "btn_remove_selected_tooltip")
+
 	app.btnEditVersion = NewCustomButton(app.messages["btn_edit_version"], func() {
 		if app.selectedModName == "" {
 			return
@@ -244,9 +293,10 @@ func (app *App) buildUI() {
 	app.applyTooltip(app.btnEditVersion, "btn_edit_version_tooltip")
 
 	// Основные кнопки
-	app.btnUp = NewCustomButton(app.messages["btn_up"], func() { app.moveSelected(-1) })
+	app.btnUp = NewIconButton(upRes, func() { app.moveSelected(-1) })
 	app.applyTooltip(app.btnUp, "btn_up_tooltip")
-	app.btnDown = NewCustomButton(app.messages["btn_down"], func() { app.moveSelected(1) })
+
+	app.btnDown = NewIconButton(downRes, func() { app.moveSelected(1) })
 	app.applyTooltip(app.btnDown, "btn_down_tooltip")
 
 	// Save List
@@ -956,7 +1006,7 @@ func (app *App) buildUI() {
 
 	// Описание в карточке
 	app.descTitle = canvas.NewText(app.messages["select_mod"], th.Color(theme.ColorNameForeground, variant))
-	app.descTitle.TextSize = theme.TextSize() + 5
+	app.descTitle.TextSize = theme.TextSize() + 2
 	app.descTitle.TextStyle = fyne.TextStyle{Bold: true}
 
 	// Кнопка открытия папки мода
@@ -1022,12 +1072,6 @@ func (app *App) buildUI() {
 	app.descConflict.Wrapping = fyne.TextWrapWord
 	app.descConflict.Hide()
 
-	// В обработчике btnRemove замените блок удаления на следующий:
-	ImgPngData, err := embeddedFiles.ReadFile("assets/buttons/trashcan_red_x.png")
-	if err != nil {
-		app.appendLog("Could not load trash icon: " + err.Error())
-	}
-	trashRes := fyne.NewStaticResource("trash", ImgPngData)
 	app.btnRemove = NewIconButton(trashRes, func() {
 		if app.selectedModName == "" {
 			return
@@ -1144,25 +1188,29 @@ func (app *App) buildUI() {
 	// Инициализация контейнера для дополнительного содержимого (спойлер со списком обновлений)
 	app.descExtraContainer = container.NewVBox()
 
-	btnRow := container.NewHBox(
+	// Отступ шириной ~20px
+	leftPadding := canvas.NewRectangle(color.Transparent)
+	leftPadding.SetMinSize(fyne.NewSize(30, 1))
+
+	// Строка: название слева, кнопки справа
+	headerRow := container.NewHBox(
+		leftPadding,
+		app.descTitle,
 		layout.NewSpacer(),
+		widget.NewSeparator(),
 		app.btnUpdateMod,
 		app.openFolderBtn,
 		app.btnRemove,
 	)
 
-	// Строка с названием мода
-	nameRow := container.NewHBox(
-		app.descTitle,
-	)
+	titleSep := canvas.NewRectangle(th.Color(themes.ColorCRTScreenStroke, variant))
+	titleSep.SetMinSize(fyne.NewSize(0, 3))
 
 	descHeader := container.NewBorder(
 		nil, nil, nil, nil,
 		container.NewVBox(
-			btnRow,
-			widget.NewSeparator(),
-			nameRow,
-			widget.NewSeparator(),
+			headerRow,
+			titleSep,
 			app.descAuthor,
 			widget.NewSeparator(),
 			container.NewHBox(widget.NewLabel(""), app.descURL, widget.NewLabel("  "), app.githubLink),

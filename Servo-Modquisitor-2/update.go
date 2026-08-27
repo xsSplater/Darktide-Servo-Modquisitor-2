@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strconv"
 	"strings"
 	"time"
@@ -118,6 +119,17 @@ func compareVersions(v1, v2 string) int {
 	return 0
 }
 
+func getProgramArchivePattern() string {
+	switch runtime.GOOS {
+	case "windows":
+		return "Servo Modquisitor 2 Windows"
+	case "linux":
+		return "Servo Modquisitor 2 Linux"
+	default:
+		return "Servo Modquisitor 2"
+	}
+}
+
 // checkSpecialUpdates проверяет наличие новых версий программы и файлов сортировки (мод 139).
 func (app *App) checkSpecialUpdates() {
 	// Проверяем, авторизован ли пользователь
@@ -127,7 +139,7 @@ func (app *App) checkSpecialUpdates() {
 	}
 
 	// Проверка программы
-	programFileInfo, err := app.getLatestFileInfoForMod(139, "Servo Modquisitor 2")
+	programFileInfo, err := app.getLatestFileInfoForMod(139, getProgramArchivePattern())
 	if err != nil {
 		app.logNexusError(err, "Program", app.messages["program_update_unavailable"])
 	} else if programFileInfo != nil {

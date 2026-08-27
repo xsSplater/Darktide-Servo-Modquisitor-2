@@ -286,48 +286,17 @@ func (app *App) changeLanguage(lang string) {
 		app.filterSelect.SetSelected(app.messages["filter_all"])
 		app.filterSelect.Refresh()
 	}
-	// if app.btnToggle != nil {
-	// 	app.updateToggleButtonText(app.btnToggle)
-	// }
 	app.refreshModList() // filterModList внутри имеет проверку counterLabel != nil
 
 	// Текстовые метки
 	if app.filterLabel != nil {
 		app.filterLabel.SetText(app.messages["filter_label"])
 	}
-	// Кнопки, которые были в правой панели и теперь в верхней
-	// if app.btnSaveOrder != nil {
-	// 	app.btnSaveOrder.SetText(app.messages["btn_save_order"])
-	// }
-	// if app.btnSortChecks != nil {
-	// 	app.btnSortChecks.SetText(app.messages["btn_sort_checks"])
-	// }
 	if app.btnAMLConfig != nil { // AML
 		app.btnAMLConfig.SetText(app.messages["btn_aml_config"])
 		app.applyTooltip(app.btnAMLConfig, "btn_aml_config_tooltip")
 	}
-	// if app.btnRefresh != nil {
-	// 	app.btnRefresh.SetText(app.messages["btn_refresh"])
-	// }
-	// if app.btnInstall != nil {
-	// 	app.btnInstall.SetText(app.messages["btn_install"])
-	// }
-	// if app.btnRemove != nil {
-	// 	app.btnRemove.SetText(app.messages["btn_remove"])
-	// }
-	if app.btnUp != nil {
-		app.btnUp.SetText(app.messages["btn_up"])
-	}
-	if app.btnDown != nil {
-		app.btnDown.SetText(app.messages["btn_down"])
-	}
 	// Новые кнопки быстрого перемещения
-	if app.moveToTopBtn != nil {
-		app.moveToTopBtn.SetText(app.messages["btn_move_to_top"])
-	}
-	if app.moveToBottomBtn != nil {
-		app.moveToBottomBtn.SetText(app.messages["btn_move_to_bottom"])
-	}
 	if app.moveToEntry != nil {
 		app.moveToEntry.SetPlaceHolder("##") // неизменяемое
 	}
@@ -356,31 +325,22 @@ func (app *App) changeLanguage(lang string) {
 	}
 	// Кнопки удаления модов
 	if app.removeAllBtn != nil {
-		app.removeAllBtn.SetText(app.messages["btn_remove_all_mods"])
 		app.applyTooltip(app.removeAllBtn, "btn_remove_all_tooltip")
 	}
 	if app.removeSelectedBtn != nil {
-		app.removeSelectedBtn.SetText(app.messages["btn_remove_selected"])
 		app.applyTooltip(app.removeSelectedBtn, "btn_remove_selected_tooltip")
 	}
 	// Кнопки запуска
-	// app.updateLaunchButtonTexts()
 	if app.headerTable != nil {
 		app.headerTable.Refresh()
 	}
-	// if app.manageBtn != nil {
-	// 	app.manageBtn.SetText(app.messages["btn_manage_mods"])
-	// }
 	if app.btnCheckUpdates != nil {
-		// app.btnCheckUpdates.SetText(app.messages["btn_check_updates"])
 		app.applyTooltip(app.btnCheckUpdates, "btn_check_updates_tooltip")
 	}
 	if app.btnUpdateMod != nil {
-		// app.btnUpdateMod.SetText(app.messages["btn_update_mod"])
 		app.applyTooltip(app.btnUpdateMod, "btn_update_mod_premium_only")
 	}
 	if app.btnUpdateAll != nil {
-		// app.btnUpdateAll.SetText(app.messages["btn_update_all"])
 		app.applyTooltip(app.btnUpdateAll, "btn_update_all_tooltip")
 	}
 
@@ -398,15 +358,6 @@ func (app *App) changeLanguage(lang string) {
 	app.reapplyTooltips()
 	app.updateDescriptionForMod(app.selectedModName)
 }
-
-// func (app *App) updateLaunchButtonTexts() {
-// if app.btnLaunchNormal != nil {
-// 	app.btnLaunchNormal.SetText(app.messages["btn_launch_game"])
-// }
-// if app.btnLaunchNoLauncher != nil {
-// 	app.btnLaunchNoLauncher.SetText(app.messages["btn_launch_nolauncher_long"])
-// }
-// }
 
 func (app *App) reapplyTooltips() {
 	app.applyTooltip(app.btnSaveOrder, "btn_save_order_tooltip")
