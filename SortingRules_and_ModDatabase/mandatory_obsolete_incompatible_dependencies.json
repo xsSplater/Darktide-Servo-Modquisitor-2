@@ -1,5 +1,5 @@
 {
-	"version": "2.0.3",
+	"version": "2.0.6",
 
 	"mandatory_order": [
 		"ModPerformanceMonitor",
@@ -40,6 +40,7 @@
 		{"before": "no_chitchat",					"after": "LessAnnoyingPing"},
 		{"before": "NumericUI",						"after": "SkitariiUIFix"},
 		{"before": "RecolorStimms",					"after": "DivisionHUD"},
+		{"before": "Servo_Lexmechanicus",			"after": "SortModMenu"},
 		{"before": "Skitarius",						"after": "guarantee_ability_activation"},
 		{"before": "Skitarius",						"after": "guarantee_special_action"},
 		{"before": "Skitarius",						"after": "guarantee_weapon_swap"},
@@ -51,6 +52,7 @@
 		{"before": "true_level",					"after": "ColorSelection"},
 		{"before": "who_are_you",					"after": "ColorSelection"},
 		{"before": "Vox Manifold",					"after": "Servo Mortis"},
+		{"before": "zServo_Lexmechanicus",			"after": "SortModMenu"},
 
 		{"before": "extended_weapon_customization",	"after": "enhanced_character_selection"},
 		{"before": "extended_weapon_customization",	"after": "for_the_drip"},
@@ -385,6 +387,7 @@
 				"es": "🔴 Conflicto:\nEnemies Improved  ⚔ Mauler Attack Indicator.\nFuncionan juntos, pero los indicadores de ataque en los enemigos tienen errores."
 			}
 		},
+		{ "mod1": "enemies_improved",		"mod2": "noobline" },
 		{ "mod1": "enemies_improved",		"mod2": "outline_colours" },
 		{ "mod1": "enemies_improved",		"mod2": "simple_healthbars" },
 		{ "mod1": "extra_keybindings",		"mod2": "MultiBind",				"type": "same" },
@@ -486,7 +489,6 @@
 		{ "mod1": "state_your_name",		"mod2": "current_havoc" },
 		{ "mod1": "state_your_name",		"mod2": "InspectFromPartyFinder" },
 		{ "mod1": "state_your_name",		"mod2": "InspectFromSocial" },
-		{ "mod1": "state_your_name",		"mod2": "HavocPeek" },
 		{ "mod1": "state_your_name",		"mod2": "teammate_tracker" },
 		{ "mod1": "state_your_name",		"mod2": "true_level" },
 		{ "mod1": "state_your_name",		"mod2": "who_are_you" },
@@ -605,11 +607,15 @@
 			"dependent": "extended_weapon_customization_more_dakka",
 				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/277"},
 		{"required": "extended_weapon_customization",
+			"dependent": "extended_weapon_customization_omnissiah",
+				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/277"},
+		{"required": "extended_weapon_customization",
 			"dependent": "extended_weapon_customization_owo",
 				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/277"},
 		{"required": "extended_weapon_customization",
 			"dependent": "extended_weapon_customization_syn_edits",
 				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/277"},
+
 		{"required": "extended_weapon_customization_base_additions",
 			"dependent": "extended_weapon_customization_empty_scopes",
 				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/277"},
