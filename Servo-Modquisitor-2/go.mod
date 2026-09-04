@@ -64,5 +64,6 @@ require (
 	golang.org/x/text v0.41.0 // indirect
 )
 
-// replace fyne.io/fyne/v2 => github.com/xsSplater/SMQ-Fyne/v2 v2.8.1-smq-fix
-replace fyne.io/fyne/v2 => A:/GitHub/SMQ-Fyne
+replace fyne.io/fyne/v2 => github.com/xsSplater/SMQ-Fyne/v2 v2.8.1-smq-tooltip-fix
+
+// replace fyne.io/fyne/v2 => A:/GitHub/SMQ-Fyne
