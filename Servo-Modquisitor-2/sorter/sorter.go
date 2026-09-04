@@ -3,7 +3,8 @@ package sorter
 
 import (
 	"Servo-Modquisitor/checks"
-	
+	"path/filepath"
+
 	"bufio"
 	"container/heap"
 	"fmt"
@@ -57,9 +58,9 @@ func SetLoadOrderOutputPath(path string) {
 	loadOrderOutputPath = path
 }
 
-func LoadSortOrders() {
-	cachedRussianOrder = readSortOrder("russian_sort_order.txt")
-	cachedEnglishOrder = readSortOrder("english_sort_order.txt")
+func LoadSortOrders(dataDir string) {
+	cachedRussianOrder = readSortOrder(filepath.Join(dataDir, "russian_sort_order.txt"))
+	cachedEnglishOrder = readSortOrder(filepath.Join(dataDir, "english_sort_order.txt"))
 }
 
 func CreateLoadOrderFromActive(activeMods []string, lang string) {

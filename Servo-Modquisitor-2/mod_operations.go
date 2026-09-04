@@ -223,15 +223,15 @@ func (app *App) refreshModList() {
 	app.amlDetected = checks.IsAMLInstalled(app.cfg.ModsPath)
 	if wasAML != app.amlDetected {
 		if app.amlDetected {
-			// app.btnSaveOrder.SetText(app.messages["btn_save_order_aml"])
-			// app.btnSortChecks.SetText(app.messages["btn_sort_checks_aml"])
-			app.applyTooltip(app.btnSaveOrder, "aml_save_warning_tooltip")
-			app.applyTooltip(app.btnSortChecks, "aml_sort_warning_tooltip")
+			app.btnSaveOrder.SetText(app.messages["btn_save_order_aml"])
+			app.btnSortChecks.SetText(app.messages["btn_sort_checks_aml"])
+			app.btnSaveOrder.SetToolTip(app.messages["aml_save_warning_tooltip"])
+			app.btnSortChecks.SetToolTip(app.messages["aml_sort_warning_tooltip"])
 		} else {
-			// app.btnSaveOrder.SetText(app.messages["btn_save_order"])
-			// app.btnSortChecks.SetText(app.messages["btn_sort_checks"])
-			app.applyTooltip(app.btnSaveOrder, "btn_save_order_tooltip")
-			app.applyTooltip(app.btnSortChecks, "btn_sort_checks_tooltip")
+			app.btnSaveOrder.SetText(app.messages["btn_save_order"])
+			app.btnSortChecks.SetText(app.messages["btn_sort_checks"])
+			app.btnSaveOrder.SetToolTip(app.messages["btn_save_order_tooltip"])
+			app.btnSortChecks.SetToolTip(app.messages["btn_sort_checks_tooltip"])
 		}
 	}
 
@@ -272,6 +272,9 @@ func (app *App) refreshModList() {
 	app.allMods = regMods
 	app.orderDirty = false
 
+	// Очистка кэша от записей, не соответствующих существующим модам
+	app.pruneVersionCache()
+
 	app.filterModList()
 
 	app.updateSystemModsTable()
@@ -292,6 +295,8 @@ func (app *App) updateSystemModsTable() {
 func (app *App) saveCurrentOrder() {
 	entries := app.buildLoadOrderEntries()
 	checks.WriteLoadOrder(entries)
+	// После сохранения в профиле - синхронизируем с игровой папкой
+	app.syncLoadOrderToGame()
 }
 
 func (app *App) buildLoadOrderEntries() []checks.LoadOrderEntry {
@@ -977,6 +982,12 @@ func (app *App) InstallModFromArchive(archivePath string, activate bool, knownVe
 			app.orderDirty = true
 			app.updateTableBorder()
 			app.filterModList()
+			app.syncProfileFromGame()
+
+			// Обновляем фильтр и таблицу
+			app.filterModList()
+			app.forceRefreshTable()
+
 			app.appendLog(fmt.Sprintf(app.messages["log_installed"], archivePath))
 		} else {
 			app.appendLog(fmt.Sprintf(app.messages["log_installed_inactive"], installedName))
@@ -1013,8 +1024,6 @@ func (app *App) updateModFromNexus(mod *checks.ModInfo, skipConfirm bool) {
 
 	if app.isSymlinkFolder(mod.Name) {
 		app.appendLog(fmt.Sprintf(app.messages["log_skipping_update_symlink"], mod.Name))
-		app.tooltipStatus.Show(fmt.Sprintf(app.messages["log_skipping_update_symlink_skipped"], mod.Name))
-		app.tooltipStatus.HideAfterDelay()
 		return
 	}
 
@@ -1309,7 +1318,6 @@ func (app *App) removeSelectedMods() {
 		return
 	}
 
-	// Запоминаем первый выбранный мод (по displayedMods)
 	var firstSelectedName string
 	for _, m := range app.displayedMods {
 		if m.Selected {
@@ -1318,43 +1326,52 @@ func (app *App) removeSelectedMods() {
 		}
 	}
 
-	// Удаляем каждый мод
 	for _, name := range selectedNames {
 		checks.RemoveMod(name)
 		app.removeModFromData(name)
+		app.removeModFromCache(name)
 	}
 
-	// Обновляем таблицу и счётчик
-	app.updateModCounter()
-	app.modTable.Length = func() (int, int) { return len(app.displayedMods), TableColumnCount }
-	app.modTable.Refresh()
-	app.orderDirty = true
+	// Сохраняем порядок (автоматически синхронизирует с игрой)
+	app.saveCurrentOrder()
+	app.orderDirty = false
 	app.updateTableBorder()
-	app.appendLog(app.messages["log_selected_mods_removed"])
 
-	// Восстанавливаем выделение
-	if len(app.displayedMods) > 0 {
-		found := false
-		if firstSelectedName != "" {
-			for i, m := range app.displayedMods {
-				if m.Name == firstSelectedName {
-					app.modTable.Select(widget.TableCellID{Row: i, Col: 0})
-					app.modTable.ScrollTo(widget.TableCellID{Row: i, Col: 0})
-					found = true
-					break
+	// Синхронизируем профиль (копирует папки, но порядок уже обновлён)
+	app.syncProfileFromGame()
+
+	fyne.Do(func() {
+		app.refreshModList()
+		app.filterModList()
+		app.forceRefreshTable()
+
+		if len(app.displayedMods) > 0 {
+			found := false
+			if firstSelectedName != "" {
+				for i, m := range app.displayedMods {
+					if m.Name == firstSelectedName {
+						app.modTable.Select(widget.TableCellID{Row: i, Col: 0})
+						app.modTable.ScrollTo(widget.TableCellID{Row: i, Col: 0})
+						found = true
+						break
+					}
 				}
 			}
+			if !found {
+				app.modTable.Select(widget.TableCellID{Row: 0, Col: 0})
+				app.modTable.ScrollTo(widget.TableCellID{Row: 0, Col: 0})
+			}
+		} else {
+			app.selectedModName = ""
+			app.selectedModIndex.Store(-1)
+			app.updateDescriptionForMod("")
+			app.updateUpDownButtons()
 		}
-		if !found {
-			app.modTable.Select(widget.TableCellID{Row: 0, Col: 0})
-			app.modTable.ScrollTo(widget.TableCellID{Row: 0, Col: 0})
-		}
-	} else {
-		app.selectedModName = ""
-		app.selectedModIndex.Store(-1)
-		app.updateDescriptionForMod("")
-		app.updateUpDownButtons()
-	}
+
+		app.orderDirty = false
+		app.updateTableBorder()
+		app.appendLog(app.messages["log_selected_mods_removed"])
+	})
 }
 
 // Удалить все моды
@@ -1367,13 +1384,30 @@ func (app *App) removeAllMods() {
 		}
 	}
 	app.modsMutex.RUnlock()
+
 	for _, name := range mods {
 		checks.RemoveMod(name)
+		app.removeModFromCache(name)
 		app.appendLog(fmt.Sprintf(app.messages["log_deleted"], name))
 	}
+
+	app.modsMutex.Lock()
+	app.allMods = []checks.ModInfo{}
+	app.displayedMods = []checks.ModInfo{}
+	app.modsMutex.Unlock()
+
+	// Сохраняем пустой порядок (синхронизирует с игрой)
+	app.saveCurrentOrder()
+	app.orderDirty = false
+	app.updateTableBorder()
+
+	app.syncProfileFromGame()
+
 	fyne.Do(func() {
 		app.refreshModList()
-		app.orderDirty = true
+		app.filterModList()
+		app.forceRefreshTable()
+		app.orderDirty = false
 		app.updateTableBorder()
 		app.appendLog(app.messages["log_all_mods_removed"])
 	})
@@ -1854,7 +1888,7 @@ func (app *App) normalizeArchiveStructure(tmpDir string) error {
 }
 
 // downloadAndInstallSystemMod загружает и устанавливает системный мод.
-func (app *App) downloadAndInstallSystemMod(downloadURL, filename, displayName string, fileInfo *FileInfo, cacheKey string, modID int, installFunc func(string) error, logInstalling, logSuccess, logManual string) {
+func (app *App) downloadAndInstallSystemMod(downloadURL, filename, displayName string, fileInfo *FileInfo, cacheKey string, installFunc func(string) error, logInstalling, logSuccess string) {
 	safeFilename, err := sanitizeFilename(filename)
 	if err != nil {
 		app.appendLog(fmt.Sprintf("Invalid filename for %s: %v", displayName, err))
@@ -1923,4 +1957,223 @@ func (app *App) downloadAndInstallSystemMod(downloadURL, filename, displayName s
 			os.Remove(dest)
 		})
 	}()
+}
+
+// updateSelectedMods принудительно обновляет выбранные моды до последней версии с Nexus.
+// Показывает единый диалог выбора с ченджлогами, пропуская подтверждение для каждого мода.
+func (app *App) updateSelectedMods() {
+	selected := app.selectedMods()
+	if len(selected) == 0 {
+		app.appendLog(app.messages["no_mods_selected"])
+		return
+	}
+
+	// Фильтруем системные, симлинки и моды без URL
+	var eligible []*checks.ModInfo
+	for _, name := range selected {
+		mod := app.findModByName(name)
+		if mod == nil || mod.IsSystem {
+			continue
+		}
+		if app.isSymlinkFolder(name) {
+			app.appendLog(fmt.Sprintf(app.messages["log_skipping_update_symlink"], name))
+			continue
+		}
+		if mod.URL == "" {
+			app.appendLog(fmt.Sprintf(app.messages["update_no_url_for"], name))
+			continue
+		}
+		eligible = append(eligible, mod)
+	}
+
+	if len(eligible) == 0 {
+		app.appendLog(app.messages["no_eligible_mods_for_update"])
+		return
+	}
+
+	if app.getAuthToken() == "" {
+		app.appendLog(app.messages["nexus_api_key_missing"])
+		return
+	}
+
+	// --- Сбор последних версий для выбранных модов (принудительно) ---
+	app.appendLog(app.messages["log_collecting_mods_for_force_update"])
+	type modUpdateItem struct {
+		Mod      *checks.ModInfo
+		ModID    int
+		FileInfo *FileInfo
+	}
+	var modsToUpdate []modUpdateItem
+
+	bar, label, cancelChan, closeDialog := app.showProgressDialog(
+		app.messages["update_title"],
+		app.messages["collecting_mods_for_update"],
+	)
+	defer closeDialog()
+
+	total := len(eligible)
+	processed := 0
+
+	for _, mod := range eligible {
+		select {
+		case <-cancelChan:
+			app.appendLog(app.messages["collecting_mods_cancelled"])
+			return
+		default:
+		}
+
+		modID := helpers.ExtractModIDFromURL(mod.URL)
+		if modID == 0 {
+			processed++
+			continue
+		}
+
+		fileInfo, err := app.getLatestFileInfoForMod(modID, mod.Name)
+		if err != nil {
+			app.logNexusError(err, mod.Name)
+			processed++
+			continue
+		}
+		if fileInfo == nil {
+			processed++
+			continue
+		}
+
+		// Добавляем мод в список, даже если нет обновления (принудительно)
+		modsToUpdate = append(modsToUpdate, modUpdateItem{
+			Mod:      mod,
+			ModID:    modID,
+			FileInfo: fileInfo,
+		})
+		processed++
+
+		if processed%5 == 0 || processed == total {
+			fyne.Do(func() {
+				bar.SetValue(float64(processed) / float64(total))
+				label.SetText(fmt.Sprintf(app.messages["collecting_mods_x_y"], processed, total))
+			})
+		}
+	}
+
+	if len(modsToUpdate) == 0 {
+		app.appendLog(app.messages["no_mods_found_for_force_update"])
+		fyne.Do(func() {
+			label.SetText(app.messages["updates_found_no"])
+			bar.SetValue(1.0)
+		})
+		time.Sleep(1 * time.Second)
+		return
+	}
+
+	// --- Получение ченджлогов ---
+	fyne.Do(func() {
+		label.SetText(app.messages["downloading_changelog"])
+		bar.SetValue(0)
+	})
+
+	var updateChoices []*ModUpdateChoice
+	for idx, item := range modsToUpdate {
+		select {
+		case <-cancelChan:
+			app.appendLog(app.messages["collecting_mods_cancelled"])
+			return
+		default:
+		}
+
+		changelog, err := app.FetchChangelog(item.ModID, item.FileInfo.ID)
+		if err != nil {
+			app.appendLog(fmt.Sprintf(app.messages["failed_fetch_changlog_for"], item.Mod.Name, err))
+			changelog = ""
+		}
+		updateChoices = append(updateChoices, &ModUpdateChoice{
+			Mod:       item.Mod,
+			FileInfo:  item.FileInfo,
+			Changelog: changelog,
+			Selected:  true,
+		})
+
+		fyne.Do(func() {
+			bar.SetValue(float64(idx+1) / float64(len(modsToUpdate)))
+			label.SetText(fmt.Sprintf(app.messages["downloading_changelog_x_y"], idx+1, len(modsToUpdate)))
+		})
+	}
+
+	closeDialog()
+
+	// --- Диалог выбора ---
+	resultChan := make(chan struct {
+		indices []int
+		ok      bool
+	}, 1)
+
+	fyne.DoAndWait(func() {
+		app.showUpdateChoiceDialog(updateChoices, resultChan)
+	})
+
+	res := <-resultChan
+	if !res.ok || len(res.indices) == 0 {
+		app.appendLog(app.messages["update_cancelled"])
+		return
+	}
+
+	// --- Обновление выбранных модов ---
+	app.modsMutex.RLock()
+	currentMods := make([]checks.ModInfo, len(app.allMods))
+	copy(currentMods, app.allMods)
+	app.modsMutex.RUnlock()
+
+	var selectedMods []*checks.ModInfo
+	for _, idx := range res.indices {
+		if idx < 0 || idx >= len(modsToUpdate) {
+			continue
+		}
+		item := modsToUpdate[idx]
+		for i := range currentMods {
+			if currentMods[i].Name == item.Mod.Name {
+				selectedMods = append(selectedMods, &currentMods[i])
+				break
+			}
+		}
+	}
+
+	if len(selectedMods) == 0 {
+		app.appendLog(app.messages["log_no_mods_selected_update"])
+		return
+	}
+
+	bar2, label2, cancelChan2, closeDialog2 := app.showProgressDialog(
+		app.messages["update_title"],
+		fmt.Sprintf("0 / %d", len(selectedMods)),
+	)
+	defer closeDialog2()
+
+	updatedCount := 0
+	for _, mod := range selectedMods {
+		select {
+		case <-cancelChan2:
+			app.appendLog(app.messages["log_update_cancelled"])
+			return
+		default:
+		}
+
+		app.appendLog(fmt.Sprintf(app.messages["updating_mod"], mod.Name))
+		// skipConfirm = true, чтобы пропустить диалог для каждого мода
+		app.updateModFromNexus(mod, true)
+		updatedCount++
+
+		fyne.Do(func() {
+			bar2.SetValue(float64(updatedCount) / float64(len(selectedMods)))
+			label2.SetText(fmt.Sprintf("%d / %d - %s", updatedCount, len(selectedMods), mod.Name))
+		})
+
+		time.Sleep(500 * time.Millisecond)
+	}
+
+	fyne.Do(func() {
+		bar2.SetValue(1.0)
+		label2.SetText(fmt.Sprintf("%d / %d - ✅", updatedCount, len(selectedMods)))
+	})
+
+	app.appendLog(fmt.Sprintf(app.messages["update_selected_forced_finished"], updatedCount))
+	time.Sleep(1 * time.Second)
 }

@@ -11,7 +11,7 @@ import (
 // ───────────── Программа ─────────────────────────────────────────
 const (
 	AppName         = "Servo-Modquisitor-2"
-	AppVersion      = "2.9.22"
+	AppVersion      = "2.9.77"
 	AppID           = "com.xssplater.servo-modquisitor"
 	AppIcon         = "assets/icon.png"
 	СonfigFolderSMQ = "Servo-Modquisitor"
@@ -52,8 +52,8 @@ const (
 	NexusV1DownLink   = "https://api.nexusmods.com/v1/games/warhammer40kdarktide/mods/%s/files/%s/download_link.json"
 	NexusModIDLink    = "https://www.nexusmods.com/warhammer40kdarktide/mods/%d"
 
-	MaxModsID      = 2000
-	MaxModsID_less = 2001
+	MaxModsID      = 2000 // Примерный максимум модов на Нексус
+	MaxModsID_less = 2001 // но меньше этого числа
 )
 
 // ───────────── Файлы ─────────────────────────────────────────────
@@ -197,10 +197,10 @@ const (
 // ───────────── Поиск и Фильтр ────────────────────────────────────
 const (
 	AMLSearchMinWidth = 600
-	SearchMinWidth    = 300
+	SearchMinWidth    = 220
 
 	AMLFilterMinWidth = 200
-	FilterMinWidth    = 200
+	FilterMinWidth    = 170
 )
 
 // ───────────── Задержки ──────────────────────────────────────────

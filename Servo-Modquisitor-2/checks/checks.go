@@ -50,6 +50,10 @@ var (
 	modDBMap         map[string]*ModDBEntry
 	externalVersion  string
 	getInstalledAt   func(string) int64
+
+	// ПРОФИЛИ: пути к данным
+	profileDataDir string // путь к папке профиля (mod_load_order.txt, nexus_versions.json)
+	globalDataDir  string // путь к глобальным данным (mod_database.json, mandatory_...)
 )
 
 func InitGlobals(
@@ -70,6 +74,16 @@ func InitGlobals(
 	isModActiveFunc = isActiveFn
 	refreshModListFunc = refreshFn
 	getInstalledAt = installedAtGetter
+}
+
+// SetProfileDataDir устанавливает путь к папке профиля для файлов состояния (порядок загрузки, кэш версий).
+func SetProfileDataDir(path string) {
+	profileDataDir = path
+}
+
+// SetGlobalDataDir устанавливает путь к глобальной папке для общих файлов (база модов, правила).
+func SetGlobalDataDir(path string) {
+	globalDataDir = path
 }
 
 var refreshModListFunc func()
@@ -104,16 +118,13 @@ func FolderExists(name string) bool {
 
 func RemoveMod(name string) {
 	path := filepath.Join(modsDir, name)
-	// Проверяем, является ли запись симлинком
 	info, err := os.Lstat(path)
 	if err != nil {
 		return
 	}
 	if info.Mode()&os.ModeSymlink != 0 {
-		// Это симлинк - удаляем только ссылку (безопасно)
 		os.Remove(path)
 	} else {
-		// Обычная папка - удаляем рекурсивно
 		os.RemoveAll(path)
 	}
 }
@@ -128,18 +139,11 @@ func ListModFolders() []string {
 		return folders
 	}
 	for _, e := range entries {
-		// Обычная папка
 		if e.IsDir() {
 			folders = append(folders, e.Name())
 			continue
 		}
-		// Символическая ссылка, junction point или другая reparse-точка.
-		// На Windows junction-папка (mklink /J) не имеет флага
-		// os.ModeSymlink и не проходит e.IsDir(), поэтому проверяем через
-		// os.Stat, который разыменовывает reparse-точку и возвращает
-		// сведения о целевой папке.
 		if e.Type()&(os.ModeSymlink|os.ModeIrregular) != 0 {
-			// Проверяем, куда ведёт ссылка
 			info, err := os.Stat(filepath.Join(modsDir, e.Name()))
 			if err == nil && info.IsDir() {
 				folders = append(folders, e.Name())
@@ -158,9 +162,9 @@ type ModInfo struct {
 	Selected          bool
 	IsSystem          bool
 	VortexDeployed    bool
-	IsSymlink         bool // true, если папка является симлинком
-	MissingFolder     bool // true, если папка отсутствует, но мод есть в списке
-	HasUpdate         bool `json:"-"` // не сохраняем в JSON
+	IsSymlink         bool
+	MissingFolder     bool
+	HasUpdate         bool `json:"-"`
 	NexusDownloads    int
 	NexusEndorsements int
 	Author            string
@@ -174,10 +178,10 @@ type ModInfo struct {
 	NexusVersion      string
 	NexusSummary      string
 	NexusPictureURL   string
-	Source            string // "nexus" или "manual"
+	Source            string
 	ModTime           time.Time
-	LastUpdated       time.Time `json:"-"` // дата последнего обновления (из последнего файла)
-	OriginalUpload    time.Time `json:"-"` // дата первой загрузки (из самого старого файла)
+	LastUpdated       time.Time `json:"-"`
+	OriginalUpload    time.Time `json:"-"`
 }
 
 type ModDBEntry struct {
@@ -186,9 +190,10 @@ type ModDBEntry struct {
 	Name             map[string]string `json:"name"`
 	Description      map[string]string `json:"description"`
 	Author           string            `json:"author"`
-	Category         string            `json:"category"` // Категория мода	// Category         string            `json:"category,omitempty"` // Категория мода
+	Category         string            `json:"category"`
 	URL              string            `json:"url"`
 	GitHubURL        string            `json:"github_url"`
+	SourceCodeURL    string            `json:"source_code_url"`
 	Note             map[string]string `json:"note"`
 }
 
@@ -196,7 +201,6 @@ func GetModsInfo(lang string, forceEnglish bool) []ModInfo {
 	folders := ListModFolders()
 	var mods []ModInfo
 
-	// 1. Добавляем виртуальные моды (из mod_load_order.txt)
 	loadOrderEntries := ReadLoadOrder()
 	if loadOrderEntries != nil {
 		existing := make(map[string]bool)
@@ -237,7 +241,6 @@ func GetModsInfo(lang string, forceEnglish bool) []ModInfo {
 		}
 	}
 
-	// 2. Реальные папки
 	for _, name := range folders {
 		fullPath := filepath.Join(modsDir, name)
 		fi, err := os.Stat(fullPath)
@@ -246,7 +249,12 @@ func GetModsInfo(lang string, forceEnglish bool) []ModInfo {
 		}
 		mod := ModInfo{Name: name, Active: true}
 
-		// Обработка специальных префиксов и суффиксов: отключаем мод и добавляем примечание
+		switch name {
+		case "base", "dmf":
+			mod.IsSystem = true
+			mod.Active = false
+		}
+
 		if messages != nil {
 			if strings.HasPrefix(name, "_") || strings.HasPrefix(name, "__") {
 				mod.Active = false
@@ -260,7 +268,6 @@ func GetModsInfo(lang string, forceEnglish bool) []ModInfo {
 			}
 		}
 
-		// Исключение мода Mod List Dividers с разделителями ___System, ___Scoreboard и т.д.
 		if helpers.ContainsString(modListDividers, name) {
 			mod.Active = true
 			mod.Note = ""
@@ -268,7 +275,6 @@ func GetModsInfo(lang string, forceEnglish bool) []ModInfo {
 
 		mod.VortexDeployed = fileExists(filepath.Join(fullPath, "__folder_managed_by_vortex"))
 
-		// --- Вычисляем cacheKey для проверки installed_at ---
 		var cacheKey string
 		switch name {
 		case "base":
@@ -285,10 +291,7 @@ func GetModsInfo(lang string, forceEnglish bool) []ModInfo {
 			}
 		}
 
-		// --- Флаг, чтобы не переопределять ModTime, если есть installed_at ---
 		modTimeSet := false
-
-		// --- Проверяем installed_at в кэше ---
 		if cacheKey != "" && getInstalledAt != nil {
 			if installed := getInstalledAt(cacheKey); installed > 0 {
 				mod.ModTime = time.Unix(installed, 0)
@@ -296,16 +299,11 @@ func GetModsInfo(lang string, forceEnglish bool) []ModInfo {
 			}
 		}
 
-		// --- Если installed_at нет, вычисляем ModTime по файлам ---
 		if !modTimeSet {
 			switch {
 			case name == "base":
-				mod.IsSystem = true
-				mod.Active = false
 				mod.ModTime = getModTimeFromFile(filepath.Join(fullPath, "mod_manager.lua"))
 			case name == "dmf":
-				mod.IsSystem = true
-				mod.Active = false
 				mod.ModTime = getModTimeFromFile(filepath.Join(fullPath, "scripts", "mods", "dmf", "dmf_loader.lua"))
 			default:
 				luaPaths := []string{
@@ -341,7 +339,6 @@ func GetModsInfo(lang string, forceEnglish bool) []ModInfo {
 			}
 		}
 
-		// Заполняем из базы данных
 		if db, ok := modDBMap[strings.ToLower(name)]; ok && db.Folder != "" {
 			mod.Author = db.Author
 			mod.URL = db.URL
@@ -364,7 +361,6 @@ func GetModsInfo(lang string, forceEnglish bool) []ModInfo {
 		mods = append(mods, mod)
 	}
 
-	// Проверяем автопатчер
 	if _, err := os.Stat(filepath.Join(modsDir, "..", "binaries", "plugins", "_dt_mod_autopatch.dll")); err == nil {
 		mod := ModInfo{
 			Name:     "autopatch",
@@ -403,28 +399,21 @@ func getModTimeFromFile(path string) time.Time {
 	return info.ModTime()
 }
 
-// TryFixMismatchedModFolder проверяет, есть ли в папке ровно один .mod файл,
-// имя которого не совпадает с именем папки. Если да - переименовывает папку
-// в имя этого .mod файла (без расширения) и возвращает новое имя папки.
-// Если переименование не удалось или условий нет - возвращает пустую строку.
 func TryFixMismatchedModFolder(folderPath, currentName string) string {
-	// Пропускаем папки, которые отключены по именованию
 	if isDisabledByNaming(currentName) {
 		return ""
 	}
 	modFile := findSingleModFile(folderPath)
 	if modFile == "" {
-		return "" // нет .mod файла вообще
+		return ""
 	}
 	expectedName := strings.TrimSuffix(modFile, ".mod")
 	if expectedName == currentName {
-		return "" // уже правильно
-	}
-	if strings.Contains(modFile, string(os.PathSeparator)) {
-		// если вдруг findSingleModFile вернул путь с подпапкой (такого не должно быть)
 		return ""
 	}
-	// Переименовываем папку
+	if strings.Contains(modFile, string(os.PathSeparator)) {
+		return ""
+	}
 	newPath := filepath.Join(filepath.Dir(folderPath), expectedName)
 	if err := os.Rename(folderPath, newPath); err != nil {
 		appendLog(fmt.Sprintf("Failed to auto-rename folder %s -> %s: %v", currentName, expectedName, err))
@@ -473,8 +462,12 @@ type LoadOrderEntry struct {
 	Active bool
 }
 
+// Читает mod_load_order.txt из папки профиля/mods
 func ReadLoadOrder() []LoadOrderEntry {
-	data, err := os.ReadFile(filepath.Join(modsDir, FileNameLoadOrder))
+	if profileDataDir == "" {
+		return nil
+	}
+	data, err := os.ReadFile(filepath.Join(profileDataDir, "mods", FileNameLoadOrder))
 	if err != nil {
 		return nil
 	}
@@ -485,15 +478,12 @@ func ReadLoadOrder() []LoadOrderEntry {
 		if line == "" {
 			continue
 		}
-		// Пропускаем заголовок программы (начинается с "-- ▒")
 		if strings.HasPrefix(line, "-- ▒") {
 			continue
 		}
-		// Пропускаем строки от другого мод-менеджера
 		if strings.Contains(strings.ToLower(line), "modified by modtide on") {
 			continue
 		}
-		// Комментарий: строка начинается с "--" и НЕ с "-- " (т.е. без пробела после дефисов)
 		if strings.HasPrefix(line, "--") && !strings.HasPrefix(line, "-- ") {
 			continue
 		}
@@ -506,12 +496,9 @@ func ReadLoadOrder() []LoadOrderEntry {
 		if name == "" || name == "base" || name == "dmf" {
 			continue
 		}
-		// Игнорируем стандартные строки шапки
 		if helpers.ContainsString(loadOrderHeaderPhrases, name) {
 			continue
 		}
-		// Проверяем, что имя содержит хотя бы одну букву или цифру,
-		// чтобы отсеять комментарии вида "################################################################"
 		hasValidChar := false
 		for _, ch := range name {
 			if (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9') {
@@ -527,8 +514,12 @@ func ReadLoadOrder() []LoadOrderEntry {
 	return entries
 }
 
+// Пишет mod_load_order.txt в папку профиля/mods
 func WriteLoadOrder(entries []LoadOrderEntry) error {
-	f, err := os.Create(filepath.Join(modsDir, FileNameLoadOrder))
+	if profileDataDir == "" {
+		return fmt.Errorf("profile data directory not set")
+	}
+	f, err := os.Create(filepath.Join(profileDataDir, "mods", FileNameLoadOrder))
 	if err != nil {
 		return err
 	}
@@ -570,24 +561,26 @@ type ExternalData struct {
 	LoadOrder         []LoadOrderRule    `json:"load_order"`
 }
 
-// type IncompatiblePair struct{ Mod1, Mod2, Desc string }
 type IncompatiblePair struct {
 	Mod1 string            `json:"mod1"`
 	Mod2 string            `json:"mod2"`
 	Desc map[string]string `json:"desc"`
-	Type string            `json:"type,omitempty"` // "includes" (по умолчанию), "same", или пусто
+	Type string            `json:"type,omitempty"`
 }
 type Dependency struct{ Dependent, Required, RequiredURL string }
 
+// Загружает mandatory_obsolete_incompatible_dependencies.json из глобальной папки
 func LoadExternalLists(filename string) error {
-	fullPath := filepath.Join(modsDir, filename)
+	if globalDataDir == "" {
+		return fmt.Errorf("global data directory not set")
+	}
+	fullPath := filepath.Join(globalDataDir, filename)
 	data, err := os.ReadFile(fullPath)
 	if err != nil {
 		return fmt.Errorf("cannot read %s: %w", fullPath, err)
 	}
 	var ext ExternalData
 	if err := json.Unmarshal(data, &ext); err != nil {
-		// Пытаемся дать максимум информации о месте ошибки
 		offset := -1
 		var line, col int
 		var snippet string
@@ -600,7 +593,6 @@ func LoadExternalLists(filename string) error {
 		}
 
 		if offset >= 0 && offset < len(data) {
-			// Вычисляем строку и столбец
 			line, col = 1, 1
 			for i := 0; i < offset; i++ {
 				if data[i] == '\n' {
@@ -610,7 +602,6 @@ func LoadExternalLists(filename string) error {
 					col++
 				}
 			}
-			// Берём контекст вокруг ошибки
 			start := offset - 30
 			if start < 0 {
 				start = 0
@@ -706,8 +697,6 @@ func EnsureModLoadOrder(window fyne.Window) {
 	}
 }
 
-// isDisabledByNaming возвращает true, если папка отключена через префикс/суффикс
-// (игнорируется при проверках на удаление).
 func isDisabledByNaming(name string) bool {
 	if strings.HasPrefix(name, "_") || strings.HasPrefix(name, "--") {
 		return true
@@ -781,7 +770,6 @@ func isLikelyWrapper(folderName string) bool {
 	if folderName == "base" || folderName == "dmf" {
 		return false
 	}
-	// Vortex-управляемые папки не считаем ошибочными обёртками
 	if fileExists(filepath.Join(fullPath, "__folder_managed_by_vortex")) {
 		return false
 	}
@@ -833,7 +821,6 @@ func CheckBrokenMods(window fyne.Window) bool {
 		if folder == "base" || folder == "dmf" || isDisabledByNaming(folder) {
 			continue
 		}
-		// Проверяем, есть ли в папке хотя бы один .mod файл
 		fullPath := filepath.Join(modsDir, folder)
 		entries, err := os.ReadDir(fullPath)
 		if err != nil {
@@ -885,7 +872,7 @@ func CheckEmptyFolders(window fyne.Window) bool {
 	for _, folder := range ListModFolders() {
 		fullPath := filepath.Join(modsDir, folder)
 		if fileExists(filepath.Join(fullPath, "__folder_managed_by_vortex")) || isDisabledByNaming(folder) {
-			continue // это не пустая папка, а отключённый мод Vortex
+			continue
 		}
 		entries, err := os.ReadDir(fullPath)
 		if err != nil {
@@ -943,9 +930,8 @@ func CheckIncompatible(window fyne.Window) bool {
 			(*messages)["skip_all"],
 		)
 		switch choice {
-		case 0: // Skip - пропускаем эту пару, запоминаем
+		case 0:
 			skipped[pairKey(*found)] = true
-			// продолжаем цикл, найдутся другие пары
 		case 1:
 			RemoveMod(found.Mod1)
 			appendLog(fmt.Sprintf((*messages)["deleted_mod"], found.Mod1))
@@ -960,13 +946,12 @@ func CheckIncompatible(window fyne.Window) bool {
 				refreshModListFunc()
 			}
 			time.Sleep(100 * time.Millisecond)
-		case 3: // Skip All - полностью выходим из проверок несовместимости
+		case 3:
 			return true
 		}
 	}
 }
 
-// pairKey создаёт уникальный ключ для пары модов (независимо от порядка).
 func pairKey(pair IncompatiblePair) string {
 	if pair.Mod1 < pair.Mod2 {
 		return pair.Mod1 + "|" + pair.Mod2
@@ -978,7 +963,6 @@ func CheckDependencies(window fyne.Window) bool {
 	for {
 		var found *Dependency
 		for _, dep := range Dependencies {
-			// зависимый мод активен, а требуемый неактивен (или отсутствует)
 			if isModActiveFunc != nil && isModActiveFunc(dep.Dependent) && !isModActiveFunc(dep.Required) {
 				d := dep
 				found = &d
@@ -1034,17 +1018,14 @@ func PickLocalized(tr map[string]string, lang string) string {
 func GetIncompatibleDesc(mod1, mod2 string) string {
 	for _, pair := range IncompatiblePairs {
 		if (pair.Mod1 == mod1 && pair.Mod2 == mod2) || (pair.Mod1 == mod2 && pair.Mod2 == mod1) {
-			// Если есть готовое описание - используем его
 			if pair.Desc != nil {
 				if desc := PickLocalized(pair.Desc, currentLang); desc != "" {
 					return desc
 				}
 			}
-			// Иначе генерируем по шаблону
 			name1 := getDisplayName(mod1, currentLang)
 			name2 := getDisplayName(mod2, currentLang)
-			// Выбираем шаблон в зависимости от типа конфликта
-			templateKey := "conflict_template_includes" // по умолчанию "includes functionality"
+			templateKey := "conflict_template_includes"
 			if pair.Type == "same" || pair.Type == "do_the_same" {
 				templateKey = "conflict_template_same"
 			}
@@ -1053,28 +1034,23 @@ func GetIncompatibleDesc(mod1, mod2 string) string {
 					return strings.ReplaceAll(strings.ReplaceAll(tmpl, "{mod1}", name1), "{mod2}", name2)
 				}
 			}
-			// Fallback на английский, если сообщения нет
 			return fmt.Sprintf("🔴 Conflict:\n%s  ⚔ %s.\nThese mods conflict with each other.", name1, name2)
 		}
 	}
 	return ""
 }
 
-// IsAMLInstalled проверяет, модифицирован ли mod_manager.lua модом Auto Mod Loading and Ordering
 func IsAMLInstalled(modsDir string) bool {
 	data, err := os.ReadFile(filepath.Join(modsDir, "base", "mod_manager.lua"))
 	if err != nil {
 		return false
 	}
 	content := string(data)
-	// Ключевые фразы, уникальные для AML
 	return strings.Contains(content, "aml_hook_load_order") ||
 		strings.Contains(content, "AML IS MANAGING MOD LIST AND LOAD ORDER")
 }
 
-// WriteLoadOrderHeader записывает подробный заголовок в файл порядка загрузки
 func WriteLoadOrderHeader(f *os.File, lang string) {
-	// Все необходимые ключи уже есть в messages.json с переводами на все языки
 	fmt.Fprintln(f, (*messages)["load_order_header_title"])
 	fmt.Fprintln(f, (*messages)["load_order_header_line1"])
 	fmt.Fprintln(f, (*messages)["load_order_header_rule1"])
@@ -1094,7 +1070,6 @@ func WriteLoadOrderHeader(f *os.File, lang string) {
 	fmt.Fprintln(f, "")
 }
 
-// GetNexusFilePattern возвращает nexus_file_pattern для папки мода (или пустую строку)
 func GetNexusFilePattern(folder string) string {
 	if modDBMap == nil {
 		return ""
@@ -1105,12 +1080,14 @@ func GetNexusFilePattern(folder string) string {
 	return ""
 }
 
-// SaveModDatabase сохраняет текущее состояние modDBMap в файл mod_database.json.
+// Сохраняет mod_database.json в глобальную папку
 func SaveModDatabase() error {
+	if globalDataDir == "" {
+		return fmt.Errorf("global data directory not set")
+	}
 	if modDBMap == nil {
 		return fmt.Errorf("mod database is empty")
 	}
-	// Если записей меньше 5 — скорее всего, база повреждена, не сохраняем
 	if len(modDBMap) < 5 {
 		return fmt.Errorf("mod database has only %d entries, refusing to save (possible data loss)", len(modDBMap))
 	}
@@ -1128,17 +1105,16 @@ func SaveModDatabase() error {
 
 	var buf bytes.Buffer
 	encoder := json.NewEncoder(&buf)
-	encoder.SetEscapeHTML(false) // отключаем экранирование <, >, &
+	encoder.SetEscapeHTML(false)
 	encoder.SetIndent("", "\t")
 	err := encoder.Encode(modDatabaseFile{Version: externalVersion, Mods: mods})
 	if err != nil {
 		return err
 	}
-	path := filepath.Join(modsDir, "mod_database.json")
+	path := filepath.Join(globalDataDir, "mod_database.json")
 	return os.WriteFile(path, buf.Bytes(), 0644)
 }
 
-// GetModDBEntry возвращает запись из базы модов по folder (если есть).
 func GetModDBEntry(folder string) *ModDBEntry {
 	if modDBMap == nil {
 		return nil
@@ -1146,7 +1122,6 @@ func GetModDBEntry(folder string) *ModDBEntry {
 	return modDBMap[strings.ToLower(folder)]
 }
 
-// UpdateModDBEntry обновляет или добавляет запись в памяти.
 func UpdateModDBEntry(entry ModDBEntry) {
 	if modDBMap == nil {
 		modDBMap = make(map[string]*ModDBEntry)
@@ -1154,7 +1129,6 @@ func UpdateModDBEntry(entry ModDBEntry) {
 	modDBMap[strings.ToLower(entry.Folder)] = &entry
 }
 
-// GetModDBList возвращает срез всех записей (для передачи в main).
 func GetModDBList() []ModDBEntry {
 	var list []ModDBEntry
 	for _, e := range modDBMap {
@@ -1163,7 +1137,6 @@ func GetModDBList() []ModDBEntry {
 	return list
 }
 
-// FolderExistsWithTimeout используется только для критических проверок при старте
 func FolderExistsWithTimeout(name string, timeout time.Duration) bool {
 	type result struct {
 		exists bool
@@ -1182,12 +1155,13 @@ func FolderExistsWithTimeout(name string, timeout time.Duration) bool {
 	}
 }
 
-// getDisplayName возвращает читаемое имя мода на языке lang (с учётом ForceEnglish в будущем можно расширить, но здесь используем просто lang)
 func getDisplayName(folder string, lang string) string {
 	if entry, ok := modDBMap[strings.ToLower(folder)]; ok {
 		if name := PickLocalized(entry.Name, lang); name != "" {
 			return name
 		}
 	}
-	return folder // fallback на техническое имя
+	return folder
 }
+
+func GlobalDataDir() string { return globalDataDir }

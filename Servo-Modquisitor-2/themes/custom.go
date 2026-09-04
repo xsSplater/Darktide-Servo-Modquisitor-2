@@ -18,7 +18,22 @@ func (t CustomTheme) Color(name fyne.ThemeColorName, variant fyne.ThemeVariant) 
 	if c, ok := t.Colors[string(name)]; ok {
 		return c
 	}
-	return theme.DefaultTheme().Color(name, variant)
+	// Fallback: для всех кастомных имён используем тёмную тему
+	switch name {
+	case ColorStatusSystem, ColorStatusBroken, ColorStatusConflict, ColorStatusObsolete,
+		ColorStatusMandatory, ColorStatusActive, ColorStatusInactive, ColorStatusVortex,
+		ColorStatusMissing, ColorStatusSymlink, ColorStatusManual, ColorStatusNexus,
+		ColorTableObsoleteMod, ColorTableHasUpdateMod, ColorTableMissingFolder,
+		ColorStatusSymlinkBg, ColorTableRowEven, ColorTableRowOdd, ColorTableRowSelected,
+		ColorTableRowConflict, ColorTableBorderDirty, ColorTableHeaderBg, ColorSystemTableBg,
+		ColorConsoleText, ColorCRTScreenFill, ColorCRTScreenStroke, ColorCRTHeaderBg,
+		ColorDescCardStroke, ColorDescCardBg, ColorManagePanelBg, ColorTopPanelBg,
+		ColorTipBg, ColorHighlightData, ColorButtonShadow, ColorButtonShadowDisabled,
+		ColorButtonStroke, ColorButtonStrokeImage:
+		return ForcedDarkTheme{}.Color(name, variant)
+	default:
+		return theme.DefaultTheme().Color(name, variant)
+	}
 }
 
 func (t CustomTheme) Font(style fyne.TextStyle) fyne.Resource {

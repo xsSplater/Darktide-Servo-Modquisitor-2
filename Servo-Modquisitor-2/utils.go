@@ -4,6 +4,7 @@ package main
 import (
 	"Servo-Modquisitor/checks"
 	"Servo-Modquisitor/sorter"
+	"archive/zip"
 	"bufio"
 	"fmt"
 	"image"
@@ -179,28 +180,15 @@ func (app *App) runAllChecks() {
 		return
 	}
 
+	// Создаём порядок в папке профиля (путь уже установлен через updateSorterOutputPath)
 	sorter.CreateLoadOrderFromActive(activeNames, app.cfg.Language)
 
-	// Дописываем неактивные моды, чтобы сохранить их состояние
-
-	loadOrderPath := filepath.Join(app.cfg.ModsPath, FileNameLoadOrder)
-	data, err := os.ReadFile(loadOrderPath)
-	if err == nil {
-		app.appendLogToFile("=== Final load order after sorting ===")
-		scanner := bufio.NewScanner(strings.NewReader(string(data)))
-		for scanner.Scan() {
-			line := scanner.Text()
-			app.appendLogToFile(line)
-		}
-		app.appendLogToFile("=== End of load order ===")
-	} else {
-		app.appendLogToFile(fmt.Sprintf(app.messages["log_failed_to_read_lo"], err))
-	}
-
-	f, err := os.OpenFile(loadOrderPath, os.O_APPEND|os.O_WRONLY, 0644)
+	// Дописываем неактивные моды в файл профиля
+	profileOrderPath := filepath.Join(app.activeProfilePath(), "mods", FileNameLoadOrder)
+	f, err := os.OpenFile(profileOrderPath, os.O_APPEND|os.O_WRONLY, 0644)
 	if err == nil {
 		existing := make(map[string]bool)
-		data, _ := os.ReadFile(loadOrderPath)
+		data, _ := os.ReadFile(profileOrderPath)
 		lines := strings.Split(string(data), "\n")
 		for _, line := range lines {
 			line = strings.TrimSpace(line)
@@ -214,6 +202,25 @@ func (app *App) runAllChecks() {
 			}
 		}
 		f.Close()
+	} else {
+		app.appendLog(fmt.Sprintf("Failed to open profile load order for append: %v", err))
+	}
+
+	// Копируем итоговый файл из профиля в игровую папку (чтобы игра его видела)
+	app.syncLoadOrderToGame()
+
+	// Логируем финальный порядок (для отладки)
+	data, err := os.ReadFile(filepath.Join(app.cfg.ModsPath, FileNameLoadOrder))
+	if err == nil {
+		app.appendLogToFile("=== Final load order after sorting ===")
+		scanner := bufio.NewScanner(strings.NewReader(string(data)))
+		for scanner.Scan() {
+			line := scanner.Text()
+			app.appendLogToFile(line)
+		}
+		app.appendLogToFile("=== End of load order ===")
+	} else {
+		app.appendLogToFile(fmt.Sprintf(app.messages["log_failed_to_read_lo"], err))
 	}
 	app.appendLog(app.messages["done"])
 
@@ -586,4 +593,184 @@ func isModsEnabledLegacy(gameRoot string) bool {
 	}
 	_, err := os.Stat(filepath.Join(gameRoot, "bundle", "bundle_database.data.bak"))
 	return err == nil // true если бэкап есть (моды включены)
+}
+
+// removeModFromCache удаляет запись о моде из nexusVersionCache (кэша профиля)
+// и сохраняет обновлённый файл.
+func (app *App) removeModFromCache(modName string) {
+	var keyToDelete string
+	app.cacheMutex.RLock()
+	for key, info := range app.nexusVersionCache {
+		if info.Folder == modName {
+			keyToDelete = key
+			break
+		}
+	}
+	app.cacheMutex.RUnlock()
+
+	if keyToDelete == "" {
+		return // нет записи в кэше
+	}
+
+	app.cacheMutex.Lock()
+	delete(app.nexusVersionCache, keyToDelete)
+	app.cacheMutex.Unlock()
+
+	app.saveNexusVersionCache()
+	app.appendLog(fmt.Sprintf("Removed cache entry for mod: %s", modName))
+}
+
+// Очистка кэша от «мёртвых» записей
+func (app *App) pruneVersionCache() {
+	// 1. Собираем существующие папки (все моды + системные)
+	existing := make(map[string]bool)
+	for _, mod := range app.allMods {
+		existing[mod.Name] = true
+	}
+	for _, mod := range app.systemMods {
+		existing[mod.Name] = true
+	}
+
+	app.cacheMutex.Lock()
+	defer app.cacheMutex.Unlock()
+
+	// 2. Удаляем записи для несуществующих папок
+	for key, info := range app.nexusVersionCache {
+		if !existing[info.Folder] {
+			delete(app.nexusVersionCache, key)
+		}
+	}
+
+	// 3. Удаляем дубликаты по folder, оставляя одну лучшую запись
+	best := make(map[string]string) // folder -> лучший ключ
+	for key, info := range app.nexusVersionCache {
+		if current, ok := best[info.Folder]; !ok {
+			best[info.Folder] = key
+		} else {
+			curInfo := app.nexusVersionCache[current]
+			// Выбираем лучшую запись
+			preferCurrent := false
+			// Если одна nexus, другая manual - nexus побеждает
+			if info.Source == "nexus" && curInfo.Source != "nexus" {
+				preferCurrent = true
+			} else if info.Source != "nexus" && curInfo.Source == "nexus" {
+				preferCurrent = false
+			} else {
+				// Оба одинакового source - сравниваем timestamp
+				if info.Timestamp > curInfo.Timestamp {
+					preferCurrent = true
+				} else if info.Timestamp == curInfo.Timestamp && info.Version != "" && curInfo.Version == "" {
+					preferCurrent = true
+				} else {
+					preferCurrent = false
+				}
+			}
+			if preferCurrent {
+				best[info.Folder] = key
+			}
+		}
+	}
+
+	// 4. Удаляем все записи, не попавшие в best
+	toDelete := []string{}
+	for key, info := range app.nexusVersionCache {
+		if best[info.Folder] != key {
+			toDelete = append(toDelete, key)
+		}
+	}
+	for _, key := range toDelete {
+		delete(app.nexusVersionCache, key)
+	}
+
+	if len(toDelete) > 0 {
+		app.saveNexusVersionCache()
+		app.appendLog(fmt.Sprintf("Pruned %d duplicate/stale entries from version cache.", len(toDelete)))
+	}
+}
+
+// createZipArchive создаёт zip-архив из папки src в файл dst.
+func (app *App) createZipArchive(src, dst string) error {
+	f, err := os.Create(dst)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	zipWriter := zip.NewWriter(f)
+	defer zipWriter.Close()
+
+	baseDir := filepath.Base(src)
+	err = filepath.Walk(src, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		relPath, err := filepath.Rel(src, path)
+		if err != nil {
+			return err
+		}
+		if relPath == "." {
+			return nil
+		}
+		zipPath := filepath.Join(baseDir, relPath)
+		header, err := zip.FileInfoHeader(info)
+		if err != nil {
+			return err
+		}
+		header.Name = filepath.ToSlash(zipPath)
+		if info.IsDir() {
+			header.Name += "/"
+		} else {
+			header.Method = zip.Deflate
+		}
+		writer, err := zipWriter.CreateHeader(header)
+		if err != nil {
+			return err
+		}
+		if info.IsDir() {
+			return nil
+		}
+		file, err := os.Open(path)
+		if err != nil {
+			return err
+		}
+		defer file.Close()
+		_, err = io.Copy(writer, file)
+		return err
+	})
+	return err
+}
+
+// extractZipArchive распаковывает zip-архив в папку dst.
+func (app *App) extractZipArchive(src, dst string) error {
+	r, err := zip.OpenReader(src)
+	if err != nil {
+		return err
+	}
+	defer r.Close()
+	for _, f := range r.File {
+		path := filepath.Join(dst, f.Name)
+		if f.FileInfo().IsDir() {
+			if err := os.MkdirAll(path, 0755); err != nil {
+				return err
+			}
+			continue
+		}
+		if err := os.MkdirAll(filepath.Dir(path), 0755); err != nil {
+			return err
+		}
+		rc, err := f.Open()
+		if err != nil {
+			return err
+		}
+		defer rc.Close()
+		out, err := os.Create(path)
+		if err != nil {
+			return err
+		}
+		defer out.Close()
+		if _, err := io.Copy(out, rc); err != nil {
+			return err
+		}
+	}
+	return nil
 }

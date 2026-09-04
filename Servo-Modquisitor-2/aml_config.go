@@ -310,7 +310,7 @@ func (app *App) showAMLConfigWindow() {
 		dirty = false
 		updateSaveButtonAppearance()
 	}
-	app.applyTooltip(saveBtn, "btn_aml_config_tooltip")
+	saveBtn.SetToolTip(app.messages["btn_aml_config_tooltip"])
 
 	// ── reloadBtn ──
 	reloadBtn = NewCustomButton(app.messages["aml_btn_reload"], func() {
@@ -401,7 +401,7 @@ func (app *App) showAMLConfigWindow() {
 			}
 		}()
 	})
-	app.applyTooltip(reloadBtn, "btn_refresh_tooltip") // используем существующий тултип
+	reloadBtn.SetToolTip(app.messages["btn_refresh_tooltip"]) // используем существующий тултип
 
 	// ── right: editor widgets ────────────────────────────────────────
 	editorTitle := widget.NewLabelWithStyle(app.messages["aml_select_mod_hint"], fyne.TextAlignLeading, fyne.TextStyle{Bold: true})

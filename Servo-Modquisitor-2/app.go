@@ -57,6 +57,7 @@ type Config struct {
 	ModsPath                  string  `json:"mods_path"`
 	Theme                     string  `json:"theme"`
 	UpdateCheckFrequency      string  `json:"update_check_frequency"`
+	ActiveProfile             string  `json:"active_profile"`
 }
 
 type ModVersionInfo struct {
@@ -106,8 +107,8 @@ type App struct {
 	disableSelectedBtn       *CustomButton
 	enableAllBtn             *CustomButton
 	disableAllBtn            *CustomButton
-	removeAllBtn             *CustomButton
-	removeSelectedBtn        *CustomButton
+	btnRemoveAll             *CustomButton
+	btnRemoveSelected        *CustomButton
 	moveToTopBtn             *CustomButton
 	moveToBottomBtn          *CustomButton
 	openFolderBtn            *CustomButton
@@ -123,6 +124,7 @@ type App struct {
 	btnSortChecks            *CustomButton
 	btnUpdateAll             *CustomButton
 	btnUpdateMod             *CustomButton
+	btnUpdateSelected        *CustomButton
 	btnCheckUpdates          *CustomButton
 	btnEditVersion           *CustomButton
 	searchClearBtn           *CustomButton
@@ -150,7 +152,6 @@ type App struct {
 	changelogMutex           sync.RWMutex // для безопасного доступа к картам
 	lastNxmTime              time.Time
 	enrichDebounce           *time.Timer
-	tooltipStatus            *TooltipStatusManager
 	moveLabel                *widget.Label
 	statusLabel              *widget.Label
 	descAuthor               *widget.Label
@@ -163,12 +164,14 @@ type App struct {
 	descLastUpdated          *widget.Label
 	descOriginalUpload       *widget.Label
 	descConflict             *widget.Label // под descStatus
+	profileLabel             *widget.Label
 	moveToEntry              *widget.Entry
 	searchEntry              *widget.Entry
 	descURL                  *widget.Hyperlink
 	githubLink               *widget.Hyperlink
 	logWindow                *widget.RichText
 	filterSelect             *widget.Select
+	profileSelect            *widget.Select // выпадающий список профилей
 	modTable                 *widget.Table
 	headerTable              *widget.Table
 	systemModsTable          *widget.Table // таблица системных модов
@@ -233,7 +236,11 @@ func getGameRootLegacy() string {
 }
 
 func (app *App) loadNexusVersionCache() {
-	path := filepath.Join(filepath.Dir(configFilePath()), FileNameNexusVersions)
+	if app.cfg.ActiveProfile == "" {
+		app.nexusVersionCache = make(map[string]ModVersionInfo)
+		return
+	}
+	path := filepath.Join(app.activeProfilePath(), FileNameNexusVersions)
 	data, err := os.ReadFile(path)
 	if err != nil {
 		app.nexusVersionCache = make(map[string]ModVersionInfo)
@@ -285,7 +292,10 @@ func (app *App) loadNexusVersionCache() {
 }
 
 func (app *App) saveNexusVersionCache() {
-	path := filepath.Join(filepath.Dir(configFilePath()), FileNameNexusVersions)
+	if app.cfg.ActiveProfile == "" {
+		return
+	}
+	path := filepath.Join(app.activeProfilePath(), FileNameNexusVersions)
 
 	keys := make([]string, 0, len(app.nexusVersionCache))
 	for k := range app.nexusVersionCache {
@@ -519,7 +529,8 @@ type ModDatabaseFile struct {
 }
 
 func (app *App) loadModDatabase(filename string) error {
-	fullPath := filepath.Join(app.cfg.ModsPath, filename)
+	// Используем глобальный путь (рядом с программой)
+	fullPath := filepath.Join(checks.GlobalDataDir(), filename)
 	data, err := os.ReadFile(fullPath)
 	if err != nil {
 		return fmt.Errorf("cannot read %s: %w", fullPath, err)
@@ -849,7 +860,7 @@ func (app *App) loadDataAfterInit() {
 	sorter.SetLogFunc(func(text string) { app.appendLog(text) })
 	sorter.SetSortMessages(app.messages["sort_ru_warning"], app.messages["sort_en_warning"])
 	sorter.SetHeaderFunc(checks.WriteLoadOrderHeader)
-	sorter.SetLoadOrderOutputPath(filepath.Join(app.cfg.ModsPath, FileNameLoadOrder))
+	// sorter.SetLoadOrderOutputPath(filepath.Join(app.cfg.ModsPath, FileNameLoadOrder))
 	sorter.SetLogMessages(app.messages["log_create_mlot"], app.messages["log_mlot_created"])
 
 	// 4. Загрузить внешние списки (один раз)
@@ -879,7 +890,7 @@ func (app *App) loadDataAfterInit() {
 		fmt.Fprintf(app.logFile, "mandatory_obsolete_incompatible_dependencies.json version: %s\n", checks.GetExternalVersion())
 		fmt.Fprintf(app.logFile, "mod_database.json version: %s\n", app.cfg.LastModDatabaseVersion)
 	}
-	sorter.LoadSortOrders()
+	sorter.LoadSortOrders(checks.GlobalDataDir())
 
 	// 7. Инициализация лаунчера
 	SetLauncherMessages(
@@ -1019,4 +1030,605 @@ func (app *App) getChangelog(modID, fileID int) string {
 	app.changelogCache[key] = clean
 	app.changelogMutex.Unlock()
 	return clean
+}
+
+// profilesDir возвращает путь к папке профилей
+func (app *App) profilesDir() string {
+	return filepath.Join(filepath.Dir(configFilePath()), "profiles")
+}
+
+// profilePath возвращает путь к папке конкретного профиля
+func (app *App) profilePath(name string) string {
+	return filepath.Join(app.profilesDir(), name)
+}
+
+// activeProfilePath возвращает путь к текущему активному профилю
+func (app *App) activeProfilePath() string {
+	return app.profilePath(app.cfg.ActiveProfile)
+}
+
+// ensureProfileDir создаёт папку профиля, если её нет
+func (app *App) ensureProfileDir(name string) error {
+	path := app.profilePath(name)
+	return os.MkdirAll(path, 0755)
+}
+
+// profileExists проверяет, существует ли профиль с таким именем
+func (app *App) profileExists(name string) bool {
+	path := app.profilePath(name)
+	info, err := os.Stat(path)
+	return err == nil && info.IsDir()
+}
+
+// initProfiles инициализирует профили, создаёт Default при необходимости
+func (app *App) initProfiles() {
+	// 1. Создаём папку profiles, если нет
+	if err := os.MkdirAll(app.profilesDir(), 0755); err != nil {
+		app.appendLog(fmt.Sprintf("Failed to create profiles directory: %v", err))
+		return
+	}
+
+	// 2. Сканируем подпапки в profilesDir
+	entries, err := os.ReadDir(app.profilesDir())
+	if err != nil {
+		app.appendLog(fmt.Sprintf("Failed to read profiles directory: %v", err))
+		return
+	}
+
+	var profileNames []string
+	for _, e := range entries {
+		if e.IsDir() {
+			profileNames = append(profileNames, e.Name())
+		}
+	}
+
+	// 3. Если профилей нет, создаём Default
+	if len(profileNames) == 0 {
+		app.appendLog("No profiles found. Creating default profile...")
+		if err := app.createDefaultProfile(); err != nil {
+			app.appendLog(fmt.Sprintf("Failed to create default profile: %v", err))
+			return
+		}
+		profileNames = append(profileNames, "Default")
+		app.cfg.ActiveProfile = "Default"
+		saveConfig(app.cfg)
+	}
+
+	// 4. Проверяем, что активный профиль существует
+	if app.cfg.ActiveProfile == "" || !app.profileExists(app.cfg.ActiveProfile) {
+		app.cfg.ActiveProfile = profileNames[0]
+		saveConfig(app.cfg)
+	}
+
+	// 5. Удаляем возможный файл mod_load_order.txt из корня активного профиля
+	app.cleanupProfileRoot(app.profilePath(app.cfg.ActiveProfile))
+
+	// 6. Устанавливаем путь к данным профиля в checks
+	checks.SetProfileDataDir(app.activeProfilePath())
+	app.appendLog(fmt.Sprintf("Active profile: %s", app.cfg.ActiveProfile))
+
+	// 7. Обновляем путь для сортировщика
+	app.updateSorterOutputPath()
+
+	// 8. Обновляем UI в главной горутине
+	fyne.Do(func() {
+		app.refreshProfileList()
+		app.refreshModList()
+		app.filterModList()
+		app.forceRefreshTable()
+	})
+}
+
+// createDefaultProfile создаёт профиль Default из текущей игровой папки mods
+func (app *App) createDefaultProfile() error {
+	defaultPath := app.profilePath("Default")
+	if err := os.MkdirAll(defaultPath, 0755); err != nil {
+		return err
+	}
+
+	// Копируем папку mods
+	modsSrc := app.cfg.ModsPath
+	modsDst := filepath.Join(defaultPath, "mods")
+	if err := copyPath(modsSrc, modsDst); err != nil {
+		return fmt.Errorf("failed to copy mods folder to profile: %w", err)
+	}
+	cleanupModsFolder(modsDst)
+
+	// Копируем mod_load_order.txt, если есть
+	srcLO := filepath.Join(modsSrc, FileNameLoadOrder)
+	dstLO := filepath.Join(modsDst, FileNameLoadOrder)
+	if _, err := os.Stat(srcLO); err == nil {
+		if err := copyFile(srcLO, dstLO); err != nil {
+			app.appendLog(fmt.Sprintf("Failed to copy load order: %v", err))
+		}
+	}
+
+	// Копируем nexus_versions.json, если есть
+	srcNV := filepath.Join(filepath.Dir(configFilePath()), FileNameNexusVersions)
+	dstNV := filepath.Join(defaultPath, FileNameNexusVersions)
+	if _, err := os.Stat(srcNV); err == nil {
+		if err := copyFile(srcNV, dstNV); err != nil {
+			app.appendLog(fmt.Sprintf("Failed to copy nexus versions: %v", err))
+		}
+	}
+
+	return nil
+}
+
+// setGlobalDataDir устанавливает путь к глобальным данным (mod_database.json, mandatory_...)
+func (app *App) setGlobalDataDir() {
+	exePath, err := os.Executable()
+	if err != nil {
+		app.appendLog("Failed to get executable path: " + err.Error())
+		return
+	}
+	globalDir := filepath.Dir(exePath)
+	checks.SetGlobalDataDir(globalDir)
+	app.appendLog(fmt.Sprintf("Global data directory set to: %s", globalDir))
+}
+
+// migrateGlobalFilesFromMods проверяет, лежат ли глобальные файлы в папке mods, и предлагает переместить их.
+func (app *App) migrateGlobalFilesFromMods() {
+	modsPath := app.cfg.ModsPath
+	exePath := app.getExePath()
+	exeDir := filepath.Dir(exePath)
+
+	hasModDB := fileExists(filepath.Join(modsPath, FileNameModDatabase))
+	hasMandatory := fileExists(filepath.Join(modsPath, FileNameMandatoryRules))
+
+	if !hasModDB && !hasMandatory {
+		return
+	}
+
+	// Если программа уже не внутри mods — просто копируем файлы в папку программы
+	if !strings.HasPrefix(exeDir, modsPath) {
+		globalDir := exeDir
+		needCopy := false
+		if hasModDB && !fileExists(filepath.Join(globalDir, FileNameModDatabase)) {
+			needCopy = true
+		}
+		if hasMandatory && !fileExists(filepath.Join(globalDir, FileNameMandatoryRules)) {
+			needCopy = true
+		}
+		if !needCopy {
+			// Файлы уже есть в папке программы — просто удаляем дубли из mods
+			if hasModDB {
+				os.Remove(filepath.Join(modsPath, FileNameModDatabase))
+			}
+			if hasMandatory {
+				os.Remove(filepath.Join(modsPath, FileNameMandatoryRules))
+			}
+			app.appendLog("Global files already exist in program directory. Duplicates removed from mods.")
+			return
+		}
+
+		choice := app.showChoiceDialogSync(app.mainWindow,
+			app.messages["migration_title"],
+			app.messages["migration_message"],
+			app.messages["migration_btn_move"],
+			app.messages["btn_cancel"],
+		)
+		if choice != 0 {
+			app.appendLog("Migration cancelled.")
+			return
+		}
+
+		// Копируем файлы
+		if hasModDB {
+			src := filepath.Join(modsPath, FileNameModDatabase)
+			dst := filepath.Join(globalDir, FileNameModDatabase)
+			if err := copyFile(src, dst); err != nil {
+				app.appendLog(fmt.Sprintf("Failed to copy %s: %v", FileNameModDatabase, err))
+				return
+			}
+			app.appendLog(fmt.Sprintf("Copied %s to %s", FileNameModDatabase, globalDir))
+		}
+		if hasMandatory {
+			src := filepath.Join(modsPath, FileNameMandatoryRules)
+			dst := filepath.Join(globalDir, FileNameMandatoryRules)
+			if err := copyFile(src, dst); err != nil {
+				app.appendLog(fmt.Sprintf("Failed to copy %s: %v", FileNameMandatoryRules, err))
+				return
+			}
+			app.appendLog(fmt.Sprintf("Copied %s to %s", FileNameMandatoryRules, globalDir))
+		}
+
+		// После копирования основных файлов добавьте:
+		sortFiles := []string{"russian_sort_order.txt", "english_sort_order.txt"}
+		for _, sf := range sortFiles {
+			src := filepath.Join(modsPath, sf)
+			if fileExists(src) {
+				dst := filepath.Join(globalDir, sf)
+				if err := copyFile(src, dst); err != nil {
+					app.appendLog(fmt.Sprintf("Failed to copy %s: %v", sf, err))
+				} else {
+					os.Remove(src)
+					app.appendLog(fmt.Sprintf("Copied %s to %s", sf, globalDir))
+				}
+			}
+		}
+
+		// Удаляем исходные файлы из mods
+		if hasModDB {
+			os.Remove(filepath.Join(modsPath, FileNameModDatabase))
+		}
+		if hasMandatory {
+			os.Remove(filepath.Join(modsPath, FileNameMandatoryRules))
+		}
+
+		// Перезагружаем базы
+		app.setGlobalDataDir()
+		if err := app.loadModDatabase(FileNameModDatabase); err == nil {
+			checks.SetModDatabase(app.modDatabase)
+		}
+		if err := checks.LoadExternalLists(FileNameMandatoryRules); err == nil {
+			app.cfg.LastMandatoryRulesVersion = checks.GetExternalVersion()
+			saveConfig(app.cfg)
+		}
+		sorter.SetMandatoryOrder(checks.MandatoryOrder)
+		sorter.SetDependencies(convertDeps(checks.Dependencies))
+		sorter.SetLoadOrderRules(checks.LoadOrderRules)
+		app.appendLog("Global files migration completed successfully.")
+		return
+	}
+
+	// Если программа находится внутри папки mods — предлагаем скопировать программу и файлы в новое место
+	app.appendLog("Program is located inside the mods folder. Please choose a new location for the program and global files.")
+
+	// Показываем диалог выбора папки (без установки заголовка)
+	resultChan := make(chan string, 1)
+	fyne.Do(func() {
+		dlg := dialog.NewFolderOpen(func(uri fyne.ListableURI, err error) {
+			if err != nil || uri == nil {
+				resultChan <- ""
+				return
+			}
+			resultChan <- filepath.FromSlash(uri.Path())
+		}, app.mainWindow)
+		dlg.Resize(fyne.NewSize(FileDialogWidth, FileDialogHeight))
+		dlg.Show()
+	})
+
+	selectedPath := <-resultChan
+	if selectedPath == "" {
+		app.appendLog("Migration cancelled (no folder selected).")
+		app.showInfoDialog(app.messages["warning_title"], "Migration cancelled. Program and files remain in the mods folder.")
+		return
+	}
+
+	// Создаём подпапку Servo-Modquisitor
+	targetDir := filepath.Join(selectedPath, "Servo-Modquisitor")
+	if err := os.MkdirAll(targetDir, 0755); err != nil {
+		app.appendLog(fmt.Sprintf("Failed to create target directory: %v", err))
+		app.showInfoDialog(app.messages["error_title"], fmt.Sprintf("Failed to create folder: %v", err))
+		return
+	}
+
+	// Копируем программу (exe)
+	exeName := filepath.Base(exePath)
+	targetExe := filepath.Join(targetDir, exeName)
+	if err := copyFile(exePath, targetExe); err != nil {
+		app.appendLog(fmt.Sprintf("Failed to copy program: %v", err))
+		app.showInfoDialog(app.messages["error_title"], fmt.Sprintf("Failed to copy program: %v", err))
+		return
+	}
+	app.appendLog(fmt.Sprintf("Program copied to %s", targetExe))
+
+	// Копируем файлы
+	if hasModDB {
+		src := filepath.Join(modsPath, FileNameModDatabase)
+		dst := filepath.Join(targetDir, FileNameModDatabase)
+		if err := copyFile(src, dst); err != nil {
+			app.appendLog(fmt.Sprintf("Failed to copy %s: %v", FileNameModDatabase, err))
+			return
+		}
+		app.appendLog(fmt.Sprintf("Copied %s to %s", FileNameModDatabase, targetDir))
+	}
+	if hasMandatory {
+		src := filepath.Join(modsPath, FileNameMandatoryRules)
+		dst := filepath.Join(targetDir, FileNameMandatoryRules)
+		if err := copyFile(src, dst); err != nil {
+			app.appendLog(fmt.Sprintf("Failed to copy %s: %v", FileNameMandatoryRules, err))
+			return
+		}
+		app.appendLog(fmt.Sprintf("Copied %s to %s", FileNameMandatoryRules, targetDir))
+	}
+
+	// Удаляем исходные файлы из mods
+	if hasModDB {
+		os.Remove(filepath.Join(modsPath, FileNameModDatabase))
+	}
+	if hasMandatory {
+		os.Remove(filepath.Join(modsPath, FileNameMandatoryRules))
+	}
+
+	// Показываем сообщение об успехе с инструкцией по удалению старой папки
+	msg := fmt.Sprintf(
+		"Program and global files have been copied to:\n%s\n\n"+
+			"Please close this program and run the new copy from the new location.\n"+
+			"After that, you can safely delete the old program folder:\n%s",
+		targetDir, exeDir,
+	)
+	app.showInfoDialog(app.messages["migration_success_title"], msg)
+	app.appendLog("Program and files copied to new location. Please restart from the new copy.")
+}
+
+// refreshProfileList обновляет список профилей и выпадающий список
+func (app *App) refreshProfileList() {
+	entries, err := os.ReadDir(app.profilesDir())
+	if err != nil {
+		app.appendLog(fmt.Sprintf("Failed to read profiles: %v", err))
+		return
+	}
+	names := []string{}
+	for _, e := range entries {
+		if e.IsDir() {
+			names = append(names, e.Name())
+		}
+	}
+	if app.profileSelect != nil {
+		app.profileSelect.Options = names
+		if app.cfg.ActiveProfile != "" {
+			app.profileSelect.SetSelected(app.cfg.ActiveProfile)
+		} else if len(names) > 0 {
+			app.profileSelect.SetSelected(names[0])
+		}
+		app.profileSelect.Refresh()
+	}
+}
+
+// switchProfile переключает активный профиль
+func (app *App) switchProfile(name string) {
+	if name == app.cfg.ActiveProfile {
+		return
+	}
+	if !app.profileExists(name) {
+		app.appendLog(fmt.Sprintf("Profile '%s' does not exist", name))
+		return
+	}
+
+	// Сохраняем изменения текущего профиля, если есть
+	if app.orderDirty {
+		app.saveCurrentOrder() // теперь внутри вызовет syncLoadOrderToGame
+		app.orderDirty = false
+		app.stopBlinkSaveButton()
+		app.updateTableBorder()
+	}
+
+	srcMods := filepath.Join(app.profilePath(name), "mods")
+	dstMods := app.cfg.ModsPath
+
+	// Удаляем пользовательские моды из игровой папки
+	if _, err := os.Stat(dstMods); err == nil {
+		entries, _ := os.ReadDir(dstMods)
+		for _, e := range entries {
+			if e.IsDir() {
+				modName := e.Name()
+				if modName != "base" && modName != "dmf" && modName != "autopatch" {
+					os.RemoveAll(filepath.Join(dstMods, modName))
+				}
+			}
+		}
+	}
+
+	// Копируем папку mods из профиля в игровую папку
+	if err := copyPath(srcMods, dstMods); err != nil {
+		app.appendLog(fmt.Sprintf("Failed to copy mods from profile '%s': %v", name, err))
+		return
+	}
+	cleanupModsFolder(dstMods)
+
+	// Удаляем возможный файл mod_load_order.txt в корне профиля (если завалялся)
+	app.cleanupProfileRoot(app.profilePath(name))
+
+	app.cfg.ActiveProfile = name
+	saveConfig(app.cfg)
+	checks.SetProfileDataDir(app.activeProfilePath())
+	app.loadNexusVersionCache()
+
+	// Обновляем путь для сортировщика ПЕРЕД сохранением порядка
+	app.updateSorterOutputPath()
+
+	// Все UI-операции — в главной горутине
+	fyne.Do(func() {
+		app.refreshModList()
+		app.saveCurrentOrder() // сохранит порядок и синхронизирует с игрой
+		app.orderDirty = false
+		app.stopBlinkSaveButton()
+		app.updateTableBorder()
+		app.filterModList()
+		app.forceRefreshTable()
+
+		app.appendLog(fmt.Sprintf("Switched to profile: %s", name))
+		if app.profileSelect != nil {
+			app.profileSelect.SetSelected(name)
+		}
+	})
+}
+
+// createProfile создаёт новый профиль
+func (app *App) createProfile(name string, copyFrom string) error {
+	if name == "" {
+		return fmt.Errorf("profile name cannot be empty")
+	}
+	if app.profileExists(name) {
+		return fmt.Errorf("profile '%s' already exists", name)
+	}
+	if err := app.ensureProfileDir(name); err != nil {
+		return err
+	}
+
+	if copyFrom != "" && app.profileExists(copyFrom) {
+		src := app.profilePath(copyFrom)
+		dst := app.profilePath(name)
+		if err := copyPath(src, dst); err != nil {
+			return fmt.Errorf("failed to copy from '%s': %w", copyFrom, err)
+		}
+		// После копирования удаляем возможный файл в корне (если завалялся)
+		app.cleanupProfileRoot(app.profilePath(name))
+	} else {
+		// Пустой профиль
+		modsPath := filepath.Join(app.profilePath(name), "mods")
+		if err := os.MkdirAll(modsPath, 0755); err != nil {
+			return err
+		}
+		// Создаём пустой файл порядка внутри mods
+		emptyPath := filepath.Join(modsPath, FileNameLoadOrder)
+		if err := os.WriteFile(emptyPath, []byte(""), 0644); err != nil {
+			app.appendLog(fmt.Sprintf("Failed to create empty load order: %v", err))
+		}
+		// Создаём пустой nexus_versions.json
+		emptyCache := map[string]ModVersionInfo{}
+		data, _ := json.MarshalIndent(emptyCache, "", "\t")
+		if err := os.WriteFile(filepath.Join(app.profilePath(name), FileNameNexusVersions), data, 0644); err != nil {
+			app.appendLog(fmt.Sprintf("Failed to create empty nexus_versions.json: %v", err))
+		}
+	}
+
+	app.appendLog(fmt.Sprintf("Created profile: %s", name))
+	fyne.Do(func() {
+		app.refreshProfileList()
+	})
+	return nil
+}
+
+// cleanupProfileRoot удаляет файл mod_load_order.txt из корня профиля, если он существует.
+func (app *App) cleanupProfileRoot(profilePath string) {
+	path := filepath.Join(profilePath, FileNameLoadOrder)
+	if _, err := os.Stat(path); err == nil {
+		if err := os.Remove(path); err != nil {
+			app.appendLog(fmt.Sprintf("Failed to remove legacy load order file from profile root: %v", err))
+		} else {
+			app.appendLog(fmt.Sprintf("Removed legacy load order file from profile root: %s", path))
+		}
+	}
+}
+
+// deleteProfile удаляет профиль
+func (app *App) deleteProfile(name string) error {
+	if name == "Default" {
+		return fmt.Errorf("cannot delete default profile")
+	}
+	if !app.profileExists(name) {
+		return fmt.Errorf("profile '%s' does not exist", name)
+	}
+	if name == app.cfg.ActiveProfile {
+		return fmt.Errorf("cannot delete active profile")
+	}
+	if err := os.RemoveAll(app.profilePath(name)); err != nil {
+		return err
+	}
+	app.appendLog(fmt.Sprintf("Deleted profile: %s", name))
+	app.refreshProfileList()
+	return nil
+}
+
+// renameProfile переименовывает профиль
+func (app *App) renameProfile(oldName, newName string) error {
+	if oldName == "Default" {
+		return fmt.Errorf("cannot rename default profile")
+	}
+	if !app.profileExists(oldName) {
+		return fmt.Errorf("profile '%s' does not exist", oldName)
+	}
+	if app.profileExists(newName) {
+		return fmt.Errorf("profile '%s' already exists", newName)
+	}
+	oldPath := app.profilePath(oldName)
+	newPath := app.profilePath(newName)
+	if err := os.Rename(oldPath, newPath); err != nil {
+		return err
+	}
+	if app.cfg.ActiveProfile == oldName {
+		app.cfg.ActiveProfile = newName
+		saveConfig(app.cfg)
+	}
+	app.appendLog(fmt.Sprintf("Renamed profile: %s -> %s", oldName, newName))
+	app.refreshProfileList()
+	return nil
+}
+
+// fileExists проверяет существование файла или папки
+func fileExists(path string) bool {
+	_, err := os.Stat(path)
+	return err == nil
+}
+
+// syncProfileFromGame копирует текущую игровую папку mods в активный профиль (перезаписывая)
+func (app *App) syncProfileFromGame() {
+	profilePath := app.activeProfilePath()
+	if profilePath == "" {
+		app.appendLog("No active profile to sync")
+		return
+	}
+
+	dstMods := filepath.Join(profilePath, "mods")
+	src := app.cfg.ModsPath
+
+	// Удаляем старые папки обычных модов в профиле
+	if _, err := os.Stat(dstMods); err == nil {
+		entries, err := os.ReadDir(dstMods)
+		if err == nil {
+			for _, e := range entries {
+				if e.IsDir() {
+					name := e.Name()
+					if name == "base" || name == "dmf" || name == "autopatch" {
+						continue
+					}
+					os.RemoveAll(filepath.Join(dstMods, name))
+				}
+			}
+		}
+	}
+
+	// Копируем свежую папку mods из игры в профиль
+	if err := copyPath(src, dstMods); err != nil {
+		app.appendLog(fmt.Sprintf("Failed to sync mods to profile: %v", err))
+		return
+	}
+
+	cleanupModsFolder(dstMods)
+	app.appendLog("Profile synced from game folder.")
+}
+
+func (app *App) getExePath() string {
+	exe, _ := os.Executable()
+	return exe
+}
+
+func cleanupModsFolder(path string) {
+	unwanted := []string{
+		FileNameModDatabase,
+		FileNameMandatoryRules,
+		// FileNameLog,
+		AppName + ".exe",
+	}
+	for _, f := range unwanted {
+		toRemove := filepath.Join(path, f)
+		if _, err := os.Stat(toRemove); err == nil {
+			if err := os.Remove(toRemove); err != nil {
+				// логировать ошибку, но не прерывать выполнение
+			}
+		}
+	}
+}
+
+// updateSorterOutputPath устанавливает путь для записи порядка загрузки в папку активного профиля.
+func (app *App) updateSorterOutputPath() {
+	if app.cfg.ActiveProfile != "" {
+		sorter.SetLoadOrderOutputPath(filepath.Join(app.activeProfilePath(), "mods", FileNameLoadOrder))
+	} else {
+		sorter.SetLoadOrderOutputPath(filepath.Join(app.cfg.ModsPath, FileNameLoadOrder))
+	}
+}
+
+// syncLoadOrderToGame копирует файл порядка из профиля в игровую папку.
+func (app *App) syncLoadOrderToGame() {
+	src := filepath.Join(app.activeProfilePath(), "mods", FileNameLoadOrder)
+	dst := filepath.Join(app.cfg.ModsPath, FileNameLoadOrder)
+	if err := copyFile(src, dst); err != nil {
+		app.appendLog(fmt.Sprintf("Failed to copy load order to game folder: %v", err))
+	} else {
+		app.appendLog("Load order synced to game folder")
+	}
 }

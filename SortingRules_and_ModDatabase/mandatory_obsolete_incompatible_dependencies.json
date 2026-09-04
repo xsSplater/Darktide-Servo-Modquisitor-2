@@ -1,5 +1,5 @@
 {
-	"version": "2.0.6",
+	"version": "2.1.0",
 
 	"mandatory_order": [
 		"ModPerformanceMonitor",
@@ -494,6 +494,7 @@
 		{ "mod1": "state_your_name",		"mod2": "who_are_you" },
 		{ "mod1": "Targeter",				"mod2": "crosshair_remap" },
 		{ "mod1": "teammate_tracker",		"mod2": "Do I Know You",			"type": "same" },
+		{ "mod1": "ToggleAltFire",			"mod2": "hybrid_alt_fire",			"type": "same" },
 		{ "mod1": "ToggleHUD",				"mod2": "NoneHUD",					"type": "same" },
 		{ "mod1": "transonic_stance_colors","mod2": "transonic_colors",			"type": "same" },
 		{ "mod1": "TraversalAssist",		"mod2": "AutoVault",				"type": "same" },
@@ -742,6 +743,12 @@
 			"dependent": "Disco Inferno",
 				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/929"},
 		{"required": "SimpleAudio",
+			"dependent": "funny_hammer",
+				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/929"},
+		{"required": "SimpleAudio",
+			"dependent": "GetsugaTenshou",
+				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/929"},
+		{"required": "SimpleAudio",
 			"dependent": "Hit_Kill_Sounds",
 				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/929"},
 		{"required": "SimpleAudio",
@@ -788,6 +795,9 @@
 				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/929"},
 		{"required": "SimpleAudio",
 			"dependent": "Wheeeee",
+				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/929"},
+		{"required": "SimpleAudio",
+			"dependent": "yippee",
 				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/929"},
 
 		{"required": "SlotFix",

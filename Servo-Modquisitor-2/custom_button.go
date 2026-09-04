@@ -35,7 +35,7 @@ func (r *_CustomButtonRenderer) Layout(size fyne.Size) {
 	if r.icon != nil {
 		iconSize := r.btn.iconSize // обычный размер
 		if r.btn.hovered && !r.btn.disabled {
-			iconSize = iconSize * 1.33 // увеличиваем на 33% при наведении
+			iconSize = iconSize * 1.35 // увеличиваем на 35% при наведении
 		}
 		x := (size.Width - iconSize) / 2
 		y := (size.Height - iconSize) / 2
@@ -190,7 +190,7 @@ func NewIconButton(icon fyne.Resource, tapped func()) *CustomButton {
 		icon:     icon,
 		OnTapped: tapped,
 
-		iconSize: 24, // по умолчанию
+		iconSize: 30, // по умолчанию
 	}
 	b.ExtendBaseWidget(b)
 	return b

@@ -2,6 +2,7 @@
 package main
 
 import (
+	"Servo-Modquisitor/themes"
 	"bufio"
 	"embed"
 	"fmt"
@@ -14,9 +15,11 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/dialog"
+	"fyne.io/fyne/v2/theme"
+	"fyne.io/fyne/v2/tooltip"
 )
 
-//go:embed lang/messages.json assets/CRT_BlackBG.jpg assets/Yellow_BG.jpg assets/Yellow_BG_button.jpg assets/Yellow_BG_col.jpg assets/icon.png assets/mechanicus.png assets/buttons/trashcan_red.png assets/buttons/trashcan_red_x.png assets/buttons/trashcan_red_sel.png assets/buttons/upd_download_blue_p.png assets/buttons/folder_open.png assets/buttons/refresh.png assets/buttons/save.png assets/buttons/check_updates_blue.png assets/buttons/update_all_mods_blue_p.png assets/buttons/add.png assets/buttons/sort.png assets/buttons/on.png assets/buttons/off_red.png assets/buttons/cog_check.png assets/buttons/play.png assets/buttons/play_fast.png assets/buttons/up.png assets/buttons/down.png assets/buttons/bottom.png assets/buttons/top.png assets/buttons/v_v2.png assets/buttons/v_.png
+//go:embed lang/messages.json assets/CRT_BlackBG.jpg assets/Yellow_BG.jpg assets/Yellow_BG_button.jpg assets/Yellow_BG_col.jpg assets/icon.png assets/mechanicus.png assets/buttons/trashcan_red.png assets/buttons/trashcan_red_x.png assets/buttons/trashcan_red_sel.png assets/buttons/upd_download_blue_p.png assets/buttons/folder_open.png assets/buttons/refresh.png assets/buttons/save.png assets/buttons/check_updates_blue.png assets/buttons/update_all_mods_blue_p.png assets/buttons/update_selected_blue_p.png assets/buttons/add.png assets/buttons/sort.png assets/buttons/on.png assets/buttons/off_red.png assets/buttons/cog_check.png assets/buttons/play.png assets/buttons/play_fast.png assets/buttons/up.png assets/buttons/down.png assets/buttons/bottom.png assets/buttons/top.png assets/buttons/select_all.png assets/buttons/select_all_de.png assets/buttons/checked_box.png assets/buttons/checked_box_un.png assets/buttons/enable_all.png assets/buttons/disable_all.png assets/buttons/edit_version.png
 var embeddedFiles embed.FS
 
 func main() {
@@ -40,11 +43,12 @@ func main() {
 
 	myApp := app.NewWithID(AppID)
 	cfg := loadConfig()
-
 	application := NewApp(cfg, myApp)
 
 	// Открываем лог (путь может быть невалидным, но logPath будет создан позже)
-	logPath := filepath.Join(cfg.ModsPath, FileNameLog)
+	exePath, _ := os.Executable()
+	globalDir := filepath.Dir(exePath)
+	logPath := filepath.Join(globalDir, FileNameLog)
 	f, err := os.OpenFile(logPath, os.O_CREATE|os.O_RDWR|os.O_APPEND, 0644)
 	if err == nil {
 		if info, err := f.Stat(); err == nil && info.Size() > MaxLogFileSize {
@@ -133,6 +137,8 @@ func main() {
 	// Показываем окно (оно уже отображается, но данные ещё не загружены)
 	application.mainWindow.Show()
 
+	application.updateTooltipStyle()
+
 	// Восстанавливаем размеры окна из конфига (если есть)
 	if cfg.WindowWidth > 0 && cfg.WindowHeight > 0 {
 		application.mainWindow.Resize(fyne.NewSize(float32(cfg.WindowWidth), float32(cfg.WindowHeight)))
@@ -148,18 +154,28 @@ func main() {
 
 	// Запускаем фоновую горутину для инициализации путей и загрузки данных
 	go func() {
-		// 1. Определяем корень игры и папку mods (в фоне, диалоги внутри используют fyne.Do)
+		// 1. Определяем корень игры и папку mods
 		application.initializePaths()
 
-		// 2. После того как пути определены, загружаем все данные и обновляем UI
+		// 2. Устанавливаем путь к глобальным данным
+		application.setGlobalDataDir()
+
+		// 3. Миграция глобальных файлов (если они ещё в папке mods)
+		//    Теперь выполняется ДО загрузки данных!
+		application.migrateGlobalFilesFromMods()
+
+		// 4. Загружаем данные (базы, кэш, списки модов)
 		application.loadDataAfterInit()
 
-		// 3. Регистрируем обработчик nxm (если ещё не зарегистрирован)
+		// 5. Инициализируем профили
+		application.initProfiles()
+
+		// 6. Регистрируем nxm
 		if exePath, err := os.Executable(); err == nil {
 			registerNXMProtocol(exePath)
 		}
 
-		// 4. Запускаем слушатель nxm-ссылок (если ещё не запущен)
+		// 7. Запускаем слушатель
 		if application.nxmListener == nil {
 			listener, err := net.Listen(NXMProtocol, NXMAddress)
 			if err == nil {
@@ -186,4 +202,29 @@ func main() {
 
 	// Запускаем главный цикл событий
 	application.mainWindow.ShowAndRun()
+}
+
+// updateTooltipStyle обновляет стиль тултипов в соответствии с текущей темой.
+func (app *App) updateTooltipStyle() {
+	if app.mainWindow == nil {
+		return
+	}
+	th := app.myApp.Settings().Theme()
+	variant := app.myApp.Settings().ThemeVariant()
+
+	// Фон тултипа - используем цвет оверлея (обычно тёмный/светлый)
+	bg := th.Color(theme.ColorNameMenuBackground, variant)
+	// Рамка - используем цвет обводки CRT-консоли (у вас он меняется в темах)
+	border := th.Color(themes.ColorCRTScreenStroke, variant)
+
+	style := tooltip.Style{
+		Background:  bg,
+		BorderColor: border,
+		BorderWidth: 1,    // Толщина рамки
+		FontBold:    true, // Жирность шрифта
+	}
+
+	if c, ok := app.mainWindow.Canvas().(interface{ SetTooltipStyle(tooltip.Style) }); ok {
+		c.SetTooltipStyle(style)
+	}
 }

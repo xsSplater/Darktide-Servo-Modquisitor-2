@@ -2,6 +2,7 @@
 package main
 
 import (
+	"Servo-Modquisitor/checks"
 	"fmt"
 	"net/url"
 	"os"
@@ -48,11 +49,13 @@ func (app *App) initiateSortFilesUpdate() {
 
 // ensureSortFiles - вызывается при старте, если файлы отсутствуют.
 func (app *App) ensureSortFiles() {
+	// Проверяем наличие файлов в глобальной папке (рядом с программой)
+	globalDir := checks.GlobalDataDir()
 	missing := false
-	if _, err := os.Stat(filepath.Join(app.cfg.ModsPath, FileNameMandatoryRules)); os.IsNotExist(err) {
+	if _, err := os.Stat(filepath.Join(globalDir, FileNameMandatoryRules)); os.IsNotExist(err) {
 		missing = true
 	}
-	if _, err := os.Stat(filepath.Join(app.cfg.ModsPath, FileNameModDatabase)); os.IsNotExist(err) {
+	if _, err := os.Stat(filepath.Join(globalDir, FileNameModDatabase)); os.IsNotExist(err) {
 		missing = true
 	}
 	if !missing {

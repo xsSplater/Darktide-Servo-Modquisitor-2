@@ -18,7 +18,7 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
-	"fyne.io/fyne/v2/driver/desktop"
+	"fyne.io/fyne/v2/storage"
 	"fyne.io/fyne/v2/widget"
 )
 
@@ -99,23 +99,6 @@ func (app *App) showChoiceDialogSync(parent fyne.Window, title, message string, 
 // Используйте showChoiceDialog с callback.
 func (app *App) showChoiceDialogAsync(parent fyne.Window, title, message string, callback func(int), options ...string) {
 	app.showChoiceDialog(parent, title, message, callback, options...)
-}
-
-// applyTooltip - навешивает тултип на кастомную кнопку.
-func (app *App) applyTooltip(btn *CustomButton, tipKey string) {
-	tip := app.messages[tipKey]
-	if tip == "" {
-		return
-	}
-	btn.OnMouseIn = func() {
-		app.tooltipStatus.Show(tip)
-	}
-	btn.OnMouseMoved = func(*desktop.MouseEvent) {
-		app.tooltipStatus.HideAfterDelay()
-	}
-	btn.OnMouseOut = func() {
-		app.tooltipStatus.HideAfterDelay()
-	}
 }
 
 // Основной диалог скачивания (для обычных модов)
@@ -827,4 +810,264 @@ func stripHTML(html string) string {
 	re := regexp.MustCompile(`<[^>]*>`)
 	text = re.ReplaceAllString(text, "")
 	return strings.TrimSpace(text)
+}
+
+// showCreateProfileDialog показывает диалог создания профиля
+func (app *App) showCreateProfileDialog() {
+	entry := widget.NewEntry()
+	entry.SetPlaceHolder(app.messages["profile_name_placeholder"])
+
+	// Чекбокс "Копировать из текущего"
+	copyCheck := widget.NewCheck(app.messages["profile_copy_from_current"], nil)
+	copyCheck.SetChecked(true)
+
+	var popUp *widget.PopUp
+
+	// Кнопки с центрированием
+	btnCreate := widget.NewButton(app.messages["btn_create"], func() {
+		name := strings.TrimSpace(entry.Text)
+		if name == "" {
+			app.showInfoDialog(app.messages["error_title"], app.messages["profile_name_empty"])
+			return
+		}
+		copyFrom := ""
+		if copyCheck.Checked {
+			copyFrom = app.cfg.ActiveProfile
+		}
+		if err := app.createProfile(name, copyFrom); err != nil {
+			app.appendLog(fmt.Sprintf("Failed to create profile: %v", err))
+			app.showInfoDialog(app.messages["error_title"], app.messages["profile_create_failed"])
+			return
+		}
+		app.switchProfile(name)
+		popUp.Hide()
+	})
+
+	btnCancel := widget.NewButton(app.messages["btn_cancel"], func() {
+		popUp.Hide()
+	})
+
+	btnContainer := container.NewCenter(
+		container.NewHBox(btnCreate, btnCancel),
+	)
+
+	content := container.NewVBox(
+		widget.NewLabelWithStyle(app.messages["profile_create_title"], fyne.TextAlignCenter, fyne.TextStyle{Bold: true}),
+		widget.NewLabel(app.messages["profile_create_message"]),
+		entry,
+		copyCheck,
+		widget.NewSeparator(),
+		btnContainer,
+	)
+
+	popUp = widget.NewModalPopUp(content, app.mainWindow.Canvas())
+	popUp.Resize(fyne.NewSize(400, 250))
+	popUp.Show()
+	app.mainWindow.Canvas().Focus(entry)
+}
+
+// showRenameProfileDialog показывает диалог переименования профиля
+func (app *App) showRenameProfileDialog() {
+	if app.cfg.ActiveProfile == "Default" {
+		app.appendLog(app.messages["profile_cannot_rename_default"])
+		return
+	}
+	entry := widget.NewEntry()
+	entry.SetText(app.cfg.ActiveProfile)
+	entry.SetPlaceHolder(app.messages["profile_name_placeholder"])
+
+	var popUp *widget.PopUp
+
+	btnRename := widget.NewButton(app.messages["btn_rename"], func() {
+		newName := strings.TrimSpace(entry.Text)
+		if newName == "" {
+			app.showInfoDialog(app.messages["error_title"], app.messages["profile_name_empty"])
+			return
+		}
+		if err := app.renameProfile(app.cfg.ActiveProfile, newName); err != nil {
+			app.appendLog(fmt.Sprintf("Failed to rename profile: %v", err))
+			app.showInfoDialog(app.messages["error_title"], app.messages["profile_rename_failed"])
+			return
+		}
+		app.refreshProfileList()
+		popUp.Hide()
+	})
+
+	btnCancel := widget.NewButton(app.messages["btn_cancel"], func() {
+		popUp.Hide()
+	})
+
+	btnContainer := container.NewCenter(container.NewHBox(btnRename, btnCancel))
+
+	content := container.NewVBox(
+		widget.NewLabelWithStyle(app.messages["profile_rename_title"], fyne.TextAlignCenter, fyne.TextStyle{Bold: true}),
+		widget.NewLabel(fmt.Sprintf(app.messages["profile_rename_message"], app.cfg.ActiveProfile)),
+		entry,
+		widget.NewSeparator(),
+		btnContainer,
+	)
+
+	popUp = widget.NewModalPopUp(content, app.mainWindow.Canvas())
+	popUp.Resize(fyne.NewSize(400, 200))
+	popUp.Show()
+	app.mainWindow.Canvas().Focus(entry)
+}
+
+// showDeleteProfileDialog показывает диалог удаления профиля
+func (app *App) showDeleteProfileDialog() {
+	if app.cfg.ActiveProfile == "Default" {
+		app.showInfoDialog(app.messages["error_title"], app.messages["profile_cannot_delete_default"])
+		return
+	}
+
+	nameToDelete := app.cfg.ActiveProfile
+
+	// Собираем другие нестандартные профили (исключая Default и удаляемый)
+	entries, err := os.ReadDir(app.profilesDir())
+	if err != nil {
+		app.appendLog(fmt.Sprintf("Failed to read profiles: %v", err))
+		return
+	}
+	var otherProfiles []string
+	for _, e := range entries {
+		if e.IsDir() && e.Name() != nameToDelete && e.Name() != "Default" {
+			otherProfiles = append(otherProfiles, e.Name())
+		}
+	}
+
+	// Если других нет - переключимся на Default (он всегда существует)
+	target := "Default"
+	if len(otherProfiles) > 0 {
+		target = otherProfiles[0]
+	}
+
+	app.showConfirmDialog(
+		app.messages["profile_delete_title"],
+		fmt.Sprintf(app.messages["profile_delete_message"], nameToDelete),
+		func() {
+			// Переключаемся на target
+			app.switchProfile(target)
+			// Удаляем старый
+			if err := app.deleteProfile(nameToDelete); err != nil {
+				app.appendLog(fmt.Sprintf("Failed to delete profile: %v", err))
+				app.showInfoDialog(app.messages["error_title"], app.messages["profile_delete_failed"])
+				return
+			}
+			app.refreshProfileList()
+			app.appendLog(fmt.Sprintf("Deleted profile: %s", nameToDelete))
+		},
+	)
+}
+
+// showImportProfileDialog показывает диалог импорта профиля
+func (app *App) showImportProfileDialog() {
+	// Используем FileOpen, чтобы можно было выбрать zip или папку
+	fd := dialog.NewFileOpen(func(reader fyne.URIReadCloser, err error) {
+		if err != nil || reader == nil {
+			return
+		}
+		defer reader.Close()
+		srcPath := filepath.FromSlash(reader.URI().Path())
+		ext := strings.ToLower(filepath.Ext(srcPath))
+		var profileFolder string
+		var tmpDir string
+
+		if ext == ".zip" {
+			// Это архив - распаковываем во временную папку
+			var err error
+			tmpDir, err = os.MkdirTemp("", "profile-import-")
+			if err != nil {
+				app.appendLog(fmt.Sprintf("Failed to create temp directory: %v", err))
+				return
+			}
+			defer os.RemoveAll(tmpDir)
+
+			if err := app.extractZipArchive(srcPath, tmpDir); err != nil {
+				app.appendLog(fmt.Sprintf("Failed to extract zip archive: %v", err))
+				return
+			}
+
+			// Ожидаем, что внутри архива будет одна папка (имя профиля)
+			entries, err := os.ReadDir(tmpDir)
+			if err != nil || len(entries) != 1 || !entries[0].IsDir() {
+				app.appendLog("Archive must contain exactly one folder (the profile name)")
+				return
+			}
+			profileFolder = filepath.Join(tmpDir, entries[0].Name())
+		} else {
+			// Это папка
+			profileFolder = srcPath
+		}
+
+		// Проверяем, что внутри есть папка mods
+		modsPath := filepath.Join(profileFolder, "mods")
+		if _, err := os.Stat(modsPath); os.IsNotExist(err) {
+			app.appendLog(app.messages["profile_import_no_mods"])
+			return
+		}
+
+		// Определяем имя нового профиля
+		baseName := filepath.Base(profileFolder)
+		if app.profileExists(baseName) {
+			baseName = baseName + "_imported"
+		}
+
+		if err := app.createProfile(baseName, ""); err != nil {
+			app.appendLog(fmt.Sprintf("Failed to create profile: %v", err))
+			return
+		}
+
+		dstPath := app.profilePath(baseName)
+		if err := copyPath(profileFolder, dstPath); err != nil {
+			app.appendLog(fmt.Sprintf("Failed to import profile: %v", err))
+			return
+		}
+		cleanupModsFolder(filepath.Join(dstPath, "mods"))
+		app.appendLog(fmt.Sprintf("Profile imported: %s", baseName))
+		app.refreshProfileList()
+		app.switchProfile(baseName)
+
+	}, app.mainWindow)
+
+	fd.SetFilter(storage.NewExtensionFileFilter([]string{".zip"})) // опционально
+	fd.Show()
+	fd.Resize(fyne.NewSize(FileDialogWidth, FileDialogHeight))
+}
+
+// showExportProfileDialog показывает диалог экспорта профиля
+func (app *App) showExportProfileDialog() {
+	fd := dialog.NewFolderOpen(func(uri fyne.ListableURI, err error) {
+		if err != nil || uri == nil {
+			return
+		}
+		dstDir := filepath.FromSlash(uri.Path())
+		profileName := app.cfg.ActiveProfile
+		zipPath := filepath.Join(dstDir, profileName+".zip")
+
+		// Создаём временную папку для подготовки архива
+		tmpDir, err := os.MkdirTemp("", "profile-export-")
+		if err != nil {
+			app.appendLog(fmt.Sprintf("Failed to create temp directory: %v", err))
+			return
+		}
+		defer os.RemoveAll(tmpDir)
+
+		// Копируем содержимое профиля во временную папку
+		srcPath := app.activeProfilePath()
+		tmpProfileDir := filepath.Join(tmpDir, profileName)
+		if err := copyPath(srcPath, tmpProfileDir); err != nil {
+			app.appendLog(fmt.Sprintf("Failed to copy profile to temp: %v", err))
+			return
+		}
+
+		// Архивируем временную папку
+		if err := app.createZipArchive(tmpProfileDir, zipPath); err != nil {
+			app.appendLog(fmt.Sprintf("Failed to create zip archive: %v", err))
+			return
+		}
+
+		app.appendLog(fmt.Sprintf("Profile exported to: %s", zipPath))
+	}, app.mainWindow)
+	fd.Show()
+	fd.Resize(fyne.NewSize(FileDialogWidth, FileDialogHeight))
 }

@@ -16,7 +16,7 @@ func (t ForcedDarkTheme) Color(name fyne.ThemeColorName, variant fyne.ThemeVaria
 	case theme.ColorNameBackground: // Основной фон всего приложения (окна, пустые области)
 		return color.NRGBA{R: 22, G: 22, B: 22, A: 225}
 	case theme.ColorNameMenuBackground: // Фон выпадающих меню (строки меню, контекстные меню)
-		return color.NRGBA{R: 60, G: 63, B: 60, A: 240} // было 52,55,52
+		return color.NRGBA{R: 60, G: 63, B: 60, A: 240}
 	case theme.ColorNameInputBackground: // Фон полей ввода - прозрачный для видимости CRT-фона
 		return color.NRGBA{R: 5, G: 6, B: 5, A: 155}
 	case theme.ColorNameOverlayBackground: // Фон всплывающих окон (диалогов) - как основной фон

@@ -174,7 +174,7 @@ func (app *App) buildMainMenu() *fyne.MainMenu {
 	amlUSConfMenu := fyne.NewMenu(app.messages["menu_aml_usconf"],
 		fyne.NewMenuItem(app.messages["btn_aml_config"], func() { app.showAMLConfigWindow() }),
 		fyne.NewMenuItemSeparator(),
-		// fyne.NewMenuItem(app.messages["menu_game_settings_editor"], func() { app.showGameSettingsEditor() }),
+		// fyne.NewMenuItem(app.messages["menu_game_settings_editor"], func() { app.showGameSettingsEditor() }), // Редактор настроек игры
 		fyne.NewMenuItem(app.messages["menu_backup_settings"], func() { app.createSettingsBackup() }),
 		fyne.NewMenuItem(app.messages["menu_restore_settings"], func() { app.showRestoreSettingsDialog() }),
 	)
@@ -216,8 +216,6 @@ func (app *App) buildMainMenu() *fyne.MainMenu {
 	})
 	donateCard := fyne.NewMenuItem(app.messages["menu_card"], func() {
 		app.myApp.Clipboard().SetContent(DonateCardNumber)
-		app.tooltipStatus.Show(app.messages["card_copied_tip"])
-		app.tooltipStatus.HideAfterDelay()
 	})
 
 	donateMenu := fyne.NewMenu(app.messages["menu_donate"],
@@ -258,8 +256,28 @@ func (app *App) buildMainMenu() *fyne.MainMenu {
 		showSystemItem,
 		fyne.NewMenuItemSeparator(),
 	)
+
+	// Меню Профили
+	profileMenu := fyne.NewMenu(app.messages["menu_profiles"],
+		fyne.NewMenuItem(app.messages["menu_profiles_create"], func() { app.showCreateProfileDialog() }),
+		fyne.NewMenuItem(app.messages["menu_profiles_rename"], func() { app.showRenameProfileDialog() }),
+		fyne.NewMenuItem(app.messages["menu_profiles_delete"], func() { app.showDeleteProfileDialog() }),
+		fyne.NewMenuItemSeparator(),
+		fyne.NewMenuItem(app.messages["menu_profiles_import"], func() { app.showImportProfileDialog() }),
+		fyne.NewMenuItem(app.messages["menu_profiles_export"], func() { app.showExportProfileDialog() }),
+	)
+
 	// Строка меню
-	return fyne.NewMainMenu(settingsMenu, nexusMenu, updatesMenu, amlUSConfMenu, contactMenu, guidesMenu, donateMenu)
+	return fyne.NewMainMenu(
+		settingsMenu,
+		nexusMenu,
+		profileMenu,
+		updatesMenu,
+		amlUSConfMenu,
+		contactMenu,
+		guidesMenu,
+		donateMenu,
+	)
 }
 
 func (app *App) changeLanguage(lang string) {
@@ -294,7 +312,7 @@ func (app *App) changeLanguage(lang string) {
 	}
 	if app.btnAMLConfig != nil { // AML
 		app.btnAMLConfig.SetText(app.messages["btn_aml_config"])
-		app.applyTooltip(app.btnAMLConfig, "btn_aml_config_tooltip")
+		app.btnAMLConfig.SetToolTip(app.messages["btn_aml_config_tooltip"])
 	}
 	// Новые кнопки быстрого перемещения
 	if app.moveToEntry != nil {
@@ -303,50 +321,32 @@ func (app *App) changeLanguage(lang string) {
 	if app.moveLabel != nil {
 		app.moveLabel.SetText(app.messages["lbl_move_to"])
 	}
-	// Кнопки выделения
-	if app.selectAllBtn != nil {
-		app.selectAllBtn.SetText(app.messages["btn_select_all"])
-	}
-	if app.deselectAllBtn != nil {
-		app.deselectAllBtn.SetText(app.messages["btn_deselect_all"])
-	}
-	if app.enableSelectedBtn != nil {
-		app.enableSelectedBtn.SetText(app.messages["btn_enable_selected"])
-	}
-	if app.disableSelectedBtn != nil {
-		app.disableSelectedBtn.SetText(app.messages["btn_disable_selected"])
-	}
-	// Кнопки массового включения/выключения
-	if app.enableAllBtn != nil {
-		app.enableAllBtn.SetText(app.messages["btn_enable_all_mods"])
-	}
-	if app.disableAllBtn != nil {
-		app.disableAllBtn.SetText(app.messages["btn_disable_all_mods"])
-	}
 	// Кнопки удаления модов
-	if app.removeAllBtn != nil {
-		app.applyTooltip(app.removeAllBtn, "btn_remove_all_tooltip")
+	if app.btnRemoveAll != nil {
+		app.btnRemoveAll.SetToolTip(app.messages["btn_remove_all_tooltip"])
 	}
-	if app.removeSelectedBtn != nil {
-		app.applyTooltip(app.removeSelectedBtn, "btn_remove_selected_tooltip")
+	if app.btnRemoveSelected != nil {
+		app.btnRemoveSelected.SetToolTip(app.messages["btn_remove_selected_tooltip"])
 	}
 	// Кнопки запуска
 	if app.headerTable != nil {
 		app.headerTable.Refresh()
 	}
 	if app.btnCheckUpdates != nil {
-		app.applyTooltip(app.btnCheckUpdates, "btn_check_updates_tooltip")
+		app.btnCheckUpdates.SetToolTip(app.messages["btn_check_updates_tooltip"])
 	}
 	if app.btnUpdateMod != nil {
-		app.applyTooltip(app.btnUpdateMod, "btn_update_mod_premium_only")
+		app.btnUpdateMod.SetToolTip(app.messages["btn_update_mod_premium_only"])
+	}
+	if app.btnUpdateSelected != nil {
+		app.btnUpdateSelected.SetToolTip(app.messages["btn_update_selected_tooltip"])
 	}
 	if app.btnUpdateAll != nil {
-		app.applyTooltip(app.btnUpdateAll, "btn_update_all_tooltip")
+		app.btnUpdateAll.SetToolTip(app.messages["btn_update_all_tooltip"])
 	}
 
 	if app.btnEditVersion != nil {
-		app.btnEditVersion.SetText(app.messages["btn_edit_version"])
-		app.applyTooltip(app.btnEditVersion, "btn_edit_version_tooltip")
+		app.btnEditVersion.SetToolTip(app.messages["btn_edit_version_tooltip"])
 	}
 
 	// Обновляем заголовок консоли
@@ -355,31 +355,40 @@ func (app *App) changeLanguage(lang string) {
 		app.logHeaderText.Refresh()
 	}
 
-	app.reapplyTooltips()
-	app.updateDescriptionForMod(app.selectedModName)
-}
+	if app.profileLabel != nil {
+		app.profileLabel.SetText(app.messages["profile_label"])
+	}
 
-func (app *App) reapplyTooltips() {
-	app.applyTooltip(app.btnSaveOrder, "btn_save_order_tooltip")
-	app.applyTooltip(app.btnRefresh, "btn_refresh_tooltip")
-	app.applyTooltip(app.btnInstall, "btn_install_tooltip")
-	app.applyTooltip(app.btnRemove, "btn_remove_tooltip")
-	app.applyTooltip(app.btnUp, "btn_up_tooltip")
-	app.applyTooltip(app.btnDown, "btn_down_tooltip")
-	app.applyTooltip(app.btnSortChecks, "btn_sort_checks_tooltip")
-	app.applyTooltip(app.btnToggle, "btn_toggle_tooltip")
-	app.applyTooltip(app.btnLaunchNormal, "btn_launch_game_tooltip")
-	app.applyTooltip(app.btnLaunchNoLauncher, "btn_launch_nolauncher_long_tooltip")
-	app.applyTooltip(app.moveToTopBtn, "btn_move_to_top_tooltip")
-	app.applyTooltip(app.moveToBottomBtn, "btn_move_to_bottom_tooltip")
-	app.applyTooltip(app.selectAllBtn, "btn_select_all_tooltip")
-	app.applyTooltip(app.deselectAllBtn, "btn_deselect_all_tooltip")
-	app.applyTooltip(app.enableSelectedBtn, "btn_enable_selected_tooltip")
-	app.applyTooltip(app.disableSelectedBtn, "btn_disable_selected_tooltip")
-	app.applyTooltip(app.enableAllBtn, "btn_enable_all_tooltip")
-	app.applyTooltip(app.disableAllBtn, "btn_disable_all_tooltip")
-	app.applyTooltip(app.manageBtn, "btn_manage_mods_tooltip")
-	app.applyTooltip(app.removeAllBtn, "btn_remove_all_tooltip")
-	app.applyTooltip(app.removeSelectedBtn, "btn_remove_selected_tooltip")
-	app.applyTooltip(app.btnAMLConfig, "btn_aml_config_tooltip")
+	app.updateDescriptionForMod(app.selectedModName)
+
+	app.refreshProfileList()
+
+	// Обновляем тултипы для всех кнопок
+	app.btnSaveOrder.SetToolTip(app.messages["btn_save_order_tooltip"])
+	app.btnRefresh.SetToolTip(app.messages["btn_refresh_tooltip"])
+	app.btnInstall.SetToolTip(app.messages["btn_install_tooltip"])
+	app.btnRemove.SetToolTip(app.messages["btn_remove_tooltip"])
+	app.btnUp.SetToolTip(app.messages["btn_up_tooltip"])
+	app.btnDown.SetToolTip(app.messages["btn_down_tooltip"])
+	app.btnSortChecks.SetToolTip(app.messages["btn_sort_checks_tooltip"])
+	app.btnToggle.SetToolTip(app.messages["btn_toggle_tooltip"])
+	app.btnLaunchNormal.SetToolTip(app.messages["btn_launch_game_tooltip"])
+	app.btnLaunchNoLauncher.SetToolTip(app.messages["btn_launch_nolauncher_long_tooltip"])
+	app.moveToTopBtn.SetToolTip(app.messages["btn_move_to_top_tooltip"])
+	app.moveToBottomBtn.SetToolTip(app.messages["btn_move_to_bottom_tooltip"])
+	app.selectAllBtn.SetToolTip(app.messages["btn_select_all_tooltip"])
+	app.deselectAllBtn.SetToolTip(app.messages["btn_deselect_all_tooltip"])
+	app.enableSelectedBtn.SetToolTip(app.messages["btn_enable_selected_tooltip"])
+	app.disableSelectedBtn.SetToolTip(app.messages["btn_disable_selected_tooltip"])
+	app.enableAllBtn.SetToolTip(app.messages["btn_enable_all_tooltip"])
+	app.disableAllBtn.SetToolTip(app.messages["btn_disable_all_tooltip"])
+	app.manageBtn.SetToolTip(app.messages["btn_manage_mods_tooltip"])
+	app.btnRemoveAll.SetToolTip(app.messages["btn_remove_all_tooltip"])
+	app.btnRemoveSelected.SetToolTip(app.messages["btn_remove_selected_tooltip"])
+	app.btnAMLConfig.SetToolTip(app.messages["btn_aml_config_tooltip"])
+	app.btnUpdateSelected.SetToolTip(app.messages["btn_update_selected_tooltip"])
+	app.btnCheckUpdates.SetToolTip(app.messages["btn_check_updates_tooltip"])
+	app.btnUpdateAll.SetToolTip(app.messages["btn_update_all_tooltip"])
+	app.btnEditVersion.SetToolTip(app.messages["btn_edit_version_tooltip"])
+	app.openFolderBtn.SetToolTip(app.messages["open_mod_folder_tooltip"])
 }

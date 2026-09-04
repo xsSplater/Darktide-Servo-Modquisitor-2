@@ -166,22 +166,10 @@ func (app *App) buildUI() {
 	app.filterSelect = widget.NewSelect(app.filterOptions(), nil)
 	app.filterSelect.SetSelected(app.messages["filter_all"])
 	app.filterSelect.OnChanged = func(s string) { app.filterModList() }
-	app.filterLabel = widget.NewLabel(app.messages["filter_label"])
 	// Увеличиваем ширину выпадающего списка фильтра
 	filterSpacer := canvas.NewRectangle(color.Transparent)
 	filterSpacer.SetMinSize(fyne.NewSize(FilterMinWidth, 1))
 	filterSelectWithSize := container.NewStack(filterSpacer, app.filterSelect)
-
-	// Статус-менеджер
-	app.statusLabel = widget.NewLabel("")
-	app.statusLabel.Alignment = fyne.TextAlignCenter
-	app.statusLabel.TextStyle = fyne.TextStyle{Bold: true}
-	app.tooltipStatus = NewTooltipStatusManager(app.statusLabel)
-
-	app.tipBgRect = canvas.NewRectangle(th.Color(themes.ColorTipBg, variant))
-	app.tipBgRect.CornerRadius = 6
-	app.tipBgRect.SetMinSize(fyne.NewSize(500, 20))
-	statusContainer := container.NewStack(app.tipBgRect, app.statusLabel)
 
 	// Кнопки быстрого перемещения
 	upImgData, err := embeddedFiles.ReadFile("assets/buttons/up.png")
@@ -229,10 +217,10 @@ func (app *App) buildUI() {
 	trashXRes := fyne.NewStaticResource("trash_x", trashXImgData)
 
 	app.moveToTopBtn = NewIconButton(topRes, func() { app.moveSelectedToTop() })
-	app.applyTooltip(app.moveToTopBtn, "btn_move_to_top_tooltip")
+	app.moveToTopBtn.SetToolTip(app.messages["btn_move_to_top_tooltip"])
 
 	app.moveToBottomBtn = NewIconButton(bottomRes, func() { app.moveSelectedToBottom() })
-	app.applyTooltip(app.moveToBottomBtn, "btn_move_to_bottom_tooltip")
+	app.moveToBottomBtn.SetToolTip(app.messages["btn_move_to_bottom_tooltip"])
 
 	app.moveToEntry = widget.NewEntry()
 	app.moveToEntry.SetPlaceHolder(app.messages["col_number"])
@@ -240,20 +228,24 @@ func (app *App) buildUI() {
 	app.moveLabel = widget.NewLabel(app.messages["lbl_move_to"])
 
 	// Кнопки выделения и массовых операций
-	app.selectAllBtn = NewCustomButton(app.messages["btn_select_all"], func() { app.selectAllMods(true) })
-	app.applyTooltip(app.selectAllBtn, "btn_select_all_tooltip")
-	app.deselectAllBtn = NewCustomButton(app.messages["btn_deselect_all"], func() { app.selectAllMods(false) })
-	app.applyTooltip(app.deselectAllBtn, "btn_deselect_all_tooltip")
-	app.enableSelectedBtn = NewCustomButton(app.messages["btn_enable_selected"], func() { app.setSelectedActive(true) })
-	app.applyTooltip(app.enableSelectedBtn, "btn_enable_selected_tooltip")
-	app.disableSelectedBtn = NewCustomButton(app.messages["btn_disable_selected"], func() { app.setSelectedActive(false) })
-	app.applyTooltip(app.disableSelectedBtn, "btn_disable_selected_tooltip")
-	app.enableAllBtn = NewCustomButton(app.messages["btn_enable_all_mods"], func() { app.setAllModsActive(true) })
-	app.applyTooltip(app.enableAllBtn, "btn_enable_all_tooltip")
-	app.disableAllBtn = NewCustomButton(app.messages["btn_disable_all_mods"], func() { app.setAllModsActive(false) })
-	app.applyTooltip(app.disableAllBtn, "btn_disable_all_tooltip")
+	// Иконки для Select All / Deselect All
+	selectAllImgData, err := embeddedFiles.ReadFile("assets/buttons/select_all.png")
+	if err != nil {
+		app.appendLog("Could not load select all icon: " + err.Error())
+	}
+	selectAllRes := fyne.NewStaticResource("select_all", selectAllImgData)
+	app.selectAllBtn = NewIconButton(selectAllRes, func() { app.selectAllMods(true) })
+	app.selectAllBtn.SetToolTip(app.messages["btn_select_all_tooltip"])
 
-	app.removeAllBtn = NewIconButton(trashXRes, func() {
+	selectAllDeImgData, err := embeddedFiles.ReadFile("assets/buttons/select_all_de.png")
+	if err != nil {
+		app.appendLog("Could not load select all de icon: " + err.Error())
+	}
+	selectAllDeRes := fyne.NewStaticResource("select_all_de", selectAllDeImgData)
+	app.deselectAllBtn = NewIconButton(selectAllDeRes, func() { app.selectAllMods(false) })
+	app.deselectAllBtn.SetToolTip(app.messages["btn_deselect_all_tooltip"])
+
+	app.btnRemoveAll = NewIconButton(trashXRes, func() {
 		app.showConfirmDialog(
 			app.messages["confirm_remove_all_title"],
 			app.messages["confirm_remove_all_text"],
@@ -262,9 +254,9 @@ func (app *App) buildUI() {
 			},
 		)
 	})
-	app.applyTooltip(app.removeAllBtn, "btn_remove_all_tooltip")
+	app.btnRemoveAll.SetToolTip(app.messages["btn_remove_all_tooltip"])
 
-	app.removeSelectedBtn = NewIconButton(selTrashRes, func() {
+	app.btnRemoveSelected = NewIconButton(selTrashRes, func() {
 		sel := app.selectedMods()
 		if len(sel) == 0 {
 			app.appendLog(app.messages["no_mods_selected"])
@@ -278,9 +270,14 @@ func (app *App) buildUI() {
 			},
 		)
 	})
-	app.applyTooltip(app.removeSelectedBtn, "btn_remove_selected_tooltip")
+	app.btnRemoveSelected.SetToolTip(app.messages["btn_remove_selected_tooltip"])
 
-	app.btnEditVersion = NewCustomButton(app.messages["btn_edit_version"], func() {
+	editVersionImgData, err := embeddedFiles.ReadFile("assets/buttons/edit_version.png")
+	if err != nil {
+		app.appendLog("Could not load edit_version icon: " + err.Error())
+	}
+	editVersionRes := fyne.NewStaticResource("edit_version", editVersionImgData)
+	app.btnEditVersion = NewIconButton(editVersionRes, func() {
 		if app.selectedModName == "" {
 			return
 		}
@@ -290,14 +287,14 @@ func (app *App) buildUI() {
 		}
 		app.showEditVersionDialog(mod)
 	})
-	app.applyTooltip(app.btnEditVersion, "btn_edit_version_tooltip")
+	app.btnEditVersion.SetToolTip(app.messages["btn_edit_version_tooltip"])
 
 	// Основные кнопки
 	app.btnUp = NewIconButton(upRes, func() { app.moveSelected(-1) })
-	app.applyTooltip(app.btnUp, "btn_up_tooltip")
+	app.btnUp.SetToolTip(app.messages["btn_up_tooltip"])
 
 	app.btnDown = NewIconButton(downRes, func() { app.moveSelected(1) })
-	app.applyTooltip(app.btnDown, "btn_down_tooltip")
+	app.btnDown.SetToolTip(app.messages["btn_down_tooltip"])
 
 	// Save List
 	saveImgData, err := embeddedFiles.ReadFile("assets/buttons/save.png")
@@ -318,7 +315,7 @@ func (app *App) buildUI() {
 			app.appendLog(app.messages["log_order_unchanged"])
 		}
 	})
-	app.applyTooltip(app.btnSaveOrder, "btn_save_order_tooltip")
+	app.btnSaveOrder.SetToolTip(app.messages["btn_save_order_tooltip"])
 
 	// Refresh List
 	refreshImgData, err := embeddedFiles.ReadFile("assets/buttons/refresh.png")
@@ -365,7 +362,7 @@ func (app *App) buildUI() {
 			}
 		}()
 	})
-	app.applyTooltip(app.btnRefresh, "btn_refresh_tooltip")
+	app.btnRefresh.SetToolTip(app.messages["btn_refresh_tooltip"])
 
 	// Toggle Mods - иконки on.png / off_red.png
 	onImgData, err := embeddedFiles.ReadFile("assets/buttons/on.png")
@@ -381,7 +378,7 @@ func (app *App) buildUI() {
 	app.toggleOffIcon = fyne.NewStaticResource("off", offImgData)
 
 	app.btnToggle = NewIconButton(app.toggleOnIcon, func() { app.toggleGlobalMods() })
-	app.applyTooltip(app.btnToggle, "btn_toggle_tooltip")
+	app.btnToggle.SetToolTip(app.messages["btn_toggle_tooltip"])
 	app.updateToggleButtonText(app.btnToggle)
 
 	// Кнопка управления модами и панель
@@ -407,10 +404,22 @@ func (app *App) buildUI() {
 		app.modTable.Refresh()
 		app.managePanel.Refresh()
 	})
-	app.applyTooltip(app.manageBtn, "btn_manage_mods_tooltip")
+	app.manageBtn.SetToolTip(app.messages["btn_manage_mods_tooltip"])
+
+	// Загрузка иконки обновления
+	updateSelImgData, err := embeddedFiles.ReadFile("assets/buttons/update_selected_blue_p.png")
+	if err != nil {
+		app.appendLog("Could not load update icon: " + err.Error())
+	}
+	updateSelRes := fyne.NewStaticResource("update", updateSelImgData)
+
+	app.btnUpdateSelected = NewIconButton(updateSelRes, func() {
+		go app.updateSelectedMods()
+	})
+	app.btnUpdateSelected.SetToolTip(app.messages["btn_update_selected_tooltip"])
 
 	app.btnAMLConfig = NewCustomButton(app.messages["btn_aml_config"], func() { app.showAMLConfigWindow() })
-	app.applyTooltip(app.btnAMLConfig, "btn_aml_config_tooltip")
+	app.btnAMLConfig.SetToolTip(app.messages["btn_aml_config_tooltip"])
 
 	if btnImgData, _ := embeddedFiles.ReadFile(ButtonBackgroundImage); btnImgData != nil {
 		img := canvas.NewImageFromResource(fyne.NewStaticResource("Yellow_BG_button", btnImgData))
@@ -422,13 +431,64 @@ func (app *App) buildUI() {
 		app.selectColumnBgRes = fyne.NewStaticResource("Yellow_BG_col", colImgData)
 	}
 
-	moveToGroup := container.NewHBox(app.moveLabel, app.moveToEntry)
-	navigationGroup := container.NewHBox(app.btnUp, app.btnDown, app.moveToTopBtn, app.moveToBottomBtn, app.removeSelectedBtn, app.removeAllBtn)
-	selectGroup := container.NewHBox(app.selectAllBtn, app.deselectAllBtn, app.enableSelectedBtn, app.disableSelectedBtn)
-	allModsGroup := container.NewHBox(app.enableAllBtn, app.disableAllBtn, app.btnEditVersion)
+	// Иконки для Enable Selected / Disable Selected
+	checkedBoxImgData, err := embeddedFiles.ReadFile("assets/buttons/checked_box.png")
+	if err != nil {
+		app.appendLog("Could not load checked_box icon: " + err.Error())
+	}
+	checkedBoxRes := fyne.NewStaticResource("checked_box", checkedBoxImgData)
+	app.enableSelectedBtn = NewIconButton(checkedBoxRes, func() { app.setSelectedActive(true) })
+	app.enableSelectedBtn.SetToolTip(app.messages["btn_enable_selected_tooltip"])
 
-	row1 := container.NewHBox(moveToGroup, navigationGroup)
-	row2 := container.NewHBox(selectGroup, allModsGroup)
+	checkedBoxUnImgData, err := embeddedFiles.ReadFile("assets/buttons/checked_box_un.png")
+	if err != nil {
+		app.appendLog("Could not load checked_box_un icon: " + err.Error())
+	}
+	checkedBoxUnRes := fyne.NewStaticResource("checked_box_un", checkedBoxUnImgData)
+	app.disableSelectedBtn = NewIconButton(checkedBoxUnRes, func() { app.setSelectedActive(false) })
+	app.disableSelectedBtn.SetToolTip(app.messages["btn_disable_selected_tooltip"])
+
+	enableAllImgData, err := embeddedFiles.ReadFile("assets/buttons/enable_all.png")
+	if err != nil {
+		app.appendLog("Could not load enable_all icon: " + err.Error())
+	}
+	enableAllRes := fyne.NewStaticResource("enable_all", enableAllImgData)
+	app.enableAllBtn = NewIconButton(enableAllRes, func() { app.setAllModsActive(true) })
+	app.enableAllBtn.SetToolTip(app.messages["btn_enable_all_tooltip"])
+
+	disableAllImgData, err := embeddedFiles.ReadFile("assets/buttons/disable_all.png")
+	if err != nil {
+		app.appendLog("Could not load disable_all icon: " + err.Error())
+	}
+	disableAllRes := fyne.NewStaticResource("disable_all", disableAllImgData)
+	app.disableAllBtn = NewIconButton(disableAllRes, func() { app.setAllModsActive(false) })
+	app.disableAllBtn.SetToolTip(app.messages["btn_disable_all_tooltip"])
+
+	// Кнопки Управления модами
+	singleRow := container.NewHBox(
+		app.moveLabel,
+		app.moveToEntry,
+		widget.NewSeparator(),
+		app.btnUp,
+		app.btnDown,
+		app.moveToTopBtn,
+		app.moveToBottomBtn,
+		widget.NewSeparator(),
+		app.selectAllBtn,
+		app.deselectAllBtn,
+		widget.NewSeparator(),
+		app.enableSelectedBtn,
+		app.disableSelectedBtn,
+		app.enableAllBtn,
+		app.disableAllBtn,
+		widget.NewSeparator(),
+		app.btnEditVersion,
+		widget.NewSeparator(),
+		app.btnUpdateSelected,
+		widget.NewSeparator(),
+		app.btnRemoveSelected,
+		app.btnRemoveAll,
+	)
 
 	yellowData, _ := embeddedFiles.ReadFile(HeaderBackgroundImage)
 	var yellowBg *canvas.Image
@@ -439,7 +499,7 @@ func (app *App) buildUI() {
 	}
 
 	app.managePanelBgRect = canvas.NewRectangle(th.Color(themes.ColorManagePanelBg, variant))
-	panelContent := container.NewVBox(row1, row2)
+	panelContent := container.NewVBox(singleRow)
 	if yellowBg != nil {
 		app.managePanel = container.NewStack(app.managePanelBgRect, yellowBg, panelContent)
 	} else {
@@ -479,10 +539,10 @@ func (app *App) buildUI() {
 			}
 		}, app.mainWindow)
 		fd.SetFilter(storage.NewExtensionFileFilter([]string{".zip", ".rar", ".7z"}))
-		fd.Resize(fyne.NewSize(FileDialogWidth, FileDialogHeight))
 		fd.Show()
+		fd.Resize(fyne.NewSize(FileDialogWidth, FileDialogHeight))
 	})
-	app.applyTooltip(app.btnInstall, "btn_install_tooltip")
+	app.btnInstall.SetToolTip(app.messages["btn_install_tooltip"])
 
 	// Auto-Sort - иконка sort.png
 	autosortImgData, err := embeddedFiles.ReadFile("assets/buttons/sort.png")
@@ -493,11 +553,11 @@ func (app *App) buildUI() {
 
 	app.btnSortChecks = NewIconButton(autosortRes, func() { go app.runAllChecks() })
 	app.btnSortChecks.SetIconSize(32) // увеличенный размер
-	app.applyTooltip(app.btnSortChecks, "btn_sort_checks_tooltip")
+	app.btnSortChecks.SetToolTip(app.messages["btn_sort_checks_tooltip"])
 
 	if app.amlDetected {
-		app.applyTooltip(app.btnSaveOrder, "aml_save_warning_tooltip")
-		app.applyTooltip(app.btnSortChecks, "aml_sort_warning_tooltip")
+		app.btnSaveOrder.SetToolTip(app.messages["aml_save_warning_tooltip"])
+		app.btnSortChecks.SetToolTip(app.messages["aml_sort_warning_tooltip"])
 	}
 
 	// Check updates
@@ -510,7 +570,7 @@ func (app *App) buildUI() {
 	app.btnCheckUpdates = NewIconButton(checkUpdatesRes, func() {
 		go app.checkNexusUpdates()
 	})
-	app.applyTooltip(app.btnCheckUpdates, "btn_check_updates_tooltip")
+	app.btnCheckUpdates.SetToolTip(app.messages["btn_check_updates_tooltip"])
 
 	// Update All Mods
 	updateAllImgData, err := embeddedFiles.ReadFile("assets/buttons/update_all_mods_blue_p.png")
@@ -522,7 +582,7 @@ func (app *App) buildUI() {
 	app.btnUpdateAll = NewIconButton(updateAllRes, func() {
 		go app.updateAllModsFromNexus()
 	})
-	app.applyTooltip(app.btnUpdateAll, "btn_update_all_premium_only")
+	app.btnUpdateAll.SetToolTip(app.messages["btn_update_all_premium_only"])
 
 	playImgData, err := embeddedFiles.ReadFile("assets/buttons/play.png")
 	if err != nil {
@@ -549,7 +609,7 @@ func (app *App) buildUI() {
 			}
 		}()
 	})
-	app.applyTooltip(app.btnLaunchNormal, "btn_launch_game_tooltip")
+	app.btnLaunchNormal.SetToolTip(app.messages["btn_launch_game_tooltip"])
 
 	playFastImgData, err := embeddedFiles.ReadFile("assets/buttons/play_fast.png")
 	if err != nil {
@@ -571,11 +631,30 @@ func (app *App) buildUI() {
 			}
 		}()
 	})
-	app.applyTooltip(app.btnLaunchNoLauncher, "btn_launch_nolauncher_long_tooltip")
+	app.btnLaunchNoLauncher.SetToolTip(app.messages["btn_launch_nolauncher_long_tooltip"])
 
 	// Верхняя панель
 	app.topPanelBgRect = canvas.NewRectangle(th.Color(themes.ColorTopPanelBg, variant))
-	topPanelContent := container.NewHBox(app.btnInstall, app.btnRefresh, app.btnSaveOrder, widget.NewSeparator(), app.btnSortChecks, widget.NewSeparator(), app.manageBtn, widget.NewSeparator(), app.filterLabel, filterSelectWithSize, searchBar, widget.NewSeparator(), app.btnCheckUpdates, app.btnUpdateAll, widget.NewSeparator(), app.btnToggle, widget.NewSeparator(), app.btnLaunchNormal, app.btnLaunchNoLauncher)
+	topPanelContent := container.NewHBox(
+		app.btnInstall,
+		app.btnRefresh,
+		app.btnSaveOrder,
+		widget.NewSeparator(),
+		app.btnSortChecks,
+		widget.NewSeparator(),
+		app.manageBtn,
+		widget.NewSeparator(),
+		filterSelectWithSize,
+		searchBar,
+		widget.NewSeparator(),
+		app.btnCheckUpdates,
+		app.btnUpdateAll,
+		widget.NewSeparator(),
+		app.btnToggle,
+		widget.NewSeparator(),
+		app.btnLaunchNormal,
+		app.btnLaunchNoLauncher,
+	)
 	topPanelWithBg := container.NewStack(app.topPanelBgRect, topPanelContent)
 
 	// Таблица заголовков
@@ -976,10 +1055,27 @@ func (app *App) buildUI() {
 
 	// Нижняя панель
 	app.counterLabel = widget.NewLabel("")
-	bottomPanel := container.NewBorder(
-		nil, nil,
+	app.profileLabel = widget.NewLabel(app.messages["profile_label"])
+	app.profileLabel.TextStyle = fyne.TextStyle{Bold: true}
+
+	// Выпадающий список профилей
+	app.profileSelect = widget.NewSelect([]string{}, func(s string) {
+		if s != app.cfg.ActiveProfile {
+			app.switchProfile(s)
+		}
+	})
+	app.profileSelect.PlaceHolder = app.messages["profile_select_placeholder"]
+
+	bottomContent := container.NewHBox(
 		app.counterLabel,
-		statusContainer,
+		layout.NewSpacer(),
+		app.profileLabel,
+		app.profileSelect,
+	)
+
+	bottomPanel := container.NewBorder(
+		nil, nil, nil, nil,
+		bottomContent,
 	)
 
 	// Левая панель
@@ -1046,7 +1142,7 @@ func (app *App) buildUI() {
 		}
 	})
 	app.openFolderBtn.Importance = widget.MediumImportance
-	app.applyTooltip(app.openFolderBtn, "open_mod_folder_tooltip")
+	app.openFolderBtn.SetToolTip(app.messages["open_mod_folder_tooltip"])
 
 	app.descAuthor = widget.NewLabel("-")
 	app.descInstalled = widget.NewLabel("")
@@ -1083,7 +1179,6 @@ func (app *App) buildUI() {
 			return
 		}
 
-		// Определяем, какой мод выделить после удаления (по индексу в displayedMods)
 		var nextModName string
 		for i, m := range app.displayedMods {
 			if m.Name == modName {
@@ -1100,20 +1195,22 @@ func (app *App) buildUI() {
 			app.messages["confirm_delete_title"],
 			fmt.Sprintf(app.messages["confirm_delete_text"], mod.Name),
 			func() {
-				// Физически удаляем папку
 				checks.RemoveMod(modName)
-				// Удаляем из внутренних структур
+				app.removeModFromCache(modName)
 				oldIndex, _ := app.removeModFromData(modName)
 
-				// Обновляем счётчик и таблицу
 				app.updateModCounter()
 				app.modTable.Length = func() (int, int) { return len(app.displayedMods), TableColumnCount }
 				app.modTable.Refresh()
-				app.orderDirty = true
 				app.updateTableBorder()
 				app.appendLog(fmt.Sprintf(app.messages["log_deleted"], modName))
 
-				// Восстанавливаем выделение и прокрутку
+				app.saveCurrentOrder()
+				app.syncProfileFromGame()
+				app.orderDirty = false
+				app.updateTableBorder()
+
+				// Восстановление выделения
 				if nextModName != "" {
 					for i, m := range app.displayedMods {
 						if m.Name == nextModName {
@@ -1137,11 +1234,10 @@ func (app *App) buildUI() {
 					app.updateDescriptionForMod("")
 					app.updateUpDownButtons()
 				}
-
 			},
 		)
 	})
-	app.applyTooltip(app.btnRemove, "btn_remove_tooltip")
+	app.btnRemove.SetToolTip(app.messages["btn_remove_tooltip"])
 
 	// Загрузка иконки обновления
 	updateImgData, err := embeddedFiles.ReadFile("assets/buttons/upd_download_blue_p.png")
@@ -1183,12 +1279,12 @@ func (app *App) buildUI() {
 			app.updateModFromNexus(mod, false)
 		}()
 	})
-	app.applyTooltip(app.btnUpdateMod, "btn_update_mod_premium_only")
+	app.btnUpdateMod.SetToolTip(app.messages["btn_update_mod_premium_only"])
 
 	// Инициализация контейнера для дополнительного содержимого (спойлер со списком обновлений)
 	app.descExtraContainer = container.NewVBox()
 
-	// Отступ шириной ~20px
+	// Отступ шириной 30px
 	leftPadding := canvas.NewRectangle(color.Transparent)
 	leftPadding.SetMinSize(fyne.NewSize(30, 1))
 
@@ -1242,9 +1338,6 @@ func (app *App) buildUI() {
 	app.descCardContent = descCardContent
 	app.descCardScroll = descCardScroll
 
-	// topRight := container.NewVBox(
-	// container.NewHBox(app.btnLaunchNormal, app.btnLaunchNoLauncher),
-	// )
 	rightContent := container.NewVSplit(descCard, app.consoleScroll)
 	rightContent.Offset = 0.65
 	rightPanel := container.NewBorder(nil, nil, nil, nil, rightContent)
@@ -1319,6 +1412,9 @@ func (app *App) refreshThemeColors() {
 		tbl.Refresh()
 	}
 
+	// Обновляем стиль тултипа
+	app.updateTooltipStyle()
+
 	for _, btn := range []*CustomButton{
 		app.btnSaveOrder, app.btnRefresh, app.btnInstall, app.btnRemove,
 		app.btnUp, app.btnDown, app.btnSortChecks, app.btnToggle,
@@ -1326,7 +1422,7 @@ func (app *App) refreshThemeColors() {
 		app.moveToTopBtn, app.moveToBottomBtn, app.btnAMLConfig,
 		app.selectAllBtn, app.deselectAllBtn, app.enableSelectedBtn,
 		app.disableSelectedBtn, app.enableAllBtn, app.disableAllBtn, app.btnEditVersion,
-		app.manageBtn, app.searchClearBtn, app.removeAllBtn, app.removeSelectedBtn,
+		app.manageBtn, app.searchClearBtn, app.btnRemoveAll, app.btnRemoveSelected,
 	} {
 		if btn != nil {
 			btn.Refresh()
@@ -1342,10 +1438,13 @@ func (app *App) appendLog(text string) {
 		return
 	}
 	fyne.Do(func() {
-		// Внутри fyne.Do тоже проверим на nil (на случай, если logWindow стал nil)
-		if app.logWindow == nil {
-			return
-		}
+		defer func() {
+			if r := recover(); r != nil {
+				if app.logFile != nil {
+					fmt.Fprintf(app.logFile, "PANIC in appendLog: %v\n", r)
+				}
+			}
+		}()
 		seg := &widget.TextSegment{
 			Style: widget.RichTextStyle{
 				ColorName: themes.ColorConsoleText,
@@ -1552,7 +1651,7 @@ func (app *App) updateDescriptionForMod(name string) {
 		if mod.GitHubURL != "" {
 			if u, err := url.Parse(mod.GitHubURL); err == nil {
 				app.githubLink.SetURL(u)
-				app.githubLink.SetText(app.messages["github_url_label"])
+				app.githubLink.SetText(app.messages["source_code_url"])
 			} else {
 				app.githubLink.SetURL(nil)
 				app.githubLink.SetText("")
@@ -1763,7 +1862,8 @@ func (app *App) updateToggleButtonText(btn *CustomButton) {
 			btn.icon = app.toggleOffIcon
 		}
 	default:
-		btn.SetText(app.messages["btn_no_patcher"])
+		// btn.SetText(app.messages["btn_no_patcher"])
+		btn.icon = app.toggleOffIcon
 		btn.Disable()
 		return
 	}
