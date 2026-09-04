@@ -749,15 +749,18 @@ func (app *App) extractZipArchive(src, dst string) error {
 	defer r.Close()
 
 	for _, f := range r.File {
-		// Используем логику safeJoin для проверки пути
-		name := strings.TrimLeft(f.Name, "/\\")
-		if filepath.VolumeName(name) != "" {
-			return fmt.Errorf("absolute path not allowed: %s", f.Name)
+		// 1. Запрещаем абсолютные пути и обход каталогов
+		if filepath.IsAbs(f.Name) || strings.Contains(f.Name, "..") {
+			return fmt.Errorf("invalid path in archive: %s", f.Name)
 		}
-		targetPath := filepath.Clean(filepath.Join(dst, name))
+
+		// 2. Строим безопасный путь внутри dst
+		targetPath := filepath.Join(dst, f.Name)
+
+		// 3. Дополнительная проверка: убеждаемся, что путь действительно внутри dst
 		rel, err := filepath.Rel(dst, targetPath)
 		if err != nil || strings.HasPrefix(rel, "..") {
-			return fmt.Errorf("path traversal detected: %s", f.Name)
+			return fmt.Errorf("path traversal attempt: %s", f.Name)
 		}
 
 		if f.FileInfo().IsDir() {
