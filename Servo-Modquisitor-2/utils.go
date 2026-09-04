@@ -740,34 +740,49 @@ func (app *App) createZipArchive(src, dst string) error {
 	return err
 }
 
-// extractZipArchive распаковывает zip-архив в папку dst.
+// extractZipArchive распаковывает zip-архив в папку dst с защитой от path traversal.
 func (app *App) extractZipArchive(src, dst string) error {
 	r, err := zip.OpenReader(src)
 	if err != nil {
 		return err
 	}
 	defer r.Close()
+
 	for _, f := range r.File {
-		path := filepath.Join(dst, f.Name)
+		// Используем логику safeJoin для проверки пути
+		name := strings.TrimLeft(f.Name, "/\\")
+		if filepath.VolumeName(name) != "" {
+			return fmt.Errorf("absolute path not allowed: %s", f.Name)
+		}
+		targetPath := filepath.Clean(filepath.Join(dst, name))
+		rel, err := filepath.Rel(dst, targetPath)
+		if err != nil || strings.HasPrefix(rel, "..") {
+			return fmt.Errorf("path traversal detected: %s", f.Name)
+		}
+
 		if f.FileInfo().IsDir() {
-			if err := os.MkdirAll(path, 0755); err != nil {
+			if err := os.MkdirAll(targetPath, 0755); err != nil {
 				return err
 			}
 			continue
 		}
-		if err := os.MkdirAll(filepath.Dir(path), 0755); err != nil {
+
+		if err := os.MkdirAll(filepath.Dir(targetPath), 0755); err != nil {
 			return err
 		}
+
 		rc, err := f.Open()
 		if err != nil {
 			return err
 		}
 		defer rc.Close()
-		out, err := os.Create(path)
+
+		out, err := os.Create(targetPath)
 		if err != nil {
 			return err
 		}
 		defer out.Close()
+
 		if _, err := io.Copy(out, rc); err != nil {
 			return err
 		}
