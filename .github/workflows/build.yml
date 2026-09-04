@@ -176,7 +176,7 @@ jobs:
           api_key: ${{ secrets.NEXUSMODS_APIKEY }}
           file_id: 7867809
           filename: ${{ steps.find_win.outputs.win_zip }}
-          version: 2.9.77
+          version: 3.0.0
           display_name: Servo-Modquisitor-2-windows.zip
           category: main
           mod_id: 139
@@ -188,7 +188,7 @@ jobs:
           api_key: ${{ secrets.NEXUSMODS_APIKEY }}
           file_id: 7867812
           filename: Servo-Modquisitor-2-linux.zip
-          version: 2.9.77
+          version: 3.0.0
           display_name: Servo-Modquisitor-2-linux.zip
           category: main
           mod_id: 139
