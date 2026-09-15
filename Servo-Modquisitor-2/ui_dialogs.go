@@ -1,4 +1,4 @@
-// ui_dialogs.go
+// Servo-Modquisitor-2/ui_dialogs.go
 package main
 
 import (
@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"runtime/debug"
 	"strconv"
 	"strings"
 	"sync"
@@ -32,67 +33,89 @@ type ModUpdateChoice struct {
 
 // showInfoDialog показывает информационный диалог с кнопкой OK.
 func (app *App) showInfoDialog(title, message string) {
+	// fyne.Do(func() {
 	dialog.ShowInformation(title, message, app.mainWindow)
+	// })
 }
 
 // showChoiceDialog показывает диалог выбора с произвольным количеством кнопок.
 // Результат возвращается через callback. Диалог автоматически закрывается при нажатии любой кнопки.
 func (app *App) showChoiceDialog(parent fyne.Window, title, message string, callback func(int), options ...string) {
+	// Все операции с UI - только в главном потоке
+	fyne.Do(func() {
+		// Объявляем popUp ПЕРЕД созданием кнопок
+		var popUp *widget.PopUp
 
-	// Объявляем popUp ПЕРЕД созданием кнопок
-	var popUp *widget.PopUp
+		var btnObjects []fyne.CanvasObject
+		for i, opt := range options {
+			idx := i
+			btn := widget.NewButton(opt, func() {
+				if popUp != nil {
+					popUp.Hide()
+				}
+				if callback != nil {
+					callback(idx)
+				}
+			})
+			btnObjects = append(btnObjects, btn)
+		}
 
-	var btnObjects []fyne.CanvasObject
-	for i, opt := range options {
-		idx := i
-		btn := widget.NewButton(opt, func() {
-			if popUp != nil {
-				popUp.Hide()
-			}
-			if callback != nil {
-				callback(idx)
-			}
-		})
-		btnObjects = append(btnObjects, btn)
-	}
+		titleLabel := widget.NewLabelWithStyle(title, fyne.TextAlignCenter, fyne.TextStyle{Bold: true})
+		msgLabel := widget.NewLabel(message)
+		msgLabel.Wrapping = fyne.TextWrapWord
 
-	titleLabel := widget.NewLabelWithStyle(title, fyne.TextAlignCenter, fyne.TextStyle{Bold: true})
-	msgLabel := widget.NewLabel(message)
-	msgLabel.Wrapping = fyne.TextWrapWord
+		// Центрируем кнопки
+		btnContainer := container.NewCenter(container.NewHBox(btnObjects...))
 
-	// Центрируем кнопки
-	btnContainer := container.NewCenter(container.NewHBox(btnObjects...))
+		content := container.NewVBox(
+			titleLabel,
+			widget.NewSeparator(),
+			msgLabel,
+			widget.NewSeparator(),
+			btnContainer,
+		)
 
-	content := container.NewVBox(
-		titleLabel,
-		widget.NewSeparator(),
-		msgLabel,
-		widget.NewSeparator(),
-		btnContainer,
-	)
-
-	popUp = widget.NewModalPopUp(content, parent.Canvas())
-	popUp.Resize(fyne.NewSize(DialogMinWidth500, DialogMinHeight200))
-	popUp.Show()
+		popUp = widget.NewModalPopUp(content, parent.Canvas())
+		popUp.Resize(fyne.NewSize(DialogMinWidth500, DialogMinHeight200))
+		popUp.Show()
+	})
 }
 
 // showConfirmDialog показывает диалог подтверждения с двумя кнопками (Да/Нет).
 func (app *App) showConfirmDialog(title, message string, onConfirm func()) {
-	dialog.ShowConfirm(title, message, func(ok bool) {
-		if ok && onConfirm != nil {
-			onConfirm()
-		}
-	}, app.mainWindow)
+	fyne.Do(func() {
+		dialog.ShowConfirm(title, message, func(ok bool) {
+			if ok && onConfirm != nil {
+				onConfirm()
+			}
+		}, app.mainWindow)
+	})
 }
 
 // showChoiceDialogSync - синхронная версия для фоновых горутин.
 // Блокирует вызывающую горутину до выбора пользователя.
+//
+// ВАЖНО: вызывать ТОЛЬКО из фоновой горутины. Вызов из UI-потока
+// приведёт к deadlock: UI-поток будет ждать канал, а fyne.Do внутри
+// showChoiceDialog не сможет выполниться, потому что UI-поток занят.
+// Для защиты от случайного misuse используется таймаут: если за
+// 5 минут ответа не последовало, функция возвращает -1 и логирует
+// предупреждение (утечка горутины, но UI остаётся живым).
 func (app *App) showChoiceDialogSync(parent fyne.Window, title, message string, options ...string) int {
 	resultChan := make(chan int, 1)
 	app.showChoiceDialog(parent, title, message, func(choice int) {
 		resultChan <- choice
 	}, options...)
-	return <-resultChan
+
+	select {
+	case choice := <-resultChan:
+		return choice
+	case <-time.After(5 * time.Minute):
+		app.appendLogToFile(fmt.Sprintf(
+			"showChoiceDialogSync: timeout waiting for user choice (title=%q). "+
+				"Возможно, вызов из UI-потока — это deadlock. Возвращён -1.", title))
+		return -1
+	}
 }
 
 // showChoiceDialogAsync - устаревшая, оставлена для совместимости.
@@ -111,28 +134,44 @@ func (app *App) showDownloadDialog(downloadURL, filename string, modName string,
 
 	app.showChoiceDialog(
 		app.mainWindow,
-		app.messages["confirm_download_title"],
-		fmt.Sprintf(app.messages["confirm_download_text"], modName, displayFilename),
+		app.msg("confirm_download_title"),
+		fmt.Sprintf(app.msg("confirm_download_text"), modName, displayFilename),
 		func(choice int) {
 			if choice != 0 {
 				return
 			}
 			app.startDownload(downloadURL, filename, modName, fileInfo, modID)
 		},
-		app.messages["btn_yes"],
-		app.messages["btn_no"],
+		app.msg("btn_yes"),
+		app.msg("btn_no"),
 	)
 }
 
 // startDownload - выполняет скачивание и установку после подтверждения.
+// Длительная работа вынесена в горутину, UI-поток только для dlg.Hide()
+// и прокрутки к установленному моду. Иначе вложенный fyne.Do даёт deadlock.
 func (app *App) startDownload(downloadURL, filename, modName string, fileInfo *FileInfo, modID string) {
-	app.appendLog(fmt.Sprintf(app.messages["log_downloading_mod"], modName))
+	app.appendLog(fmt.Sprintf(app.msg("log_downloading_mod"), modName))
+
+	// fileInfo может быть nil, если nxm-ссылка пришла без доступных
+	// метаданных файла (например, getFileInfoByID упал по сети/403).
+	// Запоминаем известную версию/timestamp один раз — это не только
+	// защита от nil-deref, но и единственный snapshot: дальше в горутине
+	// fileInfo может быть изменён другим вызовом (в теории).
+	var knownVersion string
+	var knownTimestamp int64
+	var fallbackFileName string
+	if fileInfo != nil {
+		knownVersion = fileInfo.Version
+		knownTimestamp = fileInfo.UploadedTimestamp
+		fallbackFileName = fileInfo.FileName
+	}
 
 	bar := widget.NewProgressBar()
 	bar.SetValue(0)
-	lbl := widget.NewLabel(fmt.Sprintf(app.messages["downloading"], filename))
+	lbl := widget.NewLabel(fmt.Sprintf(app.msg("downloading"), filename))
 	content := container.NewVBox(lbl, bar)
-	dlg := dialog.NewCustom(app.messages["download_title"], app.messages["btn_cancel"], content, app.mainWindow)
+	dlg := dialog.NewCustom(app.msg("download_title"), app.msg("btn_cancel"), content, app.mainWindow)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	dlg.SetOnClosed(func() {
@@ -140,74 +179,99 @@ func (app *App) startDownload(downloadURL, filename, modName string, fileInfo *F
 	})
 	dlg.Show()
 
+	// Забираем ModsPath заранее, чтобы не трогать cfg из горутины
+	app.cfgMutex.RLock()
+	modsPath := app.cfg.ModsPath
+	app.cfgMutex.RUnlock()
+
+	saveFilename := filename
+	if fallbackFileName != "" {
+		saveFilename = fallbackFileName
+	}
+	safeFilename, err := sanitizeFilename(saveFilename)
+	if err != nil {
+		app.appendLogToFile(fmt.Sprintf("Invalid filename: %v", err))
+		fyne.Do(func() { dlg.Hide() })
+		return
+	}
+	dest := filepath.Join(modsPath, safeFilename)
+
+	// Вся тяжёлая работа — в фоне. UI-поток свободен.
 	go func() {
-		saveFilename := filename
-		if fileInfo != nil && fileInfo.FileName != "" {
-			saveFilename = fileInfo.FileName
-		}
-		safeFilename, err := sanitizeFilename(saveFilename)
+		defer func() {
+			if r := recover(); r != nil {
+				app.appendLogToFile(fmt.Sprintf("PANIC in startDownload goroutine: %v", r))
+				app.appendLogToFile(fmt.Sprintf("Stack: %s", debug.Stack()))
+			}
+		}()
+
+		app.appendLogToFile(fmt.Sprintf("DownloadFileWithProgress: starting download to %s", dest))
+
+		err := app.DownloadFileWithProgress(ctx, downloadURL, dest, bar)
+		fyne.Do(func() { dlg.Hide() })
+
 		if err != nil {
-			app.appendLog(fmt.Sprintf("Invalid filename: %v", err))
+			if err == context.Canceled {
+				app.appendLog(app.msg("download_cancelled"))
+			} else {
+				app.appendLog(fmt.Sprintf(app.msg("download_failed"), err))
+			}
+			os.Remove(dest)
 			return
 		}
-		dest := filepath.Join(app.cfg.ModsPath, safeFilename)
 
-		err = app.DownloadFileWithProgress(ctx, downloadURL, dest, bar)
-		fyne.Do(func() {
-			dlg.Hide()
-			if err != nil {
-				if err == context.Canceled {
-					app.appendLog(app.messages["download_cancelled"])
-				} else {
-					app.appendLog(fmt.Sprintf(app.messages["download_failed"], err))
-				}
-				os.Remove(dest)
-				return
-			}
-			info, e := os.Stat(dest)
-			if e != nil {
-				app.appendLog(fmt.Sprintf(app.messages["log_downloaded_file_not_found"], e))
-				return
-			}
-			app.appendLog(fmt.Sprintf(app.messages["log_downloaded_file_size"], float64(info.Size())/1024/1024))
+		app.appendLogToFile("DownloadFileWithProgress: download completed successfully")
 
-			if info.Size() < 100 {
-				app.appendLog(fmt.Sprintf(app.messages["log_error_file_too_small"], safeFilename, info.Size()))
-				os.Remove(dest)
-				return
-			}
+		info, e := os.Stat(dest)
+		if e != nil {
+			app.appendLog(fmt.Sprintf(app.msg("log_downloaded_file_not_found"), e))
+			return
+		}
+		app.appendLog(fmt.Sprintf(app.msg("log_downloaded_file_size"), float64(info.Size())/1024/1024))
 
-			app.appendLog(app.messages["download_complete"])
-			// Передаём modName для удаления старой папки при обновлении
-			installedName, installedVersion, err := app.InstallModFromArchive(dest, false, fileInfo.Version, modName)
-			if err != nil {
-				app.appendLog(fmt.Sprintf(app.messages["log_install_failed"], err))
-			} else {
-				os.Remove(dest)
-				if modID != "" && installedName != "" {
-					cacheKey := modID + ":" + installedName
-					app.cacheModVersion(cacheKey, installedName, installedVersion, fileInfo.UploadedTimestamp, "nexus", 0)
-				}
-				if installedName != "" {
-					app.selectAndScrollToMod(installedName)
-				}
-				if modID != "" {
-					mid, err := strconv.Atoi(modID)
-					if err == nil {
-						var fn string
-						if fileInfo != nil {
-							fn = fileInfo.FileName
-						}
-						go app.autoAddModToDatabase(mid, installedName, fn)
-					}
-				}
+		if info.Size() < 100 {
+			app.appendLog(fmt.Sprintf(app.msg("log_error_file_too_small"), safeFilename, info.Size()))
+			os.Remove(dest)
+			return
+		}
+
+		app.appendLogToFile(fmt.Sprintf("InstallModFromArchive: starting installation for %s", modName))
+
+		// knownVersion может быть "", тогда InstallModFromArchive попробует
+		// вытащить версию из имени файла или спросить у пользователя.
+		installedName, installedVersion, err := app.InstallModFromArchive(dest, false, knownVersion, modName)
+		app.appendLogToFile(fmt.Sprintf("InstallModFromArchive: finished with err=%v, installedName=%s", err, installedName))
+		if err != nil {
+			app.appendLog(fmt.Sprintf(app.msg("log_install_failed"), err))
+			return
+		}
+
+		os.Remove(dest)
+		if modID != "" && installedName != "" {
+			cacheKey := modID + ":" + installedName
+			// cacheModVersion сам ничего не пишет, если version == "".
+			// Если InstallModFromArchive вернул "unknown", предпочтём его,
+			// но если вернул пусто — попробуем knownVersion (не пусто ли).
+			ver := installedVersion
+			if ver == "" {
+				ver = knownVersion
 			}
-		})
+			app.cacheModVersion(cacheKey, installedName, ver, knownTimestamp, "nexus", 0)
+		}
+		if installedName != "" {
+			app.selectAndScrollToMod(installedName)
+		}
+		if modID != "" {
+			mid, err := strconv.Atoi(modID)
+			if err == nil {
+				// fallbackFileName уже безопасен при fileInfo == nil
+				go app.autoAddModToDatabase(mid, installedName, fallbackFileName)
+			}
+		}
 	}()
 }
 
 // Специальные диалоги для системных модов
-
 func (app *App) showDMLDownloadDialog(downloadURL, filename string, fileInfo *FileInfo) {
 	displayFilename := filename
 	if fileInfo != nil && fileInfo.FileName != "" {
@@ -216,16 +280,16 @@ func (app *App) showDMLDownloadDialog(downloadURL, filename string, fileInfo *Fi
 
 	app.showChoiceDialog(
 		app.mainWindow,
-		app.messages["confirm_download_title"],
-		fmt.Sprintf(app.messages["confirm_download_text"], "Darktide Mod Loader", displayFilename),
+		app.msg("confirm_download_title"),
+		fmt.Sprintf(app.msg("confirm_download_text"), "Darktide Mod Loader", displayFilename),
 		func(choice int) {
 			if choice != 0 {
 				return
 			}
-			app.startSystemDownload(downloadURL, filename, "Darktide Mod Loader", fileInfo, "19:base", app.installDMLFromArchive, app.messages["installing_dml"], app.messages["dml_updated"])
+			app.startSystemDownload(downloadURL, filename, "Darktide Mod Loader", fileInfo, "19:base", app.installDMLFromArchive, app.msg("installing_dml"), app.msg("dml_updated"))
 		},
-		app.messages["btn_yes"],
-		app.messages["btn_no"],
+		app.msg("btn_yes"),
+		app.msg("btn_no"),
 	)
 }
 
@@ -237,16 +301,16 @@ func (app *App) showDMFDownloadDialog(downloadURL, filename string, fileInfo *Fi
 
 	app.showChoiceDialog(
 		app.mainWindow,
-		app.messages["confirm_download_title"],
-		fmt.Sprintf(app.messages["confirm_download_text"], "Darktide Mod Framework", displayFilename),
+		app.msg("confirm_download_title"),
+		fmt.Sprintf(app.msg("confirm_download_text"), "Darktide Mod Framework", displayFilename),
 		func(choice int) {
 			if choice != 0 {
 				return
 			}
-			app.startSystemDownload(downloadURL, filename, "Darktide Mod Framework", fileInfo, "8:dmf", app.installDMLFromArchive, app.messages["installing_dmf"], app.messages["log_dmf_updated_succ"])
+			app.startSystemDownload(downloadURL, filename, "Darktide Mod Framework", fileInfo, "8:dmf", app.installDMLFromArchive, app.msg("installing_dmf"), app.msg("log_dmf_updated_succ"))
 		},
-		app.messages["btn_yes"],
-		app.messages["btn_no"],
+		app.msg("btn_yes"),
+		app.msg("btn_no"),
 	)
 }
 
@@ -258,26 +322,26 @@ func (app *App) showAutopatcherDownloadDialog(downloadURL, filename string, file
 
 	app.showChoiceDialog(
 		app.mainWindow,
-		app.messages["confirm_download_title"],
-		fmt.Sprintf(app.messages["confirm_download_text"], "Darktide Mod Autopatcher", displayFilename),
+		app.msg("confirm_download_title"),
+		fmt.Sprintf(app.msg("confirm_download_text"), "Darktide Mod Autopatcher", displayFilename),
 		func(choice int) {
 			if choice != 0 {
 				return
 			}
-			app.startSystemDownload(downloadURL, filename, "Darktide Mod Autopatcher", fileInfo, "709:autopatch", app.installAutopatcherFromArchive, app.messages["installing_autopatcher"], app.messages["autopatcher_updated"])
+			app.startSystemDownload(downloadURL, filename, "Darktide Mod Autopatcher", fileInfo, "709:autopatch", app.installAutopatcherFromArchive, app.msg("installing_autopatcher"), app.msg("autopatcher_updated"))
 		},
-		app.messages["btn_yes"],
-		app.messages["btn_no"],
+		app.msg("btn_yes"),
+		app.msg("btn_no"),
 	)
 }
 
 // startSystemDownload - общая логика скачивания для системных модов.
 func (app *App) startSystemDownload(downloadURL, filename, displayName string, fileInfo *FileInfo, cacheKey string, installFunc func(string) error, logInstalling, logSuccess string) {
-	app.appendLog(fmt.Sprintf(app.messages["log_downloading_mod"], displayName))
+	app.appendLog(fmt.Sprintf(app.msg("log_downloading_mod"), displayName))
 	bar := widget.NewProgressBar()
-	lbl := widget.NewLabel(fmt.Sprintf(app.messages["downloading"], filename))
+	lbl := widget.NewLabel(fmt.Sprintf(app.msg("downloading"), filename))
 	content := container.NewVBox(lbl, bar)
-	dlg := dialog.NewCustom(app.messages["download_title"], app.messages["btn_cancel"], content, app.mainWindow)
+	dlg := dialog.NewCustom(app.msg("download_title"), app.msg("btn_cancel"), content, app.mainWindow)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	dlg.SetOnClosed(func() {
@@ -285,34 +349,39 @@ func (app *App) startSystemDownload(downloadURL, filename, displayName string, f
 	})
 	dlg.Show()
 
+	// Копируем ModsPath под мьютексом перед запуском горутины
+	app.cfgMutex.RLock()
+	modsPath := app.cfg.ModsPath
+	app.cfgMutex.RUnlock()
+
 	go func() {
 		safeFilename, err := sanitizeFilename(filename)
 		if err != nil {
-			app.appendLog(fmt.Sprintf("Invalid filename: %v", err))
+			app.appendLogToFile(fmt.Sprintf("Invalid filename: %v", err))
 			return
 		}
-		dest := filepath.Join(app.cfg.ModsPath, safeFilename)
+		dest := filepath.Join(modsPath, safeFilename)
 
 		err = app.DownloadFileWithProgress(ctx, downloadURL, dest, bar)
 		fyne.Do(func() {
 			dlg.Hide()
 			if err != nil {
 				if err == context.Canceled {
-					app.appendLog(app.messages["download_cancelled"])
+					app.appendLog(app.msg("download_cancelled"))
 				} else {
-					app.appendLog(fmt.Sprintf(app.messages["download_failed"], err))
+					app.appendLog(fmt.Sprintf(app.msg("download_failed"), err))
 				}
 				return
 			}
 			info, e := os.Stat(dest)
 			if e == nil && info.Size() < 100 {
-				app.appendLog(fmt.Sprintf(app.messages["log_error_file_too_small"], info.Size()))
+				app.appendLog(fmt.Sprintf(app.msg("log_error_file_too_small"), info.Size()))
 				os.Remove(dest)
 				return
 			}
 			app.appendLog(logInstalling)
 			if err := installFunc(dest); err != nil {
-				app.appendLog(fmt.Sprintf(app.messages["log_install_failed"], err))
+				app.appendLog(fmt.Sprintf(app.msg("log_install_failed"), err))
 			} else {
 				if fileInfo != nil {
 					app.setCachedVersion(cacheKey, ModVersionInfo{
@@ -335,30 +404,30 @@ func (app *App) startSystemDownload(downloadURL, filename, displayName string, f
 
 func (app *App) updateDML() {
 	if app.getAuthToken() == "" {
-		app.appendLog(app.messages["nexus_api_key_missing"])
+		app.appendLog(app.msg("nexus_api_key_missing"))
 		return
 	}
 	const dmlModID = 19
-	app.appendLog(fmt.Sprintf(app.messages["looking_for_latest_file"], dmlModID))
+	app.appendLog(fmt.Sprintf(app.msg("looking_for_latest_file"), dmlModID))
 	fileInfo, err := app.getLatestFileInfo(dmlModID)
 	if err != nil {
-		app.appendLog(fmt.Sprintf(app.messages["failed_get_latest_file_id"], err))
+		app.appendLog(fmt.Sprintf(app.msg("failed_get_latest_file_id"), err))
 		return
 	}
 	cacheKey := "19:base"
 	saved, exists := app.getCachedVersion(cacheKey)
 	// Проверяем только актуальность по дате, игнорируем source
 	if exists && saved.Timestamp != 0 && fileInfo.UploadedTimestamp <= saved.Timestamp {
-		app.appendLog(fmt.Sprintf(app.messages["already_latest"], "DML", fileInfo.Version))
+		app.appendLog(fmt.Sprintf(app.msg("already_latest"), "DML", fileInfo.Version))
 		return
 	}
 	// Если был ручной, сообщим об этом (опционально)
 	if exists && saved.Source == "manual" {
-		app.appendLog("DML was installed manually, but you chose to update - overwriting with Nexus version.")
+		app.appendLogToFile("DML was installed manually, but you chose to update - overwriting with Nexus version.")
 	}
 	directURL, filename, err := app.getPremiumDownloadURL("19", fmt.Sprintf("%d", fileInfo.ID))
 	if err != nil {
-		app.appendLog(fmt.Sprintf(app.messages["failed_get_download_link"], err))
+		app.appendLog(fmt.Sprintf(app.msg("failed_get_download_link"), err))
 		return
 	}
 	app.showDMLDownloadDialog(directURL, filename, fileInfo)
@@ -366,28 +435,28 @@ func (app *App) updateDML() {
 
 func (app *App) updateDMF() {
 	if app.getAuthToken() == "" {
-		app.appendLog(app.messages["nexus_api_key_missing"])
+		app.appendLog(app.msg("nexus_api_key_missing"))
 		return
 	}
 	const dmfModID = 8
-	app.appendLog(fmt.Sprintf(app.messages["looking_for_latest_file"], dmfModID))
+	app.appendLog(fmt.Sprintf(app.msg("looking_for_latest_file"), dmfModID))
 	fileInfo, err := app.getLatestFileInfo(dmfModID)
 	if err != nil {
-		app.appendLog(fmt.Sprintf(app.messages["failed_get_latest_file_id"], err))
+		app.appendLog(fmt.Sprintf(app.msg("failed_get_latest_file_id"), err))
 		return
 	}
 	cacheKey := "8:dmf"
 	saved, exists := app.getCachedVersion(cacheKey)
 	if exists && saved.Timestamp != 0 && fileInfo.UploadedTimestamp <= saved.Timestamp {
-		app.appendLog(fmt.Sprintf(app.messages["already_latest"], "DMF", fileInfo.Version))
+		app.appendLog(fmt.Sprintf(app.msg("already_latest"), "DMF", fileInfo.Version))
 		return
 	}
 	if exists && saved.Source == "manual" {
-		app.appendLog("DMF was installed manually, but you chose to update - overwriting with Nexus version.")
+		app.appendLogToFile("DMF was installed manually, but you chose to update - overwriting with Nexus version.")
 	}
 	directURL, filename, err := app.getPremiumDownloadURL("8", fmt.Sprintf("%d", fileInfo.ID))
 	if err != nil {
-		app.appendLog(fmt.Sprintf(app.messages["failed_get_download_link"], err))
+		app.appendLog(fmt.Sprintf(app.msg("failed_get_download_link"), err))
 		return
 	}
 	app.showDMFDownloadDialog(directURL, filename, fileInfo)
@@ -395,28 +464,28 @@ func (app *App) updateDMF() {
 
 func (app *App) updateAutopatcher() {
 	if app.getAuthToken() == "" {
-		app.appendLog(app.messages["nexus_api_key_missing"])
+		app.appendLog(app.msg("nexus_api_key_missing"))
 		return
 	}
 	const autopatchModID = 709
-	app.appendLog(fmt.Sprintf(app.messages["looking_for_latest_file"], autopatchModID))
+	app.appendLog(fmt.Sprintf(app.msg("looking_for_latest_file"), autopatchModID))
 	fileInfo, err := app.getLatestFileInfo(autopatchModID)
 	if err != nil {
-		app.appendLog(fmt.Sprintf(app.messages["failed_get_latest_file_id"], err))
+		app.appendLog(fmt.Sprintf(app.msg("failed_get_latest_file_id"), err))
 		return
 	}
 	cacheKey := "709:autopatch"
 	saved, exists := app.getCachedVersion(cacheKey)
 	if exists && saved.Timestamp != 0 && fileInfo.UploadedTimestamp <= saved.Timestamp {
-		app.appendLog(fmt.Sprintf(app.messages["already_latest"], "Autopatcher", fileInfo.Version))
+		app.appendLog(fmt.Sprintf(app.msg("already_latest"), "Autopatcher", fileInfo.Version))
 		return
 	}
 	if exists && saved.Source == "manual" {
-		app.appendLog("Autopatcher was installed manually, but you chose to update - overwriting with Nexus version.")
+		app.appendLogToFile("Autopatcher was installed manually, but you chose to update - overwriting with Nexus version.")
 	}
 	directURL, filename, err := app.getPremiumDownloadURL("709", fmt.Sprintf("%d", fileInfo.ID))
 	if err != nil {
-		app.appendLog(fmt.Sprintf(app.messages["failed_get_download_link"], err))
+		app.appendLog(fmt.Sprintf(app.msg("failed_get_download_link"), err))
 		return
 	}
 	app.showAutopatcherDownloadDialog(directURL, filename, fileInfo)
@@ -425,17 +494,14 @@ func (app *App) updateAutopatcher() {
 // Processing nxm links
 
 func (app *App) handleNXMLink(nxmURL string) {
-	now := time.Now()
-	if nxmURL == app.lastNxmURL && now.Sub(app.lastNxmTime) < 5*time.Second {
-		app.appendLog(app.messages["nxm_already_processing"])
+	if app.nxm.IsDuplicate(nxmURL) {
+		app.appendLog(app.msg("nxm_already_processing"))
 		return
 	}
-	app.lastNxmURL = nxmURL
-	app.lastNxmTime = now
 
 	u, err := url.Parse(nxmURL)
 	if err != nil {
-		app.appendLog(app.messages["log_invalid_nxm_link"])
+		app.appendLogToFile(app.msg("log_invalid_nxm_link"))
 		return
 	}
 
@@ -450,7 +516,7 @@ func (app *App) handleNXMLink(nxmURL string) {
 		}
 	}
 	if modID == "" || fileID == "" {
-		app.appendLog(app.messages["log_invalid_nxm_link"])
+		app.appendLogToFile(app.msg("log_invalid_nxm_link"))
 		return
 	}
 
@@ -478,7 +544,7 @@ func (app *App) handleNXMLink(nxmURL string) {
 				directURL, filename, err = app.getPremiumDownloadURL(modID, fileID)
 			}
 			if err != nil {
-				app.appendLog(fmt.Sprintf(app.messages["failed_get_download_link"], err))
+				app.appendLog(fmt.Sprintf(app.msg("failed_get_download_link"), err))
 				return
 			}
 			fyne.Do(func() {
@@ -509,7 +575,7 @@ func (app *App) handleNXMLink(nxmURL string) {
 				directURL, filename, err = app.getPremiumDownloadURL(modID, fileID)
 			}
 			if err != nil {
-				app.appendLog(fmt.Sprintf(app.messages["failed_get_download_link"], err))
+				app.appendLog(fmt.Sprintf(app.msg("failed_get_download_link"), err))
 				return
 			}
 			fyne.Do(func() {
@@ -533,7 +599,7 @@ func (app *App) handleNXMLink(nxmURL string) {
 			directURL, filename, err = app.getPremiumDownloadURL(modID, fileID)
 		}
 		if err != nil {
-			app.appendLog(fmt.Sprintf(app.messages["failed_get_download_link"], err))
+			app.appendLog(fmt.Sprintf(app.msg("failed_get_download_link"), err))
 			return
 		}
 		mid, _ := strconv.Atoi(modID)
@@ -575,7 +641,7 @@ func (app *App) showEditVersionDialog(mod *checks.ModInfo) {
 		}
 	}
 	if cacheKey == "" {
-		app.appendLog(app.messages["log_cannot_determine_cache_key"])
+		app.appendLogToFile(app.msg("log_cannot_determine_cache_key"))
 		return
 	}
 
@@ -586,18 +652,18 @@ func (app *App) showEditVersionDialog(mod *checks.ModInfo) {
 
 	entry := widget.NewEntry()
 	entry.SetText(currentVersion)
-	entry.SetPlaceHolder(app.messages["placeholder_mod_version"])
+	entry.SetPlaceHolder(app.msg("placeholder_mod_version"))
 
 	var popUp *widget.PopUp
 
 	content := container.NewVBox(
-		widget.NewLabel(fmt.Sprintf(app.messages["edit_version_current"], mod.DisplayName, currentVersion)),
+		widget.NewLabel(fmt.Sprintf(app.msg("edit_version_current"), mod.DisplayName, currentVersion)),
 		entry,
 		container.NewHBox(
-			widget.NewButton(app.messages["btn_save"], func() {
+			widget.NewButton(app.msg("btn_save"), func() {
 				newVersion := strings.TrimSpace(entry.Text)
 				if newVersion == "" {
-					app.appendLog(app.messages["log_cannot_version_empty"])
+					app.appendLog(app.msg("log_cannot_version_empty"))
 					return
 				}
 				app.setCachedVersion(cacheKey, ModVersionInfo{
@@ -607,11 +673,11 @@ func (app *App) showEditVersionDialog(mod *checks.ModInfo) {
 					Source:    "manual",
 				})
 				app.saveNexusVersionCache()
-				app.appendLog(fmt.Sprintf(app.messages["log_version_for_updated_to"], mod.DisplayName, newVersion))
+				app.appendLog(fmt.Sprintf(app.msg("log_version_for_updated_to"), mod.DisplayName, newVersion))
 				popUp.Hide()
 				app.updateDescriptionForMod(mod.Name)
 			}),
-			widget.NewButton(app.messages["btn_cancel"], func() {
+			widget.NewButton(app.msg("btn_cancel"), func() {
 				popUp.Hide()
 			}),
 		),
@@ -639,7 +705,7 @@ func (app *App) showProgressDialog(title, message string) (*widget.ProgressBar, 
 	var closeDialogFunc func()
 
 	fyne.Do(func() {
-		dlg = dialog.NewCustom(title, app.messages["btn_cancel"], content, app.mainWindow)
+		dlg = dialog.NewCustom(title, app.msg("btn_cancel"), content, app.mainWindow)
 		dlg.Resize(fyne.NewSize(400, 120))
 
 		dlg.SetOnClosed(func() {
@@ -676,7 +742,6 @@ func (app *App) showUpdateChoiceDialog(updates []*ModUpdateChoice, resultChan ch
 		return
 	}
 	if app.mainWindow == nil || app.mainWindow.Canvas() == nil {
-		// app.appendLog("[DEBUG] showUpdateChoiceDialog: mainWindow or Canvas is nil")
 		resultChan <- struct {
 			indices []int
 			ok      bool
@@ -701,7 +766,7 @@ func (app *App) showUpdateChoiceDialog(updates []*ModUpdateChoice, resultChan ch
 		}
 		cacheKey := fmt.Sprintf("%d:%s", helpers.ExtractModIDFromURL(update.Mod.URL), update.Mod.Name)
 		currentVersion := "?"
-		if info, ok := app.nexusVersionCache[cacheKey]; ok {
+		if info, ok := app.getCachedVersion(cacheKey); ok {
 			currentVersion = info.Version
 		}
 		titleText := fmt.Sprintf("%s  %s → %s", displayName, currentVersion, update.FileInfo.Version)
@@ -711,7 +776,7 @@ func (app *App) showUpdateChoiceDialog(updates []*ModUpdateChoice, resultChan ch
 		// Список изменений (изначально скрыт)
 		changelogText := update.Changelog
 		if changelogText == "" {
-			changelogText = app.messages["changelog_unavailable"]
+			changelogText = app.msg("changelog_unavailable")
 		} else {
 			changelogText = stripHTML(changelogText)
 		}
@@ -726,14 +791,14 @@ func (app *App) showUpdateChoiceDialog(updates []*ModUpdateChoice, resultChan ch
 			expanded bool
 			btn      *widget.Button
 		}{}
-		btnState.btn = widget.NewButton(app.messages["btn_show_changelog"], func() {
+		btnState.btn = widget.NewButton(app.msg("btn_show_changelog"), func() {
 			btnState.expanded = !btnState.expanded
 			if btnState.expanded {
 				changelogContainer.Show()
-				btnState.btn.SetText(app.messages["btn_hide_changelog"])
+				btnState.btn.SetText(app.msg("btn_hide_changelog"))
 			} else {
 				changelogContainer.Hide()
-				btnState.btn.SetText(app.messages["btn_show_changelog"])
+				btnState.btn.SetText(app.msg("btn_show_changelog"))
 			}
 		})
 
@@ -750,12 +815,12 @@ func (app *App) showUpdateChoiceDialog(updates []*ModUpdateChoice, resultChan ch
 	scroll.SetMinSize(fyne.NewSize(600, 400))
 
 	titleLabel := widget.NewLabelWithStyle(
-		fmt.Sprintf(app.messages["update_available_x"], len(updates)),
+		fmt.Sprintf(app.msg("update_available_x"), len(updates)),
 		fyne.TextAlignCenter,
 		fyne.TextStyle{Bold: true},
 	)
 
-	confirmBtn := widget.NewButton(app.messages["btn_update_mods"], func() {
+	confirmBtn := widget.NewButton(app.msg("btn_update_mods"), func() {
 		if popUp != nil {
 			popUp.Hide()
 		}
@@ -770,7 +835,7 @@ func (app *App) showUpdateChoiceDialog(updates []*ModUpdateChoice, resultChan ch
 			ok      bool
 		}{idxs, true}
 	})
-	cancelBtn := widget.NewButton(app.messages["btn_cancel"], func() {
+	cancelBtn := widget.NewButton(app.msg("btn_cancel"), func() {
 		if popUp != nil {
 			popUp.Hide()
 		}
@@ -815,35 +880,37 @@ func stripHTML(html string) string {
 // showCreateProfileDialog показывает диалог создания профиля
 func (app *App) showCreateProfileDialog() {
 	entry := widget.NewEntry()
-	entry.SetPlaceHolder(app.messages["profile_name_placeholder"])
+	entry.SetPlaceHolder(app.msg("profile_name_placeholder"))
 
 	// Чекбокс "Копировать из текущего"
-	copyCheck := widget.NewCheck(app.messages["profile_copy_from_current"], nil)
+	copyCheck := widget.NewCheck(app.msg("profile_copy_from_current"), nil)
 	copyCheck.SetChecked(true)
 
 	var popUp *widget.PopUp
 
 	// Кнопки с центрированием
-	btnCreate := widget.NewButton(app.messages["btn_create"], func() {
+	btnCreate := widget.NewButton(app.msg("btn_create"), func() {
 		name := strings.TrimSpace(entry.Text)
 		if name == "" {
-			app.showInfoDialog(app.messages["error_title"], app.messages["profile_name_empty"])
+			app.showInfoDialog(app.msg("error_title"), app.msg("profile_name_empty"))
 			return
 		}
 		copyFrom := ""
 		if copyCheck.Checked {
+			app.cfgMutex.RLock()
 			copyFrom = app.cfg.ActiveProfile
+			app.cfgMutex.RUnlock()
 		}
 		if err := app.createProfile(name, copyFrom); err != nil {
-			app.appendLog(fmt.Sprintf("Failed to create profile: %v", err))
-			app.showInfoDialog(app.messages["error_title"], app.messages["profile_create_failed"])
+			app.appendLogToFile(fmt.Sprintf("Failed to create profile: %v", err))
+			app.showInfoDialog(app.msg("error_title"), app.msg("profile_create_failed"))
 			return
 		}
 		app.switchProfile(name)
 		popUp.Hide()
 	})
 
-	btnCancel := widget.NewButton(app.messages["btn_cancel"], func() {
+	btnCancel := widget.NewButton(app.msg("btn_cancel"), func() {
 		popUp.Hide()
 	})
 
@@ -852,8 +919,8 @@ func (app *App) showCreateProfileDialog() {
 	)
 
 	content := container.NewVBox(
-		widget.NewLabelWithStyle(app.messages["profile_create_title"], fyne.TextAlignCenter, fyne.TextStyle{Bold: true}),
-		widget.NewLabel(app.messages["profile_create_message"]),
+		widget.NewLabelWithStyle(app.msg("profile_create_title"), fyne.TextAlignCenter, fyne.TextStyle{Bold: true}),
+		widget.NewLabel(app.msg("profile_create_message")),
 		entry,
 		copyCheck,
 		widget.NewSeparator(),
@@ -868,40 +935,44 @@ func (app *App) showCreateProfileDialog() {
 
 // showRenameProfileDialog показывает диалог переименования профиля
 func (app *App) showRenameProfileDialog() {
-	if app.cfg.ActiveProfile == "Default" {
-		app.appendLog(app.messages["profile_cannot_rename_default"])
+	app.cfgMutex.RLock()
+	currentProfile := app.cfg.ActiveProfile
+	app.cfgMutex.RUnlock()
+
+	if currentProfile == "Default" {
+		app.appendLog(app.msg("profile_cannot_rename_default"))
 		return
 	}
 	entry := widget.NewEntry()
-	entry.SetText(app.cfg.ActiveProfile)
-	entry.SetPlaceHolder(app.messages["profile_name_placeholder"])
+	entry.SetText(currentProfile)
+	entry.SetPlaceHolder(app.msg("profile_name_placeholder"))
 
 	var popUp *widget.PopUp
 
-	btnRename := widget.NewButton(app.messages["btn_rename"], func() {
+	btnRename := widget.NewButton(app.msg("btn_rename"), func() {
 		newName := strings.TrimSpace(entry.Text)
 		if newName == "" {
-			app.showInfoDialog(app.messages["error_title"], app.messages["profile_name_empty"])
+			app.showInfoDialog(app.msg("error_title"), app.msg("profile_name_empty"))
 			return
 		}
-		if err := app.renameProfile(app.cfg.ActiveProfile, newName); err != nil {
-			app.appendLog(fmt.Sprintf("Failed to rename profile: %v", err))
-			app.showInfoDialog(app.messages["error_title"], app.messages["profile_rename_failed"])
+		if err := app.renameProfile(currentProfile, newName); err != nil {
+			app.appendLogToFile(fmt.Sprintf("Failed to rename profile: %v", err))
+			app.showInfoDialog(app.msg("error_title"), app.msg("profile_rename_failed"))
 			return
 		}
 		app.refreshProfileList()
 		popUp.Hide()
 	})
 
-	btnCancel := widget.NewButton(app.messages["btn_cancel"], func() {
+	btnCancel := widget.NewButton(app.msg("btn_cancel"), func() {
 		popUp.Hide()
 	})
 
 	btnContainer := container.NewCenter(container.NewHBox(btnRename, btnCancel))
 
 	content := container.NewVBox(
-		widget.NewLabelWithStyle(app.messages["profile_rename_title"], fyne.TextAlignCenter, fyne.TextStyle{Bold: true}),
-		widget.NewLabel(fmt.Sprintf(app.messages["profile_rename_message"], app.cfg.ActiveProfile)),
+		widget.NewLabelWithStyle(app.msg("profile_rename_title"), fyne.TextAlignCenter, fyne.TextStyle{Bold: true}),
+		widget.NewLabel(fmt.Sprintf(app.msg("profile_rename_message"), currentProfile)),
 		entry,
 		widget.NewSeparator(),
 		btnContainer,
@@ -915,17 +986,21 @@ func (app *App) showRenameProfileDialog() {
 
 // showDeleteProfileDialog показывает диалог удаления профиля
 func (app *App) showDeleteProfileDialog() {
-	if app.cfg.ActiveProfile == "Default" {
-		app.showInfoDialog(app.messages["error_title"], app.messages["profile_cannot_delete_default"])
+	app.cfgMutex.RLock()
+	currentProfile := app.cfg.ActiveProfile
+	app.cfgMutex.RUnlock()
+
+	if currentProfile == "Default" {
+		app.showInfoDialog(app.msg("error_title"), app.msg("profile_cannot_delete_default"))
 		return
 	}
 
-	nameToDelete := app.cfg.ActiveProfile
+	nameToDelete := currentProfile
 
 	// Собираем другие нестандартные профили (исключая Default и удаляемый)
 	entries, err := os.ReadDir(app.profilesDir())
 	if err != nil {
-		app.appendLog(fmt.Sprintf("Failed to read profiles: %v", err))
+		app.appendLogToFile(fmt.Sprintf("Failed to read profiles: %v", err))
 		return
 	}
 	var otherProfiles []string
@@ -942,19 +1017,23 @@ func (app *App) showDeleteProfileDialog() {
 	}
 
 	app.showConfirmDialog(
-		app.messages["profile_delete_title"],
-		fmt.Sprintf(app.messages["profile_delete_message"], nameToDelete),
+		app.msg("profile_delete_title"),
+		fmt.Sprintf(app.msg("profile_delete_message"), nameToDelete),
 		func() {
-			// Переключаемся на target
-			app.switchProfile(target)
-			// Удаляем старый
-			if err := app.deleteProfile(nameToDelete); err != nil {
-				app.appendLog(fmt.Sprintf("Failed to delete profile: %v", err))
-				app.showInfoDialog(app.messages["error_title"], app.messages["profile_delete_failed"])
-				return
-			}
-			app.refreshProfileList()
-			app.appendLog(fmt.Sprintf("Deleted profile: %s", nameToDelete))
+			// Удаление запускаем ТОЛЬКО после того, как переключение
+			// профиля действительно завершилось. Иначе deleteProfile
+			// видит cfg.ActiveProfile = nameToDelete и отклоняет удаление
+			// («cannot delete active profile»), а параллельно с этим
+			// switchProfile ещё копирует моды — файловая гонка.
+			app.switchProfileAsync(target, func() {
+				if err := app.deleteProfile(nameToDelete); err != nil {
+					app.appendLogToFile(fmt.Sprintf("Failed to delete profile: %v", err))
+					app.showInfoDialog(app.msg("error_title"), app.msg("profile_delete_failed"))
+					return
+				}
+				app.refreshProfileList()
+				app.appendLog(fmt.Sprintf(app.msg("profile_deleted"), nameToDelete))
+			})
 		},
 	)
 }
@@ -977,20 +1056,20 @@ func (app *App) showImportProfileDialog() {
 			var err error
 			tmpDir, err = os.MkdirTemp("", "profile-import-")
 			if err != nil {
-				app.appendLog(fmt.Sprintf("Failed to create temp directory: %v", err))
+				app.appendLogToFile(fmt.Sprintf("Failed to create temp directory: %v", err))
 				return
 			}
 			defer os.RemoveAll(tmpDir)
 
 			if err := app.extractZipArchive(srcPath, tmpDir); err != nil {
-				app.appendLog(fmt.Sprintf("Failed to extract zip archive: %v", err))
+				app.appendLogToFile(fmt.Sprintf("Failed to extract zip archive: %v", err))
 				return
 			}
 
 			// Ожидаем, что внутри архива будет одна папка (имя профиля)
 			entries, err := os.ReadDir(tmpDir)
 			if err != nil || len(entries) != 1 || !entries[0].IsDir() {
-				app.appendLog("Archive must contain exactly one folder (the profile name)")
+				app.appendLogToFile(app.msg("profile_import_one_folder"))
 				return
 			}
 			profileFolder = filepath.Join(tmpDir, entries[0].Name())
@@ -1002,7 +1081,7 @@ func (app *App) showImportProfileDialog() {
 		// Проверяем, что внутри есть папка mods
 		modsPath := filepath.Join(profileFolder, "mods")
 		if _, err := os.Stat(modsPath); os.IsNotExist(err) {
-			app.appendLog(app.messages["profile_import_no_mods"])
+			app.appendLog(app.msg("profile_import_no_mods"))
 			return
 		}
 
@@ -1013,17 +1092,17 @@ func (app *App) showImportProfileDialog() {
 		}
 
 		if err := app.createProfile(baseName, ""); err != nil {
-			app.appendLog(fmt.Sprintf("Failed to create profile: %v", err))
+			app.appendLogToFile(fmt.Sprintf("Failed to create profile: %v", err))
 			return
 		}
 
 		dstPath := app.profilePath(baseName)
 		if err := copyPath(profileFolder, dstPath); err != nil {
-			app.appendLog(fmt.Sprintf("Failed to import profile: %v", err))
+			app.appendLogToFile(fmt.Sprintf("Failed to import profile: %v", err))
 			return
 		}
 		cleanupModsFolder(filepath.Join(dstPath, "mods"))
-		app.appendLog(fmt.Sprintf("Profile imported: %s", baseName))
+		app.appendLog(fmt.Sprintf(app.msg("profile_imported"), baseName))
 		app.refreshProfileList()
 		app.switchProfile(baseName)
 
@@ -1041,13 +1120,17 @@ func (app *App) showExportProfileDialog() {
 			return
 		}
 		dstDir := filepath.FromSlash(uri.Path())
+
+		app.cfgMutex.RLock()
 		profileName := app.cfg.ActiveProfile
+		app.cfgMutex.RUnlock()
+
 		zipPath := filepath.Join(dstDir, profileName+".zip")
 
 		// Создаём временную папку для подготовки архива
 		tmpDir, err := os.MkdirTemp("", "profile-export-")
 		if err != nil {
-			app.appendLog(fmt.Sprintf("Failed to create temp directory: %v", err))
+			app.appendLogToFile(fmt.Sprintf("Failed to create temp directory: %v", err))
 			return
 		}
 		defer os.RemoveAll(tmpDir)
@@ -1056,7 +1139,7 @@ func (app *App) showExportProfileDialog() {
 		srcPath := app.activeProfilePath()
 		tmpProfileDir := filepath.Join(tmpDir, profileName)
 		if err := copyPath(srcPath, tmpProfileDir); err != nil {
-			app.appendLog(fmt.Sprintf("Failed to copy profile to temp: %v", err))
+			app.appendLogToFile(fmt.Sprintf("Failed to copy profile to temp: %v", err))
 			return
 		}
 
@@ -1066,8 +1149,19 @@ func (app *App) showExportProfileDialog() {
 			return
 		}
 
-		app.appendLog(fmt.Sprintf("Profile exported to: %s", zipPath))
+		app.appendLog(fmt.Sprintf(app.msg("profile_exported"), zipPath))
 	}, app.mainWindow)
 	fd.Show()
 	fd.Resize(fyne.NewSize(FileDialogWidth, FileDialogHeight))
+}
+
+// fileInfoSnapshot безопасно извлекает поля из возможно-nil *FileInfo.
+// Возвращает (version, uploadedTimestamp, fileName). Для nil-аргумента
+// все три значения — zero-value, что позволяет вызывающей стороне
+// не думать про nil-проверки на каждом шаге.
+func fileInfoSnapshot(fi *FileInfo) (version string, timestamp int64, fileName string) {
+	if fi == nil {
+		return "", 0, ""
+	}
+	return fi.Version, fi.UploadedTimestamp, fi.FileName
 }

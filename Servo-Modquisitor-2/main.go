@@ -1,15 +1,13 @@
-// main.go
+// Servo-Modquisitor-2/main.go
 package main
 
 import (
 	"Servo-Modquisitor/themes"
-	"bufio"
 	"embed"
 	"fmt"
 	"net"
 	"os"
 	"path/filepath"
-	"strings"
 	"time"
 
 	"fyne.io/fyne/v2"
@@ -19,7 +17,14 @@ import (
 	"fyne.io/fyne/v2/tooltip"
 )
 
-//go:embed lang/messages.json assets/CRT_BlackBG.jpg assets/Yellow_BG.jpg assets/Yellow_BG_button.jpg assets/Yellow_BG_col.jpg assets/icon.png assets/mechanicus.png assets/buttons/trashcan_red.png assets/buttons/trashcan_red_x.png assets/buttons/trashcan_red_sel.png assets/buttons/upd_download_blue_p.png assets/buttons/folder_open.png assets/buttons/refresh.png assets/buttons/save.png assets/buttons/check_updates_blue.png assets/buttons/update_all_mods_blue_p.png assets/buttons/update_selected_blue_p.png assets/buttons/add.png assets/buttons/sort.png assets/buttons/on.png assets/buttons/off_red.png assets/buttons/cog_check.png assets/buttons/play.png assets/buttons/play_fast.png assets/buttons/up.png assets/buttons/down.png assets/buttons/bottom.png assets/buttons/top.png assets/buttons/select_all.png assets/buttons/select_all_de.png assets/buttons/checked_box.png assets/buttons/checked_box_un.png assets/buttons/enable_all.png assets/buttons/disable_all.png assets/buttons/edit_version.png
+// Localization + app-level images.
+//go:embed lang/messages.json
+//go:embed assets/*.jpg
+//go:embed assets/*.png
+
+// All button icons live under assets/buttons/ — glob covers the whole set.
+//go:embed assets/buttons/*.png
+
 var embeddedFiles embed.FS
 
 func main() {
@@ -36,16 +41,21 @@ func main() {
 		// Если не удалось - это первый экземпляр, продолжаем обычный запуск
 	}
 
+	// Проверяем, не запущен ли уже другой экземпляр (использует системный диалог, не требует Fyne)
 	if isAlreadyRunning() {
 		showAlreadyRunningDialog()
 		os.Exit(0)
 	}
 
+	// Создаём приложение
 	myApp := app.NewWithID(AppID)
 	cfg := loadConfig()
 	application := NewApp(cfg, myApp)
 
-	// Открываем лог (путь может быть невалидным, но logPath будет создан позже)
+	// Очищаем временные папки от предыдущих запусков
+	cleanProgramTempDirs()
+
+	// Открываем лог
 	exePath, _ := os.Executable()
 	globalDir := filepath.Dir(exePath)
 	logPath := filepath.Join(globalDir, FileNameLog)
@@ -56,24 +66,24 @@ func main() {
 			os.Remove(logPath)
 			f, err = os.OpenFile(logPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
 			if err != nil {
-				application.appendLog(fmt.Sprintf(application.messages["log_failed_to_recreate_log"], err))
+				application.appendLogToFile(fmt.Sprintf(application.msg("log_failed_to_recreate_log"), err))
 				application.logFile = nil
 			} else {
 				application.logFile = f
-				application.appendLog(application.messages["log_failed_to_recreate_log"])
-				application.appendLog(application.messages["log_started"])
+				application.appendLogToFile(application.msg("log_failed_to_recreate_log"))
+				application.appendLogToFile(application.msg("log_started"))
 			}
 		} else {
 			application.logFile = f
-			application.appendLog(application.messages["log_started"])
+			application.appendLogToFile(application.msg("log_started"))
 		}
 	} else {
-		application.appendLog(fmt.Sprintf(application.messages["log_could_not_open_log"], err))
+		application.appendLogToFile(fmt.Sprintf(application.msg("log_could_not_open_log"), err))
 		application.logFile = nil
 	}
 
 	// Создаём главное окно
-	application.mainWindow = myApp.NewWindow(application.messages["app_title_long"])
+	application.mainWindow = myApp.NewWindow(application.msg("app_title_long"))
 	ApplyWindowSettings(application.mainWindow)
 	application.mainWindow.SetMaster()
 
@@ -83,36 +93,36 @@ func main() {
 		application.mainWindow.SetIcon(icon)
 	}
 
-	// Строим UI (пока с пустыми данными)
+	// Строим UI, устанавливаем заголовок и меню
 	application.buildUI()
-
-	// Устанавливаем заголовок и меню
 	application.mainWindow.SetTitle(application.getTitle() + " v" + AppVersion)
 	application.mainWindow.SetMainMenu(application.buildMainMenu())
 
 	// Обработчик закрытия окна
 	application.mainWindow.SetOnClosed(func() {
 		// Закрываем слушатель nxm, чтобы освободить порт
-		if application.nxmListener != nil {
-			application.nxmListener.Close()
+		application.nxm.Stop()
+
+		saveWindowState := func() {
+			size := application.mainWindow.Canvas().Size()
+			application.cfgMutex.Lock()
+			application.cfg.WindowWidth = int(size.Width)
+			application.cfg.WindowHeight = int(size.Height)
+			application.cfg.WindowMaximized = isWindowMaximized(application.mainWindow.Title())
+			application.cfgMutex.Unlock()
+			application.saveConfigSafe()
 		}
 
 		if application.orderDirty {
 			dialog.ShowConfirm(
-				application.messages["window_error_title"],
-				application.messages["unsaved_changes_question"],
+				application.msg("window_error_title"),
+				application.msg("unsaved_changes_question"),
 				func(ok bool) {
 					if ok {
 						application.saveCurrentOrder()
-						application.appendLog(application.messages["order_saved_on_exit"])
+						application.appendLogToFile(application.msg("order_saved_on_exit"))
 					}
-					// Сохраняем размеры окна перед выходом
-					size := application.mainWindow.Canvas().Size()
-					application.cfg.WindowWidth = int(size.Width)
-					application.cfg.WindowHeight = int(size.Height)
-					application.cfg.WindowMaximized = isWindowMaximized(application.mainWindow.Title())
-					saveConfig(application.cfg)
-					// Закрываем окно и завершаем процесс
+					saveWindowState()
 					application.closeApp()
 				},
 				application.mainWindow,
@@ -120,12 +130,7 @@ func main() {
 			return
 		}
 
-		// Если изменений нет - просто выходим
-		size := application.mainWindow.Canvas().Size()
-		application.cfg.WindowWidth = int(size.Width)
-		application.cfg.WindowHeight = int(size.Height)
-		application.cfg.WindowMaximized = isWindowMaximized(application.mainWindow.Title())
-		saveConfig(application.cfg)
+		saveWindowState()
 		application.closeApp()
 	})
 
@@ -134,9 +139,8 @@ func main() {
 		application.handleDrop(uris)
 	})
 
-	// Показываем окно (оно уже отображается, но данные ещё не загружены)
+	// Сначала показываем окно, потом восстанавливаем размеры (как в старом коде)
 	application.mainWindow.Show()
-
 	application.updateTooltipStyle()
 
 	// Восстанавливаем размеры окна из конфига (если есть)
@@ -148,12 +152,29 @@ func main() {
 	if cfg.WindowMaximized {
 		go func() {
 			time.Sleep(WindowMaximizeDelay)
-			maximizeWindowByTitle(application.mainWindow.Title())
+			fyne.Do(func() {
+				maximizeWindowByTitle(application.mainWindow.Title())
+			})
 		}()
 	}
 
+	// Запускаем мастер установки (если нужно)
+	go func() {
+		time.Sleep(300 * time.Millisecond)
+		application.runWizard(false)
+	}()
+
 	// Запускаем фоновую горутину для инициализации путей и загрузки данных
 	go func() {
+		defer func() {
+			if r := recover(); r != nil {
+				application.appendLogToFile(fmt.Sprintf("PANIC in background initialization: %v", r))
+				fyne.Do(func() {
+					dialog.ShowError(fmt.Errorf("Critical error during initialization: %v", r), application.mainWindow)
+				})
+			}
+		}()
+
 		// 1. Определяем корень игры и папку mods
 		application.initializePaths()
 
@@ -161,7 +182,6 @@ func main() {
 		application.setGlobalDataDir()
 
 		// 3. Миграция глобальных файлов (если они ещё в папке mods)
-		//    Теперь выполняется ДО загрузки данных!
 		application.migrateGlobalFilesFromMods()
 
 		// 4. Загружаем данные (базы, кэш, списки модов)
@@ -176,28 +196,7 @@ func main() {
 		}
 
 		// 7. Запускаем слушатель
-		if application.nxmListener == nil {
-			listener, err := net.Listen(NXMProtocol, NXMAddress)
-			if err == nil {
-				application.nxmListener = listener
-				go func() {
-					for {
-						if application.nxmListener == nil {
-							return
-						}
-						conn, err := application.nxmListener.Accept()
-						if err != nil {
-							return
-						}
-						link, _ := bufio.NewReader(conn).ReadString('\n')
-						conn.Close()
-						fyne.Do(func() {
-							application.handleNXMLink(strings.TrimSpace(link))
-						})
-					}
-				}()
-			}
-		}
+		application.nxm.Start()
 	}()
 
 	// Запускаем главный цикл событий
@@ -220,8 +219,8 @@ func (app *App) updateTooltipStyle() {
 	style := tooltip.Style{
 		Background:  bg,
 		BorderColor: border,
-		BorderWidth: 1,    // Толщина рамки
-		FontBold:    true, // Жирность шрифта
+		BorderWidth: 1,
+		FontBold:    true,
 	}
 
 	if c, ok := app.mainWindow.Canvas().(interface{ SetTooltipStyle(tooltip.Style) }); ok {

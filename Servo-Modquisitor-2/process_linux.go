@@ -1,4 +1,5 @@
 //go:build linux
+// Servo-Modquisitor-2/process_linux.go
 
 package main
 
@@ -33,7 +34,7 @@ func showAlreadyRunningDialog() {
 }
 
 func isDarktideRunning() bool {
-	cmd := exec.Command("pgrep", "Darktide.exe")
+	cmd := exec.Command("pgrep", "-f", "Darktide.exe")
 	output, err := cmd.Output()
 	if err != nil {
 		return false

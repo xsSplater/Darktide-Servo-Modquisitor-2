@@ -1,4 +1,4 @@
-// utils.go
+// Servo-Modquisitor-2/utils.go
 package main
 
 import (
@@ -22,14 +22,11 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
+// checkIncompatible проверяет, является ли мод несовместимым с любым
+// другим установленным модом. Делегирует в checks.IsIncompatibleMod,
+// который читает список пар под checksDataMutex — без гонки.
 func (app *App) checkIncompatible(name string) bool {
-	for _, pair := range checks.IncompatiblePairs {
-		if (pair.Mod1 == name || pair.Mod2 == name) &&
-			checks.FolderExists(pair.Mod1) && checks.FolderExists(pair.Mod2) {
-			return true
-		}
-	}
-	return false
+	return checks.IsIncompatibleMod(name)
 }
 
 type GameVersion int
@@ -128,7 +125,7 @@ func (app *App) makeRedCRTGradient(w, h int) *image.NRGBA {
 }
 
 func (app *App) runAllChecks() {
-	app.appendLog("// " + app.messages["log_start"])
+	app.appendLogToFile("// " + app.msg("log_start"))
 
 	checks.CheckInstallation(app.mainWindow)
 
@@ -164,7 +161,9 @@ func (app *App) runAllChecks() {
 	})
 
 	// 2. Собираем активные моды для сортировки
-	var activeNames []string
+	// Защищённое чтение allMods и cfg.Language
+	app.modsMutex.RLock()
+	activeNames := []string{}
 	notActive := make(map[string]bool)
 	for _, mod := range app.allMods {
 		if mod.Active && checks.FolderExists(mod.Name) {
@@ -173,15 +172,27 @@ func (app *App) runAllChecks() {
 			notActive[mod.Name] = true
 		}
 	}
+	app.modsMutex.RUnlock()
 
 	// Если активных модов нет - просто завершаем
 	if len(activeNames) == 0 {
-		app.appendLog(app.messages["done"])
+		app.appendLog(app.msg("done"))
 		return
 	}
 
+	// Копируем язык под мьютексом
+	app.cfgMutex.RLock()
+	lang := app.cfg.Language
+	app.cfgMutex.RUnlock()
+
+	// Весь блок записи файла — под loadOrderMutex. Иначе Ctrl+S
+	// во время runAllChecks перезапишет файл in-memory порядком,
+	// который устарел уже через миллисекунду, и syncLoadOrderToGame
+	// утащит в игру этот устаревший вариант.
+	app.loadOrderMutex.Lock()
+
 	// Создаём порядок в папке профиля (путь уже установлен через updateSorterOutputPath)
-	sorter.CreateLoadOrderFromActive(activeNames, app.cfg.Language)
+	sorter.CreateLoadOrderFromActive(activeNames, lang)
 
 	// Дописываем неактивные моды в файл профиля
 	profileOrderPath := filepath.Join(app.activeProfilePath(), "mods", FileNameLoadOrder)
@@ -203,14 +214,19 @@ func (app *App) runAllChecks() {
 		}
 		f.Close()
 	} else {
-		app.appendLog(fmt.Sprintf("Failed to open profile load order for append: %v", err))
+		app.appendLogToFile(fmt.Sprintf("Failed to open profile load order for append: %v", err))
 	}
 
 	// Копируем итоговый файл из профиля в игровую папку (чтобы игра его видела)
-	app.syncLoadOrderToGame()
+	app.syncLoadOrderToGameLocked()
 
-	// Логируем финальный порядок (для отладки)
-	data, err := os.ReadFile(filepath.Join(app.cfg.ModsPath, FileNameLoadOrder))
+	app.loadOrderMutex.Unlock()
+
+	// Логируем финальный порядок (для отладки) - читаем ModsPath под мьютексом
+	app.cfgMutex.RLock()
+	modsPath := app.cfg.ModsPath
+	app.cfgMutex.RUnlock()
+	data, err := os.ReadFile(filepath.Join(modsPath, FileNameLoadOrder))
 	if err == nil {
 		app.appendLogToFile("=== Final load order after sorting ===")
 		scanner := bufio.NewScanner(strings.NewReader(string(data)))
@@ -220,25 +236,32 @@ func (app *App) runAllChecks() {
 		}
 		app.appendLogToFile("=== End of load order ===")
 	} else {
-		app.appendLogToFile(fmt.Sprintf(app.messages["log_failed_to_read_lo"], err))
+		app.appendLogToFile(fmt.Sprintf(app.msg("log_failed_to_read_lo"), err))
 	}
-	app.appendLog(app.messages["done"])
+	app.appendLog(app.msg("done"))
 
 	// Тихое обновление данных без изменения выделения и прокрутки
 	savedMod := app.selectedModName
 
 	// Финальное обновление UI в зависимости от настройки
+	// Чтение настройки под мьютексом
+	app.cfgMutex.RLock()
+	showAfterSort := app.cfg.ShowModListAfterSort
+	app.cfgMutex.RUnlock()
+
 	fyne.Do(func() {
 		app.refreshModList()
 		app.forceRefreshTable()
 
-		if app.cfg.ShowModListAfterSort {
+		if showAfterSort {
 			// Открыть файл (как было)
+			app.cfgMutex.RLock()
 			absPath, _ := filepath.Abs(filepath.Join(app.cfg.ModsPath, FileNameLoadOrder))
+			app.cfgMutex.RUnlock()
 			if _, err := os.Stat(absPath); err == nil {
 				go func() {
 					if err := openFileWithDefaultApp(absPath); err != nil {
-						app.appendLog(fmt.Sprintf(app.messages["log_failed_open_file"], err))
+						app.appendLogToFile(fmt.Sprintf(app.msg("log_failed_open_file"), err))
 					}
 				}()
 			}
@@ -251,11 +274,11 @@ func (app *App) runAllChecks() {
 
 func (app *App) forceRefreshTable() {
 	if app.modTable == nil {
-		app.appendLog("forceRefreshTable: modTable is nil, skipping")
+		app.appendLogToFile("forceRefreshTable: modTable is nil, skipping")
 		return
 	}
 	if app.mainWindow == nil || app.mainWindow.Canvas() == nil {
-		app.appendLog("forceRefreshTable: mainWindow or Canvas is nil, skipping")
+		app.appendLogToFile("forceRefreshTable: mainWindow or Canvas is nil, skipping")
 		return
 	}
 	app.modTable.Refresh()
@@ -278,7 +301,7 @@ func (app *App) restoreSelectedMod(savedModName string) {
 		fyne.Do(func() {
 			for i, m := range app.displayedMods {
 				if m.Name == savedModName {
-					app.modTable.Select(widget.TableCellID{Row: i, Col: 0})
+					app.modTable.Select(widget.TableCellID{Row: i, Col: 0}, 0)
 					app.modTable.ScrollTo(widget.TableCellID{Row: i, Col: 0})
 					// updateDescriptionForMod вызовется автоматически через OnSelected
 					return
@@ -305,22 +328,35 @@ func (app *App) appendLogToFile(msg string) {
 // Используется для генерации nexus_file_pattern.
 func extractPatternFromFilename(filename string) string {
 	base := filepath.Base(filename)
-	// Удаляем расширение
 	ext := filepath.Ext(base)
 	if ext != "" {
 		base = base[:len(base)-len(ext)]
 	}
-	// Разбиваем по пробелам
+	// Если внутри base осталось что-то вроде ".zip-", удаляем это расширение
+	// Простой вариант: убрать известные расширения архивов внутри строки
+	for _, archiveExt := range []string{".zip", ".rar", ".7z"} {
+		if idx := strings.Index(base, archiveExt+"-"); idx != -1 {
+			base = base[:idx] + base[idx+len(archiveExt):]
+			break
+		}
+	}
 	parts := strings.Fields(base)
 	if len(parts) == 0 {
 		return ""
 	}
 	word := parts[0]
-	// Приводим к нижнему регистру
-	word = strings.ToLower(word)
-	// Оставляем только буквы и цифры (для чистоты)
-	// Но в именах модов обычно нет спецсимволов, можно оставить как есть.
-	return word
+
+	// Проверяем, есть ли в слове разделитель, за которым следует версия
+	for _, sep := range []string{"_", "-"} {
+		if idx := strings.Index(word, sep); idx != -1 {
+			suffix := word[idx+1:]
+			if strings.ContainsAny(suffix, "0123456789") && (strings.Contains(suffix, ".") || len(suffix) > 0) {
+				word = word[:idx]
+				break
+			}
+		}
+	}
+	return strings.ToLower(word)
 }
 
 // copyFile копирует файл src в dst, перезаписывая существующий.
@@ -351,16 +387,19 @@ func (app *App) logNexusError(err error, modName string, customMsg ...string) {
 		if len(customMsg) > 0 && customMsg[0] != "" {
 			app.appendLog(customMsg[0])
 		} else {
-			app.appendLog(fmt.Sprintf(app.messages["log_error_mod_not_available"], modName))
+			app.appendLog(fmt.Sprintf(app.msg("log_error_mod_not_available"), modName))
 		}
 	} else {
-		app.appendLog(fmt.Sprintf("Failed to process %s: %v", modName, err))
+		app.appendLogToFile(fmt.Sprintf("Failed to process %s: %v", modName, err))
 	}
 }
 
 // isSymlinkFolder проверяет, является ли папка мода симлинком.
 func (app *App) isSymlinkFolder(modName string) bool {
-	modPath := filepath.Join(app.cfg.ModsPath, modName)
+	app.cfgMutex.RLock()
+	modsPath := app.cfg.ModsPath
+	app.cfgMutex.RUnlock()
+	modPath := filepath.Join(modsPath, modName)
 	info, err := os.Lstat(modPath)
 	if err != nil {
 		return false
@@ -369,14 +408,17 @@ func (app *App) isSymlinkFolder(modName string) bool {
 }
 
 func (app *App) fixHubHotkeyMenus() {
-	wrongFolder := filepath.Join(app.cfg.ModsPath, "hub_hotkey_menus-main")
-	correctFolder := filepath.Join(app.cfg.ModsPath, "hub_hotkey_menus")
+	app.cfgMutex.RLock()
+	modsPath := app.cfg.ModsPath
+	app.cfgMutex.RUnlock()
+	wrongFolder := filepath.Join(modsPath, "hub_hotkey_menus-main")
+	correctFolder := filepath.Join(modsPath, "hub_hotkey_menus")
 	if info, err := os.Stat(wrongFolder); err == nil && info.IsDir() {
 		if _, err := os.Stat(correctFolder); os.IsNotExist(err) {
 			if err := os.Rename(wrongFolder, correctFolder); err == nil {
-				app.appendLog(app.messages["log_fix_hub_hk_menus"])
+				app.appendLogToFile(app.msg("log_fix_hub_hk_menus"))
 			} else {
-				app.appendLog(fmt.Sprintf(app.messages["log_failed_fix_hub_hk_menus"], err))
+				app.appendLogToFile(fmt.Sprintf(app.msg("log_failed_fix_hub_hk_menus"), err))
 			}
 		}
 	}
@@ -465,12 +507,8 @@ func toggleModsLegacy(gameRoot string) error {
 
 // closeApp безопасно закрывает главное окно и завершает программу.
 func (app *App) closeApp() {
-	if app.nxmListener != nil {
-		app.nxmListener.Close()
-	}
-	fyne.Do(func() {
-		app.mainWindow.Close()
-	})
+	app.nxm.Stop()
+	app.mainWindow.Close()
 	os.Exit(0)
 }
 
@@ -500,7 +538,7 @@ func sanitizeFilename(filename string) (string, error) {
 func (app *App) createSettingsBackup() {
 	settingsPath := app.getUserSettingsPath()
 	if _, err := os.Stat(settingsPath); os.IsNotExist(err) {
-		app.showInfoDialog(app.messages["error_title"], app.messages["settings_file_not_found"])
+		app.showInfoDialog(app.msg("error_title"), app.msg("settings_file_not_found"))
 		return
 	}
 
@@ -508,7 +546,7 @@ func (app *App) createSettingsBackup() {
 	configDir := filepath.Dir(configFilePath())
 	backupDir := filepath.Join(configDir, "backups", "user_settings")
 	if err := os.MkdirAll(backupDir, 0755); err != nil {
-		app.appendLog(fmt.Sprintf("Failed to create backup directory: %v", err))
+		app.appendLogToFile(fmt.Sprintf("Failed to create backup directory: %v", err))
 		return
 	}
 
@@ -517,14 +555,14 @@ func (app *App) createSettingsBackup() {
 
 	data, err := os.ReadFile(settingsPath)
 	if err != nil {
-		app.showInfoDialog(app.messages["error_title"], fmt.Sprintf("Failed to read settings: %v", err))
+		app.showInfoDialog(app.msg("error_title"), fmt.Sprintf("Failed to read settings: %v", err))
 		return
 	}
 	if err := os.WriteFile(backupPath, data, 0644); err != nil {
-		app.showInfoDialog(app.messages["error_title"], fmt.Sprintf("Failed to write backup: %v", err))
+		app.showInfoDialog(app.msg("error_title"), fmt.Sprintf("Failed to write backup: %v", err))
 		return
 	}
-	app.appendLog(fmt.Sprintf("Backup created: %s", backupPath))
+	app.appendLogToFile(fmt.Sprintf("Backup created: %s", backupPath))
 }
 
 // getUserSettingsPath возвращает путь к файлу настроек игры
@@ -544,44 +582,75 @@ func (app *App) getUserSettingsPath() string {
 		}
 	}
 	// fallback: рядом с mods (если не нашли в стандартных местах)
-	return filepath.Join(app.cfg.ModsPath, "..", "user_settings.config")
+	app.cfgMutex.RLock()
+	modsPath := app.cfg.ModsPath
+	app.cfgMutex.RUnlock()
+	return filepath.Join(modsPath, "..", "user_settings.config")
 }
 
-// ensureDir создаёт папку по указанному пути, удаляя файлы, мешающие созданию папок.
-// Защищает .mod файлы от удаления.
-func (app *App) ensureDir(path string) error {
-	// app.appendLog(fmt.Sprintf("ensureDir: checking path %s", path))
+// getProgramTempDir возвращает путь к временной папке внутри директории программы.
+func (app *App) getProgramTempDir() string {
+	exe, err := os.Executable()
+	if err != nil {
+		return os.TempDir()
+	}
+	dir := filepath.Dir(exe)
+	tempDir := filepath.Join(dir, "temp_extract")
+	if err := os.MkdirAll(tempDir, 0755); err != nil {
+		return os.TempDir()
+	}
+	return tempDir
+}
 
+// cleanProgramTempDirs удаляет временные папки, созданные программой.
+func cleanProgramTempDirs() {
+	exe, err := os.Executable()
+	if err != nil {
+		return
+	}
+	dir := filepath.Dir(exe)
+	tempDir := filepath.Join(dir, "temp_extract")
+	if _, err := os.Stat(tempDir); err == nil {
+		_ = os.RemoveAll(tempDir)
+	}
+}
+
+// ensureDir создаёт папку по указанному пути, удаляя или переименовывая файлы, мешающие созданию папок.
+// Защищает .mod файлы от удаления. Добавлены повторные попытки при блокировке.
+func (app *App) ensureDir(path string) error {
 	// Проверяем, существует ли путь
 	info, err := os.Stat(path)
 	if err == nil && info.IsDir() {
-		// app.appendLog(fmt.Sprintf("ensureDir: %s already exists as directory", path))
 		return nil
 	}
 	if err == nil && !info.IsDir() {
-		// app.appendLog(fmt.Sprintf("ensureDir: %s exists as file, removing", path))
-		if !strings.HasSuffix(strings.ToLower(path), ".mod") {
-			if removeErr := os.Remove(path); removeErr != nil {
-				// app.appendLog(fmt.Sprintf("ensureDir: failed to remove file %s: %v", path, removeErr))
-				return fmt.Errorf("cannot remove file %s: %w", path, removeErr)
-			}
-			// app.appendLog(fmt.Sprintf("ensureDir: file %s removed", path))
-		} else {
-			// app.appendLog(fmt.Sprintf("ensureDir: refusing to remove .mod file %s", path))
+		// Это файл, мешающий созданию папки
+		if strings.HasSuffix(strings.ToLower(path), ".mod") {
 			return fmt.Errorf("cannot remove .mod file %s", path)
 		}
+		// Пытаемся удалить или переименовать файл с повторными попытками
+		for attempt := 0; attempt < 5; attempt++ {
+			// Пытаемся удалить
+			if removeErr := os.Remove(path); removeErr == nil {
+				break // успешно удалили
+			} else if attempt == 4 {
+				// Последняя попытка: пытаемся переименовать
+				newPath := path + ".old"
+				if renameErr := os.Rename(path, newPath); renameErr != nil {
+					return fmt.Errorf("cannot remove or rename file %s: %w", path, renameErr)
+				}
+				break
+			}
+			time.Sleep(100 * time.Millisecond)
+		}
 	}
-
 	// Рекурсивно обрабатываем родителя
 	parent := filepath.Dir(path)
 	if parent != path {
-		// app.appendLog(fmt.Sprintf("ensureDir: recursively processing parent %s", parent))
 		if err := app.ensureDir(parent); err != nil {
 			return err
 		}
 	}
-
-	// app.appendLog(fmt.Sprintf("ensureDir: creating directory %s", path))
 	return os.MkdirAll(path, 0755)
 }
 
@@ -595,34 +664,21 @@ func isModsEnabledLegacy(gameRoot string) bool {
 	return err == nil // true если бэкап есть (моды включены)
 }
 
-// removeModFromCache удаляет запись о моде из nexusVersionCache (кэша профиля)
-// и сохраняет обновлённый файл.
+// removeModFromCache удаляет запись о моде из кэша версий активного
+// профиля и сохраняет обновлённый файл.
 func (app *App) removeModFromCache(modName string) {
-	var keyToDelete string
-	app.cacheMutex.RLock()
-	for key, info := range app.nexusVersionCache {
-		if info.Folder == modName {
-			keyToDelete = key
-			break
-		}
-	}
-	app.cacheMutex.RUnlock()
-
-	if keyToDelete == "" {
+	if !app.versionCache.RemoveByFolder(modName) {
 		return // нет записи в кэше
 	}
-
-	app.cacheMutex.Lock()
-	delete(app.nexusVersionCache, keyToDelete)
-	app.cacheMutex.Unlock()
-
 	app.saveNexusVersionCache()
-	app.appendLog(fmt.Sprintf("Removed cache entry for mod: %s", modName))
+	app.appendLogToFile(fmt.Sprintf("Removed cache entry for mod: %s", modName))
 }
 
-// Очистка кэша от «мёртвых» записей
+// pruneVersionCache удаляет мёртвые и дублирующиеся записи из кэша
+// версий. Логика вынесена в VersionCache.Prune.
 func (app *App) pruneVersionCache() {
-	// 1. Собираем существующие папки (все моды + системные)
+	// 1. Собираем существующие папки.
+	app.modsMutex.RLock()
 	existing := make(map[string]bool)
 	for _, mod := range app.allMods {
 		existing[mod.Name] = true
@@ -630,61 +686,15 @@ func (app *App) pruneVersionCache() {
 	for _, mod := range app.systemMods {
 		existing[mod.Name] = true
 	}
+	app.modsMutex.RUnlock()
 
-	app.cacheMutex.Lock()
-	defer app.cacheMutex.Unlock()
+	// 2. Prune.
+	removed := app.versionCache.Prune(existing)
 
-	// 2. Удаляем записи для несуществующих папок
-	for key, info := range app.nexusVersionCache {
-		if !existing[info.Folder] {
-			delete(app.nexusVersionCache, key)
-		}
-	}
-
-	// 3. Удаляем дубликаты по folder, оставляя одну лучшую запись
-	best := make(map[string]string) // folder -> лучший ключ
-	for key, info := range app.nexusVersionCache {
-		if current, ok := best[info.Folder]; !ok {
-			best[info.Folder] = key
-		} else {
-			curInfo := app.nexusVersionCache[current]
-			// Выбираем лучшую запись
-			preferCurrent := false
-			// Если одна nexus, другая manual - nexus побеждает
-			if info.Source == "nexus" && curInfo.Source != "nexus" {
-				preferCurrent = true
-			} else if info.Source != "nexus" && curInfo.Source == "nexus" {
-				preferCurrent = false
-			} else {
-				// Оба одинакового source - сравниваем timestamp
-				if info.Timestamp > curInfo.Timestamp {
-					preferCurrent = true
-				} else if info.Timestamp == curInfo.Timestamp && info.Version != "" && curInfo.Version == "" {
-					preferCurrent = true
-				} else {
-					preferCurrent = false
-				}
-			}
-			if preferCurrent {
-				best[info.Folder] = key
-			}
-		}
-	}
-
-	// 4. Удаляем все записи, не попавшие в best
-	toDelete := []string{}
-	for key, info := range app.nexusVersionCache {
-		if best[info.Folder] != key {
-			toDelete = append(toDelete, key)
-		}
-	}
-	for _, key := range toDelete {
-		delete(app.nexusVersionCache, key)
-	}
-
-	if len(toDelete) > 0 {
+	// 3. Сохраняем только если что-то удалилось.
+	if removed > 0 {
 		app.saveNexusVersionCache()
-		app.appendLog(fmt.Sprintf("Pruned %d duplicate/stale entries from version cache.", len(toDelete)))
+		app.appendLogToFile(fmt.Sprintf("Pruned %d duplicate/stale entries from version cache.", removed))
 	}
 }
 
@@ -791,4 +801,190 @@ func (app *App) extractZipArchive(src, dst string) error {
 		}
 	}
 	return nil
+}
+
+// isVersionToken проверяет, что строка выглядит как часть версии (содержит точку или букву, не является датой).
+func isVersionToken(s string) bool {
+	if s == "" {
+		return false
+	}
+	// Если это дата с T или дефисами (YYYY-MM-DD), не считаем версией
+	if strings.Contains(s, "T") || strings.Contains(s, "-") && len(s) >= 8 && isNumeric(strings.ReplaceAll(s, "-", "")) {
+		return false
+	}
+	// Содержит точку и состоит из цифр, букв и точек
+	if strings.Contains(s, ".") {
+		for _, ch := range s {
+			if !((ch >= '0' && ch <= '9') || (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || ch == '.') {
+				return false
+			}
+		}
+		return true
+	}
+	// Просто число - тоже может быть версией (например, "1")
+	if isNumeric(s) {
+		return true
+	}
+	return false
+}
+
+// isDateToken проверяет, является ли токен датой (8 цифр или YYYY-MM-DD или содержит T)
+func isDateToken(s string) bool {
+	if strings.Contains(s, "T") {
+		return true
+	}
+	if len(s) == 8 && isNumeric(s) {
+		return true
+	}
+	if len(s) == 10 && strings.Contains(s, "-") {
+		parts := strings.Split(s, "-")
+		if len(parts) == 3 && len(parts[0]) == 4 && len(parts[1]) == 2 && len(parts[2]) == 2 &&
+			isNumeric(parts[0]) && isNumeric(parts[1]) && isNumeric(parts[2]) {
+			return true
+		}
+	}
+	return false
+}
+
+func extractVersionAndModIDFromFilename(filename string) (modID int, version string, ok bool) {
+	name := filepath.Base(filename)
+	ext := filepath.Ext(name)
+	if ext != "" && !strings.ContainsAny(ext, " \t") {
+		// Проверяем, что расширение содержит хотя бы одну букву
+		hasLetter := false
+		for _, ch := range ext[1:] { // пропускаем точку
+			if (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') {
+				hasLetter = true
+				break
+			}
+		}
+		if hasLetter {
+			name = name[:len(name)-len(ext)]
+		}
+	}
+
+	// Пробельный формат (пробуем сначала)
+	parts := strings.Fields(name)
+	var idIdx = -1
+	for i, p := range parts {
+		if isNumeric(p) {
+			id, err := strconv.Atoi(p)
+			if err == nil && id > 0 && id < MaxModsID_less {
+				idIdx = i
+				break
+			}
+		}
+	}
+	if idIdx != -1 {
+		modID, _ = strconv.Atoi(parts[idIdx])
+
+		// Если после ID нет токенов → версия отсутствует
+		if idIdx+1 >= len(parts) {
+			return 0, "", false
+		}
+
+		// Собираем токены после ID, пока они являются версионными
+		var verParts []string
+		for i := idIdx + 1; i < len(parts); i++ {
+			token := parts[i]
+			if isDateToken(token) {
+				break
+			}
+			if isVersionToken(token) {
+				verParts = append(verParts, token)
+			} else {
+				break
+			}
+		}
+
+		if len(verParts) > 0 {
+			version = strings.Join(verParts, ".")
+			ok = true
+			return
+		}
+
+		// Если первый токен после ID — дата → версия неизвестна
+		if idIdx+1 < len(parts) && isDateToken(parts[idIdx+1]) {
+			return modID, "unknown", true
+		}
+
+		// В остальных случаях версия неизвестна
+		return modID, "unknown", true
+	}
+
+	// Дефисный формат (если пробельный не сработал)
+	if strings.Contains(name, "-") {
+		parts := strings.Split(name, "-")
+		var idIdx, tsIdx = -1, -1
+		for i, p := range parts {
+			if isNumeric(p) {
+				id, err := strconv.Atoi(p)
+				if err == nil && id > 0 && id < MaxModsID_less {
+					idIdx = i
+				}
+			}
+			if len(p) == 10 && isNumeric(p) {
+				tsIdx = i
+			}
+		}
+		if idIdx != -1 && tsIdx != -1 && idIdx < tsIdx {
+			modID, _ = strconv.Atoi(parts[idIdx])
+			var verParts []string
+			for i := idIdx + 1; i < tsIdx; i++ {
+				verParts = append(verParts, parts[i])
+			}
+			if len(verParts) > 0 {
+				version = strings.Join(verParts, ".")
+				ok = true
+				return
+			}
+			return modID, "unknown", true
+		}
+		if idIdx != -1 {
+			modID, _ = strconv.Atoi(parts[idIdx])
+			var verParts []string
+			for i := idIdx + 1; i < len(parts); i++ {
+				verParts = append(verParts, parts[i])
+			}
+			if len(verParts) > 0 {
+				version = strings.Join(verParts, ".")
+				ok = true
+				return
+			}
+			return modID, "unknown", true
+		}
+	}
+
+	return 0, "", false
+}
+
+// compareVersions сравнивает две семантические версии (например, "1.9.0" и "1.9.5").
+func compareVersions(v1, v2 string) int {
+	if v1 == "" || v2 == "" {
+		return 0
+	}
+	parts1 := strings.Split(v1, ".")
+	parts2 := strings.Split(v2, ".")
+	maxLen := len(parts1)
+	if len(parts2) > maxLen {
+		maxLen = len(parts2)
+	}
+	for i := 0; i < maxLen; i++ {
+		n1, _ := strconv.Atoi(getPart(parts1, i))
+		n2, _ := strconv.Atoi(getPart(parts2, i))
+		if n1 < n2 {
+			return -1
+		}
+		if n1 > n2 {
+			return 1
+		}
+	}
+	return 0
+}
+
+func getPart(parts []string, i int) string {
+	if i < len(parts) {
+		return parts[i]
+	}
+	return "0"
 }

@@ -1,15 +1,15 @@
 {
 	"FixedFileInfo": {
 		"FileVersion": {
-			"Major": 3,
+			"Major": 4,
 			"Minor": 0,
-			"Patch": 1,
+			"Patch": 0,
 			"Build": 0
 		},
 		"ProductVersion": {
-			"Major": 3,
+			"Major": 4,
 			"Minor": 0,
-			"Patch": 1,
+			"Patch": 0,
 			"Build": 0
 		},
 		"FileType": "01"

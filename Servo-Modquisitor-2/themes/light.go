@@ -1,4 +1,4 @@
-// light.go
+// Servo-Modquisitor-2/themes/light.go
 package themes
 
 import (
@@ -167,6 +167,26 @@ func (t ForcedLightTheme) Color(name fyne.ThemeColorName, variant fyne.ThemeVari
 		return color.NRGBA{R: 200, G: 200, B: 200, A: 255} // обводка кнопки
 	case ColorButtonStrokeImage:
 		return color.NRGBA{R: 200, G: 200, B: 200, A: 150} // обводка для иконок
+
+	// ──────────────── Верхнее меню ────────────────
+	case theme.ColorNameMenuBarAccent:
+		return color.NRGBA{R: 46, G: 125, B: 50, A: 255}
+	case theme.ColorNameMenuBarActiveBg:
+		return color.NRGBA{R: 76, G: 175, B: 80, A: 0x1F}
+	case theme.ColorNameMenuBarHoverBg:
+		return color.NRGBA{R: 76, G: 175, B: 80, A: 0x0F}
+
+	// ──────────────── Меню ────────────────
+	case theme.ColorNameMenuBorder:
+		return color.NRGBA{R: 200, G: 200, B: 200, A: 0xFF}
+	case theme.ColorNameMenuItemActiveBorder:
+		return color.NRGBA{R: 46, G: 125, B: 50, A: 0xAA}
+	case theme.ColorNameMenuItemDanger:
+		return color.NRGBA{R: 211, G: 47, B: 47, A: 255}
+	case theme.ColorNameMenuItemHeader:
+		return color.NRGBA{R: 46, G: 125, B: 50, A: 255}
+	case theme.ColorNameMenuItemHeaderBg:
+		return color.NRGBA{R: 46, G: 125, B: 50, A: 0x14}
 
 	default:
 		return theme.DefaultTheme().Color(name, variant)

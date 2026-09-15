@@ -1,5 +1,7 @@
 //go:build windows
 
+// Servo-Modquisitor-2/launcher_windows.go
+
 package main
 
 import (
@@ -15,6 +17,7 @@ func launchGame(version GameVersion, gameRoot string, skipLauncher bool) error {
 
 	switch version {
 	case VersionSteam:
+		// Steam: exe лежит прямо в binaries/, bundle — рядом.
 		exePath = filepath.Join(gameRoot, "binaries", "Darktide.exe")
 		if !skipLauncher {
 			return exec.Command("rundll32", "url.dll,FileProtocolHandler", "steam://rungameid/"+DarktideAppID).Start()
@@ -30,9 +33,13 @@ func launchGame(version GameVersion, gameRoot string, skipLauncher bool) error {
 		}
 
 	case VersionXbox:
+		// Xbox: exe внутри content/binaries/. Это совпадает с
+		// detectGameVersion, которая считает корнем тот, где есть
+		// content/, и со старым батником:
+		//   %game_root%\content\binaries\Darktide.exe
 		exePath = filepath.Join(gameRoot, "content", "binaries", "Darktide.exe")
 		if !skipLauncher {
-			return exec.Command("explorer", "shell:AppsFolder\\...").Start()
+			return fmt.Errorf("Xbox launcher not supported. Please use 'Launch without launcher' option.")
 		}
 		args = []string{
 			"--bundle-dir", "../bundle",

@@ -1,4 +1,4 @@
-// aml_test.go
+// Servo-Modquisitor-2/checks/aml_test.go
 package checks
 
 import (
@@ -200,5 +200,197 @@ func TestCleanList(t *testing.T) {
 	want := []string{"a", "b", "c"}
 	if !reflect.DeepEqual(got, want) {
 		t.Errorf("cleanList = %v, want %v", got, want)
+	}
+}
+
+// Регрессия на P0 #1: запятая ВНУТРИ строкового литерала не должна
+// обрезать значение и ломать файл.
+func TestApplyStringKeyWithCommaInValue(t *testing.T) {
+	const tricky = `return {
+  author = "Smith, John",
+  version = "1.0.0",
+}
+`
+	dir := t.TempDir()
+	path := writeMod(t, dir, "commamod", tricky)
+
+	cfg := ReadAMLConfig("commamod")
+	if cfg.Author != "Smith, John" {
+		t.Fatalf("read author = %q, want %q", cfg.Author, "Smith, John")
+	}
+
+	cfg.Author = "Doe, Jane"
+	if err := WriteAMLConfig(cfg); err != nil {
+		t.Fatalf("WriteAMLConfig: %v", err)
+	}
+
+	out, _ := os.ReadFile(path)
+	got := string(out)
+	if !luaBracesBalanced(got) {
+		t.Fatalf("unbalanced braces after write:\n%s", got)
+	}
+
+	// Ключ version на следующей строке должен уцелеть.
+	re := ReadAMLConfig("commamod")
+	if re.Author != "Doe, Jane" {
+		t.Errorf("after write author = %q, want %q", re.Author, "Doe, Jane")
+	}
+	if re.Version != "1.0.0" {
+		t.Errorf("after write version = %q, want unchanged %q", re.Version, "1.0.0")
+	}
+}
+
+// Регрессия на P0 #1: фигурная скобка ВНУТРИ строкового литерала не
+// должна обрывать сканирование раньше закрывающей кавычки.
+func TestApplyStringKeyWithBraceInValue(t *testing.T) {
+	const tricky = `return {
+  author = "Ann {knee} Smith",
+  version = "2.0",
+}
+`
+	dir := t.TempDir()
+	path := writeMod(t, dir, "bracemod", tricky)
+
+	cfg := ReadAMLConfig("bracemod")
+	if cfg.Author != "Ann {knee} Smith" {
+		t.Fatalf("read author = %q, want %q", cfg.Author, "Ann {knee} Smith")
+	}
+
+	cfg.Author = "New Author"
+	if err := WriteAMLConfig(cfg); err != nil {
+		t.Fatalf("WriteAMLConfig: %v", err)
+	}
+
+	out, _ := os.ReadFile(path)
+	got := string(out)
+	if !luaBracesBalanced(got) {
+		t.Fatalf("unbalanced braces after write:\n%s", got)
+	}
+	re := ReadAMLConfig("bracemod")
+	if re.Author != "New Author" {
+		t.Errorf("after write author = %q, want %q", re.Author, "New Author")
+	}
+	if re.Version != "2.0" {
+		t.Errorf("after write version = %q, want unchanged %q", re.Version, "2.0")
+	}
+}
+
+// Экранированные кавычки внутри литерала тоже должны корректно
+// пропускаться (skipLuaString умеет \"). Проверим, что файл после
+// записи остаётся валидным Lua и парсится.
+func TestApplyStringKeyWithEscapedQuote(t *testing.T) {
+	const tricky = `return {
+  author = "He said \"hi\"",
+  version = "3.0",
+}
+`
+	dir := t.TempDir()
+	path := writeMod(t, dir, "escaper", tricky)
+
+	cfg := ReadAMLConfig("escaper")
+	if cfg.Author != `He said "hi"` {
+		t.Fatalf("read author = %q", cfg.Author)
+	}
+	cfg.Author = "OK"
+	if err := WriteAMLConfig(cfg); err != nil {
+		t.Fatalf("WriteAMLConfig: %v", err)
+	}
+	out, _ := os.ReadFile(path)
+	got := string(out)
+	if !luaBracesBalanced(got) {
+		t.Fatalf("unbalanced braces after write:\n%s", got)
+	}
+	re := ReadAMLConfig("escaper")
+	if re.Author != "OK" {
+		t.Errorf("after write author = %q, want OK", re.Author)
+	}
+}
+
+// #15: кириллица в author/version должна сохраняться как валидный Lua,
+// а не превращаться в Go-escape \uXXXX.
+func TestApplyStringKeyKeepsCyrillic(t *testing.T) {
+	const src = `return {
+  author = "old",
+  version = "1.0",
+}
+`
+	dir := t.TempDir()
+	path := writeMod(t, dir, "cyr", src)
+
+	cfg := ReadAMLConfig("cyr")
+	cfg.Author = "Иванов Иван"
+	cfg.Version = "2.0-тест"
+	if err := WriteAMLConfig(cfg); err != nil {
+		t.Fatalf("WriteAMLConfig: %v", err)
+	}
+
+	out, _ := os.ReadFile(path)
+	got := string(out)
+
+	// Главное: НЕ должно быть Go-escape \u04...
+	if strings.Contains(got, `\u`) {
+		t.Fatalf("Go-style \\u escape leaked into Lua file:\n%s", got)
+	}
+	if !strings.Contains(got, "Иванов Иван") {
+		t.Errorf("cyrillic author missing in output:\n%s", got)
+	}
+	if !luaBracesBalanced(got) {
+		t.Fatalf("unbalanced braces:\n%s", got)
+	}
+
+	re := ReadAMLConfig("cyr")
+	if re.Author != "Иванов Иван" {
+		t.Errorf("round-trip author = %q, want %q", re.Author, "Иванов Иван")
+	}
+	if re.Version != "2.0-тест" {
+		t.Errorf("round-trip version = %q, want %q", re.Version, "2.0-тест")
+	}
+}
+
+// #15: управляющие символы пишутся как \ddd (3 цифры), а не как \xXX.
+func TestLuaQuoteControlBytes(t *testing.T) {
+	cases := []struct {
+		in   string
+		want string
+	}{
+		{"abc", `"abc"`},
+		{"Иванов", `"Иванов"`},
+		{"line\nbreak", `"line\nbreak"`},
+		{"tab\there", `"tab\there"`},
+		{"quote\"inside", `"quote\"inside"`},
+		{"back\\slash", `"back\\slash"`},
+		{"bell\x07", `"bell\007"`},
+		{"esc\x1b[31m", `"esc\027[31m"`},
+		{"del\x7f", `"del\127"`},
+		{"\x00", `"\000"`},
+	}
+	for _, tc := range cases {
+		got := luaQuote(tc.in)
+		if got != tc.want {
+			t.Errorf("luaQuote(%q) = %s, want %s", tc.in, got, tc.want)
+		}
+	}
+}
+
+// #15: безопасность — если author содержит кавычку или обратный слэш,
+// файл после записи должен остаться валидным Lua (баланс скобок + парсинг).
+func TestApplyStringKeyWithQuotesAndBackslash(t *testing.T) {
+	const src = `return {
+  author = "old",
+  version = "1",
+}
+`
+	dir := t.TempDir()
+	writeMod(t, dir, "qbs", src)
+
+	cfg := ReadAMLConfig("qbs")
+	cfg.Author = `He said "hi" and \ farewell`
+	if err := WriteAMLConfig(cfg); err != nil {
+		t.Fatalf("WriteAMLConfig: %v", err)
+	}
+
+	re := ReadAMLConfig("qbs")
+	if re.Author != `He said "hi" and \ farewell` {
+		t.Errorf("round-trip author = %q, want %q", re.Author, `He said "hi" and \ farewell`)
 	}
 }

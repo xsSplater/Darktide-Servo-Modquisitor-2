@@ -1,4 +1,4 @@
-// aml.go
+// Servo-Modquisitor-2/checks/aml.go
 //
 // Parsing and (careful) rewriting of Darktide ".mod" files for the AML
 // ("Auto Mod Loading and Ordering") configuration feature.
@@ -31,10 +31,8 @@ package checks
 
 import (
 	"errors"
-	"fmt"
 	"os"
 	"path/filepath"
-	"strconv"
 	"strings"
 )
 
@@ -258,7 +256,7 @@ func serializeArray(key string, items []string) string {
 	b.WriteString(" = {\n")
 	for _, it := range items {
 		b.WriteString("\t\t")
-		b.WriteString(strconv.Quote(it)) // ASCII mod names: Lua-compatible quoting
+		b.WriteString(luaQuote(it))
 		b.WriteString(",\n")
 	}
 	b.WriteString("\t}")
@@ -554,6 +552,7 @@ func extractLuaStrings(s string) []string {
 }
 
 // unquoteLua strips surrounding quotes and unescapes a simple Lua string literal.
+// unquoteLua strips surrounding quotes and unescapes a simple Lua string literal.
 func unquoteLua(s string) string {
 	if len(s) < 2 {
 		return ""
@@ -566,20 +565,105 @@ func unquoteLua(s string) string {
 	for i := 0; i < len(inner); i++ {
 		if inner[i] == '\\' && i+1 < len(inner) {
 			i++
-			switch inner[i] {
-			case 'n':
+			switch {
+			case inner[i] == 'n':
 				b.WriteByte('\n')
-			case 't':
+			case inner[i] == 't':
 				b.WriteByte('\t')
-			case 'r':
+			case inner[i] == 'r':
 				b.WriteByte('\r')
+			case inner[i] == 'a':
+				b.WriteByte(7)
+			case inner[i] == 'b':
+				b.WriteByte(8)
+			case inner[i] == 'f':
+				b.WriteByte(12)
+			case inner[i] == 'v':
+				b.WriteByte(11)
+			case inner[i] == '\\':
+				b.WriteByte('\\')
+			case inner[i] == '"':
+				b.WriteByte('"')
+			case inner[i] == '\'':
+				b.WriteByte('\'')
+			case inner[i] >= '0' && inner[i] <= '9':
+				// \ddd — до 3 десятичных цифр.
+				n := int(inner[i] - '0')
+				for k := 1; k < 3 && i+1 < len(inner); k++ {
+					d := inner[i+1]
+					if d < '0' || d > '9' {
+						break
+					}
+					n = n*10 + int(d-'0')
+					i++
+				}
+				if n > 255 {
+					n %= 256 // Lua берёт младший байт; на всякий случай
+				}
+				b.WriteByte(byte(n))
 			default:
+				// Неизвестный escape: Lua 5.1 падает, но мы не парсер —
+				// пропускаем символ как есть, чтобы не терять данные.
 				b.WriteByte(inner[i])
 			}
 			continue
 		}
 		b.WriteByte(inner[i])
 	}
+	return b.String()
+}
+
+// luaQuote возвращает Lua-совместимый строковый литерал для s.
+//
+// В отличие от Go-функций strconv.Quote / fmt.Sprintf("%q"), здесь НЕ
+// применяется \uXXXX — в Lua такой escape-последовательности нет.
+// Lua использует \ddd (десятичное, до 3 знаков) и (в 5.3+) \u{XXXX}
+// с обязательными фигурными скобками. Go-форма приводит к syntax error
+// при загрузке .mod файла движком Darktide.
+//
+// UTF-8-байты пропускаются как есть: Lua-строки байтовые, а движок
+// Darktide нативно работает с UTF-8, поэтому кириллица и эмодзи
+// сохраняются в исходном виде.
+//
+// Экранируются только:
+//
+//	\   -> \\\\
+//	"   -> \"
+//	\n  -> \n
+//	\r  -> \r
+//	\t  -> \t
+//	прочие control-байты (0x00..0x1F, 0x7F) -> \ddd (ровно 3 цифры)
+func luaQuote(s string) string {
+	var b strings.Builder
+	b.Grow(len(s) + 2)
+	b.WriteByte('"')
+	for i := 0; i < len(s); i++ {
+		c := s[i]
+		switch c {
+		case '\\':
+			b.WriteString(`\\`)
+		case '"':
+			b.WriteString(`\"`)
+		case '\n':
+			b.WriteString(`\n`)
+		case '\r':
+			b.WriteString(`\r`)
+		case '\t':
+			b.WriteString(`\t`)
+		default:
+			if c < 0x20 || c == 0x7F {
+				// \ddd ровно 3 цифры: иначе следующий за escape байт-
+				// цифра склеится с последовательностью (\1 + "5" -> \15).
+				b.WriteByte('\\')
+				b.WriteByte('0' + (c/100)%10)
+				b.WriteByte('0' + (c/10)%10)
+				b.WriteByte('0' + c%10)
+			} else {
+				b.WriteByte(c)
+			}
+		}
+	}
+	b.WriteByte('"')
 	return b.String()
 }
 
@@ -621,13 +705,24 @@ func applyStringKey(content, key, value string) (string, error) {
 	_, valStart, found := findLuaTopLevelKey(content, open, closeIdx, key)
 
 	if found {
-		// Находим конец значения (до запятой или закрывающей скобки)
-		valEnd := valStart
-		for valEnd < len(content) && content[valEnd] != ',' && content[valEnd] != '}' {
-			valEnd++
+		// Определяем конец старого значения.
+		// Для строкового литерала используем skipLuaString — это корректно
+		// пропускает запятые и фигурные скобки ВНУТРИ кавычек, а также
+		// учитывает экранирование (\", \\). Иначе любой `,`/`}` внутри
+		// строки (например `author = "Smith, John"`) обрезал бы значение
+		// и превращал файл в невалидный Lua.
+		var valEnd int
+		if valStart < len(content) && (content[valStart] == '"' || content[valStart] == '\'') {
+			valEnd = skipLuaString(content, valStart)
+		} else {
+			// Не-строковое значение (число/bool/nil): сканируем до разделителя.
+			valEnd = valStart
+			for valEnd < len(content) && content[valEnd] != ',' && content[valEnd] != '}' {
+				valEnd++
+			}
 		}
-		// Заменяем только значение, оставляя запятую на месте
-		newVal := fmt.Sprintf(`%q`, value)
+		// Заменяем только значение, оставляя запятую и прочее на месте
+		newVal := luaQuote(value)
 		return content[:valStart] + newVal + content[valEnd:], nil
 	}
 
@@ -639,6 +734,6 @@ func applyStringKey(content, key, value string) (string, error) {
 	if closeIdx > 0 && content[closeIdx-1] != '\n' {
 		ins = "\n"
 	}
-	ins += "\t" + fmt.Sprintf(`%s = %q`, key, value) + ",\n"
+	ins += "\t" + key + " = " + luaQuote(value) + ",\n"
 	return content[:closeIdx] + ins + content[closeIdx:], nil
 }

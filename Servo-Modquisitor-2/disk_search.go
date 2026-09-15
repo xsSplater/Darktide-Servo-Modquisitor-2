@@ -1,4 +1,4 @@
-// disk_search.go
+// Servo-Modquisitor-2/disk_search.go
 package main
 
 import (
@@ -70,24 +70,30 @@ func (app *App) showDiskSearchDialog() chan GameSearchResult {
 	grid := container.NewGridWithColumns(cols, checkboxes...)
 
 	// Заголовок
-	labelText := app.messages["disk_search_label"]
+	labelText := app.msg("disk_search_label")
 	if runtime.GOOS != "windows" {
-		labelText = app.messages["disk_search_label_linux"]
+		labelText = app.msg("disk_search_label_linux")
 	}
 	label := widget.NewLabelWithStyle(labelText, fyne.TextAlignCenter, fyne.TextStyle{Bold: true})
 
-	// Прогресс и статус
-	progress := widget.NewProgressBar()
+	// Прогресс и статус.
+	// Используем ProgressBarInfinite: общее число папок заранее
+	// неизвестно (обход дерева без предварительной оценки). Обычный
+	// ProgressBar с SetValue(current/total) не давал никакой обратной
+	// связи — total всегда приходил 0, и бар стоял мёртвым. Анимированный
+	// индикатор показывает «идёт работа», а конкретика (сколько папок
+	// проверено) — в statusLabel.
+	progress := widget.NewProgressBarInfinite()
 	progress.Hide()
-	statusLabel := widget.NewLabel(app.messages["disk_search_status_ready"])
+	statusLabel := widget.NewLabel(app.msg("disk_search_status_ready"))
 	statusLabel.Alignment = fyne.TextAlignCenter
 	statusLabel.Wrapping = fyne.TextWrapWord
 
 	// Кнопки
-	searchBtn := widget.NewButtonWithIcon(app.messages["disk_search_btn_start"], theme.SearchIcon(), nil)
+	searchBtn := widget.NewButtonWithIcon(app.msg("disk_search_btn_start"), theme.SearchIcon(), nil)
 	searchBtn.Importance = widget.HighImportance
-	manualBtn := widget.NewButtonWithIcon(app.messages["disk_search_btn_manual"], theme.FolderOpenIcon(), nil)
-	cancelBtn := widget.NewButton(app.messages["btn_cancel"], nil)
+	manualBtn := widget.NewButtonWithIcon(app.msg("disk_search_btn_manual"), theme.FolderOpenIcon(), nil)
+	cancelBtn := widget.NewButton(app.msg("btn_cancel"), nil)
 
 	var popUp *widget.PopUp
 	content := container.NewVBox(
@@ -107,9 +113,11 @@ func (app *App) showDiskSearchDialog() chan GameSearchResult {
 		),
 	)
 
-	popUp = widget.NewModalPopUp(content, app.mainWindow.Canvas())
-	popUp.Resize(fyne.NewSize(DialogMinWidth, DialogMinHeight200))
-	popUp.Show()
+	fyne.Do(func() {
+		popUp = widget.NewModalPopUp(content, app.mainWindow.Canvas())
+		popUp.Resize(fyne.NewSize(DialogMinWidth, DialogMinHeight200))
+		popUp.Show()
+	})
 
 	// Переменные для управления поиском
 	var cancelCtx context.Context
@@ -121,21 +129,13 @@ func (app *App) showDiskSearchDialog() chan GameSearchResult {
 		fyne.Do(func() { statusLabel.SetText(text) })
 	}
 
-	updateProgress := func(current, total int) {
-		fyne.Do(func() {
-			if total > 0 {
-				progress.SetValue(float64(current) / float64(total))
-			}
-		})
-	}
-
 	searchBtn.OnTapped = func() {
 		mu.Lock()
 		if searchRunning {
 			if cancelFunc != nil {
 				cancelFunc()
 			}
-			searchBtn.SetText(app.messages["disk_search_btn_start"])
+			searchBtn.SetText(app.msg("disk_search_btn_start"))
 			searchRunning = false
 			mu.Unlock()
 			return
@@ -151,17 +151,17 @@ func (app *App) showDiskSearchDialog() chan GameSearchResult {
 			}
 		}
 		if len(selected) == 0 {
-			updateStatus(app.messages["disk_search_status_no_selection"])
+			updateStatus(app.msg("disk_search_status_no_selection"))
 			mu.Lock()
 			searchRunning = false
 			mu.Unlock()
 			return
 		}
 
-		searchBtn.SetText(app.messages["disk_search_btn_stop"])
+		searchBtn.SetText(app.msg("disk_search_btn_stop"))
 		progress.Show()
-		updateStatus(fmt.Sprintf(app.messages["disk_search_status_searching"], 0))
-		progress.SetValue(0)
+		progress.Start()
+		updateStatus(fmt.Sprintf(app.msg("disk_search_status_searching"), 0))
 
 		cancelCtx, cancelFunc = context.WithCancel(context.Background())
 
@@ -169,35 +169,42 @@ func (app *App) showDiskSearchDialog() chan GameSearchResult {
 			defer func() {
 				mu.Lock()
 				searchRunning = false
-				searchBtn.SetText(app.messages["disk_search_btn_start"])
-				progress.Hide()
 				mu.Unlock()
+				fyne.Do(func() {
+					searchBtn.SetText(app.msg("disk_search_btn_start"))
+					progress.Stop()
+					progress.Hide()
+				})
 			}()
 
-			found, err := app.searchGameOnDrives(selected, cancelCtx, func(current, total int, currentPath string) {
-				updateProgress(current, total)
-				if current%100 == 0 {
-					updateStatus(fmt.Sprintf(app.messages["disk_search_status_searching"], current))
+			found, err := app.searchGameOnDrives(selected, cancelCtx, func(checked int, _ int, _ string) {
+				// Общее число неизвестно — прогресс-бар анимируется сам,
+				// а тут только обновляем счётчик в статусе. 100 — разумная
+				// частота: statusLabel.SetText дёргается реже, чем каждую
+				// проверенную папку, но достаточно часто, чтобы видеть
+				// движение при больших дисках.
+				if checked%100 == 0 {
+					updateStatus(fmt.Sprintf(app.msg("disk_search_status_searching"), checked))
 				}
 			})
 
 			if err != nil {
-				updateStatus(fmt.Sprintf(app.messages["disk_search_status_error"], err.Error()))
+				updateStatus(fmt.Sprintf(app.msg("disk_search_status_error"), err.Error()))
 				return
 			}
 
 			if cancelCtx.Err() != nil {
-				updateStatus(app.messages["disk_search_status_cancelled"])
+				updateStatus(app.msg("disk_search_status_cancelled"))
 				return
 			}
 
 			if len(found) == 0 {
-				updateStatus(app.messages["disk_search_status_not_found"])
+				updateStatus(app.msg("disk_search_status_not_found"))
 				return
 			}
 
 			if len(found) == 1 {
-				updateStatus(fmt.Sprintf(app.messages["disk_search_status_found"], found[0]))
+				updateStatus(fmt.Sprintf(app.msg("disk_search_status_found"), found[0]))
 				time.Sleep(500 * time.Millisecond)
 				fyne.Do(func() {
 					popUp.Hide()
@@ -224,9 +231,9 @@ func (app *App) showDiskSearchDialog() chan GameSearchResult {
 				var newPopUp *widget.PopUp
 				newPopUp = widget.NewModalPopUp(
 					container.NewVBox(
-						widget.NewLabelWithStyle(app.messages["disk_search_multiple_found_title"], fyne.TextAlignCenter, fyne.TextStyle{Bold: true}),
+						widget.NewLabelWithStyle(app.msg("disk_search_multiple_found_title"), fyne.TextAlignCenter, fyne.TextStyle{Bold: true}),
 						container.NewVScroll(list),
-						widget.NewButton(app.messages["btn_cancel"], func() {
+						widget.NewButton(app.msg("btn_cancel"), func() {
 							newPopUp.Hide()
 							popUp.Hide()
 							resultChan <- GameSearchResult{Success: false}
@@ -276,14 +283,34 @@ func (app *App) searchGameOnDrives(roots []string, ctx context.Context, progress
 	var mu sync.Mutex
 	var totalChecked int
 
-	// Папки, которые игнорируем для ускорения
+	// Папки, которые игнорируем для ускорения. Ключи — в нижнем регистре,
+	// проверка идёт через strings.ToLower(name). Windows нечувствителен
+	// к регистру имён каталогов ("Program Files" / "PROGRAM FILES" /
+	// "Program files" — одна и та же папка), а map[string]bool — чувствителен.
 	ignoreDirs := map[string]bool{
-		"Windows": true, "Program Files": true, "Program Files (x86)": true,
-		"System32": true, "System": true, "AppData": true,
-		"$Recycle.Bin": true, "System Volume Information": true,
-		"boot": true, "Users": true, "ProgramData": true,
-		"Microsoft": true, "WindowsApps": true, "WpSystem": true,
-		"proc": true, "sys": true, "dev": true, "run": true, "tmp": true, "var": true, "etc": true,
+		// Windows-специфичные
+		"windows":                   true,
+		"program files":             true,
+		"program files (x86)":       true,
+		"system32":                  true,
+		"system":                    true,
+		"appdata":                   true,
+		"$recycle.bin":              true,
+		"system volume information": true,
+		"boot":                      true,
+		"users":                     true,
+		"programdata":               true,
+		"microsoft":                 true,
+		"windowsapps":               true,
+		"wpsystem":                  true,
+		// Linux / Unix-специфичные
+		"proc": true,
+		"sys":  true,
+		"dev":  true,
+		"run":  true,
+		"tmp":  true,
+		"var":  true,
+		"etc":  true,
 	}
 
 	const maxDepth = 5 // /Steam/steamapps/common/Warhammer... 4 уровня, запас 5
@@ -313,7 +340,7 @@ func (app *App) searchGameOnDrives(roots []string, ctx context.Context, progress
 			if strings.HasPrefix(name, ".") || strings.HasPrefix(name, "$") {
 				continue
 			}
-			if ignoreDirs[name] {
+			if ignoreDirs[strings.ToLower(name)] {
 				continue
 			}
 

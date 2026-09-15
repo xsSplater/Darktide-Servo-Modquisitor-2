@@ -1,6 +1,6 @@
 //go:build windows
+// Servo-Modquisitor-2/register_nxm_windows.go
 
-// register_nxm_windows.go
 package main
 
 import (

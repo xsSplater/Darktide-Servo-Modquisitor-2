@@ -1,4 +1,4 @@
-// highcontrast.go
+// Servo-Modquisitor-2/themes/highcontrast.go
 package themes
 
 import (
@@ -159,6 +159,26 @@ func (t HighContrastTheme) Color(name fyne.ThemeColorName, variant fyne.ThemeVar
 		return color.NRGBA{R: 0, G: 0, B: 0, A: 255}
 	case ColorButtonStrokeImage:
 		return color.NRGBA{R: 0, G: 0, B: 0, A: 150}
+
+	// ──────────────── Верхнее меню ────────────────
+	case theme.ColorNameMenuBarAccent:
+		return color.NRGBA{R: 0, G: 0, B: 0, A: 255}
+	case theme.ColorNameMenuBarActiveBg:
+		return color.NRGBA{R: 255, G: 165, B: 0, A: 0x33}
+	case theme.ColorNameMenuBarHoverBg:
+		return color.NRGBA{R: 255, G: 165, B: 0, A: 0x1A}
+
+	// ──────────────── Меню ────────────────
+	case theme.ColorNameMenuBorder:
+		return color.NRGBA{R: 0, G: 0, B: 0, A: 0xFF}
+	case theme.ColorNameMenuItemActiveBorder:
+		return color.NRGBA{R: 0, G: 0, B: 0, A: 0xFF}
+	case theme.ColorNameMenuItemDanger:
+		return color.NRGBA{R: 255, G: 0, B: 0, A: 0xFF}
+	case theme.ColorNameMenuItemHeader:
+		return color.NRGBA{R: 0, G: 0, B: 0, A: 0xFF}
+	case theme.ColorNameMenuItemHeaderBg:
+		return color.NRGBA{R: 200, G: 200, B: 200, A: 0xFF}
 
 	default:
 		return theme.DefaultTheme().Color(name, variant)

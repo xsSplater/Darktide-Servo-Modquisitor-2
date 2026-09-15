@@ -1,9 +1,8 @@
-// checks.go
+// Servo-Modquisitor-2/checks/checks.go
 package checks
 
 import (
 	"Servo-Modquisitor/helpers"
-
 	"bufio"
 	"bytes"
 	"encoding/json"
@@ -12,6 +11,8 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+	"sync"
+	"sync/atomic"
 	"time"
 
 	"fyne.io/fyne/v2"
@@ -41,24 +42,53 @@ var loadOrderHeaderPhrases = []string{
 }
 
 var (
-	appendLog        func(string)
-	messages         *map[string]string
+	appendLog func(string)
+	// msgGetter безопасно читает перевод по ключу — обычно указывает
+	// на App.msg, работающий через atomic.Pointer. Так checks не
+	// держит указатель на map, которую App подменяет целиком.
+	msgGetter        func(string) string
 	showChoiceDialog func(fyne.Window, string, string, ...string) int
 	openURL          func(string)
 	modsDir          string
 	isModActiveFunc  func(string) bool
 	modDBMap         map[string]*ModDBEntry
+	modDBMutex       sync.RWMutex // защищает modDBMap
 	externalVersion  string
+	extVersionMutex  sync.RWMutex // защищает externalVersion
 	getInstalledAt   func(string) int64
 
-	// ПРОФИЛИ: пути к данным
-	profileDataDir string // путь к папке профиля (mod_load_order.txt, nexus_versions.json)
-	globalDataDir  string // путь к глобальным данным (mod_database.json, mandatory_...)
+	// pathsMutex защищает modsDir, profileDataDir, globalDataDir.
+	// Порядок: pathsMutex — внутренний (вкладывается в modDBMutex,
+	// но не наоборот).
+	pathsMutex     sync.RWMutex
+	profileDataDir string
+	globalDataDir  string
 )
+
+// getModsDir возвращает путь к папке модов.
+func getModsDir() string {
+	pathsMutex.RLock()
+	defer pathsMutex.RUnlock()
+	return modsDir
+}
+
+// getProfileDataDir возвращает путь к папке данных активного профиля.
+func getProfileDataDir() string {
+	pathsMutex.RLock()
+	defer pathsMutex.RUnlock()
+	return profileDataDir
+}
+
+// getGlobalDataDir возвращает путь к папке глобальных данных.
+func getGlobalDataDir() string {
+	pathsMutex.RLock()
+	defer pathsMutex.RUnlock()
+	return globalDataDir
+}
 
 func InitGlobals(
 	logger func(string),
-	msg *map[string]string,
+	msgFn func(string) string,
 	dialogFunc func(fyne.Window, string, string, ...string) int,
 	urlOpener func(string),
 	modsDirPath string,
@@ -67,32 +97,59 @@ func InitGlobals(
 	installedAtGetter func(string) int64,
 ) {
 	appendLog = logger
-	messages = msg
+	if msgFn == nil {
+		msgFn = func(string) string { return "" }
+	}
+	msgGetter = msgFn
 	showChoiceDialog = dialogFunc
 	openURL = urlOpener
+
+	pathsMutex.Lock()
 	modsDir = modsDirPath
+	pathsMutex.Unlock()
+
 	isModActiveFunc = isActiveFn
 	refreshModListFunc = refreshFn
 	getInstalledAt = installedAtGetter
 }
 
-// SetProfileDataDir устанавливает путь к папке профиля для файлов состояния (порядок загрузки, кэш версий).
 func SetProfileDataDir(path string) {
+	pathsMutex.Lock()
 	profileDataDir = path
+	pathsMutex.Unlock()
 }
 
-// SetGlobalDataDir устанавливает путь к глобальной папке для общих файлов (база модов, правила).
 func SetGlobalDataDir(path string) {
+	pathsMutex.Lock()
 	globalDataDir = path
+	pathsMutex.Unlock()
 }
 
 var refreshModListFunc func()
 
-var currentLang string
+// currentLang хранит текущий код языка. Атомарный указатель, потому что
+// значение пишется из UI-потока (changeLanguage) и из фоновой инициализации
+// (loadDataAfterInit), а читается в GetIncompatibleDesc, WriteLoadOrderHeader
+// и askMissing.
+var currentLang atomic.Pointer[string]
 
-func SetLanguage(lang string) { currentLang = lang }
+// SetLanguage сохраняет код языка потокобезопасно.
+func SetLanguage(lang string) {
+	currentLang.Store(&lang)
+}
+
+// getCurrentLang возвращает текущий код языка. Если SetLanguage ещё не
+// вызывался, возвращает "en".
+func getCurrentLang() string {
+	if p := currentLang.Load(); p != nil {
+		return *p
+	}
+	return "en"
+}
 
 func SetModDatabase(entries []ModDBEntry) {
+	modDBMutex.Lock()
+	defer modDBMutex.Unlock()
 	modDBMap = make(map[string]*ModDBEntry, len(entries))
 	for i := range entries {
 		modDBMap[strings.ToLower(entries[i].Folder)] = &entries[i]
@@ -106,10 +163,10 @@ type LoadOrderRule struct {
 
 var LoadOrderRules []LoadOrderRule
 
-func ModsDir() string { return modsDir }
+func ModsDir() string { return getModsDir() }
 
 func FolderExists(name string) bool {
-	info, err := os.Stat(filepath.Join(modsDir, name))
+	info, err := os.Stat(filepath.Join(getModsDir(), name))
 	if os.IsNotExist(err) {
 		return false
 	}
@@ -117,7 +174,7 @@ func FolderExists(name string) bool {
 }
 
 func RemoveMod(name string) {
-	path := filepath.Join(modsDir, name)
+	path := filepath.Join(getModsDir(), name)
 	info, err := os.Lstat(path)
 	if err != nil {
 		return
@@ -131,10 +188,11 @@ func RemoveMod(name string) {
 
 func ListModFolders() []string {
 	var folders []string
-	entries, err := os.ReadDir(modsDir)
+	dir := getModsDir()
+	entries, err := os.ReadDir(dir)
 	if err != nil {
 		if appendLog != nil {
-			appendLog(fmt.Sprintf((*messages)["log_error_reading_mods_dir"], err))
+			appendLog(fmt.Sprintf(msgGetter("log_error_reading_mods_dir"), err))
 		}
 		return folders
 	}
@@ -144,7 +202,7 @@ func ListModFolders() []string {
 			continue
 		}
 		if e.Type()&(os.ModeSymlink|os.ModeIrregular) != 0 {
-			info, err := os.Stat(filepath.Join(modsDir, e.Name()))
+			info, err := os.Stat(filepath.Join(dir, e.Name()))
 			if err == nil && info.IsDir() {
 				folders = append(folders, e.Name())
 			}
@@ -197,74 +255,74 @@ type ModDBEntry struct {
 	Note             map[string]string `json:"note"`
 }
 
+// JoinNotes склеивает непустые заметки через разделитель " · ".
+// Пустые игнорируются, полностью пустой результат — пустая строка.
+//
+// Используется там, где два независимых источника текста должны
+// сосуществовать (например, структурная причина отключения мода по
+// имени папки + свободная заметка из mod_database.json, или заметка
+// + пометка о конфликте). Раньше прямое присваивание / конкатенация
+// без разделителя затирали или склеивали текст.
+func JoinNotes(parts ...string) string {
+	var nonEmpty []string
+	for _, p := range parts {
+		if p = strings.TrimSpace(p); p != "" {
+			nonEmpty = append(nonEmpty, p)
+		}
+	}
+	return strings.Join(nonEmpty, " · ")
+}
+
 func GetModsInfo(lang string, forceEnglish bool) []ModInfo {
+	modDBMutex.RLock()
+	defer modDBMutex.RUnlock()
+
+	modsPath := getModsDir() // снимок на функцию
 	folders := ListModFolders()
 	var mods []ModInfo
 
+	// 1. Читаем файл порядка
 	loadOrderEntries := ReadLoadOrder()
-	if loadOrderEntries != nil {
-		existing := make(map[string]bool)
-		for _, name := range folders {
-			existing[name] = true
-		}
-		for _, entry := range loadOrderEntries {
-			if existing[entry.Name] {
-				continue
-			}
-			if entry.Name == "base" || entry.Name == "dmf" {
-				continue
-			}
-			mod := ModInfo{
-				Name:          entry.Name,
-				Active:        entry.Active,
-				MissingFolder: true,
-				ModTime:       time.Time{},
-			}
-			if db, ok := modDBMap[strings.ToLower(entry.Name)]; ok && db.Folder != "" {
-				mod.Author = db.Author
-				mod.URL = db.URL
-				mod.GitHubURL = db.GitHubURL
-				mod.Category = db.Category
-				mod.Description = PickLocalized(db.Description, lang)
-				mod.Note = PickLocalized(db.Note, lang)
-				if forceEnglish {
-					if enName := PickLocalized(db.Name, "en"); enName != "" {
-						mod.DisplayName = enName
-					}
-				} else {
-					if dn := PickLocalized(db.Name, lang); dn != "" {
-						mod.DisplayName = dn
-					}
-				}
-			}
-			mods = append(mods, mod)
-		}
+	orderMap := make(map[string]bool)
+	for _, entry := range loadOrderEntries {
+		orderMap[entry.Name] = entry.Active
 	}
 
+	// 2. Создаём записи для всех папок
 	for _, name := range folders {
-		fullPath := filepath.Join(modsDir, name)
+		fullPath := filepath.Join(modsPath, name)
 		fi, err := os.Stat(fullPath)
 		if err != nil {
 			continue
 		}
 		mod := ModInfo{Name: name, Active: true}
 
-		switch name {
-		case "base", "dmf":
-			mod.IsSystem = true
+		// Применяем активность из файла порядка
+		if active, ok := orderMap[name]; ok {
+			mod.Active = active
+		} else {
+			// Если мода нет в файле порядка, он считается неактивным
 			mod.Active = false
 		}
 
-		if messages != nil {
+		// Определяем системные моды
+		switch name {
+		case "base", "dmf":
+			mod.IsSystem = true
+			mod.Active = false // системные моды всегда неактивны (они не управляются через порядок)
+		}
+
+		// Обработка префиксов для неактивных модов
+		if msgGetter != nil {
 			if strings.HasPrefix(name, "_") || strings.HasPrefix(name, "__") {
 				mod.Active = false
-				mod.Note = (*messages)["note_disabled_prefix"]
+				mod.Note = msgGetter("note_disabled_prefix")
 			} else if strings.HasPrefix(name, "--") {
 				mod.Active = false
-				mod.Note = (*messages)["note_disabled_prefix_double"]
+				mod.Note = msgGetter("note_disabled_prefix_double")
 			} else if strings.Contains(name, " - Copy") || strings.Contains(name, " — копия") {
 				mod.Active = false
-				mod.Note = (*messages)["note_backup_copy"]
+				mod.Note = msgGetter("note_backup_copy")
 			}
 		}
 
@@ -275,6 +333,7 @@ func GetModsInfo(lang string, forceEnglish bool) []ModInfo {
 
 		mod.VortexDeployed = fileExists(filepath.Join(fullPath, "__folder_managed_by_vortex"))
 
+		// Определяем cacheKey для получения даты установки и версии
 		var cacheKey string
 		switch name {
 		case "base":
@@ -339,12 +398,17 @@ func GetModsInfo(lang string, forceEnglish bool) []ModInfo {
 			}
 		}
 
+		// Заполняем поля из базы данных
 		if db, ok := modDBMap[strings.ToLower(name)]; ok && db.Folder != "" {
 			mod.Author = db.Author
 			mod.URL = db.URL
 			mod.GitHubURL = db.GitHubURL
 			mod.Description = PickLocalized(db.Description, lang)
-			mod.Note = PickLocalized(db.Note, lang)
+			// Не перезаписываем Note: если выше уже проставлена
+			// структурная причина (disabled-префикс, копия), она
+			// должна сохраниться. joinNotes склеивает обе заметки
+			// через разделитель, сохраняя порядок (структурная — первая).
+			mod.Note = JoinNotes(mod.Note, PickLocalized(db.Note, lang))
 			if forceEnglish {
 				if enName := PickLocalized(db.Name, "en"); enName != "" {
 					mod.DisplayName = enName
@@ -358,17 +422,50 @@ func GetModsInfo(lang string, forceEnglish bool) []ModInfo {
 		if mod.Description == "" {
 			mod.Description = tryReadLocalization(name)
 		}
+
 		mods = append(mods, mod)
 	}
 
-	if _, err := os.Stat(filepath.Join(modsDir, "..", "binaries", "plugins", "_dt_mod_autopatch.dll")); err == nil {
+	// 3. Добавляем записи из файла порядка для отсутствующих папок
+	for _, entry := range loadOrderEntries {
+		if !containsFolder(folders, entry.Name) {
+			mod := ModInfo{
+				Name:          entry.Name,
+				Active:        entry.Active,
+				MissingFolder: true,
+				ModTime:       time.Time{},
+			}
+			// Заполняем из базы данных
+			if db, ok := modDBMap[strings.ToLower(entry.Name)]; ok && db.Folder != "" {
+				mod.Author = db.Author
+				mod.URL = db.URL
+				mod.GitHubURL = db.GitHubURL
+				mod.Category = db.Category
+				mod.Description = PickLocalized(db.Description, lang)
+				mod.Note = PickLocalized(db.Note, lang)
+				if forceEnglish {
+					if enName := PickLocalized(db.Name, "en"); enName != "" {
+						mod.DisplayName = enName
+					}
+				} else {
+					if dn := PickLocalized(db.Name, lang); dn != "" {
+						mod.DisplayName = dn
+					}
+				}
+			}
+			mods = append(mods, mod)
+		}
+	}
+
+	// 4. Добавляем системный мод autopatch (если установлен)
+	autopatchDLL := filepath.Join(modsPath, "..", "binaries", "plugins", "_dt_mod_autopatch.dll")
+	if _, err := os.Stat(autopatchDLL); err == nil {
 		mod := ModInfo{
 			Name:     "autopatch",
 			IsSystem: true,
 			Active:   false,
 		}
-		dllPath := filepath.Join(modsDir, "..", "binaries", "plugins", "_dt_mod_autopatch.dll")
-		mod.ModTime = getModTimeFromFile(dllPath)
+		mod.ModTime = getModTimeFromFile(autopatchDLL)
 
 		if db, ok := modDBMap["autopatch"]; ok && db.Folder != "" {
 			mod.Author = db.Author
@@ -388,6 +485,7 @@ func GetModsInfo(lang string, forceEnglish bool) []ModInfo {
 		}
 		mods = append(mods, mod)
 	}
+
 	return mods
 }
 
@@ -416,10 +514,10 @@ func TryFixMismatchedModFolder(folderPath, currentName string) string {
 	}
 	newPath := filepath.Join(filepath.Dir(folderPath), expectedName)
 	if err := os.Rename(folderPath, newPath); err != nil {
-		appendLog(fmt.Sprintf("Failed to auto-rename folder %s -> %s: %v", currentName, expectedName, err))
+		appendLog(fmt.Sprintf(msgGetter("log_failed_to_autorename"), currentName, expectedName, err))
 		return ""
 	}
-	appendLog(fmt.Sprintf("Auto-renamed mismatched mod folder: %s -> %s", currentName, expectedName))
+	appendLog(fmt.Sprintf(msgGetter("log_failed_to_autorename_mis"), currentName, expectedName))
 	return expectedName
 }
 
@@ -429,7 +527,7 @@ func fileExists(path string) bool {
 }
 
 func tryReadLocalization(modName string) string {
-	dir := filepath.Join(modsDir, modName)
+	dir := filepath.Join(getModsDir(), modName)
 	entries, err := os.ReadDir(dir)
 	if err != nil {
 		return ""
@@ -462,12 +560,12 @@ type LoadOrderEntry struct {
 	Active bool
 }
 
-// Читает mod_load_order.txt из папки профиля/mods
 func ReadLoadOrder() []LoadOrderEntry {
-	if profileDataDir == "" {
+	dir := getProfileDataDir()
+	if dir == "" {
 		return nil
 	}
-	data, err := os.ReadFile(filepath.Join(profileDataDir, "mods", FileNameLoadOrder))
+	data, err := os.ReadFile(filepath.Join(dir, "mods", FileNameLoadOrder))
 	if err != nil {
 		return nil
 	}
@@ -514,17 +612,17 @@ func ReadLoadOrder() []LoadOrderEntry {
 	return entries
 }
 
-// Пишет mod_load_order.txt в папку профиля/mods
 func WriteLoadOrder(entries []LoadOrderEntry) error {
-	if profileDataDir == "" {
+	dir := getProfileDataDir()
+	if dir == "" {
 		return fmt.Errorf("profile data directory not set")
 	}
-	f, err := os.Create(filepath.Join(profileDataDir, "mods", FileNameLoadOrder))
+	f, err := os.Create(filepath.Join(dir, "mods", FileNameLoadOrder))
 	if err != nil {
 		return err
 	}
 	defer f.Close()
-	WriteLoadOrderHeader(f, currentLang)
+	WriteLoadOrderHeader(f, getCurrentLang())
 	for _, e := range entries {
 		if e.Active {
 			fmt.Fprintln(f, e.Name)
@@ -546,6 +644,7 @@ func UpdateModActive(entries []LoadOrderEntry, modName string, active bool) []Lo
 }
 
 var (
+	checksDataMutex   sync.RWMutex // Решение гонки 79
 	ObsoleteMods      []string
 	IncompatiblePairs []IncompatiblePair
 	Dependencies      []Dependency
@@ -569,12 +668,12 @@ type IncompatiblePair struct {
 }
 type Dependency struct{ Dependent, Required, RequiredURL string }
 
-// Загружает mandatory_obsolete_incompatible_dependencies.json из глобальной папки
 func LoadExternalLists(filename string) error {
-	if globalDataDir == "" {
+	dir := getGlobalDataDir()
+	if dir == "" {
 		return fmt.Errorf("global data directory not set")
 	}
-	fullPath := filepath.Join(globalDataDir, filename)
+	fullPath := filepath.Join(dir, filename)
 	data, err := os.ReadFile(fullPath)
 	if err != nil {
 		return fmt.Errorf("cannot read %s: %w", fullPath, err)
@@ -618,18 +717,28 @@ func LoadExternalLists(filename string) error {
 		}
 		return fmt.Errorf("cannot unmarshal %s: %w", fullPath, err)
 	}
+	extVersionMutex.Lock()
 	externalVersion = ext.Version
+	extVersionMutex.Unlock()
+	checksDataMutex.Lock() // Решение гонки 79
 	ObsoleteMods = ext.ObsoleteMods
 	IncompatiblePairs = ext.IncompatiblePairs
 	Dependencies = ext.Dependencies
 	LoadOrderRules = ext.LoadOrder
 	MandatoryOrder = ext.MandatoryOrder
+	checksDataMutex.Unlock()
 	return nil
 }
 
-func GetExternalVersion() string { return externalVersion }
+func GetExternalVersion() string {
+	extVersionMutex.RLock()
+	defer extVersionMutex.RUnlock()
+	return externalVersion
+}
 
 func IsMandatoryMod(name string) bool {
+	checksDataMutex.RLock() // Решение гонки 79
+	defer checksDataMutex.RUnlock()
 	for _, m := range MandatoryOrder {
 		if m == name {
 			return true
@@ -640,38 +749,38 @@ func IsMandatoryMod(name string) bool {
 
 func CheckInstallation(window fyne.Window) bool {
 	if !FolderExistsWithTimeout("base", 3*time.Second) {
-		appendLog((*messages)["log_warn_base_missing"])
+		appendLog(msgGetter("log_warn_base_missing"))
 		return askMissing("base", "DML", "Darktide Mod Loader", "https://www.nexusmods.com/warhammer40kdarktide/mods/19", window)
 	}
 	if !FolderExistsWithTimeout("dmf", 3*time.Second) {
-		appendLog((*messages)["dmf_missing"])
+		appendLog(msgGetter("dmf_missing"))
 		return askMissing("dmf", "DMF", "Darktide Mod Framework", "https://www.nexusmods.com/warhammer40kdarktide/mods/8", window)
 	}
-	appendLog((*messages)["step_install"])
+	appendLog(msgGetter("step_install"))
 	return true
 }
 
 func askMissing(folder, modAbbr, modName, nexusURL string, window fyne.Window) bool {
-	choice := showChoiceDialog(window, (*messages)["window_error_title"],
-		fmt.Sprintf((*messages)["window_error_dsc_dml_dmf"], folder, modName),
-		(*messages)["btn_open_steam_guide"],
-		fmt.Sprintf((*messages)["btn_open_nexus_for_mod"], modAbbr),
-		(*messages)["open_mods_folder"],
-		(*messages)["btn_cancel"],
+	choice := showChoiceDialog(window, msgGetter("window_error_title"),
+		fmt.Sprintf(msgGetter("window_error_dsc_dml_dmf"), folder, modName),
+		msgGetter("btn_open_steam_guide"),
+		fmt.Sprintf(msgGetter("btn_open_nexus_for_mod"), modAbbr),
+		msgGetter("open_mods_folder"),
+		msgGetter("btn_cancel"),
 	)
 	switch choice {
 	case 0:
-		appendLog((*messages)["log_open_steam_guide"])
+		appendLog(msgGetter("log_open_steam_guide"))
 		guideURL := steamGuideEnURL
-		if currentLang == "ru" {
+		if getCurrentLang() == "ru" {
 			guideURL = steamGuideRuURL
 		}
 		openURL(guideURL)
 	case 1:
-		appendLog((*messages)["log_open_nexus_page"])
+		appendLog(msgGetter("log_open_nexus_page"))
 		openURL(nexusURL)
 	case 2:
-		appendLog((*messages)["log_open_mods_folder"])
+		appendLog(msgGetter("log_open_mods_folder"))
 		openURL("file://" + filepath.ToSlash(modsDir))
 	case 3:
 		return false
@@ -680,17 +789,17 @@ func askMissing(folder, modAbbr, modName, nexusURL string, window fyne.Window) b
 }
 
 func EnsureModLoadOrder(window fyne.Window) {
-	path := filepath.Join(modsDir, FileNameLoadOrder)
+	path := filepath.Join(getModsDir(), FileNameLoadOrder)
 	if _, err := os.Stat(path); os.IsNotExist(err) {
-		appendLog((*messages)["window_error_dsc_mlo_mis"])
-		choice := showChoiceDialog(window, (*messages)["window_error_title"],
-			(*messages)["window_error_dsc_mlo_mis"],
-			(*messages)["btn_create_new"],
-			(*messages)["btn_quit"],
+		appendLog(msgGetter("window_error_dsc_mlo_mis"))
+		choice := showChoiceDialog(window, msgGetter("window_error_title"),
+			msgGetter("window_error_dsc_mlo_mis"),
+			msgGetter("btn_create_new"),
+			msgGetter("btn_quit"),
 		)
 		if choice == 0 {
 			os.WriteFile(path, []byte{}, 0644)
-			appendLog((*messages)["mod_load_order_created"])
+			appendLog(msgGetter("mod_load_order_created"))
 		} else {
 			os.Exit(0)
 		}
@@ -707,27 +816,34 @@ func isDisabledByNaming(name string) bool {
 	return false
 }
 
+// Решение гонки 79
 func CheckObsoleteMods(window fyne.Window) bool {
+	// Копируем список устаревших модов под защитой мьютекса
+	checksDataMutex.RLock()
+	obsoleteCopy := make([]string, len(ObsoleteMods))
+	copy(obsoleteCopy, ObsoleteMods)
+	checksDataMutex.RUnlock()
+
 	var found []string
-	for _, mod := range ObsoleteMods {
+	for _, mod := range obsoleteCopy {
 		if FolderExists(mod) && !isDisabledByNaming(mod) {
 			found = append(found, mod)
 		}
 	}
 	if len(found) == 0 {
-		appendLog((*messages)["no_obsolete_found"])
+		appendLog(msgGetter("no_obsolete_found"))
 		return true
 	}
-	appendLog(fmt.Sprintf((*messages)["obsolete_found_list"], strings.Join(found, ", ")))
-	choice := showChoiceDialog(window, (*messages)["obsolete_title"],
-		(*messages)["obsolete_message"]+"\n\n"+strings.Join(found, "\n"),
-		(*messages)["skip"],
-		(*messages)["delete_obsolete"],
+	appendLog(fmt.Sprintf(msgGetter("obsolete_found_list"), strings.Join(found, ", ")))
+	choice := showChoiceDialog(window, msgGetter("obsolete_title"),
+		msgGetter("obsolete_message")+"\n\n"+strings.Join(found, "\n"),
+		msgGetter("skip"),
+		msgGetter("delete_obsolete"),
 	)
 	if choice == 1 {
 		for _, mod := range found {
 			RemoveMod(mod)
-			appendLog(fmt.Sprintf((*messages)["deleted_mod"], mod))
+			appendLog(fmt.Sprintf(msgGetter("deleted_mod"), mod))
 		}
 	}
 	return true
@@ -744,20 +860,20 @@ func CheckMalformed(window fyne.Window) bool {
 		}
 	}
 	if len(malformed) == 0 {
-		appendLog((*messages)["no_malformed_found"])
+		appendLog(msgGetter("no_malformed_found"))
 		return true
 	}
-	appendLog(fmt.Sprintf((*messages)["malformed_found_list"], strings.Join(malformed, ", ")))
-	choice := showChoiceDialog(window, (*messages)["window_error_title"],
-		(*messages)["window_error_dsc_mlfrmd"]+"\n\n"+strings.Join(malformed, "\n")+"\n\n"+(*messages)["window_error_dsc_mlfrmd2"],
-		(*messages)["skip"],
-		(*messages)["btn_fix_malformed"],
+	appendLog(fmt.Sprintf(msgGetter("malformed_found_list"), strings.Join(malformed, ", ")))
+	choice := showChoiceDialog(window, msgGetter("window_error_title"),
+		msgGetter("window_error_dsc_mlfrmd")+"\n\n"+strings.Join(malformed, "\n")+"\n\n"+msgGetter("window_error_dsc_mlfrmd2"),
+		msgGetter("skip"),
+		msgGetter("btn_fix_malformed"),
 	)
 	if choice == 1 {
 		for _, wrapper := range malformed {
 			fixWrapper(wrapper)
 		}
-		appendLog((*messages)["log_succ_malformed_fixed"])
+		appendLog(msgGetter("log_succ_malformed_fixed"))
 	}
 	return true
 }
@@ -766,7 +882,7 @@ func isLikelyWrapper(folderName string) bool {
 	if isDisabledByNaming(folderName) {
 		return false
 	}
-	fullPath := filepath.Join(modsDir, folderName)
+	fullPath := filepath.Join(getModsDir(), folderName)
 	if folderName == "base" || folderName == "dmf" {
 		return false
 	}
@@ -790,7 +906,8 @@ func isLikelyWrapper(folderName string) bool {
 }
 
 func fixWrapper(wrapper string) {
-	fullWrapper := filepath.Join(modsDir, wrapper)
+	dir := getModsDir()
+	fullWrapper := filepath.Join(dir, wrapper)
 	entries, err := os.ReadDir(fullWrapper)
 	if err != nil || len(entries) == 0 {
 		return
@@ -806,13 +923,13 @@ func fixWrapper(wrapper string) {
 		return
 	}
 	innerPath := filepath.Join(fullWrapper, innerName)
-	targetPath := filepath.Join(modsDir, innerName)
+	targetPath := filepath.Join(dir, innerName)
 	if FolderExists(innerName) {
 		os.RemoveAll(targetPath)
 	}
 	os.Rename(innerPath, targetPath)
 	os.RemoveAll(fullWrapper)
-	appendLog(fmt.Sprintf((*messages)["fixed_wrapper"], wrapper, innerName))
+	appendLog(fmt.Sprintf(msgGetter("fixed_wrapper"), wrapper, innerName))
 }
 
 func CheckBrokenMods(window fyne.Window) bool {
@@ -821,7 +938,7 @@ func CheckBrokenMods(window fyne.Window) bool {
 		if folder == "base" || folder == "dmf" || isDisabledByNaming(folder) {
 			continue
 		}
-		fullPath := filepath.Join(modsDir, folder)
+		fullPath := filepath.Join(getModsDir(), folder)
 		entries, err := os.ReadDir(fullPath)
 		if err != nil {
 			continue
@@ -838,19 +955,19 @@ func CheckBrokenMods(window fyne.Window) bool {
 		}
 	}
 	if len(broken) == 0 {
-		appendLog((*messages)["no_broken_found"])
+		appendLog(msgGetter("no_broken_found"))
 		return true
 	}
-	appendLog(fmt.Sprintf((*messages)["broken_found_list"], strings.Join(broken, ", ")))
-	choice := showChoiceDialog(window, (*messages)["broken_title"],
-		(*messages)["broken_message"]+"\n\n"+strings.Join(broken, "\n"),
-		(*messages)["skip"],
-		(*messages)["delete_broken"],
+	appendLog(fmt.Sprintf(msgGetter("broken_found_list"), strings.Join(broken, ", ")))
+	choice := showChoiceDialog(window, msgGetter("broken_title"),
+		msgGetter("broken_message")+"\n\n"+strings.Join(broken, "\n"),
+		msgGetter("skip"),
+		msgGetter("delete_broken"),
 	)
 	if choice == 1 {
 		for _, mod := range broken {
 			RemoveMod(mod)
-			appendLog(fmt.Sprintf((*messages)["deleted_mod"], mod))
+			appendLog(fmt.Sprintf(msgGetter("deleted_mod"), mod))
 		}
 	}
 	return true
@@ -870,7 +987,7 @@ func AutoFixMalformed() {
 func CheckEmptyFolders(window fyne.Window) bool {
 	var empty []string
 	for _, folder := range ListModFolders() {
-		fullPath := filepath.Join(modsDir, folder)
+		fullPath := filepath.Join(getModsDir(), folder)
 		if fileExists(filepath.Join(fullPath, "__folder_managed_by_vortex")) || isDisabledByNaming(folder) {
 			continue
 		}
@@ -883,29 +1000,36 @@ func CheckEmptyFolders(window fyne.Window) bool {
 		}
 	}
 	if len(empty) == 0 {
-		appendLog((*messages)["no_empty_found"])
+		appendLog(msgGetter("no_empty_found"))
 		return true
 	}
-	appendLog(fmt.Sprintf((*messages)["empty_found_list"], strings.Join(empty, ", ")))
-	choice := showChoiceDialog(window, (*messages)["empty_folder_title"],
-		(*messages)["empty_folder_message"]+"\n\n"+strings.Join(empty, "\n"),
-		(*messages)["skip"],
-		(*messages)["delete_empty"],
+	appendLog(fmt.Sprintf(msgGetter("empty_found_list"), strings.Join(empty, ", ")))
+	choice := showChoiceDialog(window, msgGetter("empty_folder_title"),
+		msgGetter("empty_folder_message")+"\n\n"+strings.Join(empty, "\n"),
+		msgGetter("skip"),
+		msgGetter("delete_empty"),
 	)
 	if choice == 1 {
+		dir := getModsDir()
 		for _, folder := range empty {
-			os.RemoveAll(filepath.Join(modsDir, folder))
-			appendLog(fmt.Sprintf((*messages)["deleted_empty_folder"], folder))
+			os.RemoveAll(filepath.Join(dir, folder))
 		}
 	}
 	return true
 }
 
+// Решение гонки 79
 func CheckIncompatible(window fyne.Window) bool {
+	// Копируем список несовместимых пар под защитой мьютекса
+	checksDataMutex.RLock()
+	pairsCopy := make([]IncompatiblePair, len(IncompatiblePairs))
+	copy(pairsCopy, IncompatiblePairs)
+	checksDataMutex.RUnlock()
+
 	skipped := make(map[string]bool)
 	for {
 		var found *IncompatiblePair
-		for _, pair := range IncompatiblePairs {
+		for _, pair := range pairsCopy {
 			if FolderExists(pair.Mod1) && FolderExists(pair.Mod2) &&
 				isModActiveFunc != nil && isModActiveFunc(pair.Mod1) && isModActiveFunc(pair.Mod2) {
 				key := pairKey(pair)
@@ -917,31 +1041,31 @@ func CheckIncompatible(window fyne.Window) bool {
 			}
 		}
 		if found == nil {
-			appendLog((*messages)["no_incompatible_found"])
+			appendLog(msgGetter("no_incompatible_found"))
 			return true
 		}
-		appendLog(fmt.Sprintf((*messages)["incompatible_found_list"], found.Mod1, found.Mod2) + " - " + GetIncompatibleDesc(found.Mod1, found.Mod2))
+		appendLog(fmt.Sprintf(msgGetter("incompatible_found_list"), found.Mod1, found.Mod2) + " - " + GetIncompatibleDesc(found.Mod1, found.Mod2))
 
-		choice := showChoiceDialog(window, (*messages)["incompatible_title"],
-			fmt.Sprintf((*messages)["incompatible_desc"], found.Mod1, found.Mod2)+"\n"+GetIncompatibleDesc(found.Mod1, found.Mod2),
-			(*messages)["skip"],
-			fmt.Sprintf((*messages)["delete_first"], found.Mod1),
-			fmt.Sprintf((*messages)["delete_second"], found.Mod2),
-			(*messages)["skip_all"],
+		choice := showChoiceDialog(window, msgGetter("incompatible_title"),
+			fmt.Sprintf(msgGetter("incompatible_desc"), found.Mod1, found.Mod2)+"\n"+GetIncompatibleDesc(found.Mod1, found.Mod2),
+			msgGetter("skip"),
+			fmt.Sprintf(msgGetter("delete_first"), found.Mod1),
+			fmt.Sprintf(msgGetter("delete_second"), found.Mod2),
+			msgGetter("skip_all"),
 		)
 		switch choice {
 		case 0:
 			skipped[pairKey(*found)] = true
 		case 1:
 			RemoveMod(found.Mod1)
-			appendLog(fmt.Sprintf((*messages)["deleted_mod"], found.Mod1))
+			appendLog(fmt.Sprintf(msgGetter("deleted_mod"), found.Mod1))
 			if refreshModListFunc != nil {
 				refreshModListFunc()
 			}
 			time.Sleep(100 * time.Millisecond)
 		case 2:
 			RemoveMod(found.Mod2)
-			appendLog(fmt.Sprintf((*messages)["deleted_mod"], found.Mod2))
+			appendLog(fmt.Sprintf(msgGetter("deleted_mod"), found.Mod2))
 			if refreshModListFunc != nil {
 				refreshModListFunc()
 			}
@@ -960,9 +1084,15 @@ func pairKey(pair IncompatiblePair) string {
 }
 
 func CheckDependencies(window fyne.Window) bool {
+	// Копируем список зависимостей под защитой мьютекса
+	checksDataMutex.RLock()
+	depsCopy := make([]Dependency, len(Dependencies))
+	copy(depsCopy, Dependencies)
+	checksDataMutex.RUnlock()
+
 	for {
 		var found *Dependency
-		for _, dep := range Dependencies {
+		for _, dep := range depsCopy {
 			if isModActiveFunc != nil && isModActiveFunc(dep.Dependent) && !isModActiveFunc(dep.Required) {
 				d := dep
 				found = &d
@@ -970,15 +1100,15 @@ func CheckDependencies(window fyne.Window) bool {
 			}
 		}
 		if found == nil {
-			appendLog((*messages)["no_dependency_issues"])
+			appendLog(msgGetter("no_dependency_issues"))
 			return true
 		}
-		appendLog(fmt.Sprintf((*messages)["dependency_error_list"], found.Dependent, found.Required))
-		choice := showChoiceDialog(window, (*messages)["dependency_title"],
-			fmt.Sprintf((*messages)["dependency_desc"], found.Dependent, found.Required),
-			(*messages)["skip"],
-			fmt.Sprintf((*messages)["open_required_page"], found.Required),
-			fmt.Sprintf((*messages)["delete_dependent"], found.Dependent),
+		appendLog(fmt.Sprintf(msgGetter("dependency_error_list"), found.Dependent, found.Required))
+		choice := showChoiceDialog(window, msgGetter("dependency_title"),
+			fmt.Sprintf(msgGetter("dependency_desc"), found.Dependent, found.Required),
+			msgGetter("skip"),
+			fmt.Sprintf(msgGetter("open_required_page"), found.Required),
+			fmt.Sprintf(msgGetter("delete_dependent"), found.Dependent),
 		)
 		switch choice {
 		case 1:
@@ -986,7 +1116,7 @@ func CheckDependencies(window fyne.Window) bool {
 			return false
 		case 2:
 			RemoveMod(found.Dependent)
-			appendLog(fmt.Sprintf((*messages)["deleted_mod"], found.Dependent))
+			appendLog(fmt.Sprintf(msgGetter("deleted_mod"), found.Dependent))
 			if refreshModListFunc != nil {
 				refreshModListFunc()
 			}
@@ -1015,22 +1145,30 @@ func PickLocalized(tr map[string]string, lang string) string {
 	return ""
 }
 
+// Решение гонки 79
 func GetIncompatibleDesc(mod1, mod2 string) string {
-	for _, pair := range IncompatiblePairs {
+	// Копируем список пар под защитой мьютекса
+	checksDataMutex.RLock()
+	pairsCopy := make([]IncompatiblePair, len(IncompatiblePairs))
+	copy(pairsCopy, IncompatiblePairs)
+	checksDataMutex.RUnlock()
+
+	lang := getCurrentLang() // один снимок на функцию
+	for _, pair := range pairsCopy {
 		if (pair.Mod1 == mod1 && pair.Mod2 == mod2) || (pair.Mod1 == mod2 && pair.Mod2 == mod1) {
 			if pair.Desc != nil {
-				if desc := PickLocalized(pair.Desc, currentLang); desc != "" {
+				if desc := PickLocalized(pair.Desc, lang); desc != "" {
 					return desc
 				}
 			}
-			name1 := getDisplayName(mod1, currentLang)
-			name2 := getDisplayName(mod2, currentLang)
+			name1 := getDisplayName(mod1, lang)
+			name2 := getDisplayName(mod2, lang)
 			templateKey := "conflict_template_includes"
 			if pair.Type == "same" || pair.Type == "do_the_same" {
 				templateKey = "conflict_template_same"
 			}
-			if messages != nil {
-				if tmpl, ok := (*messages)[templateKey]; ok {
+			if msgGetter != nil {
+				if tmpl := msgGetter(templateKey); tmpl != "" {
 					return strings.ReplaceAll(strings.ReplaceAll(tmpl, "{mod1}", name1), "{mod2}", name2)
 				}
 			}
@@ -1051,26 +1189,28 @@ func IsAMLInstalled(modsDir string) bool {
 }
 
 func WriteLoadOrderHeader(f *os.File, lang string) {
-	fmt.Fprintln(f, (*messages)["load_order_header_title"])
-	fmt.Fprintln(f, (*messages)["load_order_header_line1"])
-	fmt.Fprintln(f, (*messages)["load_order_header_rule1"])
-	fmt.Fprintln(f, (*messages)["load_order_header_rule1_1"])
-	fmt.Fprintln(f, (*messages)["load_order_header_rule2"])
-	fmt.Fprintln(f, (*messages)["load_order_header_rule2_1"])
-	fmt.Fprintln(f, (*messages)["load_order_header_rule3"])
-	fmt.Fprintln(f, (*messages)["load_order_header_rule3_1"])
-	fmt.Fprintln(f, (*messages)["load_order_header_rule4"])
-	fmt.Fprintln(f, (*messages)["load_order_header_rule4_1"])
-	fmt.Fprintln(f, (*messages)["load_order_header_rule5"])
-	fmt.Fprintln(f, (*messages)["load_order_header_rule5_1"])
-	fmt.Fprintln(f, (*messages)["load_order_header_discord"])
-	fmt.Fprintln(f, (*messages)["load_order_header_nexus"])
-	fmt.Fprintln(f, (*messages)["load_order_header_footer1"])
-	fmt.Fprintln(f, (*messages)["load_order_header_footer2"])
+	fmt.Fprintln(f, msgGetter("load_order_header_title"))
+	fmt.Fprintln(f, msgGetter("load_order_header_line1"))
+	fmt.Fprintln(f, msgGetter("load_order_header_rule1"))
+	fmt.Fprintln(f, msgGetter("load_order_header_rule1_1"))
+	fmt.Fprintln(f, msgGetter("load_order_header_rule2"))
+	fmt.Fprintln(f, msgGetter("load_order_header_rule2_1"))
+	fmt.Fprintln(f, msgGetter("load_order_header_rule3"))
+	fmt.Fprintln(f, msgGetter("load_order_header_rule3_1"))
+	fmt.Fprintln(f, msgGetter("load_order_header_rule4"))
+	fmt.Fprintln(f, msgGetter("load_order_header_rule4_1"))
+	fmt.Fprintln(f, msgGetter("load_order_header_rule5"))
+	fmt.Fprintln(f, msgGetter("load_order_header_rule5_1"))
+	fmt.Fprintln(f, msgGetter("load_order_header_discord"))
+	fmt.Fprintln(f, msgGetter("load_order_header_nexus"))
+	fmt.Fprintln(f, msgGetter("load_order_header_footer1"))
+	fmt.Fprintln(f, msgGetter("load_order_header_footer2"))
 	fmt.Fprintln(f, "")
 }
 
 func GetNexusFilePattern(folder string) string {
+	modDBMutex.RLock()
+	defer modDBMutex.RUnlock()
 	if modDBMap == nil {
 		return ""
 	}
@@ -1080,42 +1220,66 @@ func GetNexusFilePattern(folder string) string {
 	return ""
 }
 
-// Сохраняет mod_database.json в глобальную папку
 func SaveModDatabase() error {
-	if globalDataDir == "" {
+	dir := getGlobalDataDir()
+	if dir == "" {
 		return fmt.Errorf("global data directory not set")
 	}
+	modDBMutex.RLock()
 	if modDBMap == nil {
+		modDBMutex.RUnlock()
 		return fmt.Errorf("mod database is empty")
 	}
 	if len(modDBMap) < 5 {
+		modDBMutex.RUnlock()
 		return fmt.Errorf("mod database has only %d entries, refusing to save (possible data loss)", len(modDBMap))
 	}
-	type modDatabaseFile struct {
-		Version string       `json:"version"`
-		Mods    []ModDBEntry `json:"mod_database"`
-	}
+	// Копируем данные для сохранения
 	var mods []ModDBEntry
 	for _, entry := range modDBMap {
 		mods = append(mods, *entry)
 	}
+	modDBMutex.RUnlock()
+
 	sort.Slice(mods, func(i, j int) bool {
 		return helpers.ExtractModIDFromURL(mods[i].URL) < helpers.ExtractModIDFromURL(mods[j].URL)
 	})
 
+	type modDatabaseFile struct {
+		Version string       `json:"version"`
+		Mods    []ModDBEntry `json:"mod_database"`
+	}
 	var buf bytes.Buffer
 	encoder := json.NewEncoder(&buf)
 	encoder.SetEscapeHTML(false)
 	encoder.SetIndent("", "\t")
-	err := encoder.Encode(modDatabaseFile{Version: externalVersion, Mods: mods})
+
+	extVersionMutex.RLock()
+	ver := externalVersion
+	extVersionMutex.RUnlock()
+
+	err := encoder.Encode(modDatabaseFile{Version: ver, Mods: mods})
 	if err != nil {
 		return err
 	}
-	path := filepath.Join(globalDataDir, "mod_database.json")
+	path := filepath.Join(dir, "mod_database.json")
 	return os.WriteFile(path, buf.Bytes(), 0644)
 }
 
 func GetModDBEntry(folder string) *ModDBEntry {
+	modDBMutex.RLock()
+	defer modDBMutex.RUnlock()
+	if modDBMap == nil {
+		return nil
+	}
+	return modDBMap[strings.ToLower(folder)]
+}
+
+// getModDBEntryLocked - внутренняя функция, предполагает, что вызывающий уже взял блокировку,
+// но для безопасности используем RLock.
+func getModDBEntryLocked(folder string) *ModDBEntry {
+	modDBMutex.RLock()
+	defer modDBMutex.RUnlock()
 	if modDBMap == nil {
 		return nil
 	}
@@ -1123,6 +1287,8 @@ func GetModDBEntry(folder string) *ModDBEntry {
 }
 
 func UpdateModDBEntry(entry ModDBEntry) {
+	modDBMutex.Lock()
+	defer modDBMutex.Unlock()
 	if modDBMap == nil {
 		modDBMap = make(map[string]*ModDBEntry)
 	}
@@ -1130,6 +1296,8 @@ func UpdateModDBEntry(entry ModDBEntry) {
 }
 
 func GetModDBList() []ModDBEntry {
+	modDBMutex.RLock()
+	defer modDBMutex.RUnlock()
 	var list []ModDBEntry
 	for _, e := range modDBMap {
 		list = append(list, *e)
@@ -1141,9 +1309,10 @@ func FolderExistsWithTimeout(name string, timeout time.Duration) bool {
 	type result struct {
 		exists bool
 	}
+	dir := getModsDir() // снимок до запуска горутины
 	ch := make(chan result, 1)
 	go func() {
-		_, err := os.Stat(filepath.Join(modsDir, name))
+		_, err := os.Stat(filepath.Join(dir, name))
 		ch <- result{exists: err == nil}
 	}()
 	select {
@@ -1156,7 +1325,7 @@ func FolderExistsWithTimeout(name string, timeout time.Duration) bool {
 }
 
 func getDisplayName(folder string, lang string) string {
-	if entry, ok := modDBMap[strings.ToLower(folder)]; ok {
+	if entry := GetModDBEntry(folder); entry != nil {
 		if name := PickLocalized(entry.Name, lang); name != "" {
 			return name
 		}
@@ -1164,4 +1333,60 @@ func getDisplayName(folder string, lang string) string {
 	return folder
 }
 
-func GlobalDataDir() string { return globalDataDir }
+func GlobalDataDir() string { return getGlobalDataDir() }
+
+func containsFolder(folders []string, name string) bool {
+	for _, f := range folders {
+		if f == name {
+			return true
+		}
+	}
+	return false
+}
+
+// GetIncompatiblePairs возвращает копию списка несовместимых пар (потокобезопасно).
+func GetIncompatiblePairs() []IncompatiblePair {
+	checksDataMutex.RLock()
+	defer checksDataMutex.RUnlock()
+	return append([]IncompatiblePair(nil), IncompatiblePairs...)
+}
+
+// IsIncompatibleMod проверяет, является ли мод с именем name несовместимым с любым другим установленным модом.
+func IsIncompatibleMod(name string) bool {
+	pairs := GetIncompatiblePairs()
+	for _, pair := range pairs {
+		if (pair.Mod1 == name || pair.Mod2 == name) && FolderExists(pair.Mod1) && FolderExists(pair.Mod2) {
+			return true
+		}
+	}
+	return false
+}
+
+// GetObsoleteMods возвращает копию списка устаревших модов.
+// (нужно для правки из пункта 2 — если ещё не добавлено)
+func GetObsoleteMods() []string {
+	checksDataMutex.RLock()
+	defer checksDataMutex.RUnlock()
+	return append([]string(nil), ObsoleteMods...)
+}
+
+// GetMandatoryOrder возвращает копию списка обязательных модов.
+func GetMandatoryOrder() []string {
+	checksDataMutex.RLock()
+	defer checksDataMutex.RUnlock()
+	return append([]string(nil), MandatoryOrder...)
+}
+
+// GetDependencies возвращает копию списка зависимостей.
+func GetDependencies() []Dependency {
+	checksDataMutex.RLock()
+	defer checksDataMutex.RUnlock()
+	return append([]Dependency(nil), Dependencies...)
+}
+
+// GetLoadOrderRules возвращает копию списка правил порядка загрузки.
+func GetLoadOrderRules() []LoadOrderRule {
+	checksDataMutex.RLock()
+	defer checksDataMutex.RUnlock()
+	return append([]LoadOrderRule(nil), LoadOrderRules...)
+}

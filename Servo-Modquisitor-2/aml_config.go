@@ -1,4 +1,4 @@
-// aml_config.go
+// Servo-Modquisitor-2/aml_config.go
 //
 // The "AML Configuration" window. AML (Auto Mod Loading and Ordering) reads the
 // top-level load_after / load_before / require tables from each mod's ".mod"
@@ -104,7 +104,7 @@ func (app *App) getAMLDisplayName(folder string) string {
 }
 
 func (app *App) showAMLConfigWindow() {
-	win := app.myApp.NewWindow(app.messages["aml_config_title"])
+	win := app.myApp.NewWindow(app.msg("aml_config_title"))
 	selTheme := amlOverrideTheme{Theme: app.myApp.Settings().Theme()}
 
 	configs := checks.ListAMLConfigs() // all mods (source of truth)
@@ -126,47 +126,92 @@ func (app *App) showAMLConfigWindow() {
 	var reloadBtn *CustomButton
 	var blinkActive bool
 
+	// Section-level state
+	var sectionTables [3]*widget.Table
+	var sectionCountLabels [3]*canvas.Text
+
 	// ── left: mod table (5 columns: marker | Mod Name | Load After | Load Before | Required) ──
 	markerWidth := float32(30)
+
+	// Иконки-маркеры для колонки «есть ли AML-настройки у мода».
+	// checked_box.png — есть конфиг, unchecked_box_red.png — нет.
+	amlCheckedIcon := app.loadIconResource("checked_box", "assets/buttons/checked_box.png")
+	amlUncheckedIcon := app.loadIconResource("unchecked_box_red", "assets/buttons/unchecked_box_red.png")
 
 	modList = widget.NewTable(
 		func() (int, int) { return len(displayed), 5 },
 		func() fyne.CanvasObject {
 			bg := canvas.NewRectangle(color.Transparent)
-			lbl := widget.NewLabel("")
-			lbl.Alignment = fyne.TextAlignCenter
-			return container.NewStack(bg, lbl)
+			// Явная минимальная высота строки: Fyne берёт MinSize шаблона
+			// как высоту. Пустой прозрачный прямоугольник даёт (0,0) и
+			// строки схлопываются.
+			bg.SetMinSize(fyne.NewSize(1, 28))
+			// Универсальный контейнер: что положить внутрь — решает
+			// updateCell по id.Col. Так одна ячейка может держать либо
+			// Label, либо Image.
+			content := container.NewStack()
+			return container.NewStack(bg, content)
 		},
 		func(id widget.TableCellID, cell fyne.CanvasObject) {
 			if id.Row >= len(displayed) {
 				return
 			}
 			c := displayed[id.Row]
-			stack := cell.(*fyne.Container)
-			bg := stack.Objects[0].(*canvas.Rectangle)
-			lbl := stack.Objects[1].(*widget.Label)
+			outer := cell.(*fyne.Container)
+			bg := outer.Objects[0].(*canvas.Rectangle)
+			content := outer.Objects[1].(*fyne.Container)
+
+			// Сбрасываем содержимое — templateSize переиспользует ячейки,
+			// поэтому нельзя «докидывать» в существующий контейнер.
+			content.Objects = nil
+
 			switch id.Col {
 			case 0:
+				// Иконка-маркер, выровнена по центру.
+				var icon fyne.Resource
 				if c.HasConfig {
-					lbl.SetText("✅")
+					icon = amlCheckedIcon
 				} else {
-					lbl.SetText("❌")
+					icon = amlUncheckedIcon
 				}
+				if icon != nil {
+					img := canvas.NewImageFromResource(icon)
+					img.FillMode = canvas.ImageFillContain
+					img.SetMinSize(fyne.NewSize(18, 18))
+					content.Add(container.NewCenter(img))
+				}
+
 			case 1:
-				lbl.SetText(app.getAMLDisplayName(c.Folder))
+				lbl := widget.NewLabel(app.getAMLDisplayName(c.Folder))
+				lbl.Alignment = fyne.TextAlignLeading
+				content.Add(lbl)
+
 			case 2:
-				lbl.SetText(fmt.Sprintf("%d", len(c.LoadAfter)))
+				lbl := widget.NewLabel(fmt.Sprintf("%d", len(c.LoadAfter)))
+				lbl.Alignment = fyne.TextAlignCenter
+				content.Add(lbl)
+
 			case 3:
-				lbl.SetText(fmt.Sprintf("%d", len(c.LoadBefore)))
+				lbl := widget.NewLabel(fmt.Sprintf("%d", len(c.LoadBefore)))
+				lbl.Alignment = fyne.TextAlignCenter
+				content.Add(lbl)
+
 			case 4:
-				lbl.SetText(fmt.Sprintf("%d", len(c.Require)))
+				lbl := widget.NewLabel(fmt.Sprintf("%d", len(c.Require)))
+				lbl.Alignment = fyne.TextAlignCenter
+				content.Add(lbl)
 			}
-			// Устанавливаем цвет фона в зависимости от чётности строки
+			content.Refresh()
+
+			// Фон: выделенная строка — цвет выделения, иначе полосатый.
 			th := app.myApp.Settings().Theme()
 			variant := app.myApp.Settings().ThemeVariant()
-			if id.Row%2 == 0 {
+			switch {
+			case c.Folder != "" && c.Folder == selectedFolder:
+				bg.FillColor = th.Color(themes.ColorTableRowSelected, variant)
+			case id.Row%2 == 0:
 				bg.FillColor = th.Color(themes.ColorTableRowEven, variant)
-			} else {
+			default:
 				bg.FillColor = th.Color(themes.ColorTableRowOdd, variant)
 			}
 			bg.Refresh()
@@ -178,10 +223,13 @@ func (app *App) showAMLConfigWindow() {
 	modList.SetColumnWidth(2, LABRWidth)
 	modList.SetColumnWidth(3, LABRWidth)
 	modList.SetColumnWidth(4, LABRWidth)
+	modList.SetRowHeight(-1, 28)
 
 	modList.OnSelected = func(id widget.TableCellID) {
 		if int(id.Row) >= 0 && int(id.Row) < len(displayed) {
 			loadMod(displayed[id.Row])
+			// Перерисовать — иначе выделение не появится.
+			modList.Refresh()
 		}
 	}
 
@@ -191,11 +239,11 @@ func (app *App) showAMLConfigWindow() {
 		sortedAll := sortAMLOrder(configs)
 
 		// --- Логирование для дебага (построчно с номерами) ---
-		// app.appendLog("=== AML Sorted Order ===")
-		// for i, c := range sortedAll {
-		// app.appendLog(fmt.Sprintf("%3d: %s", i+1, c.Folder))
-		// }
-		// app.appendLog("=== End of AML Order ===")
+		app.appendLogToFile("=== AML Sorted Order ===")
+		for i, c := range sortedAll {
+			app.appendLogToFile(fmt.Sprintf("%3d: %s", i+1, c.Folder))
+		}
+		app.appendLogToFile("=== End of AML Order ===")
 		// --- Конец лога ---
 
 		displayed = displayed[:0]
@@ -217,7 +265,7 @@ func (app *App) showAMLConfigWindow() {
 			if selectedFolder != "" {
 				for i, c := range displayed {
 					if c.Folder == selectedFolder {
-						modList.Select(widget.TableCellID{Row: i, Col: 0})
+						modList.Select(widget.TableCellID{Row: i, Col: 0}, 0)
 						break
 					}
 				}
@@ -226,7 +274,7 @@ func (app *App) showAMLConfigWindow() {
 	}
 
 	// ── Создаём saveBtn с пустым обработчиком, потом определим функцию и назначим обработчик ──
-	saveBtn = NewCustomButton(app.messages["aml_btn_save"], nil)
+	saveBtn = NewCustomButton(app.msg("aml_btn_save"), nil)
 
 	// ── Определяем функцию обновления внешнего вида кнопки Save (мигание) ──
 	updateSaveButtonAppearance := func() {
@@ -264,6 +312,16 @@ func (app *App) showAMLConfigWindow() {
 		}
 	}
 
+	// ── Обновляет счётчики в section headers ──
+	updateSectionCounts := func() {
+		for k := 0; k < 3; k++ {
+			if sectionCountLabels[k] != nil {
+				sectionCountLabels[k].Text = fmt.Sprintf("(%d)", len(edit.lists[k]))
+				sectionCountLabels[k].Refresh()
+			}
+		}
+	}
+
 	// ── Теперь назначаем обработчик для saveBtn ──
 	saveBtn.OnTapped = func() {
 		if selectedFolder == "" {
@@ -279,10 +337,10 @@ func (app *App) showAMLConfigWindow() {
 			Author:      edit.author,
 		}
 		if err := checks.WriteAMLConfig(cfg); err != nil {
-			app.appendLog(fmt.Sprintf(app.messages["aml_log_save_failed"], edit.folder, err))
+			app.appendLogToFile(fmt.Sprintf(app.msg("aml_log_save_failed"), edit.folder, err))
 			return
 		}
-		app.appendLog(fmt.Sprintf(app.messages["aml_log_saved"], edit.folder))
+		app.appendLogToFile(fmt.Sprintf(app.msg("aml_log_saved"), edit.folder))
 
 		// Warn about any entry referencing a mod that isn't installed.
 		installed := make(map[string]bool, len(allFolders))
@@ -292,7 +350,7 @@ func (app *App) showAMLConfigWindow() {
 		for _, lst := range edit.lists {
 			for _, e := range lst {
 				if !installed[e] {
-					app.appendLog(fmt.Sprintf(app.messages["aml_log_unknown_ref"], edit.folder, e))
+					app.appendLogToFile(fmt.Sprintf(app.msg("aml_log_unknown_ref"), edit.folder, e))
 				}
 			}
 		}
@@ -310,10 +368,10 @@ func (app *App) showAMLConfigWindow() {
 		dirty = false
 		updateSaveButtonAppearance()
 	}
-	saveBtn.SetToolTip(app.messages["btn_aml_config_tooltip"])
+	saveBtn.SetToolTip(app.msg("btn_aml_config_tooltip"))
 
 	// ── reloadBtn ──
-	reloadBtn = NewCustomButton(app.messages["aml_btn_reload"], func() {
+	reloadBtn = NewCustomButton(app.msg("aml_btn_reload"), func() {
 		go func() {
 			// Функция для выполнения перезагрузки (вынесена для избежания дублирования)
 			doReload := func() {
@@ -340,11 +398,11 @@ func (app *App) showAMLConfigWindow() {
 				// Диалог должен показываться в главном потоке, поэтому используем fyne.Do
 				choice := app.showChoiceDialogSync(
 					win,
-					app.messages["warning_title"],
-					app.messages["refresh_discard_changes"],
-					app.messages["btn_save_and_refresh"],
-					app.messages["btn_cancel"],
-					app.messages["btn_refresh_anyway"],
+					app.msg("warning_title"),
+					app.msg("refresh_discard_changes"),
+					app.msg("btn_save_and_refresh"),
+					app.msg("btn_cancel"),
+					app.msg("btn_refresh_anyway"),
 				)
 				switch choice {
 				case 0: // Save and Reload
@@ -359,12 +417,12 @@ func (app *App) showAMLConfigWindow() {
 						}
 						if err := checks.WriteAMLConfig(cfg); err != nil {
 							fyne.Do(func() {
-								app.appendLog(fmt.Sprintf(app.messages["aml_log_save_failed"], edit.folder, err))
+								app.appendLogToFile(fmt.Sprintf(app.msg("aml_log_save_failed"), edit.folder, err))
 							})
 							return
 						}
 						fyne.Do(func() {
-							app.appendLog(fmt.Sprintf(app.messages["aml_log_saved"], edit.folder))
+							app.appendLogToFile(fmt.Sprintf(app.msg("aml_log_saved"), edit.folder))
 						})
 						// Проверка зависимостей
 						installed := make(map[string]bool, len(allFolders))
@@ -375,7 +433,7 @@ func (app *App) showAMLConfigWindow() {
 							for _, e := range lst {
 								if !installed[e] {
 									fyne.Do(func() {
-										app.appendLog(fmt.Sprintf(app.messages["aml_log_unknown_ref"], edit.folder, e))
+										app.appendLogToFile(fmt.Sprintf(app.msg("aml_log_unknown_ref"), edit.folder, e))
 									})
 								}
 							}
@@ -401,24 +459,25 @@ func (app *App) showAMLConfigWindow() {
 			}
 		}()
 	})
-	reloadBtn.SetToolTip(app.messages["btn_refresh_tooltip"]) // используем существующий тултип
+	reloadBtn.SetToolTip(app.msg("btn_refresh_tooltip")) // используем существующий тултип
 
 	// ── right: editor widgets ────────────────────────────────────────
-	editorTitle := widget.NewLabelWithStyle(app.messages["aml_select_mod_hint"], fyne.TextAlignLeading, fyne.TextStyle{Bold: true})
+	editorTitle := widget.NewLabelWithStyle(app.msg("aml_select_mod_hint"), fyne.TextAlignLeading, fyne.TextStyle{Bold: true})
+	editorTitle.Wrapping = fyne.TextWrapWord
+
 	versionEntry := widget.NewEntry()
-	versionEntry.SetPlaceHolder(app.messages["placeholder_mod_version"])
+	versionEntry.SetPlaceHolder(app.msg("placeholder_mod_version"))
 	versionEntry.OnChanged = func(s string) {
 		edit.version = s
 		dirty = true
 		updateSaveButtonAppearance()
 	}
-	// Обёртка для фиксированной ширины (100 пикселей)
 	versionSpacer := canvas.NewRectangle(color.Transparent)
 	versionSpacer.SetMinSize(fyne.NewSize(150, 1))
 	versionEntryBox := container.NewStack(versionSpacer, versionEntry)
 
 	authorEntry := widget.NewEntry()
-	authorEntry.SetPlaceHolder(app.messages["author_unknown"])
+	authorEntry.SetPlaceHolder(app.msg("author_unknown"))
 	authorEntry.OnChanged = func(s string) {
 		edit.author = s
 		dirty = true
@@ -428,7 +487,6 @@ func (app *App) showAMLConfigWindow() {
 	authorSpacer.SetMinSize(fyne.NewSize(300, 1))
 	authorEntryBox := container.NewStack(authorSpacer, authorEntry)
 
-	var sectionLists [3]*widget.List
 	var addBtns [3]*CustomButton
 	var remBtns [3]*CustomButton
 
@@ -438,7 +496,10 @@ func (app *App) showAMLConfigWindow() {
 			return
 		}
 		edit.lists[idx] = append(edit.lists[idx], name)
-		sectionLists[idx].Refresh()
+		if sectionTables[idx] != nil {
+			sectionTables[idx].Refresh()
+		}
+		updateSectionCounts()
 		dirty = true
 		updateSaveButtonAppearance()
 	}
@@ -450,8 +511,10 @@ func (app *App) showAMLConfigWindow() {
 			}
 		}
 		edit.lists[idx] = out
-		sectionLists[idx].UnselectAll()
-		sectionLists[idx].Refresh()
+		if sectionTables[idx] != nil {
+			sectionTables[idx].Refresh()
+		}
+		updateSectionCounts()
 		dirty = true
 		updateSaveButtonAppearance()
 	}
@@ -491,7 +554,7 @@ func (app *App) showAMLConfigWindow() {
 		}
 
 		search := widget.NewEntry()
-		search.SetPlaceHolder(app.messages["search_placeholder"])
+		search.SetPlaceHolder(app.msg("search_placeholder"))
 		search.OnChanged = func(q string) {
 			apply(q)
 			list.UnselectAll()
@@ -501,7 +564,7 @@ func (app *App) showAMLConfigWindow() {
 		titleLbl := widget.NewLabelWithStyle(title, fyne.TextAlignCenter, fyne.TextStyle{Bold: true})
 		listScroll := container.NewVScroll(list)
 		listScroll.SetMinSize(fyne.NewSize(330, 320))
-		cancel := NewCustomButton(app.messages["btn_cancel"], func() { pop.Hide() })
+		cancel := NewCustomButton(app.msg("btn_cancel"), func() { pop.Hide() })
 
 		content := container.NewBorder(
 			container.NewVBox(titleLbl, search),
@@ -531,7 +594,7 @@ func (app *App) showAMLConfigWindow() {
 				source = append(source, f)
 			}
 		}
-		title := app.messages["aml_btn_add"] + " · " + app.messages[sectionHeaderKeys[idx]]
+		title := app.msg("aml_btn_add") + " · " + app.msg(sectionHeaderKeys[idx])
 		showSearchPopup(title, source, func(name string) { addEntry(idx, name) })
 	}
 
@@ -541,47 +604,102 @@ func (app *App) showAMLConfigWindow() {
 			return
 		}
 		source := append([]string{}, edit.lists[idx]...)
-		title := app.messages["aml_btn_remove"] + " · " + app.messages[sectionHeaderKeys[idx]]
+		title := app.msg("aml_btn_remove") + " · " + app.msg(sectionHeaderKeys[idx])
 		showSearchPopup(title, source, func(name string) { removeEntryByName(idx, name) })
 	}
 
-	// ── build three sections with striped lists ──────────────────────
+	// ── build three sections with striped tables ─────────────────────
 	buildSection := func(idx int) fyne.CanvasObject {
-		header := widget.NewLabelWithStyle(app.messages[sectionHeaderKeys[idx]], fyne.TextAlignLeading, fyne.TextStyle{Bold: true})
+		titleText := canvas.NewText(app.msg(sectionHeaderKeys[idx]), color.White)
+		titleText.TextStyle = fyne.TextStyle{Bold: true}
+		titleText.TextSize = 13
+
+		countText := canvas.NewText("(0)", color.White)
+		countText.Alignment = fyne.TextAlignTrailing
+		countText.TextSize = 12
+		sectionCountLabels[idx] = countText
+
+		th := app.myApp.Settings().Theme()
+		variant := app.myApp.Settings().ThemeVariant()
+		headerBg := canvas.NewRectangle(th.Color(themes.ColorTableHeaderBg, variant))
+
+		headerInner := container.NewBorder(
+			nil, nil,
+			container.NewPadded(titleText),
+			container.NewPadded(countText),
+			nil,
+		)
+		headerBox := container.NewStack(headerBg, headerInner)
+
 		controls := container.NewHBox(addBtns[idx], remBtns[idx])
 
-		// Создаём список с чередованием фона
-		lst := widget.NewList(
-			func() int { return len(edit.lists[idx]) },
+		secTable := widget.NewTable(
+			func() (int, int) {
+				n := len(edit.lists[idx])
+				if n == 0 {
+					return 1, 2 // 1 пустая колонка-номер + 1 для текста «пусто»
+				}
+				return n, 2
+			},
 			func() fyne.CanvasObject {
 				bg := canvas.NewRectangle(color.Transparent)
+				bg.SetMinSize(fyne.NewSize(1, 26))
 				label := widget.NewLabel("")
 				return container.NewStack(bg, label)
 			},
-			func(id widget.ListItemID, obj fyne.CanvasObject) {
-				if id >= len(edit.lists[idx]) {
-					return
-				}
-				stack := obj.(*fyne.Container)
+			func(id widget.TableCellID, cell fyne.CanvasObject) {
+				stack := cell.(*fyne.Container)
 				bg := stack.Objects[0].(*canvas.Rectangle)
 				label := stack.Objects[1].(*widget.Label)
-				label.SetText(edit.lists[idx][id])
-				th := app.myApp.Settings().Theme()
-				variant := app.myApp.Settings().ThemeVariant()
-				if id%2 == 0 {
-					bg.FillColor = th.Color(themes.ColorTableRowEven, variant)
+
+				tTh := fyne.CurrentApp().Settings().Theme()
+				tVariant := fyne.CurrentApp().Settings().ThemeVariant()
+
+				if len(edit.lists[idx]) == 0 {
+					// Empty state. Текст кладём во вторую колонку —
+					// там ей хватает ширины (см. SetColumnWidth ниже),
+					// и он не вылезает за левый край, как было бы в
+					// узкой колонке с номером.
+					bg.FillColor = color.Transparent
+					if id.Col == 0 {
+						label.SetText("")
+					} else {
+						label.SetText(app.msg("aml_empty_list"))
+						label.TextStyle = fyne.TextStyle{Italic: true}
+						label.Alignment = fyne.TextAlignLeading
+					}
 				} else {
-					bg.FillColor = th.Color(themes.ColorTableRowOdd, variant)
+					if id.Row%2 == 0 {
+						bg.FillColor = tTh.Color(themes.ColorTableRowEven, tVariant)
+					} else {
+						bg.FillColor = tTh.Color(themes.ColorTableRowOdd, tVariant)
+					}
+					if id.Col == 0 {
+						label.SetText(fmt.Sprintf("%d", id.Row+1))
+						label.Alignment = fyne.TextAlignCenter
+					} else {
+						label.SetText(edit.lists[idx][id.Row])
+						label.Alignment = fyne.TextAlignLeading
+					}
+					label.TextStyle = fyne.TextStyle{}
 				}
 				bg.Refresh()
+				label.Refresh()
 			},
 		)
-		sectionLists[idx] = lst
+		secTable.SetColumnWidth(0, 30)
+		secTable.SetColumnWidth(1, 220)
+		secTable.SetRowHeight(-1, 26)
+		sectionTables[idx] = secTable
 
-		listScroll := container.NewVScroll(lst)
-		listScroll.SetMinSize(fyne.NewSize(0, 120))
-		return container.NewBorder(header, nil, nil, nil,
-			container.NewBorder(controls, nil, nil, nil, listScroll))
+		scroll := container.NewVScroll(secTable)
+		scroll.SetMinSize(fyne.NewSize(0, 100))
+
+		return container.NewBorder(headerBox,
+			container.NewVBox(controls, widget.NewSeparator()),
+			nil, nil,
+			scroll,
+		)
 	}
 
 	// ── loadMod function ─────────────────────────────────────────────
@@ -598,14 +716,15 @@ func (app *App) showAMLConfigWindow() {
 		editorTitle.SetText(app.getAMLDisplayName(c.Folder))
 		versionEntry.SetText(c.Version)
 		authorEntry.SetText(c.Author)
-		ver := c.Version
-		if ver == "" {
-			ver = "-"
-		}
+
+		// Обновляем таблицы разделов.
 		for k := 0; k < 3; k++ {
-			sectionLists[k].UnselectAll()
-			sectionLists[k].Refresh()
+			if sectionTables[k] != nil {
+				sectionTables[k].Refresh()
+			}
 		}
+		updateSectionCounts()
+
 		// Сбрасываем dirty при загрузке нового мода
 		dirty = false
 		updateSaveButtonAppearance()
@@ -613,9 +732,8 @@ func (app *App) showAMLConfigWindow() {
 
 	// left-list filter controls
 	searchEntry := widget.NewEntry()
-	searchEntry.SetPlaceHolder(app.messages["search_placeholder"])
+	searchEntry.SetPlaceHolder(app.msg("search_placeholder"))
 
-	// Кнопка очистки
 	searchClearBtn := NewCustomButton("✕", func() {
 		searchEntry.SetText("")
 	})
@@ -632,44 +750,38 @@ func (app *App) showAMLConfigWindow() {
 		applyModFilter()
 	}
 
-	// Минимальная ширина поля поиска (можно оставить 500 или уменьшить до 300)
 	searchSpacer := canvas.NewRectangle(color.Transparent)
 	searchSpacer.SetMinSize(fyne.NewSize(AMLSearchMinWidth, 1))
 	searchEntryBox := container.NewStack(searchSpacer, searchEntry)
 
-	// Поле поиска с кнопкой очистки справа
 	searchBox := container.NewBorder(nil, nil, nil, searchClearBtn, searchEntryBox)
 
-	// Метка "Фильтр:"
-	filterLabel := widget.NewLabel(app.messages["filter_label"])
+	filterLabel := widget.NewLabel(app.msg("filter_label"))
 
-	// Выпадающий список фильтров
 	filterSelect := widget.NewSelect(
 		[]string{
-			app.messages["filter_all"],
-			app.messages["aml_filter_configured"],
-			app.messages["aml_filter_not_configured"],
+			app.msg("filter_all"),
+			app.msg("aml_filter_configured"),
+			app.msg("aml_filter_not_configured"),
 		},
 		func(s string) {
 			switch s {
-			case app.messages["filter_all"]:
+			case app.msg("filter_all"):
 				filterMode = 0
-			case app.messages["aml_filter_configured"]:
+			case app.msg("aml_filter_configured"):
 				filterMode = 1
-			case app.messages["aml_filter_not_configured"]:
+			case app.msg("aml_filter_not_configured"):
 				filterMode = 2
 			}
 			applyModFilter()
 		},
 	)
-	filterSelect.Selected = app.messages["filter_all"]
+	filterSelect.Selected = app.msg("filter_all")
 
-	// Задаём минимальную ширину для выпадающего списка (чтобы он был шире)
 	filterSpacer := canvas.NewRectangle(color.Transparent)
-	filterSpacer.SetMinSize(fyne.NewSize(AMLFilterMinWidth, 1)) // регулируйте под свой вкус
+	filterSpacer.SetMinSize(fyne.NewSize(AMLFilterMinWidth, 1))
 	filterSelectWithSize := container.NewStack(filterSpacer, filterSelect)
 
-	// Всё в одной строке
 	leftTop := container.NewHBox(
 		filterLabel,
 		filterSelectWithSize,
@@ -680,10 +792,12 @@ func (app *App) showAMLConfigWindow() {
 	headerTable := widget.NewTable(
 		func() (int, int) { return 1, 5 },
 		func() fyne.CanvasObject {
-			return container.NewStack(
-				canvas.NewRectangle(color.Transparent),
-				widget.NewLabel(""),
-			)
+			bg := canvas.NewRectangle(color.Transparent)
+			bg.SetMinSize(fyne.NewSize(1, 26))
+			lbl := widget.NewLabel("")
+			lbl.Alignment = fyne.TextAlignCenter
+			lbl.TextStyle = fyne.TextStyle{Bold: true}
+			return container.NewStack(bg, lbl)
 		},
 		func(id widget.TableCellID, cell fyne.CanvasObject) {
 			cont := cell.(*fyne.Container)
@@ -692,20 +806,20 @@ func (app *App) showAMLConfigWindow() {
 			th := app.myApp.Settings().Theme()
 			variant := app.myApp.Settings().ThemeVariant()
 			bg.FillColor = th.Color(themes.ColorTableHeaderBg, variant)
-			lbl.TextStyle = fyne.TextStyle{Bold: true}
-			lbl.Alignment = fyne.TextAlignCenter
+			bg.Refresh()
 			switch id.Col {
 			case 0:
-				lbl.SetText(app.messages["col_checkbox"])
+				lbl.SetText(app.msg("col_checkbox"))
 			case 1:
-				lbl.SetText(app.messages["col_name"])
+				lbl.SetText(app.msg("col_name"))
 			case 2:
-				lbl.SetText(app.messages["aml_col_load_after"])
+				lbl.SetText(app.msg("aml_col_load_after"))
 			case 3:
-				lbl.SetText(app.messages["aml_col_load_before"])
+				lbl.SetText(app.msg("aml_col_load_before"))
 			case 4:
-				lbl.SetText(app.messages["aml_col_required"])
+				lbl.SetText(app.msg("aml_col_required"))
 			}
+			lbl.Refresh()
 		},
 	)
 	headerTable.SetColumnWidth(0, ColCheckboxWidth)
@@ -713,6 +827,7 @@ func (app *App) showAMLConfigWindow() {
 	headerTable.SetColumnWidth(2, LABRWidth)
 	headerTable.SetColumnWidth(3, LABRWidth)
 	headerTable.SetColumnWidth(4, LABRWidth)
+	headerTable.SetRowHeight(-1, 26)
 
 	// Фон для левой панели (как в основной таблице, ImageFillContain)
 	leftContent := container.NewBorder(headerTable, nil, nil, nil, modList)
@@ -729,8 +844,8 @@ func (app *App) showAMLConfigWindow() {
 	// Создаём кнопки Add/Remove для каждой секции
 	for i := 0; i < 3; i++ {
 		idx := i
-		addBtns[idx] = NewCustomButton(app.messages["aml_btn_add"], func() { openPicker(idx) })
-		remBtns[idx] = NewCustomButton(app.messages["aml_btn_remove"], func() { openRemovePicker(idx) })
+		addBtns[idx] = NewCustomButton(app.msg("aml_btn_add"), func() { openPicker(idx) })
+		remBtns[idx] = NewCustomButton(app.msg("aml_btn_remove"), func() { openRemovePicker(idx) })
 	}
 
 	section0 := buildSection(0)
@@ -742,9 +857,9 @@ func (app *App) showAMLConfigWindow() {
 		widget.NewSeparator(),
 		editorTitle,
 		container.NewHBox(
-			widget.NewLabel(app.messages["aml_editor_version"]),
+			widget.NewLabel(app.msg("aml_editor_version")),
 			versionEntryBox,
-			widget.NewLabel(app.messages["aml_editor_author"]),
+			widget.NewLabel(app.msg("aml_editor_author")),
 			authorEntryBox,
 		),
 		widget.NewSeparator(),
@@ -757,7 +872,6 @@ func (app *App) showAMLConfigWindow() {
 	splitTopRest := container.NewVSplit(section0, splitMiddleBottom)
 	splitTopRest.Offset = 0.333
 
-	// Правая панель — без фонового изображения
 	editorScroll := container.NewVScroll(container.NewBorder(topPart, nil, nil, nil, splitTopRest))
 
 	// ── final layout ──────────────────────────────────────────────────

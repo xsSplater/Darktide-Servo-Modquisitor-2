@@ -1,4 +1,4 @@
-// dark.go
+// Servo-Modquisitor-2/themes/dark.go
 package themes
 
 import (
@@ -78,7 +78,7 @@ func (t ForcedDarkTheme) Color(name fyne.ThemeColorName, variant fyne.ThemeVaria
 	// ================== РАЗДЕЛИТЕЛИ =================
 	// Цвет разделительных линий (например, widget.NewSeparator())
 	case theme.ColorNameSeparator:
-		return color.NRGBA{R: 65, G: 111, B: 25, A: 111}
+		return color.NRGBA{R: 65, G: 111, B: 25, A: 222}
 
 	// ================== ТЕНИ ========================
 	// Цвет тени окон и всплывающих элементов
@@ -174,6 +174,26 @@ func (t ForcedDarkTheme) Color(name fyne.ThemeColorName, variant fyne.ThemeVaria
 		return color.NRGBA{R: 0, G: 0, B: 0, A: 155}
 	case ColorButtonStrokeImage:
 		return color.NRGBA{R: 0, G: 0, B: 0, A: 85}
+
+	// ──────────────── Верхнее меню ────────────────
+	case theme.ColorNameMenuBarAccent:
+		return color.NRGBA{R: 0xC0, G: 0xFF, B: 0x1A, A: 0xFF} // #c0ff1a
+	case theme.ColorNameMenuBarActiveBg:
+		return color.NRGBA{R: 0xC0, G: 0xFF, B: 0x1A, A: 0x1F}
+	case theme.ColorNameMenuBarHoverBg:
+		return color.NRGBA{R: 0xC0, G: 0xFF, B: 0x1A, A: 0x0F}
+
+	// ──────────────── Меню ────────────────
+	case theme.ColorNameMenuBorder:
+		return color.NRGBA{R: 0xC0, G: 0xFF, B: 0x1A, A: 0x33}
+	case theme.ColorNameMenuItemActiveBorder:
+		return color.NRGBA{R: 0xC0, G: 0xFF, B: 0x1A, A: 0xAA}
+	case theme.ColorNameMenuItemDanger:
+		return color.NRGBA{R: 220, G: 60, B: 60, A: 255}
+	case theme.ColorNameMenuItemHeader:
+		return color.NRGBA{R: 0xC0, G: 0xFF, B: 0x1A, A: 255}
+	case theme.ColorNameMenuItemHeaderBg:
+		return color.NRGBA{R: 0xC0, G: 0xFF, B: 0x1A, A: 0x14}
 
 	// Если вдруг запрошен неизвестный цвет - отдаём белый (заглушка)
 	default:

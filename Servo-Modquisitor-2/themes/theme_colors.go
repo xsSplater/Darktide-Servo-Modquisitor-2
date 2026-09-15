@@ -1,4 +1,4 @@
-// theme_colors.go
+// Servo-Modquisitor-2/themes/theme_colors.go
 package themes
 
 // Имена собственных цветов, используемых в интерфейсе.

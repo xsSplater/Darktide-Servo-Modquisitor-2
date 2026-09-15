@@ -1,4 +1,4 @@
-// helpers/helpers.go
+// Servo-Modquisitor-2/helpers/helpers.go
 package helpers
 
 import (
@@ -9,6 +9,10 @@ import (
 // ExtractModIDFromURL извлекает числовой ID мода из ссылки Nexus Mods.
 // Поддерживает URL вида: https://www.nexusmods.com/warhammer40kdarktide/mods/123
 func ExtractModIDFromURL(rawURL string) int {
+	// Удаляем параметры запроса и якорь, если они есть
+	if idx := strings.IndexAny(rawURL, "?#"); idx != -1 {
+		rawURL = rawURL[:idx]
+	}
 	parts := strings.Split(strings.TrimRight(rawURL, "/"), "/")
 	if len(parts) < 2 {
 		return 0

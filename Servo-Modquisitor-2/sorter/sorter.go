@@ -1,9 +1,10 @@
-// sorter.go
+// Servo-Modquisitor-2/sorter/sorter.go
 package sorter
 
 import (
 	"Servo-Modquisitor/checks"
 	"path/filepath"
+	"sync"
 
 	"bufio"
 	"container/heap"
@@ -16,6 +17,7 @@ var (
 	folderExists    func(string) bool
 	listModFolders  func() []string
 	logFunc         func(string)
+	sorterDataMutex sync.RWMutex // Решение гонки 79
 	mandatoryOrder  []string
 	loadOrderRules  []checks.LoadOrderRule
 	dependencies    []ModDependency
@@ -32,18 +34,28 @@ type ModDependency struct {
 }
 
 // Функции-сеттеры
+func SetMandatoryOrder(order []string) { // Решение гонки 79
+	sorterDataMutex.Lock()
+	mandatoryOrder = order
+	sorterDataMutex.Unlock()
+}
+func SetDependencies(deps []ModDependency) {
+	sorterDataMutex.Lock()
+	dependencies = deps
+	sorterDataMutex.Unlock()
+}
+func SetLoadOrderRules(rules []checks.LoadOrderRule) {
+	sorterDataMutex.Lock()
+	loadOrderRules = rules
+	sorterDataMutex.Unlock()
+}
 func SetFolderExistsFunc(fn func(string) bool) { folderExists = fn }
 func SetListModFoldersFunc(fn func() []string) { listModFolders = fn }
 func SetLogFunc(fn func(string))               { logFunc = fn }
-func SetMandatoryOrder(order []string)         { mandatoryOrder = order }
-func SetDependencies(deps []ModDependency)     { dependencies = deps }
 func SetSortMessages(ru, en string)            { sortWarningRu = ru; sortWarningEn = en }
 func SetLogMessages(createMLOT, mlotCreated string) {
 	logCreateMLOT = createMLOT
 	logMLOTCreated = mlotCreated
-}
-func SetLoadOrderRules(rules []checks.LoadOrderRule) {
-	loadOrderRules = rules
 }
 func SetHeaderFunc(fn func(*os.File, string)) {
 	writeHeaderFunc = fn
@@ -52,10 +64,22 @@ func SetHeaderFunc(fn func(*os.File, string)) {
 // Кэш кастомных порядков
 var cachedRussianOrder, cachedEnglishOrder []string
 
-var loadOrderOutputPath string
+var (
+	loadOrderOutputPath string
+	loadOrderPathMutex  sync.Mutex
+)
 
 func SetLoadOrderOutputPath(path string) {
+	loadOrderPathMutex.Lock()
 	loadOrderOutputPath = path
+	loadOrderPathMutex.Unlock()
+}
+
+// getLoadOrderOutputPath возвращает снимок пути для записи.
+func getLoadOrderOutputPath() string {
+	loadOrderPathMutex.Lock()
+	defer loadOrderPathMutex.Unlock()
+	return loadOrderOutputPath
 }
 
 func LoadSortOrders(dataDir string) {
@@ -64,11 +88,15 @@ func LoadSortOrders(dataDir string) {
 }
 
 func CreateLoadOrderFromActive(activeMods []string, lang string) {
+	sorterDataMutex.RLock()
+	customOrder := loadCustomOrder(lang)
+	mandatory := mandatoryOrder
+	deps := dependencies
+	rules := loadOrderRules
+	sorterDataMutex.RUnlock()
 	if logFunc != nil {
 		logFunc(logCreateMLOT)
 	}
-
-	customOrder := loadCustomOrder(lang)
 
 	activeSet := make(map[string]bool)
 	for _, m := range activeMods {
@@ -78,7 +106,7 @@ func CreateLoadOrderFromActive(activeMods []string, lang string) {
 	var finalOrder []string
 	added := make(map[string]bool)
 
-	for _, m := range mandatoryOrder {
+	for _, m := range mandatory {
 		if activeSet[m] && folderExists(m) && !added[m] {
 			finalOrder = append(finalOrder, m)
 			added[m] = true
@@ -99,9 +127,9 @@ func CreateLoadOrderFromActive(activeMods []string, lang string) {
 		}
 	}
 
-	allDeps := make([]ModDependency, len(dependencies))
-	copy(allDeps, dependencies)
-	for _, rule := range loadOrderRules {
+	allDeps := make([]ModDependency, len(deps))
+	copy(allDeps, deps)
+	for _, rule := range rules {
 		if rule.Before == "*" {
 			continue
 		}
@@ -110,24 +138,36 @@ func CreateLoadOrderFromActive(activeMods []string, lang string) {
 			Dependent: rule.After,  // Зависимый ПОСЛЕ
 		})
 	}
-	for i := 0; i < len(mandatoryOrder)-1; i++ {
+	for i := 0; i < len(mandatory)-1; i++ {
 		allDeps = append(allDeps, ModDependency{
-			Required:  mandatoryOrder[i],   // Зависимость ДО
-			Dependent: mandatoryOrder[i+1], // Зависимый ПОСЛЕ
+			Required:  mandatory[i],   // Зависимость ДО
+			Dependent: mandatory[i+1], // Зависимый ПОСЛЕ
 		})
 	}
 	sortedRest := topologicalSort(rest, allDeps)
 	finalOrder = append(finalOrder, sortedRest...)
 
-	file, _ := os.Create(loadOrderOutputPath)
-	if file != nil {
-		defer file.Close()
-		if writeHeaderFunc != nil {
-			writeHeaderFunc(file, lang)
+	outPath := getLoadOrderOutputPath()
+	if outPath == "" {
+		if logFunc != nil {
+			logFunc("loadOrderOutputPath is not set")
 		}
-		for _, mod := range finalOrder {
-			fmt.Fprintln(file, mod)
+		return
+	}
+	file, err := os.Create(outPath)
+	if err != nil {
+		if logFunc != nil {
+			logFunc(fmt.Sprintf("Failed to create load order file: %v", err))
 		}
+		return
+	}
+	defer file.Close()
+
+	if writeHeaderFunc != nil {
+		writeHeaderFunc(file, lang)
+	}
+	for _, mod := range finalOrder {
+		fmt.Fprintln(file, mod)
 	}
 
 	if logFunc != nil {

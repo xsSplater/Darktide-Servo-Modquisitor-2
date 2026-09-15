@@ -1,4 +1,4 @@
-// config.go
+// Servo-Modquisitor-2/config.go
 package main
 
 import (
@@ -11,7 +11,7 @@ import (
 // ───────────── Программа ─────────────────────────────────────────
 const (
 	AppName         = "Servo-Modquisitor-2"
-	AppVersion      = "3.0.1"
+	AppVersion      = "4.0.0"
 	AppID           = "com.xssplater.servo-modquisitor"
 	AppIcon         = "assets/icon.png"
 	СonfigFolderSMQ = "Servo-Modquisitor"
@@ -74,13 +74,16 @@ const (
 	GitHubRepoSMQ    = "https://github.com/xsSplater/Darktide-Servo-Modquisitor-2"
 	GitHubReleaseAPI = "https://api.github.com/repos/xsSplater/Darktide-Servo-Modquisitor-2/releases/latest"
 
+	DarktideModDMF = "https://www.nexusmods.com/warhammer40kdarktide/mods/8"
 	DarktideModDML = "https://www.nexusmods.com/warhammer40kdarktide/mods/19"
 	ServoMQModPage = "https://www.nexusmods.com/warhammer40kdarktide/mods/139"
+	DarktideAPPage = "https://www.nexusmods.com/warhammer40kdarktide/mods/709"
 
 	DiscordDTModders = "https://discord.com/channels/1048312349867646996/1506507675976859679"
 	DiscordDTMy      = "https://discord.gg/BGZagw3xnz"
 
-	YouTubeGuideURL = "https://www.youtube.com/watch?v=k0Mvd-M-c5s"
+	YouTubeGuideURLOld = "https://www.youtube.com/watch?v=k0Mvd-M-c5s"
+	YouTubeGuideProfil = "https://www.youtube.com/watch?v=RDgXpLSmUXE"
 )
 
 // ───────────── Донаты ────────────────────────────────────────────
@@ -146,8 +149,13 @@ const (
 	ModNameWidth float32 = 450
 	LABRWidth    float32 = 130
 
-	TableRowHeight    = 6
-	SystemTableHeight = 75
+	TableRowHeight = 6
+	// SystemTableRowHeight — высота одной строки системной таблицы.
+	// Исторически SystemTableHeight = 75 было рассчитано на 2 строки
+	// (DML + DMF). Теперь высота контейнера вычисляется как
+	// SystemTableRowHeight * len(systemMods), поэтому 37.5 округлили
+	// до 38, чтобы округление не «съедало» пиксель у последней строки.
+	SystemTableRowHeight float32 = 38
 
 	StatusRowSpacing = -2 // отступ между строками в пикселях (0 — без отступа)
 	StatusFontSize   = 11 // размер шрифта для дополнительного статуса (основной будет на 2 больше)
@@ -155,7 +163,7 @@ const (
 
 const (
 	TableBackgroundImage   = "assets/mechanicus.png"
-	TableBackgroundOpacity = 0.97 // 1.00 - невидимый, 0 - видимый
+	TableBackgroundOpacity = 0.95 // 1.00 - невидимый, 0 - видимый
 
 	HeaderBackgroundImage = "assets/Yellow_BG.jpg"
 	ButtonBackgroundImage = "assets/Yellow_BG_col.jpg"

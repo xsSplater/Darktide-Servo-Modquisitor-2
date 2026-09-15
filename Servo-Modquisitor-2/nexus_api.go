@@ -1,4 +1,4 @@
-// nexus_api.go
+// Servo-Modquisitor-2/nexus_api.go
 package main
 
 import (
@@ -47,16 +47,24 @@ type FileInfo struct {
 var htmlTagRe = regexp.MustCompile(`<[^>]*>`)
 
 // FetchNexusModInfo получает информацию о моде по числовому ID.
+//
+// Параметр apiKey — это OAuth access token. Раньше функция игнорировала
+// его и вызывала app.getAuthToken() внутри (лишний поход в OS keyring,
+// который недешёвый: ~1-3 мс на вызов через Win Credential Manager /
+// libsecret). Теперь используем то, что передали.
 func (app *App) FetchNexusModInfo(modID int, apiKey string) (*NexusModInfo, error) {
-	url := fmt.Sprintf("%s/games/warhammer40kdarktide/mods/%d.json", nexusAPIBase, modID)
-	req, _ := http.NewRequest("GET", url, nil)
-	token := app.getAuthToken()
-	if token != "" {
-		req.Header.Set("Authorization", "Bearer "+token)
+	urlStr := fmt.Sprintf("%s/games/warhammer40kdarktide/mods/%d.json", nexusAPIBase, modID)
+	req, err := http.NewRequest("GET", urlStr, nil)
+	if err != nil {
+		return nil, fmt.Errorf("build request: %w", err)
+	}
+	if apiKey != "" {
+		req.Header.Set("Authorization", "Bearer "+apiKey)
 	}
 	req.Header.Set("Application-Name", appName)
 	req.Header.Set("Application-Version", appVersion)
 	req.Header.Set("Referer", NexusMainURL)
+
 	client := &http.Client{Timeout: Timeout10Seconds}
 	resp, err := client.Do(req)
 	if err != nil {
@@ -66,7 +74,10 @@ func (app *App) FetchNexusModInfo(modID int, apiKey string) (*NexusModInfo, erro
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("HTTP %d", resp.StatusCode)
 	}
-	body, _ := io.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("read body: %w", err)
+	}
 	var info NexusModInfo
 	if err := json.Unmarshal(body, &info); err != nil {
 		return nil, err
@@ -74,10 +85,17 @@ func (app *App) FetchNexusModInfo(modID int, apiKey string) (*NexusModInfo, erro
 	return &info, nil
 }
 
-// DownloadFileWithProgress скачивает файл и обновляет прогресс‑бар.
+// DownloadFileWithProgress скачивает файл и обновляет прогресс-бар.
+//
+// UI обновляется не на каждый прочитанный чанк (32 КБ), а только при
+// смене целого процента. При быстрой сети старый код вызвал бы
+// fyne.Do сотни раз в секунду и забил UI-очередь. Финальные 100%
+// выставляются явно, чтобы троттлинг не оставил прогресс на 99%.
 func (app *App) DownloadFileWithProgress(ctx context.Context, url, destPath string, bar *widget.ProgressBar) error {
+	// app.appendLogToFile(fmt.Sprintf("DownloadFileWithProgress: creating request to %s", url))
 	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
 	if err != nil {
+		app.appendLogToFile(fmt.Sprintf("DownloadFileWithProgress: NewRequest failed: %v", err))
 		return err
 	}
 	req.Header.Set("User-Agent", СonfigFolderSMQ)
@@ -86,74 +104,88 @@ func (app *App) DownloadFileWithProgress(ctx context.Context, url, destPath stri
 	req.Header.Set("Referer", NexusMainURL)
 
 	client := &http.Client{Timeout: Timeout30Minutes}
+	app.appendLogToFile("DownloadFileWithProgress: sending request")
 	resp, err := client.Do(req)
 	if err != nil {
+		app.appendLogToFile(fmt.Sprintf("DownloadFileWithProgress: Do failed: %v", err))
 		return err
 	}
 	defer resp.Body.Close()
+	app.appendLogToFile(fmt.Sprintf("DownloadFileWithProgress: response status %d", resp.StatusCode))
 
 	if resp.StatusCode != http.StatusOK {
+		app.appendLogToFile(fmt.Sprintf("DownloadFileWithProgress: bad status %d", resp.StatusCode))
 		return fmt.Errorf("HTTP error: %d", resp.StatusCode)
 	}
 
 	totalSize := resp.ContentLength
+	app.appendLogToFile(fmt.Sprintf("DownloadFileWithProgress: content length %d", totalSize))
+
 	out, err := os.Create(destPath)
 	if err != nil {
+		app.appendLogToFile(fmt.Sprintf("DownloadFileWithProgress: Create file failed: %v", err))
 		return err
 	}
 	defer out.Close()
 
 	var downloaded int64
 	buf := make([]byte, 32*1024)
-	var lastLoggedPercent int = -1
+	lastPercent := -1
 
 loop:
 	for {
 		select {
 		case <-ctx.Done():
+			app.appendLogToFile("DownloadFileWithProgress: context cancelled")
 			return ctx.Err()
 		default:
 			n, err := resp.Body.Read(buf)
 			if n > 0 {
-				_, writeErr := out.Write(buf[:n])
-				if writeErr != nil {
+				if _, writeErr := out.Write(buf[:n]); writeErr != nil {
+					app.appendLogToFile(fmt.Sprintf("DownloadFileWithProgress: write error: %v", writeErr))
 					return writeErr
 				}
 				downloaded += int64(n)
 				if totalSize > 0 {
 					percent := int(float64(downloaded) / float64(totalSize) * 100)
-					if percent > lastLoggedPercent {
-						lastLoggedPercent = percent
+					if percent > lastPercent {
+						lastPercent = percent
+						fyne.Do(func() {
+							bar.SetValue(float64(downloaded) / float64(totalSize))
+						})
 					}
-					fyne.Do(func() {
-						bar.SetValue(float64(downloaded) / float64(totalSize))
-					})
 				}
 			}
 			if err == io.EOF {
+				app.appendLogToFile(fmt.Sprintf("DownloadFileWithProgress: EOF reached, downloaded %d bytes", downloaded))
 				break loop
 			}
 			if err != nil {
+				app.appendLogToFile(fmt.Sprintf("DownloadFileWithProgress: read error: %v", err))
 				return err
 			}
 		}
 	}
-
+	// Гарантируем 100% даже если последний шаг прогресса был на 99.x%.
+	if totalSize > 0 {
+		fyne.Do(func() { bar.SetValue(1.0) })
+	}
+	app.appendLogToFile("DownloadFileWithProgress: completed successfully")
 	return nil
 }
 
 func (app *App) checkNexusUpdates() {
 	if app.getAuthToken() == "" {
-		app.appendLog(app.messages["nexus_api_key_missing"])
+		app.appendLog(app.msg("nexus_api_key_missing"))
 		return
 	}
 
-	app.appendLog(app.messages["log_checking_updates"])
+	app.appendLog(app.msg("log_checking_updates"))
 
 	// Показываем прогресс
 	bar, label, cancelChan, closeDialog := app.showProgressDialog(
-		app.messages["update_title"],
-		app.messages["collecting_mods_for_update"],
+		app.msg("update_title"),
+		app.msg("collecting_mods_for_update"),
 	)
 	defer closeDialog()
 
@@ -175,7 +207,7 @@ func (app *App) checkNexusUpdates() {
 	for i := range allModsCopy {
 		select {
 		case <-cancelChan:
-			app.appendLog(app.messages["collecting_mods_cancelled"])
+			app.appendLog(app.msg("collecting_mods_cancelled"))
 			return
 		default:
 		}
@@ -190,7 +222,7 @@ func (app *App) checkNexusUpdates() {
 			continue
 		}
 		if app.isSymlinkFolder(mod.Name) {
-			app.appendLog(fmt.Sprintf(app.messages["log_skipping_update_check_symlink"], mod.Name))
+			app.appendLog(fmt.Sprintf(app.msg("log_skipping_update_check_symlink"), mod.Name))
 			processed++
 			continue
 		}
@@ -212,7 +244,7 @@ func (app *App) checkNexusUpdates() {
 		}
 
 		if fileInfo.UploadedTimestamp > saved.Timestamp {
-			app.appendLog(fmt.Sprintf(app.messages["update_available_x_a_b"], mod.Name, saved.Version, fileInfo.Version))
+			app.appendLog(fmt.Sprintf(app.msg("update_available_x_a_b"), mod.Name, saved.Version, fileInfo.Version))
 			updatesFound++
 		}
 
@@ -220,19 +252,19 @@ func (app *App) checkNexusUpdates() {
 		if processed%5 == 0 || processed == totalMods {
 			fyne.Do(func() {
 				bar.SetValue(float64(processed) / float64(totalMods))
-				label.SetText(fmt.Sprintf(app.messages["checked_x_y"], processed, totalMods))
+				label.SetText(fmt.Sprintf(app.msg("checked_x_y"), processed, totalMods))
 			})
 		}
 	}
 
 	if updatesFound == 0 {
-		app.appendLog(app.messages["no_updates_found"])
+		app.appendLog(app.msg("no_updates_found"))
 	} else {
-		app.appendLog(fmt.Sprintf(app.messages["updates_found_count"], updatesFound))
+		app.appendLog(fmt.Sprintf(app.msg("updates_found_count"), updatesFound))
 	}
 
 	app.checkSpecialUpdates()
-	app.appendLog(app.messages["log_update_check_completed"])
+	app.appendLog(app.msg("log_update_check_completed"))
 
 	fyne.Do(func() {
 		app.refreshModList()
@@ -258,9 +290,12 @@ func (app *App) getLatestFileInfo(modID int) (*FileInfo, error) {
 	if token == "" {
 		return nil, fmt.Errorf("no authentication token")
 	}
-	url := fmt.Sprintf(NexusV1Files, modID)
-	req, _ := http.NewRequest("GET", url, nil)
-	req.Header.Set("Authorization", "Bearer "+token) // токен уже гарантированно не пустой
+	urlStr := fmt.Sprintf(NexusV1Files, modID)
+	req, err := http.NewRequest("GET", urlStr, nil)
+	if err != nil {
+		return nil, fmt.Errorf("build request: %w", err)
+	}
+	req.Header.Set("Authorization", "Bearer "+token)
 	req.Header.Set("Application-Name", appName)
 	req.Header.Set("Application-Version", appVersion)
 	req.Header.Set("Referer", NexusMainURL)
@@ -274,7 +309,7 @@ func (app *App) getLatestFileInfo(modID int) (*FileInfo, error) {
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("read body: %w", err)
 	}
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("HTTP %d: %s", resp.StatusCode, string(body))
@@ -285,7 +320,7 @@ func (app *App) getLatestFileInfo(modID int) (*FileInfo, error) {
 			FileID            int    `json:"file_id"`
 			Version           string `json:"version"`
 			UploadedTimestamp int64  `json:"uploaded_timestamp"`
-			FileName          string `json:"file_name"` // важно!
+			FileName          string `json:"file_name"`
 		} `json:"files"`
 	}
 	if err := json.Unmarshal(body, &result); err != nil {
@@ -314,8 +349,11 @@ func (app *App) getFileInfoByID(modID, fileID string) (*FileInfo, error) {
 	if token == "" {
 		return nil, fmt.Errorf("no authentication token")
 	}
-	url := fmt.Sprintf(NexusV1Filess, modID, fileID)
-	req, _ := http.NewRequest("GET", url, nil)
+	urlStr := fmt.Sprintf(NexusV1Filess, modID, fileID)
+	req, err := http.NewRequest("GET", urlStr, nil)
+	if err != nil {
+		return nil, fmt.Errorf("build request: %w", err)
+	}
 	req.Header.Set("Authorization", "Bearer "+token)
 	req.Header.Set("Application-Name", appName)
 	req.Header.Set("Application-Version", appVersion)
@@ -328,7 +366,10 @@ func (app *App) getFileInfoByID(modID, fileID string) (*FileInfo, error) {
 	}
 	defer resp.Body.Close()
 
-	body, _ := io.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("read body: %w", err)
+	}
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("HTTP %d: %s", resp.StatusCode, string(body))
 	}
@@ -366,14 +407,17 @@ func (app *App) getFileInfoByFolderPattern(modID int, folderName string) (*FileI
 	if token == "" {
 		return nil, fmt.Errorf("no authentication token")
 	}
-	url := fmt.Sprintf(NexusV1Files, modID)
-	req, _ := http.NewRequest("GET", url, nil)
+	urlStr := fmt.Sprintf(NexusV1Files, modID)
+	req, err := http.NewRequest("GET", urlStr, nil)
+	if err != nil {
+		return nil, fmt.Errorf("build request: %w", err)
+	}
 	req.Header.Set("Authorization", "Bearer "+token)
 	req.Header.Set("Application-Name", appName)
 	req.Header.Set("Application-Version", appVersion)
 	req.Header.Set("Referer", NexusMainURL)
 
-	client := &http.Client{Timeout: 10 * time.Second}
+	client := &http.Client{Timeout: Timeout10Seconds}
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
@@ -382,7 +426,7 @@ func (app *App) getFileInfoByFolderPattern(modID int, folderName string) (*FileI
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("read body: %w", err)
 	}
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("HTTP %d: %s", resp.StatusCode, string(body))
@@ -418,7 +462,7 @@ func (app *App) getFileInfoByFolderPattern(modID int, folderName string) (*FileI
 	})
 
 	for _, f := range files {
-		fileNameNorm := normalizeForPattern(f.FileName) // <-- нормализуем имя файла
+		fileNameNorm := normalizeForPattern(f.FileName)
 		if strings.Contains(fileNameNorm, normalizedPattern) {
 			return &FileInfo{
 				ID:                f.FileID,
@@ -431,7 +475,6 @@ func (app *App) getFileInfoByFolderPattern(modID int, folderName string) (*FileI
 	return nil, fmt.Errorf("no file matching pattern '%s' for folder '%s'", pattern, folderName)
 }
 
-// .
 func (app *App) getLatestFileInfoForMod(modID int, folderName string) (*FileInfo, error) {
 	return app.getFileInfoByFolderPattern(modID, folderName)
 }
@@ -469,15 +512,13 @@ func (app *App) autoAddModToDatabase(modID int, folderName string, fileName ...s
 				existing.Author == "" {
 				// Удаляем старую запись из кэша
 				oldCacheKey := fmt.Sprintf("%d:%s", existingModID, folderName)
-				app.cacheMutex.Lock()
-				delete(app.nexusVersionCache, oldCacheKey)
-				app.cacheMutex.Unlock()
+				app.versionCache.Delete(oldCacheKey)
 				app.saveNexusVersionCache()
-				app.appendLog(fmt.Sprintf(app.messages["removed_cache_for"], folderName, existingModID, modID))
+				app.appendLogToFile(fmt.Sprintf(app.msg("removed_cache_for"), folderName, existingModID, modID))
 				// Далее создадим новую запись с нуля
 				existing = nil // чтобы не копировать старую
 			} else {
-				app.appendLog(fmt.Sprintf(app.messages["mod_already_has_id"], folderName, existingModID, modID))
+				app.appendLog(fmt.Sprintf(app.msg("mod_already_has_id"), folderName, existingModID, modID))
 				return
 			}
 		}
@@ -497,7 +538,7 @@ func (app *App) autoAddModToDatabase(modID int, folderName string, fileName ...s
 		// Запись уже полная, но добавим недостающие языковые ключи (если они отсутствуют)
 		ensureAllLanguageKeys(existing)
 		if err := checks.SaveModDatabase(); err != nil {
-			app.appendLog(fmt.Sprintf(app.messages["save_mod_db_failed"], err))
+			app.appendLog(fmt.Sprintf(app.msg("save_mod_db_failed"), err))
 		}
 		return
 	}
@@ -535,7 +576,7 @@ func (app *App) autoAddModToDatabase(modID int, folderName string, fileName ...s
 	}
 	if pattern != "" {
 		entry.NexusFilePattern = pattern
-		app.appendLog(fmt.Sprintf(app.messages["log_autosaved_stable_pattern"], folderName, pattern))
+		app.appendLogToFile(fmt.Sprintf(app.msg("log_autosaved_stable_pattern"), folderName, pattern))
 	}
 
 	// Инициализируем карты, если nil
@@ -566,11 +607,16 @@ func (app *App) autoAddModToDatabase(modID int, folderName string, fileName ...s
 	// Сохраняем
 	checks.UpdateModDBEntry(entry)
 	if err := checks.SaveModDatabase(); err != nil {
-		app.appendLog(fmt.Sprintf(app.messages["log_failed_to_save_mod_db"], err))
+		app.appendLogToFile(fmt.Sprintf(app.msg("log_failed_to_save_mod_db"), err))
 	} else {
-		app.appendLog(fmt.Sprintf(app.messages["log_mod_db_updated"], folderName))
-		app.modDatabase = checks.GetModDBList()
-		checks.SetModDatabase(app.modDatabase)
+		app.appendLog(fmt.Sprintf(app.msg("log_mod_db_updated"), folderName))
+		// Забираем свежий список из modDBMap (внутри GetModDBList уже
+		// взята блокировка modDBMutex в пакете checks).
+		newDB := checks.GetModDBList()
+		app.modsMutex.Lock()
+		app.modDatabase = newDB
+		app.modsMutex.Unlock()
+		checks.SetModDatabase(newDB)
 		fyne.Do(func() {
 			app.refreshModList()
 		})
@@ -581,10 +627,13 @@ func (app *App) autoAddModToDatabase(modID int, folderName string, fileName ...s
 func (app *App) getPremiumDownloadURL(modID, fileID string) (string, string, error) {
 	token := app.getAuthToken()
 	if token == "" {
-		return "", "", errors.New(app.messages["log_error_prem_download_oauth"])
+		return "", "", errors.New(app.msg("log_error_prem_download_oauth"))
 	}
 	urlStr := fmt.Sprintf(NexusV1DownLink, modID, fileID)
-	req, _ := http.NewRequest("GET", urlStr, nil)
+	req, err := http.NewRequest("GET", urlStr, nil)
+	if err != nil {
+		return "", "", fmt.Errorf("build request: %w", err)
+	}
 	req.Header.Set("Authorization", "Bearer "+token)
 	req.Header.Set("Application-Name", appName)
 	req.Header.Set("Application-Version", appVersion)
@@ -597,7 +646,10 @@ func (app *App) getPremiumDownloadURL(modID, fileID string) (string, string, err
 		return "", "", err
 	}
 	defer resp.Body.Close()
-	respBody, _ := io.ReadAll(resp.Body)
+	respBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return "", "", fmt.Errorf("read body: %w", err)
+	}
 	snippet := string(respBody)
 	if len(snippet) > 500 {
 		snippet = snippet[:500] + "..."
@@ -618,24 +670,29 @@ func (app *App) getPremiumDownloadURL(modID, fileID string) (string, string, err
 }
 
 // getFreeDownloadURL - for FREE users (v1, used for nxm links of regular mods)
+//
+// 401/403 обрабатываем отдельно от общего случая: на этой ручке они
+// означают истёкшую nxm-ссылку. Раньше проверка 401/403 шла после
+// общего if и была мёртвым кодом — пользователь видел сухое
+// "API error 401: {...}" вместо понятного сообщения.
 func (app *App) getFreeDownloadURL(modID, fileID, key, expires string) (string, string, error) {
-	// Checking for the presence of required parameters
 	if key == "" || expires == "" {
 		return "", "", fmt.Errorf("missing key or expires in nxm link")
 	}
 
-	// Forming a URL with the key and expires parameters
 	urlStr := fmt.Sprintf(NexusV1DownLink, modID, fileID) +
 		"?key=" + url.QueryEscape(key) +
 		"&expires=" + url.QueryEscape(expires)
 
-	req, _ := http.NewRequest("GET", urlStr, nil)
+	req, err := http.NewRequest("GET", urlStr, nil)
+	if err != nil {
+		return "", "", fmt.Errorf("build request: %w", err)
+	}
 
 	token := app.getAuthToken()
 	if token != "" {
 		req.Header.Set("Authorization", "Bearer "+token)
 	}
-
 	req.Header.Set("Application-Name", appName)
 	req.Header.Set("Application-Version", appVersion)
 	req.Header.Set("Referer", NexusMainURL)
@@ -648,18 +705,24 @@ func (app *App) getFreeDownloadURL(modID, fileID, key, expires string) (string, 
 	}
 	defer resp.Body.Close()
 
-	respBody, _ := io.ReadAll(resp.Body)
+	respBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return "", "", fmt.Errorf("read body: %w", err)
+	}
 	snippet := string(respBody)
 	if len(snippet) > 500 {
 		snippet = snippet[:500] + "..."
 	}
 
-	if resp.StatusCode != http.StatusOK {
+	switch resp.StatusCode {
+	case http.StatusOK:
+		// продолжаем ниже
+	case http.StatusUnauthorized, http.StatusForbidden:
+		return "", "", fmt.Errorf(
+			"download link expired or invalid (HTTP %d). Please generate a new link on Nexus.",
+			resp.StatusCode)
+	default:
 		return "", "", fmt.Errorf("API error %d: %s", resp.StatusCode, snippet)
-	}
-
-	if resp.StatusCode == 401 || resp.StatusCode == 403 {
-		return "", "", fmt.Errorf("download link expired or invalid (HTTP %d). Please generate a new link on Nexus.", resp.StatusCode)
 	}
 
 	var mirrors []struct {
@@ -711,17 +774,17 @@ func (app *App) FetchChangelog(modID int, fileID int) (string, error) {
 	if token == "" {
 		return "", fmt.Errorf("no authentication token")
 	}
-	url := fmt.Sprintf("%s/games/warhammer40kdarktide/mods/%d/files/%d.json", nexusAPIBase, modID, fileID)
-	req, err := http.NewRequest("GET", url, nil)
+	urlStr := fmt.Sprintf("%s/games/warhammer40kdarktide/mods/%d/files/%d.json", nexusAPIBase, modID, fileID)
+	req, err := http.NewRequest("GET", urlStr, nil)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("build request: %w", err)
 	}
 	req.Header.Set("Authorization", "Bearer "+token)
 	req.Header.Set("Application-Name", appName)
 	req.Header.Set("Application-Version", appVersion)
 	req.Header.Set("Referer", NexusMainURL)
 
-	client := &http.Client{Timeout: 10 * time.Second}
+	client := &http.Client{Timeout: Timeout10Seconds}
 	resp, err := client.Do(req)
 	if err != nil {
 		return "", err
@@ -749,20 +812,26 @@ func (app *App) getOldestFileInfo(modID int) (*FileInfo, error) {
 	if token == "" {
 		return nil, fmt.Errorf("no authentication token")
 	}
-	url := fmt.Sprintf(NexusV1Files, modID)
-	req, _ := http.NewRequest("GET", url, nil)
+	urlStr := fmt.Sprintf(NexusV1Files, modID)
+	req, err := http.NewRequest("GET", urlStr, nil)
+	if err != nil {
+		return nil, fmt.Errorf("build request: %w", err)
+	}
 	req.Header.Set("Authorization", "Bearer "+token)
 	req.Header.Set("Application-Name", appName)
 	req.Header.Set("Application-Version", appVersion)
 	req.Header.Set("Referer", NexusMainURL)
 
-	client := &http.Client{Timeout: 10 * time.Second}
+	client := &http.Client{Timeout: Timeout10Seconds}
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
-	body, _ := io.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("read body: %w", err)
+	}
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("HTTP %d: %s", resp.StatusCode, string(body))
 	}

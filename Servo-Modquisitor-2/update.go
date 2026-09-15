@@ -1,4 +1,4 @@
-// update.go
+// Servo-Modquisitor-2/update.go
 package main
 
 import (
@@ -8,43 +8,18 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
-	"strconv"
-	"strings"
 	"time"
-)
 
-// shouldCheckUpdates определяет, нужно ли проверять обновления при старте.
-func (app *App) shouldCheckUpdates() bool {
-	if app.cfg.UpdateCheckFrequency == "never" {
-		return false
-	}
-	if app.cfg.UpdateCheckFrequency == "every_start" {
-		return true
-	}
-	if app.cfg.LastUpdateCheck == "" {
-		return true
-	}
-	last, err := time.Parse(time.RFC3339, app.cfg.LastUpdateCheck)
-	if err != nil {
-		return true
-	}
-	now := time.Now()
-	switch app.cfg.UpdateCheckFrequency {
-	case "weekly":
-		return now.Sub(last) >= 7*24*time.Hour
-	case "monthly":
-		return now.After(last.AddDate(0, 1, 0))
-	case "yearly":
-		return now.After(last.AddDate(1, 0, 0))
-	}
-	return false
-}
+	"fyne.io/fyne/v2"
+)
 
 // initiateSortFilesUpdate - открывает страницу мода и предлагает скачать файлы сортировки
 func (app *App) initiateSortFilesUpdate() {
-	app.appendLog(app.messages["log_open_nexus_page"])
+	app.appendLog(app.msg("log_open_nexus_page"))
 	u, _ := url.Parse(ServoMQModPage)
-	_ = app.myApp.OpenURL(u)
+	fyne.Do(func() {
+		_ = app.myApp.OpenURL(u)
+	})
 }
 
 // ensureSortFiles - вызывается при старте, если файлы отсутствуют.
@@ -62,64 +37,43 @@ func (app *App) ensureSortFiles() {
 		return
 	}
 
-	app.appendLog(app.messages["sort_files_missing_short"])
+	app.appendLog(app.msg("sort_files_missing_short"))
 
-	if app.cfg.SkipSortFilesPrompt {
-		app.appendLog(app.messages["download_skip_forever"])
+	// Чтение настройки под мьютексом
+	app.cfgMutex.RLock()
+	skipPrompt := app.cfg.SkipSortFilesPrompt
+	app.cfgMutex.RUnlock()
+
+	if skipPrompt {
+		app.appendLog(app.msg("download_skip_forever"))
 		return
 	}
 
 	// Асинхронный диалог - не блокирует поток
 	app.showChoiceDialog(
 		app.mainWindow,
-		app.messages["sort_files_missing"],
-		app.messages["sort_files_missing_open_page"],
+		app.msg("sort_files_missing"),
+		app.msg("sort_files_missing_open_page"),
 		func(choice int) {
 			switch choice {
 			case 0:
 				u, _ := url.Parse(ServoMQModPage)
 				_ = app.myApp.OpenURL(u)
-				app.appendLog(app.messages["please_download_mod_db_install"])
+				app.appendLog(app.msg("please_download_mod_db_install"))
 			case 2:
+				app.cfgMutex.Lock()
 				app.cfg.SkipSortFilesPrompt = true
+				app.cfgMutex.Unlock()
 				saveConfig(app.cfg)
 				fallthrough
 			case 1:
-				app.appendLog(app.messages["download_skipped"])
+				app.appendLog(app.msg("download_skipped"))
 			}
 		},
-		app.messages["btn_yes"],
-		app.messages["skip"],
-		app.messages["download_skip_forever"],
+		app.msg("btn_yes"),
+		app.msg("skip"),
+		app.msg("download_skip_forever"),
 	)
-}
-
-// compareVersions сравнивает две семантические версии (например, "1.9.0" и "1.9.5").
-// Возвращает -1, если v1 < v2; 0, если равны; 1, если v1 > v2.
-func compareVersions(v1, v2 string) int {
-	// Разбиваем на части по точкам
-	parts1 := strings.Split(v1, ".")
-	parts2 := strings.Split(v2, ".")
-	maxLen := len(parts1)
-	if len(parts2) > maxLen {
-		maxLen = len(parts2)
-	}
-	for i := 0; i < maxLen; i++ {
-		var n1, n2 int
-		if i < len(parts1) {
-			n1, _ = strconv.Atoi(parts1[i])
-		}
-		if i < len(parts2) {
-			n2, _ = strconv.Atoi(parts2[i])
-		}
-		if n1 < n2 {
-			return -1
-		}
-		if n1 > n2 {
-			return 1
-		}
-	}
-	return 0
 }
 
 func getProgramArchivePattern() string {
@@ -137,44 +91,46 @@ func getProgramArchivePattern() string {
 func (app *App) checkSpecialUpdates() {
 	// Проверяем, авторизован ли пользователь
 	if app.getAuthToken() == "" {
-		app.appendLog(app.messages["log_spec_update_not_logged"])
+		app.appendLog(app.msg("log_spec_update_not_logged"))
 		return
 	}
 
 	// Проверка программы
 	programFileInfo, err := app.getLatestFileInfoForMod(139, getProgramArchivePattern())
 	if err != nil {
-		app.logNexusError(err, "Program", app.messages["program_update_unavailable"])
+		app.logNexusError(err, "Program", app.msg("program_update_unavailable"))
 	} else if programFileInfo != nil {
 		if saved, ok := app.getCachedVersion(NexusCacheKeyProgram); ok {
 			// сравниваем, но не обновляем кэш
 			if compareVersions(programFileInfo.Version, saved.Version) > 0 {
-				app.appendLog(fmt.Sprintf(app.messages["log_new_program_version_available"],
+				app.appendLog(fmt.Sprintf(app.msg("log_new_program_version_available"),
 					programFileInfo.Version, saved.Version))
 			}
 		} else {
 			// Просто пропускаем, не создаём запись
-			app.appendLog(app.messages["log_program_not_cached"])
+			app.appendLog(app.msg("log_program_not_cached"))
 		}
 	}
 
 	// Проверка файлов сортировки
 	rulesFileInfo, err := app.getLatestFileInfoForMod(139, "Mod DB And Sorting Rules")
 	if err != nil {
-		app.logNexusError(err, "Rules", app.messages["rules_update_unavailable"])
+		app.logNexusError(err, "Rules", app.msg("rules_update_unavailable"))
 	} else if rulesFileInfo != nil {
 		if saved, ok := app.getCachedVersion(NexusCacheKeyRules); ok {
 			if compareVersions(rulesFileInfo.Version, saved.Version) > 0 {
-				app.appendLog(fmt.Sprintf(app.messages["log_new_sorting_files_available"],
+				app.appendLog(fmt.Sprintf(app.msg("log_new_sorting_files_available"),
 					rulesFileInfo.Version, saved.Version))
 			}
 		} else {
 			// Просто пропускаем, не создаём запись
-			app.appendLog(app.messages["log_sorting_rules_not_cached"])
+			app.appendLog(app.msg("log_sorting_rules_not_cached"))
 		}
 	}
 
-	// Обновляем время последней проверки
+	// Обновляем время последней проверки под мьютексом
+	app.cfgMutex.Lock()
 	app.cfg.LastUpdateCheck = time.Now().Format(time.RFC3339)
-	saveConfig(app.cfg)
+	app.cfgMutex.Unlock()
+	app.saveConfigSafe()
 }

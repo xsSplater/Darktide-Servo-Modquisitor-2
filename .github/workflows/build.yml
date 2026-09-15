@@ -3,21 +3,17 @@ name: Build
 on:
   release:
     types: [ published, prereleased ]
-  push:
-    tags:
-      - 'v*'
   workflow_dispatch:
 
 permissions:
   contents: write
 
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
 jobs:
-  # === Сборка для Windows ===
+  # ─── Сборка для Windows ────────────────────────────────────────────
   build-windows:
+    name: Build Windows
     runs-on: windows-latest
+    timeout-minutes: 30
     defaults:
       run:
         working-directory: ./Servo-Modquisitor-2
@@ -28,59 +24,50 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.26'
+          go-version: '1.27.1'
           cache-dependency-path: ./Servo-Modquisitor-2/go.sum
-
-      - name: List files for debugging
-        run: |
-          echo "Current directory:"
-          dir
-          echo "winres directory:"
-          if exist winres dir winres
-        shell: cmd
 
       - name: Install go-winres
         run: go install github.com/tc-hib/go-winres@latest
 
-      - name: Copy winres.json to root (fix)
-        run: |
-          if exist winres\winres.json (
-            copy winres\winres.json .
-          ) else (
-            echo "winres/winres.json not found!"
-            exit 1
-          )
-        shell: cmd
-
       - name: Generate resources (icon + version info)
-        run: go-winres make
+        run: go-winres make --in winres/winres.json --out rsrc
 
       - name: Download dependencies
         run: go mod download
 
+      - name: Vet
+        run: go vet ./...
+
       - name: Build
         run: go build -ldflags="-s -w -H=windowsgui" -o servo-modquisitor.exe .
 
-      - name: Prepare files for packaging (Windows)
+      - name: Prepare files for packaging
+        shell: bash
         run: |
-          mkdir Servo-Modquisitor-2
-          copy servo-modquisitor.exe Servo-Modquisitor-2\
-          copy ..\SortingRules_and_ModDatabase\mandatory_obsolete_incompatible_dependencies.json Servo-Modquisitor-2\
-          copy ..\SortingRules_and_ModDatabase\mod_database.json Servo-Modquisitor-2\
+          mkdir -p package/Servo-Modquisitor-2
+          cp servo-modquisitor.exe package/Servo-Modquisitor-2/
+          cp ../SortingRules_and_ModDatabase/mandatory_obsolete_incompatible_dependencies.json package/Servo-Modquisitor-2/
+          cp ../SortingRules_and_ModDatabase/mod_database.json package/Servo-Modquisitor-2/
 
       - name: Package Windows (zip)
+        shell: bash
         run: |
-          7z a -tzip Servo-Modquisitor-2-windows.zip .\Servo-Modquisitor-2\
+          cd package
+          7z a -tzip ../Servo-Modquisitor-2-windows.zip Servo-Modquisitor-2
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: servo-modquisitor-windows
           path: ./Servo-Modquisitor-2/Servo-Modquisitor-2-windows.zip
+          retention-days: 14
 
-  # === Сборка для Linux ===
+  # ─── Сборка для Linux ──────────────────────────────────────────────
   build-linux:
+    name: Build Linux
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     defaults:
       run:
         working-directory: ./Servo-Modquisitor-2
@@ -91,10 +78,10 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.26'
+          go-version: '1.27.1'
           cache-dependency-path: ./Servo-Modquisitor-2/go.sum
 
-      - name: Install dependencies (Linux)
+      - name: Install system dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y gcc libgl1-mesa-dev xorg-dev libxkbcommon-x11-dev libgtk-3-dev
@@ -102,28 +89,35 @@ jobs:
       - name: Download dependencies
         run: go mod download
 
-      - name: Build
-        run: go build -ldflags="-s -w" -o servo-modquisitor-linux .
+      - name: Vet
+        run: go vet ./...
 
-      - name: Prepare files for packaging (Linux)
+      - name: Build
+        run: go build -ldflags="-s -w" -o servo-modquisitor .
+
+      - name: Prepare files for packaging
         run: |
-          mkdir Servo-Modquisitor-2
-          cp servo-modquisitor-linux Servo-Modquisitor-2/
-          cp ../SortingRules_and_ModDatabase/mandatory_obsolete_incompatible_dependencies.json Servo-Modquisitor-2/
-          cp ../SortingRules_and_ModDatabase/mod_database.json Servo-Modquisitor-2/
-          chmod +x Servo-Modquisitor-2/servo-modquisitor-linux
+          mkdir -p package/Servo-Modquisitor-2
+          cp servo-modquisitor package/Servo-Modquisitor-2/
+          cp ../SortingRules_and_ModDatabase/mandatory_obsolete_incompatible_dependencies.json package/Servo-Modquisitor-2/
+          cp ../SortingRules_and_ModDatabase/mod_database.json package/Servo-Modquisitor-2/
+          chmod +x package/Servo-Modquisitor-2/servo-modquisitor
 
       - name: Package Linux (tar.gz)
-        run: tar -czvf Servo-Modquisitor-2-linux.tar.gz Servo-Modquisitor-2/
+        run: |
+          cd package
+          tar -czvf ../Servo-Modquisitor-2-linux.tar.gz Servo-Modquisitor-2
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: servo-modquisitor-linux
           path: ./Servo-Modquisitor-2/Servo-Modquisitor-2-linux.tar.gz
+          retention-days: 14
 
-  # === Загрузка архивов в релиз (при публикации) ===
+  # ─── Загрузка архивов в GitHub Release ─────────────────────────────
   release:
+    name: Attach artifacts to Release
     needs: [build-windows, build-linux]
     runs-on: ubuntu-latest
     if: github.event_name == 'release' && (github.event.action == 'published' || github.event.action == 'prereleased')
@@ -142,33 +136,44 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  # === Публикация на Nexus Mods ===
+  # ─── Загрузка на Nexus Mods (только на published, не на prereleased) ─
   upload-nexus:
     name: Upload to Nexus Mods
     runs-on: ubuntu-latest
     needs: release
     if: github.event_name == 'release' && github.event.action == 'published'
-    permissions:
-      contents: read
     steps:
-      - name: Download artifacts from release
+      - name: Extract version from tag
+        id: version
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Release version: $VERSION"
+
+      - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
           path: artifacts
 
-      - name: Prepare Linux tar.gz inside zip (for Nexus)
+      - name: Prepare Linux zip (Nexus needs zip for signed binary)
         run: |
-          linux_tar=$(find artifacts -name "*.tar.gz" | head -n 1)
-          if [ -n "$linux_tar" ]; then
-            cp "$linux_tar" ./Servo-Modquisitor-2-linux.tar.gz
-            zip Servo-Modquisitor-2-linux.zip Servo-Modquisitor-2-linux.tar.gz
+          LINUX_TAR=$(find artifacts -name "*.tar.gz" | head -n 1)
+          if [ -z "$LINUX_TAR" ]; then
+            echo "Linux tar.gz not found"
+            exit 1
           fi
+          cp "$LINUX_TAR" ./Servo-Modquisitor-2-linux.tar.gz
+          zip -9 Servo-Modquisitor-2-linux.zip Servo-Modquisitor-2-linux.tar.gz
 
       - name: Find Windows zip
         id: find_win
         run: |
-          WIN_ZIP=$(find artifacts -name "*.zip" ! -name "*linux*" | head -n 1)
-          echo "win_zip=$WIN_ZIP" >> $GITHUB_OUTPUT
+          WIN_ZIP=$(find artifacts -name "*.zip" | grep -v linux | head -n 1)
+          if [ -z "$WIN_ZIP" ]; then
+            echo "Windows zip not found"
+            exit 1
+          fi
+          echo "win_zip=$WIN_ZIP" >> "$GITHUB_OUTPUT"
 
       - name: Upload Windows to Nexus
         uses: Nexus-Mods/upload-action@v1.0.0-beta.10
@@ -176,7 +181,7 @@ jobs:
           api_key: ${{ secrets.NEXUSMODS_APIKEY }}
           file_id: 7867809
           filename: ${{ steps.find_win.outputs.win_zip }}
-          version: 3.0.0
+          version: ${{ steps.version.outputs.version }}
           display_name: Servo-Modquisitor-2-windows.zip
           category: main
           mod_id: 139
@@ -188,7 +193,7 @@ jobs:
           api_key: ${{ secrets.NEXUSMODS_APIKEY }}
           file_id: 7867812
           filename: Servo-Modquisitor-2-linux.zip
-          version: 3.0.0
+          version: ${{ steps.version.outputs.version }}
           display_name: Servo-Modquisitor-2-linux.zip
           category: main
           mod_id: 139
