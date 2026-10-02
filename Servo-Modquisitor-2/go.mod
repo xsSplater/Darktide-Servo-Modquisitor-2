@@ -5,6 +5,7 @@ go 1.27.1
 require (
 	fyne.io/fyne/v2 v2.8.1
 	github.com/STARRY-S/zip v0.2.3
+	github.com/jeandeaual/go-locale v0.0.0-20250612000132-0ef82f21eade
 	github.com/lusingander/colorpicker v0.7.5
 	github.com/mholt/archives v0.1.5
 	github.com/zalando/go-keyring v0.2.8
@@ -33,7 +34,6 @@ require (
 	github.com/go-text/typesetting v0.3.5 // indirect
 	github.com/godbus/dbus/v5 v5.2.2 // indirect
 	github.com/hashicorp/golang-lru/v2 v2.0.7 // indirect
-	github.com/jeandeaual/go-locale v0.0.0-20250612000132-0ef82f21eade // indirect
 	github.com/jsummers/gobmp v0.0.0-20230614200233-a9de23ed2e25 // indirect
 	github.com/klauspost/compress v1.20.0 // indirect
 	github.com/klauspost/pgzip v1.2.6 // indirect
@@ -51,7 +51,7 @@ require (
 	github.com/srwiley/rasterx v0.0.0-20220730225603-2ab79fcdd4ef // indirect
 	github.com/stangelandcl/ppmd v0.1.1 // indirect
 	github.com/stretchr/objx v0.5.3 // indirect
-	github.com/ulikunitz/xz v0.5.16 // indirect
+	github.com/ulikunitz/xz v0.5.17 // indirect
 	github.com/yuin/goldmark v1.8.6 // indirect
 	go4.org v0.0.0-20260112195520-a5071408f32f // indirect
 	golang.org/x/image v0.46.0 // indirect
@@ -59,8 +59,8 @@ require (
 	golang.org/x/text v0.42.0 // indirect
 )
 
-// replace fyne.io/fyne/v2 => A:/GitHub/xssyne
-replace fyne.io/fyne/v2 => github.com/xsSplater/xssyne/v2 v2.0.1
+replace fyne.io/fyne/v2 => github.com/xsSplater/xssyne/v2 v2.0.2
+// replace fyne.io/fyne/v2 => /home/xssplater/Проекты/GitHub/xssyne // локальная папка
 
-// replace github.com/lusingander/colorpicker => A:/GitHub/xsscolorpicker
+// replace github.com/lusingander/colorpicker => /home/xssplater/Проекты/GitHub/xsscolorpicker // локальная папка
 replace github.com/lusingander/colorpicker => github.com/xsSplater/xsscolorpicker v0.5.1

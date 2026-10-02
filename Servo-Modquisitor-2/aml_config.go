@@ -20,6 +20,7 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+	"sync/atomic"
 	"time"
 
 	"fyne.io/fyne/v2"
@@ -117,14 +118,17 @@ func (app *App) showAMLConfigWindow() {
 	// left-list filter state
 	searchText := ""
 	filterMode := 0 // 0 - Все, 1 - С настройками AML, 2 - Без настроек AML
-	dirty := false  // unsaved changes flag
+
+	// dirty и blinkActive — читаются из фоновой горутины мигания,
+	// поэтому держим их в atomic, а не в обычных bool.
+	var dirty atomic.Bool
+	var blinkActive atomic.Bool
 
 	var modList *widget.Table
 	var applyModFilter func()
 	var loadMod func(c checks.AMLModConfig)
 	var saveBtn *CustomButton
 	var reloadBtn *CustomButton
-	var blinkActive bool
 
 	// Section-level state
 	var sectionTables [3]*widget.Table
@@ -277,18 +281,22 @@ func (app *App) showAMLConfigWindow() {
 	saveBtn = NewCustomButton(app.msg("aml_btn_save"), nil)
 
 	// ── Определяем функцию обновления внешнего вида кнопки Save (мигание) ──
+	// ── Определяем функцию обновления внешнего вида кнопки Save (мигание) ──
+	//
+	// dirty и blinkActive — atomic.Bool, потому что цикл мигания живёт
+	// в отдельной горутине и читает оба флага, пока UI-поток их пишет.
 	updateSaveButtonAppearance := func() {
-		if dirty {
-			if !blinkActive {
-				blinkActive = true
+		if dirty.Load() {
+			if !blinkActive.Load() {
+				blinkActive.Store(true)
 				go func() {
-					for blinkActive && dirty {
+					for blinkActive.Load() && dirty.Load() {
 						fyne.Do(func() {
 							saveBtn.Importance = widget.WarningImportance
 							saveBtn.Refresh()
 						})
 						time.Sleep(600 * time.Millisecond)
-						if !dirty {
+						if !dirty.Load() {
 							break
 						}
 						fyne.Do(func() {
@@ -304,7 +312,7 @@ func (app *App) showAMLConfigWindow() {
 				}()
 			}
 		} else {
-			blinkActive = false
+			blinkActive.Store(false)
 			fyne.Do(func() {
 				saveBtn.Importance = widget.MediumImportance
 				saveBtn.Refresh()
@@ -365,7 +373,7 @@ func (app *App) showAMLConfigWindow() {
 		}
 		updateConfigByFolder(selectedFolder)
 		applyModFilter() // refresh marker/counts (and re-highlight)
-		dirty = false
+		dirty.Store(false)
 		updateSaveButtonAppearance()
 	}
 	saveBtn.SetToolTip(app.msg("btn_aml_config_tooltip"))
@@ -389,12 +397,12 @@ func (app *App) showAMLConfigWindow() {
 							break
 						}
 					}
-					dirty = false
+					dirty.Store(false)
 					updateSaveButtonAppearance()
 				})
 			}
 
-			if dirty {
+			if dirty.Load() {
 				// Диалог должен показываться в главном потоке, поэтому используем fyne.Do
 				choice := app.showChoiceDialogSync(
 					win,
@@ -469,7 +477,7 @@ func (app *App) showAMLConfigWindow() {
 	versionEntry.SetPlaceHolder(app.msg("placeholder_mod_version"))
 	versionEntry.OnChanged = func(s string) {
 		edit.version = s
-		dirty = true
+		dirty.Store(true)
 		updateSaveButtonAppearance()
 	}
 	versionSpacer := canvas.NewRectangle(color.Transparent)
@@ -480,7 +488,7 @@ func (app *App) showAMLConfigWindow() {
 	authorEntry.SetPlaceHolder(app.msg("author_unknown"))
 	authorEntry.OnChanged = func(s string) {
 		edit.author = s
-		dirty = true
+		dirty.Store(true)
 		updateSaveButtonAppearance()
 	}
 	authorSpacer := canvas.NewRectangle(color.Transparent)
@@ -500,7 +508,7 @@ func (app *App) showAMLConfigWindow() {
 			sectionTables[idx].Refresh()
 		}
 		updateSectionCounts()
-		dirty = true
+		dirty.Store(true)
 		updateSaveButtonAppearance()
 	}
 	removeEntryByName := func(idx int, name string) {
@@ -515,7 +523,7 @@ func (app *App) showAMLConfigWindow() {
 			sectionTables[idx].Refresh()
 		}
 		updateSectionCounts()
-		dirty = true
+		dirty.Store(true)
 		updateSaveButtonAppearance()
 	}
 
@@ -726,7 +734,7 @@ func (app *App) showAMLConfigWindow() {
 		updateSectionCounts()
 
 		// Сбрасываем dirty при загрузке нового мода
-		dirty = false
+		dirty.Store(false)
 		updateSaveButtonAppearance()
 	}
 

@@ -11,10 +11,10 @@ import (
 // ───────────── Программа ─────────────────────────────────────────
 const (
 	AppName         = "Servo-Modquisitor-2"
-	AppVersion      = "4.0.0"
+	AppVersion      = "4.5.0"
 	AppID           = "com.xssplater.servo-modquisitor"
 	AppIcon         = "assets/icon.png"
-	СonfigFolderSMQ = "Servo-Modquisitor"
+	ConfigFolderSMQ = "Servo-Modquisitor"
 	DarktideAppID   = "1361210"
 	MaxLogFileSize  = 512 * 1024 // 512 Кб, 1*1024*1024 = 1 Мб
 

@@ -1107,7 +1107,7 @@
 	},
 	"btn_ok": {
 		"en": "OK",
-		"ru": "ОК",
+		"ru": "Ок",
    "zh-hans": "确定",
    "zh-hant": "確定",
 		"de": "OK",
@@ -1387,7 +1387,7 @@
 	},
 	"btn_continue": {
 		"en": "Continue",
-		"ru": "Продолжать",
+		"ru": "Продолжить",
    "zh-hans": "继续",
    "zh-hant": "繼續",
 		"de": "Fortsetzen",
@@ -5364,8 +5364,8 @@
 	"menu_guides_video_hti": {
 		"en": "Mod Installation [OBSOLETE!] | Use the Wizard above!",
 		"ru": "Установка модов [УСТАРЕЛО!] | Используйте Мастер выше!",
-		"zh-hans": "模组安装 [已过时！] | 请使用上方的向导！",
-		"zh-hant": "模組安裝 [已過時！] | 請使用上方的精靈！",
+   "zh-hans": "模组安装 [已过时！] | 请使用上方的向导！",
+   "zh-hant": "模組安裝 [已過時！] | 請使用上方的精靈！",
 		"de": "Mod-Installation [VERALTET!] | Verwenden Sie den Assistenten oben!",
 		"fr": "Installation des mods [OBSOLÈTE !] | Utilisez l'Assistant ci-dessus !",
 		"ja": "Modのインストール [廃止！] | 上のウィザードを使用してください！",
@@ -5373,21 +5373,35 @@
 		"it": "Installazione mod [OBSOLETO!] | Usa la procedura guidata sopra!",
 		"pl": "Instalacja modów [PRZESTARZAŁE!] | Użyj kreatora powyżej!",
 		"es": "Instalación de mods [¡OBSOLETO!] | ¡Usa el Asistente de arriba!",
-		"pt-BR": "Instalação de mods [OBSOLETO!] | Use o Assistente acima!"
+	 "pt-BR": "Instalação de mods [OBSOLETO!] | Use o Assistente acima!"
+	},
+	"menu_guides_video_install_wiz": {
+		"en": "SMQ - Mod Installer Wizard",
+		"ru": "SMQ - Мастер установки модов",
+   "zh-hans": "SMQ - 模组安装向导",
+   "zh-hant": "SMQ - 模組安裝精靈",
+		"de": "SMQ - Mod-Installationsassistent",
+		"fr": "SMQ - Assistant d'installation de mods",
+		"ja": "SMQ - Modインストーラーウィザード",
+		"ko": "SMQ - 모드 설치 마법사",
+		"it": "SMQ - Procedura guidata di installazione mod",
+		"pl": "SMQ - Kreator instalacji modów",
+		"es": "SMQ - Asistente de instalación de mods",
+	 "pt-BR": "SMQ - Assistente de instalação de mods"
 	},
 	"menu_guides_video_profiles": {
-		"en": "Servo-Modquisitor Profiles Demo",
-		"ru": "Servo-Modquisitor демонстрация работы профилей.",
-		"zh-hans": "Servo-Modquisitor 配置文件演示",
-		"zh-hant": "Servo-Modquisitor 設定檔演示",
-		"de": "Servo-Modquisitor Profile-Demo",
-		"fr": "Démo des profils Servo-Modquisitor",
-		"ja": "Servo-Modquisitor プロファイルデモ",
-		"ko": "Servo-Modquisitor 프로필 데모",
-		"it": "Demo profili di Servo-Modquisitor",
-		"pl": "Demo profili Servo-Modquisitor",
-		"es": "Demostración de perfiles de Servo-Modquisitor",
-		"pt-BR": "Demonstração de perfis do Servo-Modquisitor"
+		"en": "SMQ Profiles Demo",
+		"ru": "SMQ демонстрация работы профилей",
+   "zh-hans": "SMQ 配置文件演示",
+   "zh-hant": "SMQ 設定檔演示",
+		"de": "SMQ Profile-Demo",
+		"fr": "Démo des profils SMQ",
+		"ja": "SMQ プロファイルデモ",
+		"ko": "SMQ 프로필 데모",
+		"it": "Demo profili di SMQ",
+		"pl": "Demo profili SMQ",
+		"es": "Demostración de perfiles de SMQ",
+	 "pt-BR": "Demonstração de perfis do SMQ"
 	},
 	"menu_theme_highcontrast": {
 		"en": "High Contrast",
@@ -8704,8 +8718,8 @@
 	"aml_empty_list": {
 		"en": "— empty —",
 		"ru": "— пусто —",
-		"zh-hans": "— 空 —",
-		"zh-hant": "— 空 —",
+   "zh-hans": "— 空 —",
+   "zh-hant": "— 空 —",
 		"de": "— leer —",
 		"fr": "— vide —",
 		"ja": "— 空 —",
@@ -8713,13 +8727,13 @@
 		"it": "— vuoto —",
 		"pl": "— puste —",
 		"es": "— vacío —",
-		"pt-BR": "— vazio —"
+	 "pt-BR": "— vazio —"
 	},
 	"usettings_search_placeholder": {
 		"en": "Search...",
 		"ru": "Поиск...",
-		"zh-hans": "搜索...",
-		"zh-hant": "搜尋...",
+   "zh-hans": "搜索...",
+   "zh-hant": "搜尋...",
 		"de": "Suchen...",
 		"fr": "Rechercher...",
 		"ja": "検索...",
@@ -8727,13 +8741,13 @@
 		"it": "Cerca...",
 		"pl": "Szukaj...",
 		"es": "Buscar...",
-		"pt-BR": "Pesquisar..."
+	 "pt-BR": "Pesquisar..."
 	},
 	"usettings_path_root": {
 		"en": "📂 //",
 		"ru": "📂 //",
-		"zh-hans": "📂 //",
-		"zh-hant": "📂 //",
+   "zh-hans": "📂 //",
+   "zh-hant": "📂 //",
 		"de": "📂 //",
 		"fr": "📂 //",
 		"ja": "📂 //",
@@ -8741,13 +8755,13 @@
 		"it": "📂 //",
 		"pl": "📂 //",
 		"es": "📂 //",
-		"pt-BR": "📂 //"
+	 "pt-BR": "📂 //"
 	},
 	"usettings_path_game": {
 		"en": "📂 Game Settings / ",
 		"ru": "📂 Настройки игры / ",
-		"zh-hans": "📂 游戏设置 / ",
-		"zh-hant": "📂 遊戲設定 / ",
+   "zh-hans": "📂 游戏设置 / ",
+   "zh-hant": "📂 遊戲設定 / ",
 		"de": "📂 Spieleinstellungen / ",
 		"fr": "📂 Paramètres du jeu / ",
 		"ja": "📂 ゲーム設定 / ",
@@ -8755,13 +8769,13 @@
 		"it": "📂 Impostazioni di gioco / ",
 		"pl": "📂 Ustawienia gry / ",
 		"es": "📂 Configuración del juego / ",
-		"pt-BR": "📂 Configurações do jogo / "
+	 "pt-BR": "📂 Configurações do jogo / "
 	},
 	"usettings_path_mods": {
 		"en": "📂 Mods Settings / ",
 		"ru": "📂 Настройки модов / ",
-		"zh-hans": "📂 模组设置 / ",
-		"zh-hant": "📂 模組設定 / ",
+   "zh-hans": "📂 模组设置 / ",
+   "zh-hant": "📂 模組設定 / ",
 		"de": "📂 Mod-Einstellungen / ",
 		"fr": "📂 Paramètres des mods / ",
 		"ja": "📂 MOD設定 / ",
@@ -8769,7 +8783,7 @@
 		"it": "📂 Impostazioni mod / ",
 		"pl": "📂 Ustawienia modów / ",
 		"es": "📂 Configuración de mods / ",
-		"pt-BR": "📂 Configurações de mods / "
+	 "pt-BR": "📂 Configurações de mods / "
 	},
 	"usettings_type_header": {
 		"en": "T", "ru": "T", "zh-hans": "T", "zh-hant": "T",
@@ -8779,8 +8793,8 @@
 	"usettings_block_label": {
 		"en": "(block)",
 		"ru": "(блок)",
-		"zh-hans": "(块)",
-		"zh-hant": "(區塊)",
+   "zh-hans": "(块)",
+   "zh-hant": "(區塊)",
 		"de": "(Block)",
 		"fr": "(bloc)",
 		"ja": "(ブロック)",
@@ -8788,13 +8802,13 @@
 		"it": "(blocco)",
 		"pl": "(blok)",
 		"es": "(bloque)",
-		"pt-BR": "(bloco)"
+	 "pt-BR": "(bloco)"
 	},
 	"usettings_empty_settings_warning": {
 		"en": "Empty settings, not saving.",
 		"ru": "Пустые настройки, сохранение отменено.",
-		"zh-hans": "设置为空，不保存。",
-		"zh-hant": "設定為空，不儲存。",
+   "zh-hans": "设置为空，不保存。",
+   "zh-hant": "設定為空，不儲存。",
 		"de": "Leere Einstellungen, nicht gespeichert.",
 		"fr": "Paramètres vides, non enregistrés.",
 		"ja": "設定が空のため、保存しません。",
@@ -8802,13 +8816,13 @@
 		"it": "Impostazioni vuote, salvataggio annullato.",
 		"pl": "Puste ustawienia, zapis anulowany.",
 		"es": "Configuración vacía, no se guardará.",
-		"pt-BR": "Configurações vazias, não será salvo."
+	 "pt-BR": "Configurações vazias, não será salvo."
 	},
 	"usettings_delete_mod_btn": {
 		"en": "Delete mod settings",
 		"ru": "Удалить настройки мода",
-		"zh-hans": "删除模组设置",
-		"zh-hant": "刪除模組設定",
+   "zh-hans": "删除模组设置",
+   "zh-hant": "刪除模組設定",
 		"de": "Mod-Einstellungen löschen",
 		"fr": "Supprimer les paramètres du mod",
 		"ja": "MOD設定を削除",
@@ -8816,13 +8830,13 @@
 		"it": "Elimina impostazioni mod",
 		"pl": "Usuń ustawienia moda",
 		"es": "Eliminar configuración del mod",
-		"pt-BR": "Excluir configurações do mod"
+	 "pt-BR": "Excluir configurações do mod"
 	},
 	"usettings_info_title": {
 		"en": "Information",
 		"ru": "Информация",
-		"zh-hans": "信息",
-		"zh-hant": "資訊",
+   "zh-hans": "信息",
+   "zh-hant": "資訊",
 		"de": "Information",
 		"fr": "Information",
 		"ja": "情報",
@@ -8830,13 +8844,13 @@
 		"it": "Informazioni",
 		"pl": "Informacja",
 		"es": "Información",
-		"pt-BR": "Informação"
+	 "pt-BR": "Informação"
 	},
 	"usettings_select_mod_to_delete": {
 		"en": "Select a mod to delete its settings.",
 		"ru": "Выберите мод для удаления настроек.",
-		"zh-hans": "请选择要删除设置的模组。",
-		"zh-hant": "請選擇要刪除設定的模組。",
+   "zh-hans": "请选择要删除设置的模组。",
+   "zh-hant": "請選擇要刪除設定的模組。",
 		"de": "Wählen Sie einen Mod, dessen Einstellungen gelöscht werden sollen.",
 		"fr": "Sélectionnez un mod pour supprimer ses paramètres.",
 		"ja": "設定を削除するMODを選択してください。",
@@ -8844,13 +8858,13 @@
 		"it": "Seleziona un mod per eliminare le sue impostazioni.",
 		"pl": "Wybierz mod, którego ustawienia chcesz usunąć.",
 		"es": "Seleccione un mod para eliminar su configuración.",
-		"pt-BR": "Selecione um mod para excluir suas configurações."
+	 "pt-BR": "Selecione um mod para excluir suas configurações."
 	},
 	"usettings_select_mod_root": {
 		"en": "Select the mod root, not a single setting.",
 		"ru": "Выберите корень мода, а не отдельную настройку.",
-		"zh-hans": "请选择模组根，而不是单个设置。",
-		"zh-hant": "請選擇模組根，而不是單個設定。",
+   "zh-hans": "请选择模组根，而不是单个设置。",
+   "zh-hant": "請選擇模組根，而不是單個設定。",
 		"de": "Wählen Sie den Mod-Stamm, nicht eine einzelne Einstellung.",
 		"fr": "Sélectionnez la racine du mod, pas un paramètre individuel.",
 		"ja": "個別の設定ではなく、MODのルートを選択してください。",
@@ -8858,13 +8872,13 @@
 		"it": "Seleziona la radice del mod, non una singola impostazione.",
 		"pl": "Wybierz katalog główny moda, a nie pojedyncze ustawienie.",
 		"es": "Seleccione la raíz del mod, no una configuración individual.",
-		"pt-BR": "Selecione a raiz do mod, não uma configuração individual."
+	 "pt-BR": "Selecione a raiz do mod, não uma configuração individual."
 	},
 	"usettings_confirm_title": {
 		"en": "Confirmation",
 		"ru": "Подтверждение",
-		"zh-hans": "确认",
-		"zh-hant": "確認",
+   "zh-hans": "确认",
+   "zh-hant": "確認",
 		"de": "Bestätigung",
 		"fr": "Confirmation",
 		"ja": "確認",
@@ -8872,13 +8886,13 @@
 		"it": "Conferma",
 		"pl": "Potwierdzenie",
 		"es": "Confirmación",
-		"pt-BR": "Confirmação"
+	 "pt-BR": "Confirmação"
 	},
 	"usettings_confirm_delete_mod": {
 		"en": "Delete settings for mod '%s'?",
 		"ru": "Удалить настройки мода '%s'?",
-		"zh-hans": "删除模组 '%s' 的设置？",
-		"zh-hant": "刪除模組 '%s' 的設定？",
+   "zh-hans": "删除模组 '%s' 的设置？",
+   "zh-hant": "刪除模組 '%s' 的設定？",
 		"de": "Einstellungen für Mod '%s' löschen?",
 		"fr": "Supprimer les paramètres du mod '%s' ?",
 		"ja": "MOD「%s」の設定を削除しますか？",
@@ -8886,13 +8900,13 @@
 		"it": "Eliminare le impostazioni per il mod '%s'?",
 		"pl": "Usunąć ustawienia moda '%s'?",
 		"es": "¿Eliminar la configuración del mod '%s'?",
-		"pt-BR": "Excluir configurações do mod '%s'?"
+	 "pt-BR": "Excluir configurações do mod '%s'?"
 	},
 	"usettings_error_title": {
 		"en": "Error",
 		"ru": "Ошибка",
-		"zh-hans": "错误",
-		"zh-hant": "錯誤",
+   "zh-hans": "错误",
+   "zh-hant": "錯誤",
 		"de": "Fehler",
 		"fr": "Erreur",
 		"ja": "エラー",
@@ -8900,13 +8914,13 @@
 		"it": "Errore",
 		"pl": "Błąd",
 		"es": "Error",
-		"pt-BR": "Erro"
+	 "pt-BR": "Erro"
 	},
 	"usettings_mod_not_found": {
 		"en": "Mod not found in settings.",
 		"ru": "Мод не найден в настройках.",
-		"zh-hans": "未在设置中找到模组。",
-		"zh-hant": "未在設定中找到模組。",
+   "zh-hans": "未在设置中找到模组。",
+   "zh-hant": "未在設定中找到模組。",
 		"de": "Mod nicht in Einstellungen gefunden.",
 		"fr": "Mod introuvable dans les paramètres.",
 		"ja": "設定にMODが見つかりません。",
@@ -8914,13 +8928,13 @@
 		"it": "Mod non trovato nelle impostazioni.",
 		"pl": "Nie znaleziono moda w ustawieniach.",
 		"es": "Mod no encontrado en la configuración.",
-		"pt-BR": "Mod não encontrado nas configurações."
+	 "pt-BR": "Mod não encontrado nas configurações."
 	},
 	"usettings_export_mod_btn": {
 		"en": "Export mod",
 		"ru": "Экспорт мода",
-		"zh-hans": "导出模组",
-		"zh-hant": "匯出模組",
+   "zh-hans": "导出模组",
+   "zh-hant": "匯出模組",
 		"de": "Mod exportieren",
 		"fr": "Exporter le mod",
 		"ja": "MODをエクスポート",
@@ -8928,13 +8942,13 @@
 		"it": "Esporta mod",
 		"pl": "Eksportuj mod",
 		"es": "Exportar mod",
-		"pt-BR": "Exportar mod"
+	 "pt-BR": "Exportar mod"
 	},
 	"usettings_select_mod_to_export": {
 		"en": "Select a mod to export.",
 		"ru": "Выберите мод для экспорта.",
-		"zh-hans": "请选择要导出的模组。",
-		"zh-hant": "請選擇要匯出的模組。",
+   "zh-hans": "请选择要导出的模组。",
+   "zh-hant": "請選擇要匯出的模組。",
 		"de": "Wählen Sie einen Mod zum Exportieren.",
 		"fr": "Sélectionnez un mod à exporter.",
 		"ja": "エクスポートするMODを選択してください。",
@@ -8942,13 +8956,13 @@
 		"it": "Seleziona un mod da esportare.",
 		"pl": "Wybierz mod do eksportu.",
 		"es": "Seleccione un mod para exportar.",
-		"pt-BR": "Selecione um mod para exportar."
+	 "pt-BR": "Selecione um mod para exportar."
 	},
 	"usettings_select_mod_root_short": {
 		"en": "Select the mod root.",
 		"ru": "Выберите корень мода.",
-		"zh-hans": "请选择模组根。",
-		"zh-hant": "請選擇模組根。",
+   "zh-hans": "请选择模组根。",
+   "zh-hant": "請選擇模組根。",
 		"de": "Wählen Sie den Mod-Stamm.",
 		"fr": "Sélectionnez la racine du mod.",
 		"ja": "MODのルートを選択してください。",
@@ -8956,13 +8970,13 @@
 		"it": "Seleziona la radice del mod.",
 		"pl": "Wybierz katalog główny moda.",
 		"es": "Seleccione la raíz del mod.",
-		"pt-BR": "Selecione a raiz do mod."
+	 "pt-BR": "Selecione a raiz do mod."
 	},
 	"usettings_no_mod_settings": {
 		"en": "No mod settings.",
 		"ru": "Нет настроек модов.",
-		"zh-hans": "没有模组设置。",
-		"zh-hant": "沒有模組設定。",
+   "zh-hans": "没有模组设置。",
+   "zh-hant": "沒有模組設定。",
 		"de": "Keine Mod-Einstellungen.",
 		"fr": "Aucun paramètre de mod.",
 		"ja": "MOD設定がありません。",
@@ -8970,13 +8984,13 @@
 		"it": "Nessuna impostazione mod.",
 		"pl": "Brak ustawień modów.",
 		"es": "Sin configuración de mods.",
-		"pt-BR": "Sem configurações de mods."
+	 "pt-BR": "Sem configurações de mods."
 	},
 	"usettings_mod_not_found_short": {
 		"en": "Mod not found.",
 		"ru": "Мод не найден.",
-		"zh-hans": "未找到模组。",
-		"zh-hant": "未找到模組。",
+   "zh-hans": "未找到模组。",
+   "zh-hant": "未找到模組。",
 		"de": "Mod nicht gefunden.",
 		"fr": "Mod introuvable.",
 		"ja": "MODが見つかりません。",
@@ -8984,13 +8998,13 @@
 		"it": "Mod non trovato.",
 		"pl": "Nie znaleziono moda.",
 		"es": "Mod no encontrado.",
-		"pt-BR": "Mod não encontrado."
+	 "pt-BR": "Mod não encontrado."
 	},
 	"usettings_save_failed": {
 		"en": "Failed to save: %v",
 		"ru": "Не удалось сохранить: %v",
-		"zh-hans": "保存失败：%v",
-		"zh-hant": "儲存失敗：%v",
+   "zh-hans": "保存失败：%v",
+   "zh-hant": "儲存失敗：%v",
 		"de": "Speichern fehlgeschlagen: %v",
 		"fr": "Échec de l'enregistrement : %v",
 		"ja": "保存に失敗しました: %v",
@@ -8998,13 +9012,13 @@
 		"it": "Salvataggio non riuscito: %v",
 		"pl": "Nie udało się zapisać: %v",
 		"es": "Error al guardar: %v",
-		"pt-BR": "Falha ao salvar: %v"
+	 "pt-BR": "Falha ao salvar: %v"
 	},
 	"usettings_mod_exported": {
 		"en": "Settings for mod '%s' exported.",
 		"ru": "Настройки мода '%s' экспортированы.",
-		"zh-hans": "模组 '%s' 的设置已导出。",
-		"zh-hant": "模組 '%s' 的設定已匯出。",
+   "zh-hans": "模组 '%s' 的设置已导出。",
+   "zh-hant": "模組 '%s' 的設定已匯出。",
 		"de": "Einstellungen für Mod '%s' exportiert.",
 		"fr": "Paramètres du mod '%s' exportés.",
 		"ja": "MOD「%s」の設定をエクスポートしました。",
@@ -9012,13 +9026,13 @@
 		"it": "Impostazioni per il mod '%s' esportate.",
 		"pl": "Ustawienia moda '%s' wyeksportowane.",
 		"es": "Configuración del mod '%s' exportada.",
-		"pt-BR": "Configurações do mod '%s' exportadas."
+	 "pt-BR": "Configurações do mod '%s' exportadas."
 	},
 	"usettings_import_mod_btn": {
 		"en": "Import mod",
 		"ru": "Импорт мода",
-		"zh-hans": "导入模组",
-		"zh-hant": "匯入模組",
+   "zh-hans": "导入模组",
+   "zh-hant": "匯入模組",
 		"de": "Mod importieren",
 		"fr": "Importer le mod",
 		"ja": "MODをインポート",
@@ -9026,13 +9040,13 @@
 		"it": "Importa mod",
 		"pl": "Importuj mod",
 		"es": "Importar mod",
-		"pt-BR": "Importar mod"
+	 "pt-BR": "Importar mod"
 	},
 	"usettings_read_failed": {
 		"en": "Failed to read file: %v",
 		"ru": "Не удалось прочитать файл: %v",
-		"zh-hans": "读取文件失败：%v",
-		"zh-hant": "讀取檔案失敗：%v",
+   "zh-hans": "读取文件失败：%v",
+   "zh-hant": "讀取檔案失敗：%v",
 		"de": "Datei konnte nicht gelesen werden: %v",
 		"fr": "Échec de la lecture du fichier : %v",
 		"ja": "ファイルの読み取りに失敗しました: %v",
@@ -9040,13 +9054,13 @@
 		"it": "Impossibile leggere il file: %v",
 		"pl": "Nie udało się odczytać pliku: %v",
 		"es": "Error al leer el archivo: %v",
-		"pt-BR": "Falha ao ler o arquivo: %v"
+	 "pt-BR": "Falha ao ler o arquivo: %v"
 	},
 	"usettings_invalid_file": {
 		"en": "Invalid file: %v",
 		"ru": "Некорректный файл: %v",
-		"zh-hans": "无效文件：%v",
-		"zh-hant": "無效檔案：%v",
+   "zh-hans": "无效文件：%v",
+   "zh-hant": "無效檔案：%v",
 		"de": "Ungültige Datei: %v",
 		"fr": "Fichier invalide : %v",
 		"ja": "無効なファイル: %v",
@@ -9054,13 +9068,13 @@
 		"it": "File non valido: %v",
 		"pl": "Nieprawidłowy plik: %v",
 		"es": "Archivo no válido: %v",
-		"pt-BR": "Arquivo inválido: %v"
+	 "pt-BR": "Arquivo inválido: %v"
 	},
 	"usettings_one_mod_required": {
 		"en": "File must contain exactly one mod settings block.",
 		"ru": "Файл должен содержать ровно один блок настроек мода.",
-		"zh-hans": "文件必须包含恰好一个模组设置块。",
-		"zh-hant": "檔案必須包含恰好一個模組設定區塊。",
+   "zh-hans": "文件必须包含恰好一个模组设置块。",
+   "zh-hant": "檔案必須包含恰好一個模組設定區塊。",
 		"de": "Die Datei muss genau einen Mod-Einstellungsblock enthalten.",
 		"fr": "Le fichier doit contenir exactement un bloc de paramètres de mod.",
 		"ja": "ファイルにはMOD設定ブロックが1つだけ含まれている必要があります。",
@@ -9068,13 +9082,13 @@
 		"it": "Il file deve contenere esattamente un blocco di impostazioni mod.",
 		"pl": "Plik musi zawierać dokładnie jeden blok ustawień moda.",
 		"es": "El archivo debe contener exactamente un bloque de configuración de mod.",
-		"pt-BR": "O arquivo deve conter exatamente um bloco de configurações de mod."
+	 "pt-BR": "O arquivo deve conter exatamente um bloco de configurações de mod."
 	},
 	"usettings_mod_exists_replace": {
 		"en": "Mod '%s' already exists. Replace?",
 		"ru": "Мод '%s' уже есть. Заменить?",
-		"zh-hans": "模组 '%s' 已存在。是否替换？",
-		"zh-hant": "模組 '%s' 已存在。是否取代？",
+   "zh-hans": "模组 '%s' 已存在。是否替换？",
+   "zh-hant": "模組 '%s' 已存在。是否取代？",
 		"de": "Mod '%s' existiert bereits. Ersetzen?",
 		"fr": "Le mod '%s' existe déjà. Remplacer ?",
 		"ja": "MOD「%s」は既に存在します。置き換えますか？",
@@ -9082,13 +9096,13 @@
 		"it": "Il mod '%s' esiste già. Sostituire?",
 		"pl": "Mod '%s' już istnieje. Zastąpić?",
 		"es": "El mod '%s' ya existe. ¿Reemplazar?",
-		"pt-BR": "O mod '%s' já existe. Substituir?"
+	 "pt-BR": "O mod '%s' já existe. Substituir?"
 	},
 	"usettings_mod_imported": {
 		"en": "Settings for mod '%s' imported.",
 		"ru": "Настройки мода '%s' импортированы.",
-		"zh-hans": "模组 '%s' 的设置已导入。",
-		"zh-hant": "模組 '%s' 的設定已匯入。",
+   "zh-hans": "模组 '%s' 的设置已导入。",
+   "zh-hant": "模組 '%s' 的設定已匯入。",
 		"de": "Einstellungen für Mod '%s' importiert.",
 		"fr": "Paramètres du mod '%s' importés.",
 		"ja": "MOD「%s」の設定をインポートしました。",
@@ -9096,13 +9110,13 @@
 		"it": "Impostazioni per il mod '%s' importate.",
 		"pl": "Ustawienia moda '%s' zaimportowane.",
 		"es": "Configuración del mod '%s' importada.",
-		"pt-BR": "Configurações do mod '%s' importadas."
+	 "pt-BR": "Configurações do mod '%s' importadas."
 	},
 	"usettings_mod_deleted": {
 		"en": "Settings for mod '%s' deleted.",
 		"ru": "Настройки мода '%s' удалены.",
-		"zh-hans": "模组 '%s' 的设置已删除。",
-		"zh-hant": "模組 '%s' 的設定已刪除。",
+   "zh-hans": "模组 '%s' 的设置已删除。",
+   "zh-hant": "模組 '%s' 的設定已刪除。",
 		"de": "Einstellungen für Mod '%s' gelöscht.",
 		"fr": "Paramètres du mod '%s' supprimés.",
 		"ja": "MOD「%s」の設定を削除しました。",
@@ -9110,13 +9124,13 @@
 		"it": "Impostazioni per il mod '%s' eliminate.",
 		"pl": "Ustawienia moda '%s' usunięte.",
 		"es": "Configuración del mod '%s' eliminada.",
-		"pt-BR": "Configurações do mod '%s' excluídas."
+	 "pt-BR": "Configurações do mod '%s' excluídas."
 	},
 	"usettings_select_backup": {
 		"en": "Select a backup to restore:",
 		"ru": "Выберите бэкап для восстановления:",
-		"zh-hans": "选择要恢复的备份：",
-		"zh-hant": "選擇要還原的備份：",
+   "zh-hans": "选择要恢复的备份：",
+   "zh-hant": "選擇要還原的備份：",
 		"de": "Wählen Sie eine Sicherung zum Wiederherstellen:",
 		"fr": "Sélectionnez une sauvegarde à restaurer :",
 		"ja": "復元するバックアップを選択してください：",
@@ -9124,13 +9138,13 @@
 		"it": "Seleziona un backup da ripristinare:",
 		"pl": "Wybierz kopię zapasową do przywrócenia:",
 		"es": "Seleccione una copia de seguridad para restaurar:",
-		"pt-BR": "Selecione um backup para restaurar:"
+	 "pt-BR": "Selecione um backup para restaurar:"
 	},
 	"usettings_restore_btn": {
 		"en": "Restore",
 		"ru": "Восстановить",
-		"zh-hans": "恢复",
-		"zh-hant": "還原",
+   "zh-hans": "恢复",
+   "zh-hant": "還原",
 		"de": "Wiederherstellen",
 		"fr": "Restaurer",
 		"ja": "復元",
@@ -9138,13 +9152,13 @@
 		"it": "Ripristina",
 		"pl": "Przywróć",
 		"es": "Restaurar",
-		"pt-BR": "Restaurar"
+	 "pt-BR": "Restaurar"
 	},
 	"usettings_select_file": {
 		"en": "Select a file.",
 		"ru": "Выберите файл.",
-		"zh-hans": "请选择文件。",
-		"zh-hant": "請選擇檔案。",
+   "zh-hans": "请选择文件。",
+   "zh-hant": "請選擇檔案。",
 		"de": "Wählen Sie eine Datei.",
 		"fr": "Sélectionnez un fichier.",
 		"ja": "ファイルを選択してください。",
@@ -9152,13 +9166,13 @@
 		"it": "Seleziona un file.",
 		"pl": "Wybierz plik.",
 		"es": "Seleccione un archivo.",
-		"pt-BR": "Selecione um arquivo."
+	 "pt-BR": "Selecione um arquivo."
 	},
 	"usettings_confirm_restore": {
 		"en": "Restore settings from file %s? Current settings will be replaced.",
 		"ru": "Восстановить настройки из файла %s? Текущие настройки будут заменены.",
-		"zh-hans": "从文件 %s 恢复设置？当前设置将被替换。",
-		"zh-hant": "從檔案 %s 還原設定？目前設定將被取代。",
+   "zh-hans": "从文件 %s 恢复设置？当前设置将被替换。",
+   "zh-hant": "從檔案 %s 還原設定？目前設定將被取代。",
 		"de": "Einstellungen aus Datei %s wiederherstellen? Aktuelle Einstellungen werden ersetzt.",
 		"fr": "Restaurer les paramètres depuis le fichier %s ? Les paramètres actuels seront remplacés.",
 		"ja": "ファイル %s から設定を復元しますか？現在の設定は置き換えられます。",
@@ -9166,13 +9180,13 @@
 		"it": "Ripristinare le impostazioni dal file %s? Le impostazioni attuali saranno sostituite.",
 		"pl": "Przywrócić ustawienia z pliku %s? Bieżące ustawienia zostaną zastąpione.",
 		"es": "¿Restaurar la configuración desde el archivo %s? La configuración actual será reemplazada.",
-		"pt-BR": "Restaurar configurações do arquivo %s? As configurações atuais serão substituídas."
+	 "pt-BR": "Restaurar configurações do arquivo %s? As configurações atuais serão substituídas."
 	},
 	"usettings_read_backup_failed": {
 		"en": "Failed to read backup: %v",
 		"ru": "Не удалось прочитать бэкап: %v",
-		"zh-hans": "读取备份失败：%v",
-		"zh-hant": "讀取備份失敗：%v",
+   "zh-hans": "读取备份失败：%v",
+   "zh-hant": "讀取備份失敗：%v",
 		"de": "Sicherung konnte nicht gelesen werden: %v",
 		"fr": "Échec de la lecture de la sauvegarde : %v",
 		"ja": "バックアップの読み取りに失敗しました: %v",
@@ -9180,13 +9194,13 @@
 		"it": "Impossibile leggere il backup: %v",
 		"pl": "Nie udało się odczytać kopii zapasowej: %v",
 		"es": "Error al leer la copia de seguridad: %v",
-		"pt-BR": "Falha ao ler o backup: %v"
+	 "pt-BR": "Falha ao ler o backup: %v"
 	},
 	"usettings_restore_failed": {
 		"en": "Failed to restore settings: %v",
 		"ru": "Не удалось восстановить настройки: %v",
-		"zh-hans": "恢复设置失败：%v",
-		"zh-hant": "還原設定失敗：%v",
+   "zh-hans": "恢复设置失败：%v",
+   "zh-hant": "還原設定失敗：%v",
 		"de": "Einstellungen konnten nicht wiederhergestellt werden: %v",
 		"fr": "Échec de la restauration des paramètres : %v",
 		"ja": "設定の復元に失敗しました: %v",
@@ -9194,13 +9208,13 @@
 		"it": "Impossibile ripristinare le impostazioni: %v",
 		"pl": "Nie udało się przywrócić ustawień: %v",
 		"es": "Error al restaurar la configuración: %v",
-		"pt-BR": "Falha ao restaurar as configurações: %v"
+	 "pt-BR": "Falha ao restaurar as configurações: %v"
 	},
 	"usettings_restored": {
 		"en": "Settings restored from backup: %s",
 		"ru": "Настройки восстановлены из бэкапа: %s",
-		"zh-hans": "已从备份恢复设置：%s",
-		"zh-hant": "已從備份還原設定：%s",
+   "zh-hans": "已从备份恢复设置：%s",
+   "zh-hant": "已從備份還原設定：%s",
 		"de": "Einstellungen aus Sicherung wiederhergestellt: %s",
 		"fr": "Paramètres restaurés depuis la sauvegarde : %s",
 		"ja": "バックアップから設定を復元しました: %s",
@@ -9208,13 +9222,13 @@
 		"it": "Impostazioni ripristinate dal backup: %s",
 		"pl": "Ustawienia przywrócone z kopii zapasowej: %s",
 		"es": "Configuración restaurada desde la copia de seguridad: %s",
-		"pt-BR": "Configurações restauradas do backup: %s"
+	 "pt-BR": "Configurações restauradas do backup: %s"
 	},
 	"usettings_no_backups": {
 		"en": "No saved backups.",
 		"ru": "Нет сохранённых бэкапов.",
-		"zh-hans": "没有已保存的备份。",
-		"zh-hant": "沒有已儲存的備份。",
+   "zh-hans": "没有已保存的备份。",
+   "zh-hant": "沒有已儲存的備份。",
 		"de": "Keine gespeicherten Sicherungen.",
 		"fr": "Aucune sauvegarde enregistrée.",
 		"ja": "保存されたバックアップはありません。",
@@ -9222,13 +9236,13 @@
 		"it": "Nessun backup salvato.",
 		"pl": "Brak zapisanych kopii zapasowych.",
 		"es": "No hay copias de seguridad guardadas.",
-		"pt-BR": "Nenhum backup salvo."
+	 "pt-BR": "Nenhum backup salvo."
 	},
 	"usettings_read_backup_dir_failed": {
 		"en": "Failed to read backup folder: %v",
 		"ru": "Не удалось прочитать папку бэкапов: %v",
-		"zh-hans": "读取备份文件夹失败：%v",
-		"zh-hant": "讀取備份資料夾失敗：%v",
+   "zh-hans": "读取备份文件夹失败：%v",
+   "zh-hant": "讀取備份資料夾失敗：%v",
 		"de": "Sicherungsordner konnte nicht gelesen werden: %v",
 		"fr": "Échec de la lecture du dossier de sauvegarde : %v",
 		"ja": "バックアップフォルダの読み取りに失敗しました: %v",
@@ -9236,13 +9250,13 @@
 		"it": "Impossibile leggere la cartella dei backup: %v",
 		"pl": "Nie udało się odczytać folderu kopii zapasowych: %v",
 		"es": "Error al leer la carpeta de copias de seguridad: %v",
-		"pt-BR": "Falha ao ler a pasta de backup: %v"
+	 "pt-BR": "Falha ao ler a pasta de backup: %v"
 	},
 	"usettings_no_backup_files": {
 		"en": "No backup files.",
 		"ru": "Нет файлов бэкапов.",
-		"zh-hans": "没有备份文件。",
-		"zh-hant": "沒有備份檔案。",
+   "zh-hans": "没有备份文件。",
+   "zh-hant": "沒有備份檔案。",
 		"de": "Keine Sicherungsdateien.",
 		"fr": "Aucun fichier de sauvegarde.",
 		"ja": "バックアップファイルがありません。",
@@ -9250,13 +9264,13 @@
 		"it": "Nessun file di backup.",
 		"pl": "Brak plików kopii zapasowych.",
 		"es": "No hay archivos de copia de seguridad.",
-		"pt-BR": "Nenhum arquivo de backup."
+	 "pt-BR": "Nenhum arquivo de backup."
 	},
 	"theme_editor_title": {
 		"en": "Theme Editor",
 		"ru": "Редактор темы",
-		"zh-hans": "主题编辑器",
-		"zh-hant": "主題編輯器",
+   "zh-hans": "主题编辑器",
+   "zh-hant": "主題編輯器",
 		"de": "Theme-Editor",
 		"fr": "Éditeur de thème",
 		"ja": "テーマエディタ",
@@ -9264,13 +9278,13 @@
 		"it": "Editor tema",
 		"pl": "Edytor motywu",
 		"es": "Editor de temas",
-		"pt-BR": "Editor de tema"
+	 "pt-BR": "Editor de tema"
 	},
 	"theme_editor_search_placeholder": {
 		"en": "Search...",
 		"ru": "Поиск...",
-		"zh-hans": "搜索...",
-		"zh-hant": "搜尋...",
+   "zh-hans": "搜索...",
+   "zh-hant": "搜尋...",
 		"de": "Suchen...",
 		"fr": "Rechercher...",
 		"ja": "検索...",
@@ -9278,13 +9292,13 @@
 		"it": "Cerca...",
 		"pl": "Szukaj...",
 		"es": "Buscar...",
-		"pt-BR": "Pesquisar..."
+	 "pt-BR": "Pesquisar..."
 	},
 	"theme_editor_base": {
 		"en": "Base:",
 		"ru": "Основа:",
-		"zh-hans": "基础：",
-		"zh-hant": "基礎：",
+   "zh-hans": "基础：",
+   "zh-hant": "基礎：",
 		"de": "Basis:",
 		"fr": "Base :",
 		"ja": "ベース:",
@@ -9292,13 +9306,13 @@
 		"it": "Base:",
 		"pl": "Baza:",
 		"es": "Base:",
-		"pt-BR": "Base:"
+	 "pt-BR": "Base:"
 	},
 	"theme_editor_search": {
 		"en": "Search:",
 		"ru": "Поиск:",
-		"zh-hans": "搜索：",
-		"zh-hant": "搜尋：",
+   "zh-hans": "搜索：",
+   "zh-hant": "搜尋：",
 		"de": "Suchen:",
 		"fr": "Rechercher :",
 		"ja": "検索:",
@@ -9306,13 +9320,13 @@
 		"it": "Cerca:",
 		"pl": "Szukaj:",
 		"es": "Buscar:",
-		"pt-BR": "Pesquisar:"
+	 "pt-BR": "Pesquisar:"
 	},
 	"theme_editor_group": {
 		"en": "Group:",
 		"ru": "Группа:",
-		"zh-hans": "分组：",
-		"zh-hant": "分組：",
+   "zh-hans": "分组：",
+   "zh-hant": "分組：",
 		"de": "Gruppe:",
 		"fr": "Groupe :",
 		"ja": "グループ:",
@@ -9320,13 +9334,13 @@
 		"it": "Gruppo:",
 		"pl": "Grupa:",
 		"es": "Grupo:",
-		"pt-BR": "Grupo:"
+	 "pt-BR": "Grupo:"
 	},
 	"theme_editor_invalid_hex": {
 		"en": "Invalid hex (#RRGGBB or #RRGGBBAA)",
 		"ru": "Некорректный hex (#RRGGBB или #RRGGBBAA)",
-		"zh-hans": "无效的 hex（#RRGGBB 或 #RRGGBBAA）",
-		"zh-hant": "無效的 hex（#RRGGBB 或 #RRGGBBAA）",
+   "zh-hans": "无效的 hex（#RRGGBB 或 #RRGGBBAA）",
+   "zh-hant": "無效的 hex（#RRGGBB 或 #RRGGBBAA）",
 		"de": "Ungültiger Hex-Wert (#RRGGBB oder #RRGGBBAA)",
 		"fr": "Hex invalide (#RRGGBB ou #RRGGBBAA)",
 		"ja": "無効なhex（#RRGGBBまたは#RRGGBBAA）",
@@ -9334,11 +9348,11 @@
 		"it": "Hex non valido (#RRGGBB o #RRGGBBAA)",
 		"pl": "Nieprawidłowy hex (#RRGGBB lub #RRGGBBAA)",
 		"es": "Hex no válido (#RRGGBB o #RRGGBBAA)",
-		"pt-BR": "Hex inválido (#RRGGBB ou #RRGGBBAA)"
+	 "pt-BR": "Hex inválido (#RRGGBB ou #RRGGBBAA)"
 	},
 	"theme_editor_btn_normal": {
 		"en": "Normal", "ru": "Обычная",
-		"zh-hans": "普通", "zh-hant": "一般",
+   "zh-hans": "普通", "zh-hant": "一般",
 		"de": "Normal", "fr": "Normal",
 		"ja": "通常", "ko": "일반",
 		"it": "Normale", "pl": "Normalna",
@@ -9346,7 +9360,7 @@
 	},
 	"theme_editor_btn_hover": {
 		"en": "Hover", "ru": "Наведение",
-		"zh-hans": "悬停", "zh-hant": "懸停",
+   "zh-hans": "悬停", "zh-hant": "懸停",
 		"de": "Hover", "fr": "Survol",
 		"ja": "ホバー", "ko": "호버",
 		"it": "Hover", "pl": "Najechanie",
@@ -9354,7 +9368,7 @@
 	},
 	"theme_editor_btn_pressed": {
 		"en": "Pressed", "ru": "Нажатие",
-		"zh-hans": "按下", "zh-hant": "按下",
+   "zh-hans": "按下", "zh-hant": "按下",
 		"de": "Gedrückt", "fr": "Enfoncé",
 		"ja": "押下", "ko": "누름",
 		"it": "Premuto", "pl": "Naciśnięte",
@@ -9362,7 +9376,7 @@
 	},
 	"theme_editor_btn_disabled": {
 		"en": "Disabled", "ru": "Отключена",
-		"zh-hans": "禁用", "zh-hant": "停用",
+   "zh-hans": "禁用", "zh-hant": "停用",
 		"de": "Deaktiviert", "fr": "Désactivé",
 		"ja": "無効", "ko": "비활성",
 		"it": "Disabilitato", "pl": "Wyłączone",
@@ -9371,8 +9385,8 @@
 	"theme_editor_placeholder_text": {
 		"en": "Placeholder text longer",
 		"ru": "Пример текста-заполнителя",
-		"zh-hans": "占位符文本较长",
-		"zh-hant": "預留位置文字較長",
+   "zh-hans": "占位符文本较长",
+   "zh-hant": "預留位置文字較長",
 		"de": "Platzhaltertext länger",
 		"fr": "Texte d'espace réservé plus long",
 		"ja": "プレースホルダーテキスト（長め）",
@@ -9380,11 +9394,11 @@
 		"it": "Testo segnaposto più lungo",
 		"pl": "Dłuższy tekst zastępczy",
 		"es": "Texto de marcador de posición más largo",
-		"pt-BR": "Texto de espaço reservado mais longo"
+	 "pt-BR": "Texto de espaço reservado mais longo"
 	},
 	"theme_editor_preview": {
 		"en": "Preview", "ru": "Предпросмотр",
-		"zh-hans": "预览", "zh-hant": "預覽",
+   "zh-hans": "预览", "zh-hant": "預覽",
 		"de": "Vorschau", "fr": "Aperçu",
 		"ja": "プレビュー", "ko": "미리보기",
 		"it": "Anteprima", "pl": "Podgląd",
@@ -9392,7 +9406,7 @@
 	},
 	"theme_editor_console": {
 		"en": "Console", "ru": "Консоль",
-		"zh-hans": "控制台", "zh-hant": "主控台",
+   "zh-hans": "控制台", "zh-hant": "主控台",
 		"de": "Konsole", "fr": "Console",
 		"ja": "コンソール", "ko": "콘솔",
 		"it": "Console", "pl": "Konsola",
@@ -9400,7 +9414,7 @@
 	},
 	"theme_editor_console_ready": {
 		"en": "> Ready", "ru": "> Готово",
-		"zh-hans": "> 就绪", "zh-hant": "> 就緒",
+   "zh-hans": "> 就绪", "zh-hant": "> 就緒",
 		"de": "> Bereit", "fr": "> Prêt",
 		"ja": "> 準備完了", "ko": "> 준비됨",
 		"it": "> Pronto", "pl": "> Gotowe",
@@ -9408,7 +9422,7 @@
 	},
 	"theme_editor_menu_file": {
 		"en": "File", "ru": "Файл",
-		"zh-hans": "文件", "zh-hant": "檔案",
+   "zh-hans": "文件", "zh-hant": "檔案",
 		"de": "Datei", "fr": "Fichier",
 		"ja": "ファイル", "ko": "파일",
 		"it": "File", "pl": "Plik",
@@ -9416,7 +9430,7 @@
 	},
 	"theme_editor_menu_edit": {
 		"en": "Edit", "ru": "Правка",
-		"zh-hans": "编辑", "zh-hant": "編輯",
+   "zh-hans": "编辑", "zh-hant": "編輯",
 		"de": "Bearbeiten", "fr": "Édition",
 		"ja": "編集", "ko": "편집",
 		"it": "Modifica", "pl": "Edycja",
@@ -9424,7 +9438,7 @@
 	},
 	"theme_editor_menu_view": {
 		"en": "View", "ru": "Вид",
-		"zh-hans": "视图", "zh-hant": "檢視",
+   "zh-hans": "视图", "zh-hant": "檢視",
 		"de": "Ansicht", "fr": "Affichage",
 		"ja": "表示", "ko": "보기",
 		"it": "Visualizza", "pl": "Widok",
@@ -9433,8 +9447,8 @@
 	"theme_editor_live_apply": {
 		"en": "Live apply",
 		"ru": "Применять сразу",
-		"zh-hans": "实时应用",
-		"zh-hant": "即時套用",
+   "zh-hans": "实时应用",
+   "zh-hant": "即時套用",
 		"de": "Live anwenden",
 		"fr": "Application en direct",
 		"ja": "ライブ適用",
@@ -9442,11 +9456,11 @@
 		"it": "Applicazione live",
 		"pl": "Zastosowanie na żywo",
 		"es": "Aplicación en vivo",
-		"pt-BR": "Aplicação ao vivo"
+	 "pt-BR": "Aplicação ao vivo"
 	},
 	"theme_editor_btn_apply": {
 		"en": "Apply", "ru": "Применить",
-		"zh-hans": "应用", "zh-hant": "套用",
+   "zh-hans": "应用", "zh-hant": "套用",
 		"de": "Anwenden", "fr": "Appliquer",
 		"ja": "適用", "ko": "적용",
 		"it": "Applica", "pl": "Zastosuj",
@@ -9455,8 +9469,8 @@
 	"theme_editor_btn_reset_this": {
 		"en": "Reset this color",
 		"ru": "Сбросить этот цвет",
-		"zh-hans": "重置此颜色",
-		"zh-hant": "重設此顏色",
+   "zh-hans": "重置此颜色",
+   "zh-hant": "重設此顏色",
 		"de": "Diese Farbe zurücksetzen",
 		"fr": "Réinitialiser cette couleur",
 		"ja": "この色をリセット",
@@ -9464,13 +9478,13 @@
 		"it": "Ripristina questo colore",
 		"pl": "Przywróć ten kolor",
 		"es": "Restablecer este color",
-		"pt-BR": "Redefinir esta cor"
+	 "pt-BR": "Redefinir esta cor"
 	},
 	"theme_editor_btn_reset_all": {
 		"en": "Reset all to base",
 		"ru": "Сбросить всё к основе",
-		"zh-hans": "全部重置为基础",
-		"zh-hant": "全部重設為基礎",
+   "zh-hans": "全部重置为基础",
+   "zh-hant": "全部重設為基礎",
 		"de": "Alle auf Basis zurücksetzen",
 		"fr": "Tout réinitialiser à la base",
 		"ja": "すべてベースにリセット",
@@ -9478,13 +9492,13 @@
 		"it": "Ripristina tutto alla base",
 		"pl": "Przywróć wszystko do bazy",
 		"es": "Restablecer todo a la base",
-		"pt-BR": "Redefinir tudo para a base"
+	 "pt-BR": "Redefinir tudo para a base"
 	},
 	"theme_editor_btn_reset_original": {
 		"en": "Reset to original",
 		"ru": "Сбросить к исходному",
-		"zh-hans": "重置为原始状态",
-		"zh-hant": "重設為原始狀態",
+   "zh-hans": "重置为原始状态",
+   "zh-hant": "重設為原始狀態",
 		"de": "Auf Original zurücksetzen",
 		"fr": "Réinitialiser à l'original",
 		"ja": "元に戻す",
@@ -9492,21 +9506,27 @@
 		"it": "Ripristina all'originale",
 		"pl": "Przywróć oryginał",
 		"es": "Restablecer al original",
-		"pt-BR": "Redefinir para o original"
+	 "pt-BR": "Redefinir para o original"
 	},
 	"theme_editor_btn_close": {
-		"en": "Close", "ru": "Закрыть",
-		"zh-hans": "关闭", "zh-hant": "關閉",
-		"de": "Schließen", "fr": "Fermer",
-		"ja": "閉じる", "ko": "닫기",
-		"it": "Chiudi", "pl": "Zamknij",
-		"es": "Cerrar", "pt-BR": "Fechar"
+		"en": "Close",
+		"ru": "Закрыть",
+   "zh-hans": "关闭",
+   "zh-hant": "關閉",
+		"de": "Schließen",
+		"fr": "Fermer",
+		"ja": "閉じる",
+		"ko": "닫기",
+		"it": "Chiudi",
+		"pl": "Zamknij",
+		"es": "Cerrar",
+	 "pt-BR": "Fechar"
 	},
 	"theme_editor_reset_title": {
 		"en": "Reset theme",
 		"ru": "Сбросить тему",
-		"zh-hans": "重置主题",
-		"zh-hant": "重設主題",
+   "zh-hans": "重置主题",
+   "zh-hant": "重設主題",
 		"de": "Theme zurücksetzen",
 		"fr": "Réinitialiser le thème",
 		"ja": "テーマをリセット",
@@ -9514,13 +9534,13 @@
 		"it": "Ripristina tema",
 		"pl": "Przywróć motyw",
 		"es": "Restablecer tema",
-		"pt-BR": "Redefinir tema"
+	 "pt-BR": "Redefinir tema"
 	},
 	"theme_editor_reset_message": {
 		"en": "Discard all custom colors and reset to the base theme?",
 		"ru": "Отменить все пользовательские цвета и сбросить к базовой теме?",
-		"zh-hans": "放弃所有自定义颜色并重置为基础主题？",
-		"zh-hant": "放棄所有自訂顏色並重設為基礎主題？",
+   "zh-hans": "放弃所有自定义颜色并重置为基础主题？",
+   "zh-hant": "放棄所有自訂顏色並重設為基礎主題？",
 		"de": "Alle benutzerdefinierten Farben verwerfen und auf das Basis-Theme zurücksetzen?",
 		"fr": "Ignorer toutes les couleurs personnalisées et revenir au thème de base ?",
 		"ja": "すべてのカスタムカラーを破棄してベーステーマにリセットしますか？",
@@ -9528,13 +9548,13 @@
 		"it": "Ignorare tutti i colori personalizzati e ripristinare il tema di base?",
 		"pl": "Odrzucić wszystkie niestandardowe kolory i przywrócić motyw bazowy?",
 		"es": "¿Descartar todos los colores personalizados y restablecer el tema base?",
-		"pt-BR": "Descartar todas as cores personalizadas e redefinir para o tema base?"
+	 "pt-BR": "Descartar todas as cores personalizadas e redefinir para o tema base?"
 	},
 	"theme_editor_unsaved_title": {
 		"en": "Unsaved changes",
 		"ru": "Несохранённые изменения",
-		"zh-hans": "未保存的更改",
-		"zh-hant": "未儲存的變更",
+   "zh-hans": "未保存的更改",
+   "zh-hant": "未儲存的變更",
 		"de": "Ungespeicherte Änderungen",
 		"fr": "Modifications non enregistrées",
 		"ja": "未保存の変更",
@@ -9542,13 +9562,13 @@
 		"it": "Modifiche non salvate",
 		"pl": "Niezapisane zmiany",
 		"es": "Cambios sin guardar",
-		"pt-BR": "Alterações não salvas"
+	 "pt-BR": "Alterações não salvas"
 	},
 	"theme_editor_unsaved_message": {
 		"en": "You have unsaved changes. Close without applying?",
 		"ru": "У вас есть несохранённые изменения. Закрыть без применения?",
-		"zh-hans": "您有未保存的更改。不应用就关闭吗？",
-		"zh-hant": "您有未儲存的變更。不套用就關閉嗎？",
+   "zh-hans": "您有未保存的更改。不应用就关闭吗？",
+   "zh-hant": "您有未儲存的變更。不套用就關閉嗎？",
 		"de": "Sie haben ungespeicherte Änderungen. Ohne Anwenden schließen?",
 		"fr": "Vous avez des modifications non enregistrées. Fermer sans appliquer ?",
 		"ja": "未保存の変更があります。適用せずに閉じますか？",
@@ -9556,11 +9576,11 @@
 		"it": "Hai modifiche non salvate. Chiudere senza applicare?",
 		"pl": "Masz niezapisane zmiany. Zamknąć bez zastosowania?",
 		"es": "Tiene cambios sin guardar. ¿Cerrar sin aplicar?",
-		"pt-BR": "Você tem alterações não salvas. Fechar sem aplicar?"
+	 "pt-BR": "Você tem alterações não salvas. Fechar sem aplicar?"
 	},
 	"theme_editor_col_color": {
 		"en": "Color", "ru": "Цвет",
-		"zh-hans": "颜色", "zh-hant": "顏色",
+   "zh-hans": "颜色", "zh-hant": "顏色",
 		"de": "Farbe", "fr": "Couleur",
 		"ja": "色", "ko": "색상",
 		"it": "Colore", "pl": "Kolor",
@@ -9601,8 +9621,8 @@
 	"usettings_desc_adapter_index": {
 		"en": "Graphics adapter index (0 - primary)",
 		"ru": "Индекс графического адаптера (0 - основной)",
-		"zh-hans": "Graphics adapter index (0 - primary)",
-		"zh-hant": "Graphics adapter index (0 - primary)",
+   "zh-hans": "Graphics adapter index (0 - primary)",
+   "zh-hant": "Graphics adapter index (0 - primary)",
 		"de": "Grafikadapter-Index (0 - primär)",
 		"fr": "Index de la carte graphique (0 - principale)",
 		"ja": "Graphics adapter index (0 - primary)",
@@ -9610,13 +9630,13 @@
 		"it": "Indice scheda grafica (0 - principale)",
 		"pl": "Indeks karty graficznej (0 - podstawowy)",
 		"es": "Índice del adaptador gráfico (0 - principal)",
-		"pt-BR": "Índice do adaptador gráfico (0 - principal)"
+	 "pt-BR": "Índice do adaptador gráfico (0 - principal)"
 	},
 	"usettings_desc_aspect_ratio": {
 		"en": "Aspect ratio (-1 - auto)",
 		"ru": "Соотношение сторон (-1 - авто)",
-		"zh-hans": "Aspect ratio (-1 - auto)",
-		"zh-hant": "Aspect ratio (-1 - auto)",
+   "zh-hans": "Aspect ratio (-1 - auto)",
+   "zh-hant": "Aspect ratio (-1 - auto)",
 		"de": "Seitenverhältnis (-1 - auto)",
 		"fr": "Format d'image (-1 - auto)",
 		"ja": "Aspect ratio (-1 - auto)",
@@ -9624,13 +9644,13 @@
 		"it": "Proporzioni (-1 - auto)",
 		"pl": "Proporcje (-1 - auto)",
 		"es": "Relación de aspecto (-1 - auto)",
-		"pt-BR": "Proporção (-1 - auto)"
+	 "pt-BR": "Proporção (-1 - auto)"
 	},
 	"usettings_desc_borderless_fullscreen": {
 		"en": "Borderless fullscreen mode",
 		"ru": "Полноэкранный режим без рамки",
-		"zh-hans": "Borderless fullscreen mode",
-		"zh-hant": "Borderless fullscreen mode",
+   "zh-hans": "Borderless fullscreen mode",
+   "zh-hant": "Borderless fullscreen mode",
 		"de": "Rahmenloser Vollbildmodus",
 		"fr": "Mode plein écran sans bordure",
 		"ja": "Borderless fullscreen mode",
@@ -9638,13 +9658,13 @@
 		"it": "Modalità a schermo intero senza bordi",
 		"pl": "Pełny ekran bez obramowania",
 		"es": "Pantalla completa sin bordes",
-		"pt-BR": "Tela cheia sem bordas"
+	 "pt-BR": "Tela cheia sem bordas"
 	},
 	"usettings_desc_fullscreen": {
 		"en": "Fullscreen mode",
 		"ru": "Полноэкранный режим",
-		"zh-hans": "Fullscreen mode",
-		"zh-hant": "Fullscreen mode",
+   "zh-hans": "Fullscreen mode",
+   "zh-hant": "Fullscreen mode",
 		"de": "Vollbildmodus",
 		"fr": "Mode plein écran",
 		"ja": "Fullscreen mode",
@@ -9652,13 +9672,13 @@
 		"it": "Modalità a schermo intero",
 		"pl": "Tryb pełnoekranowy",
 		"es": "Modo de pantalla completa",
-		"pt-BR": "Modo tela cheia"
+	 "pt-BR": "Modo tela cheia"
 	},
 	"usettings_desc_fullscreen_output": {
 		"en": "Monitor number for fullscreen mode",
 		"ru": "Номер монитора для полноэкранного режима",
-		"zh-hans": "Monitor number for fullscreen mode",
-		"zh-hant": "Monitor number for fullscreen mode",
+   "zh-hans": "Monitor number for fullscreen mode",
+   "zh-hant": "Monitor number for fullscreen mode",
 		"de": "Monitor-Nummer für den Vollbildmodus",
 		"fr": "Numéro du moniteur pour le mode plein écran",
 		"ja": "Monitor number for fullscreen mode",
@@ -9666,13 +9686,13 @@
 		"it": "Numero del monitor per la modalità a schermo intero",
 		"pl": "Numer monitora dla trybu pełnoekranowego",
 		"es": "Número de monitor para el modo de pantalla completa",
-		"pt-BR": "Número do monitor para o modo tela cheia"
+	 "pt-BR": "Número do monitor para o modo tela cheia"
 	},
 	"usettings_desc_gamma": {
 		"en": "Gamma correction",
 		"ru": "Гамма-коррекция",
-		"zh-hans": "Gamma correction",
-		"zh-hant": "Gamma correction",
+   "zh-hans": "Gamma correction",
+   "zh-hant": "Gamma correction",
 		"de": "Gamma-Korrektur",
 		"fr": "Correction gamma",
 		"ja": "Gamma correction",
@@ -9680,13 +9700,13 @@
 		"it": "Correzione gamma",
 		"pl": "Korekcja gamma",
 		"es": "Corrección gamma",
-		"pt-BR": "Correção gama"
+	 "pt-BR": "Correção gama"
 	},
 	"usettings_desc_gpu_id": {
 		"en": "Graphics card identifier",
 		"ru": "Идентификатор видеокарты",
-		"zh-hans": "Graphics card identifier",
-		"zh-hant": "Graphics card identifier",
+   "zh-hans": "Graphics card identifier",
+   "zh-hant": "Graphics card identifier",
 		"de": "Grafikkarten-ID",
 		"fr": "Identifiant de la carte graphique",
 		"ja": "Graphics card identifier",
@@ -9694,13 +9714,13 @@
 		"it": "Identificatore scheda grafica",
 		"pl": "Identyfikator karty graficznej",
 		"es": "Identificador de la tarjeta gráfica",
-		"pt-BR": "Identificador da placa de vídeo"
+	 "pt-BR": "Identificador da placa de vídeo"
 	},
 	"usettings_desc_language_id": {
 		"en": "Interface language (ru, en, etc.)",
 		"ru": "Язык интерфейса (ru, en и т.д.)",
-		"zh-hans": "Interface language (ru, en, etc.)",
-		"zh-hant": "Interface language (ru, en, etc.)",
+   "zh-hans": "Interface language (ru, en, etc.)",
+   "zh-hant": "Interface language (ru, en, etc.)",
 		"de": "Sprache der Oberfläche (ru, en usw.)",
 		"fr": "Langue de l'interface (ru, en, etc.)",
 		"ja": "Interface language (ru, en, etc.)",
@@ -9708,13 +9728,13 @@
 		"it": "Lingua dell'interfaccia (ru, en, ecc.)",
 		"pl": "Język interfejsu (ru, en itd.)",
 		"es": "Idioma de la interfaz (ru, en, etc.)",
-		"pt-BR": "Idioma da interface (ru, en, etc.)"
+	 "pt-BR": "Idioma da interface (ru, en, etc.)"
 	},
 	"usettings_desc_max_worker_threads": {
 		"en": "Maximum number of worker threads",
 		"ru": "Максимальное число рабочих потоков",
-		"zh-hans": "Maximum number of worker threads",
-		"zh-hant": "Maximum number of worker threads",
+   "zh-hans": "Maximum number of worker threads",
+   "zh-hant": "Maximum number of worker threads",
 		"de": "Maximale Anzahl von Worker-Threads",
 		"fr": "Nombre maximal de threads de travail",
 		"ja": "Maximum number of worker threads",
@@ -9722,13 +9742,13 @@
 		"it": "Numero massimo di thread di lavoro",
 		"pl": "Maksymalna liczba wątków roboczych",
 		"es": "Número máximo de hilos de trabajo",
-		"pt-BR": "Número máximo de threads de trabalho"
+	 "pt-BR": "Número máximo de threads de trabalho"
 	},
 	"usettings_desc_screen_mode": {
 		"en": "Screen mode (window, borderless-fullscreen)",
 		"ru": "Режим экрана (window, borderless-fullscreen)",
-		"zh-hans": "Screen mode (window, borderless-fullscreen)",
-		"zh-hant": "Screen mode (window, borderless-fullscreen)",
+   "zh-hans": "Screen mode (window, borderless-fullscreen)",
+   "zh-hant": "Screen mode (window, borderless-fullscreen)",
 		"de": "Bildschirmmodus (window, borderless-fullscreen)",
 		"fr": "Mode d'écran (window, borderless-fullscreen)",
 		"ja": "Screen mode (window, borderless-fullscreen)",
@@ -9736,13 +9756,13 @@
 		"it": "Modalità schermo (window, borderless-fullscreen)",
 		"pl": "Tryb ekranu (window, borderless-fullscreen)",
 		"es": "Modo de pantalla (window, borderless-fullscreen)",
-		"pt-BR": "Modo de tela (window, borderless-fullscreen)"
+	 "pt-BR": "Modo de tela (window, borderless-fullscreen)"
 	},
 	"usettings_desc_screen_resolution": {
 		"en": "Screen resolution [width, height]",
 		"ru": "Разрешение экрана [ширина, высота]",
-		"zh-hans": "Screen resolution [width, height]",
-		"zh-hant": "Screen resolution [width, height]",
+   "zh-hans": "Screen resolution [width, height]",
+   "zh-hant": "Screen resolution [width, height]",
 		"de": "Bildschirmauflösung [Breite, Höhe]",
 		"fr": "Résolution d'écran [largeur, hauteur]",
 		"ja": "Screen resolution [width, height]",
@@ -9750,13 +9770,13 @@
 		"it": "Risoluzione dello schermo [larghezza, altezza]",
 		"pl": "Rozdzielczość ekranu [szerokość, wysokość]",
 		"es": "Resolución de pantalla [ancho, alto]",
-		"pt-BR": "Resolução da tela [largura, altura]"
+	 "pt-BR": "Resolução da tela [largura, altura]"
 	},
 	"usettings_desc_vsync": {
 		"en": "Vertical synchronization",
 		"ru": "Вертикальная синхронизация",
-		"zh-hans": "Vertical synchronization",
-		"zh-hant": "Vertical synchronization",
+   "zh-hans": "Vertical synchronization",
+   "zh-hant": "Vertical synchronization",
 		"de": "Vertikale Synchronisation",
 		"fr": "Synchronisation verticale",
 		"ja": "Vertical synchronization",
@@ -9764,13 +9784,13 @@
 		"it": "Sincronizzazione verticale",
 		"pl": "Synchronizacja pionowa",
 		"es": "Sincronización vertical",
-		"pt-BR": "Sincronização vertical"
+	 "pt-BR": "Sincronização vertical"
 	},
 	"usettings_desc_detected_user_settings": {
 		"en": "Auto-detected settings",
 		"ru": "Настройки, обнаруженные автоматически",
-		"zh-hans": "Auto-detected settings",
-		"zh-hant": "Auto-detected settings",
+   "zh-hans": "Auto-detected settings",
+   "zh-hant": "Auto-detected settings",
 		"de": "Automatisch erkannte Einstellungen",
 		"fr": "Paramètres détectés automatiquement",
 		"ja": "Auto-detected settings",
@@ -9778,13 +9798,13 @@
 		"it": "Impostazioni rilevate automaticamente",
 		"pl": "Ustawienia wykryte automatycznie",
 		"es": "Configuración detectada automáticamente",
-		"pt-BR": "Configurações detectadas automaticamente"
+	 "pt-BR": "Configurações detectadas automaticamente"
 	},
 	"usettings_desc_master_render_settings": {
 		"en": "Master render settings",
 		"ru": "Основные настройки рендеринга",
-		"zh-hans": "Master render settings",
-		"zh-hant": "Master render settings",
+   "zh-hans": "Master render settings",
+   "zh-hant": "Master render settings",
 		"de": "Haupt-Render-Einstellungen",
 		"fr": "Paramètres de rendu principaux",
 		"ja": "Master render settings",
@@ -9792,13 +9812,13 @@
 		"it": "Impostazioni di rendering principali",
 		"pl": "Główne ustawienia renderowania",
 		"es": "Configuración principal de renderizado",
-		"pt-BR": "Configurações principais de renderização"
+	 "pt-BR": "Configurações principais de renderização"
 	},
 	"usettings_desc_render_settings": {
 		"en": "Render settings",
 		"ru": "Настройки рендеринга",
-		"zh-hans": "Render settings",
-		"zh-hant": "Render settings",
+   "zh-hans": "Render settings",
+   "zh-hant": "Render settings",
 		"de": "Render-Einstellungen",
 		"fr": "Paramètres de rendu",
 		"ja": "Render settings",
@@ -9806,13 +9826,13 @@
 		"it": "Impostazioni di rendering",
 		"pl": "Ustawienia renderowania",
 		"es": "Configuración de renderizado",
-		"pt-BR": "Configurações de renderização"
+	 "pt-BR": "Configurações de renderização"
 	},
 	"usettings_desc_sound_settings": {
 		"en": "Sound settings",
 		"ru": "Настройки звука",
-		"zh-hans": "Sound settings",
-		"zh-hant": "Sound settings",
+   "zh-hans": "Sound settings",
+   "zh-hant": "Sound settings",
 		"de": "Audio-Einstellungen",
 		"fr": "Paramètres audio",
 		"ja": "Sound settings",
@@ -9820,13 +9840,13 @@
 		"it": "Impostazioni audio",
 		"pl": "Ustawienia dźwięku",
 		"es": "Configuración de sonido",
-		"pt-BR": "Configurações de som"
+	 "pt-BR": "Configurações de som"
 	},
 	"usettings_desc_network_settings": {
 		"en": "Network settings",
 		"ru": "Настройки сети",
-		"zh-hans": "Network settings",
-		"zh-hant": "Network settings",
+   "zh-hans": "Network settings",
+   "zh-hant": "Network settings",
 		"de": "Netzwerkeinstellungen",
 		"fr": "Paramètres réseau",
 		"ja": "Network settings",
@@ -9834,13 +9854,13 @@
 		"it": "Impostazioni di rete",
 		"pl": "Ustawienia sieci",
 		"es": "Configuración de red",
-		"pt-BR": "Configurações de rede"
+	 "pt-BR": "Configurações de rede"
 	},
 	"usettings_desc_performance_settings": {
 		"en": "Performance settings",
 		"ru": "Настройки производительности",
-		"zh-hans": "Performance settings",
-		"zh-hant": "Performance settings",
+   "zh-hans": "Performance settings",
+   "zh-hant": "Performance settings",
 		"de": "Leistungseinstellungen",
 		"fr": "Paramètres de performance",
 		"ja": "Performance settings",
@@ -9848,13 +9868,13 @@
 		"it": "Impostazioni prestazioni",
 		"pl": "Ustawienia wydajności",
 		"es": "Configuración de rendimiento",
-		"pt-BR": "Configurações de desempenho"
+	 "pt-BR": "Configurações de desempenho"
 	},
 	"usettings_desc_texture_settings": {
 		"en": "Texture settings",
 		"ru": "Настройки текстур",
-		"zh-hans": "Texture settings",
-		"zh-hant": "Texture settings",
+   "zh-hans": "Texture settings",
+   "zh-hant": "Texture settings",
 		"de": "Textur-Einstellungen",
 		"fr": "Paramètres de texture",
 		"ja": "Texture settings",
@@ -9862,13 +9882,13 @@
 		"it": "Impostazioni texture",
 		"pl": "Ustawienia tekstur",
 		"es": "Configuración de texturas",
-		"pt-BR": "Configurações de textura"
+	 "pt-BR": "Configurações de textura"
 	},
 	"usettings_desc_direct_storage": {
 		"en": "DirectStorage settings",
 		"ru": "Настройки DirectStorage",
-		"zh-hans": "DirectStorage settings",
-		"zh-hant": "DirectStorage settings",
+   "zh-hans": "DirectStorage settings",
+   "zh-hant": "DirectStorage settings",
 		"de": "DirectStorage-Einstellungen",
 		"fr": "Paramètres DirectStorage",
 		"ja": "DirectStorage settings",
@@ -9876,13 +9896,13 @@
 		"it": "Impostazioni DirectStorage",
 		"pl": "Ustawienia DirectStorage",
 		"es": "Configuración de DirectStorage",
-		"pt-BR": "Configurações do DirectStorage"
+	 "pt-BR": "Configurações do DirectStorage"
 	},
 	"usettings_desc_gore_settings": {
 		"en": "Gore settings",
 		"ru": "Настройки жестокости",
-		"zh-hans": "Gore settings",
-		"zh-hant": "Gore settings",
+   "zh-hans": "Gore settings",
+   "zh-hant": "Gore settings",
 		"de": "Gore-Einstellungen",
 		"fr": "Paramètres de gore",
 		"ja": "Gore settings",
@@ -9890,13 +9910,13 @@
 		"it": "Impostazioni gore",
 		"pl": "Ustawienia gore",
 		"es": "Configuración de gore",
-		"pt-BR": "Configurações de gore"
+	 "pt-BR": "Configurações de gore"
 	},
 	"usettings_desc_interface_settings": {
 		"en": "Interface settings",
 		"ru": "Настройки интерфейса",
-		"zh-hans": "Interface settings",
-		"zh-hant": "Interface settings",
+   "zh-hans": "Interface settings",
+   "zh-hant": "Interface settings",
 		"de": "Interface-Einstellungen",
 		"fr": "Paramètres de l'interface",
 		"ja": "Interface settings",
@@ -9904,13 +9924,13 @@
 		"it": "Impostazioni interfaccia",
 		"pl": "Ustawienia interfejsu",
 		"es": "Configuración de la interfaz",
-		"pt-BR": "Configurações da interface"
+	 "pt-BR": "Configurações da interface"
 	},
 	"usettings_desc_launcher_overrides": {
 		"en": "Launcher overrides",
 		"ru": "Параметры запуска",
-		"zh-hans": "Launcher overrides",
-		"zh-hant": "Launcher overrides",
+   "zh-hans": "Launcher overrides",
+   "zh-hant": "Launcher overrides",
 		"de": "Launcher-Überschreibungen",
 		"fr": "Substitutions du lanceur",
 		"ja": "Launcher overrides",
@@ -9918,13 +9938,13 @@
 		"it": "Override del launcher",
 		"pl": "Nadpisania launchera",
 		"es": "Anulaciones del lanzador",
-		"pt-BR": "Substituições do lançador"
+	 "pt-BR": "Substituições do lançador"
 	},
 	"usettings_desc_launcher_verification_passed": {
 		"en": "Launcher verification passed",
 		"ru": "Проверка лаунчера пройдена",
-		"zh-hans": "Launcher verification passed",
-		"zh-hant": "Launcher verification passed",
+   "zh-hans": "Launcher verification passed",
+   "zh-hant": "Launcher verification passed",
 		"de": "Launcher-Überprüfung bestanden",
 		"fr": "Vérification du lanceur réussie",
 		"ja": "Launcher verification passed",
@@ -9932,13 +9952,13 @@
 		"it": "Verifica del launcher superata",
 		"pl": "Weryfikacja launchera zakończona pomyślnie",
 		"es": "Verificación del lanzador superada",
-		"pt-BR": "Verificação do lançador aprovada"
+	 "pt-BR": "Verificação do lançador aprovada"
 	},
 	"usettings_desc_mod_manager_settings": {
 		"en": "Mod manager settings",
 		"ru": "Настройки менеджера модов",
-		"zh-hans": "Mod manager settings",
-		"zh-hant": "Mod manager settings",
+   "zh-hans": "Mod manager settings",
+   "zh-hant": "Mod manager settings",
 		"de": "Mod-Manager-Einstellungen",
 		"fr": "Paramètres du gestionnaire de mods",
 		"ja": "Mod manager settings",
@@ -9946,13 +9966,13 @@
 		"it": "Impostazioni del gestore mod",
 		"pl": "Ustawienia menedżera modów",
 		"es": "Configuración del gestor de mods",
-		"pt-BR": "Configurações do gerenciador de mods"
+	 "pt-BR": "Configurações do gerenciador de mods"
 	},
 	"usettings_desc_mods_settings": {
 		"en": "Mod settings",
 		"ru": "Настройки модов",
-		"zh-hans": "Mod settings",
-		"zh-hant": "Mod settings",
+   "zh-hans": "Mod settings",
+   "zh-hant": "Mod settings",
 		"de": "Mod-Einstellungen",
 		"fr": "Paramètres des mods",
 		"ja": "Mod settings",
@@ -9960,13 +9980,13 @@
 		"it": "Impostazioni mod",
 		"pl": "Ustawienia modów",
 		"es": "Configuración de mods",
-		"pt-BR": "Configurações de mods"
+	 "pt-BR": "Configurações de mods"
 	},
 	"usettings_desc_mesh_streamer_settings": {
 		"en": "Mesh streaming settings",
 		"ru": "Настройки потоковой загрузки мешей",
-		"zh-hans": "Mesh streaming settings",
-		"zh-hant": "Mesh streaming settings",
+   "zh-hans": "Mesh streaming settings",
+   "zh-hant": "Mesh streaming settings",
 		"de": "Mesh-Streaming-Einstellungen",
 		"fr": "Paramètres de streaming des maillages",
 		"ja": "Mesh streaming settings",
@@ -9974,13 +9994,13 @@
 		"it": "Impostazioni di streaming mesh",
 		"pl": "Ustawienia strumieniowania siatek",
 		"es": "Configuración de streaming de mallas",
-		"pt-BR": "Configurações de streaming de malhas"
+	 "pt-BR": "Configurações de streaming de malhas"
 	},
 	"usettings_desc_threads": {
 		"en": "Thread settings",
 		"ru": "Настройки потоков",
-		"zh-hans": "Thread settings",
-		"zh-hant": "Thread settings",
+   "zh-hans": "Thread settings",
+   "zh-hant": "Thread settings",
 		"de": "Thread-Einstellungen",
 		"fr": "Paramètres des threads",
 		"ja": "Thread settings",
@@ -9988,13 +10008,13 @@
 		"it": "Impostazioni thread",
 		"pl": "Ustawienia wątków",
 		"es": "Configuración de hilos",
-		"pt-BR": "Configurações de threads"
+	 "pt-BR": "Configurações de threads"
 	},
 	"usettings_desc_version": {
 		"en": "Settings file version",
 		"ru": "Версия файла настроек",
-		"zh-hans": "Settings file version",
-		"zh-hant": "Settings file version",
+   "zh-hans": "Settings file version",
+   "zh-hant": "Settings file version",
 		"de": "Version der Einstellungsdatei",
 		"fr": "Version du fichier de paramètres",
 		"ja": "Settings file version",
@@ -10002,6 +10022,741 @@
 		"it": "Versione del file delle impostazioni",
 		"pl": "Wersja pliku ustawień",
 		"es": "Versión del archivo de configuración",
-		"pt-BR": "Versão do arquivo de configurações"
+	 "pt-BR": "Versão do arquivo de configurações"
+	},
+
+	"setting_auto_focus_window": {
+		"en": "Bring window to front on dialogs",
+		"ru": "Автофокус на программе при открытии диалогов",
+   "zh-hans": "对话框打开时将窗口置于前台",
+   "zh-hant": "對話框開啟時將視窗置於前景",
+		"de": "Fenster bei Dialogen in den Vordergrund",
+		"fr": "Mettre la fenêtre au premier plan lors des dialogues",
+		"ja": "ダイアログ表示時にウィンドウを前面に",
+		"ko": "대화 상자 표시 시 창을 앞으로 가져오기",
+		"it": "Porta la finestra in primo piano sui dialoghi",
+		"pl": "Wysuwaj okno przy otwarciu okien dialogowych",
+		"es": "Traer la ventana al frente al abrir diálogos",
+	 "pt-BR": "Trazer janela para frente em diálogos"
+	},
+	"setting_auto_confirm_download": {
+		"en": "Download mods without confirmation",
+		"ru": "Скачивать моды без подтверждения",
+   "zh-hans": "无需确认即可下载模组",
+   "zh-hant": "無需確認即可下載模組",
+		"de": "Mods ohne Bestätigung herunterladen",
+		"fr": "Télécharger les mods sans confirmation",
+		"ja": "確認なしでMODをダウンロード",
+		"ko": "확인 없이 모드 다운로드",
+		"it": "Scarica mod senza conferma",
+		"pl": "Pobieraj mody bez potwierdzenia",
+		"es": "Descargar mods sin confirmación",
+	 "pt-BR": "Baixar mods sem confirmação"
+	},
+
+	"menu_change_game_path": {
+		"en": "Change game path…",
+		"ru": "Сменить путь к игре…",
+		"de": "Spielpfad ändern…",
+		"es": "Cambiar ruta del juego…",
+		"fr": "Changer le chemin du jeu…",
+		"it": "Cambia percorso del gioco…",
+		"ja": "ゲームパスを変更…",
+		"ko": "게임 경로 변경…",
+		"pl": "Zmień ścieżkę gry…",
+	 "pt-BR": "Alterar caminho do jogo…",
+   "zh-hans": "更改游戏路径…",
+   "zh-hant": "更改遊戲路徑…"
+	},
+	"change_game_path_title": {
+		"en": "Change game path",
+		"ru": "Смена пути к игре",
+		"de": "Spielpfad ändern",
+		"es": "Cambiar ruta del juego",
+		"fr": "Changer le chemin du jeu",
+		"it": "Cambia percorso del gioco",
+		"ja": "ゲームパスの変更",
+		"ko": "게임 경로 변경",
+		"pl": "Zmiana ścieżki gry",
+	 "pt-BR": "Alterar caminho do jogo",
+   "zh-hans": "更改游戏路径",
+   "zh-hant": "更改遊戲路徑"
+	},
+	"change_game_path_message": {
+		"en": "Reset saved paths and choose the game folder again?",
+		"ru": "Сбросить сохранённые пути и выбрать папку игры заново?",
+		"de": "Gespeicherte Pfade zurücksetzen und den Spielordner erneut auswählen?",
+		"es": "¿Restablecer las rutas guardadas y elegir la carpeta del juego de nuevo?",
+		"fr": "Réinitialiser les chemins enregistrés et choisir à nouveau le dossier du jeu ?",
+		"it": "Reimpostare i percorsi salvati e scegliere di nuovo la cartella del gioco?",
+		"ja": "保存されたパスをリセットして、ゲームフォルダを再選択しますか？",
+		"ko": "저장된 경로를 재설정하고 게임 폴더를 다시 선택하시겠습니까?",
+		"pl": "Zresetować zapisane ścieżki i ponownie wybrać folder gry?",
+	 "pt-BR": "Redefinir os caminhos salvos e escolher a pasta do jogo novamente?",
+   "zh-hans": "重置已保存的路径并重新选择游戏文件夹？",
+   "zh-hant": "重置已儲存的路徑並重新選擇遊戲資料夾？"
+	},
+
+	"choose_lang": {
+		"en": "Choose the interface language.",
+		"ru": "Выберите язык интерфейса.",
+   "zh-hans": "选择界面语言。",
+   "zh-hant": "選擇介面語言。",
+		"de": "Wählen Sie die Sprache der Benutzeroberfläche.",
+		"fr": "Choisissez la langue de l'interface.",
+		"ja": "インターフェースの言語を選択してください。",
+		"ko": "인터페이스 언어를 선택하세요.",
+		"it": "Scegli la lingua dell'interfaccia.",
+		"pl": "Wybierz język interfejsu.",
+		"es": "Elige el idioma de la interfaz.",
+	 "pt-BR": "Escolha o idioma da interface."
+	},
+
+	"oauth_success_nexus_close": {
+		"en": "The login page on Nexus Mods can be closed as well.",
+		"ru": "Страницу входа на Nexus Mods тоже можно закрыть.",
+		"de": "Die Nexus-Mods-Anmeldeseite kann ebenfalls geschlossen werden.",
+		"es": "La página de inicio de sesión de Nexus Mods también se puede cerrar.",
+		"fr": "La page de connexion à Nexus Mods peut également être fermée.",
+		"it": "Anche la pagina di accesso di Nexus Mods può essere chiusa.",
+		"ja": "Nexus Mods のログインページも閉じて構いません。",
+		"ko": "Nexus Mods 로그인 페이지도 닫아도 됩니다.",
+		"pl": "Stronę logowania Nexus Mods również można zamknąć.",
+	 "pt-BR": "A página de login do Nexus Mods também pode ser fechada.",
+   "zh-hans": "Nexus Mods 的登录页面也可以关闭。",
+   "zh-hant": "Nexus Mods 的登入頁面也可以關閉。"
+	},
+	"oauth_success_close": {
+		"en": "You may close this window now.",
+		"ru": "Теперь это окно можно закрыть.",
+		"de": "Sie können dieses Fenster jetzt schließen.",
+		"es": "Ahora puede cerrar esta ventana.",
+		"fr": "Vous pouvez maintenant fermer cette fenêtre.",
+		"it": "Ora puoi chiudere questa finestra.",
+		"ja": "このウィンドウは閉じて構いません。",
+		"ko": "이 창은 이제 닫아도 됩니다.",
+		"pl": "Możesz teraz zamknąć to okno.",
+	 "pt-BR": "Você já pode fechar esta janela.",
+   "zh-hans": "现在可以关闭此窗口。",
+   "zh-hant": "現在可以關閉此視窗。"
+	},
+
+	"steam_not_running_title": {
+		"en": "Steam not running",
+		"ru": "Steam не запущен",
+   "zh-hans": "Steam 未运行",
+   "zh-hant": "Steam 未執行",
+		"de": "Steam läuft nicht",
+		"fr": "Steam n'est pas en cours d'exécution",
+		"ja": "Steam が起動していません",
+		"ko": "Steam이 실행되지 않음",
+		"it": "Steam non in esecuzione",
+		"pl": "Steam nie jest uruchomiony",
+		"es": "Steam no está en ejecución",
+	 "pt-BR": "Steam não está em execução"
+	},
+	"steam_not_running_message": {
+		"en": "Steam is not running.\n\nThe game needs Steam running for mods and cloud saves to work correctly.\n\nStart Steam now?",
+		"ru": "Steam не запущен.\n\nДля корректной работы модов и облачных сохранений нужен запущенный Steam.\n\nЗапустить Steam?",
+   "zh-hans": "Steam 未运行。\n\n游戏需要 Steam 正在运行才能让模组和云存档正常工作。\n\n现在启动 Steam？",
+   "zh-hant": "Steam 未執行。\n\n遊戲需要 Steam 正在執行才能讓模組和雲端存檔正常運作。\n\n現在啟動 Steam？",
+		"de": "Steam läuft nicht.\n\nDas Spiel benötigt laufendes Steam, damit Mods und Cloud-Speicherungen korrekt funktionieren.\n\nSteam jetzt starten?",
+		"fr": "Steam n'est pas en cours d'exécution.\n\nLe jeu a besoin de Steam en cours d'exécution pour que les mods et les sauvegardes cloud fonctionnent correctement.\n\nDémarrer Steam maintenant ?",
+		"ja": "Steam が起動していません。\n\nModとクラウドセーブが正しく動作するには、Steamが起動している必要があります。\n\n今すぐSteamを起動しますか？",
+		"ko": "Steam이 실행되지 않았습니다.\n\n모드와 클라우드 저장이 제대로 작동하려면 Steam이 실행 중이어야 합니다.\n\n지금 Steam을 시작하시겠습니까?",
+		"it": "Steam non è in esecuzione.\n\nIl gioco necessita di Steam in esecuzione affinché mod e salvataggi cloud funzionino correttamente.\n\nAvviare Steam ora?",
+		"pl": "Steam nie jest uruchomiony.\n\nGra wymaga uruchomionego Steam, aby mody i zapisy w chmurze działały poprawnie.\n\nUruchomić Steam teraz?",
+		"es": "Steam no está en ejecución.\n\nEl juego necesita que Steam esté en ejecución para que los mods y las partidas guardadas en la nube funcionen correctamente.\n\n¿Iniciar Steam ahora?",
+	 "pt-BR": "O Steam não está em execução.\n\nO jogo precisa do Steam em execução para que mods e salvamentos na nuvem funcionem corretamente.\n\nIniciar o Steam agora?"
+	},
+	"btn_start_steam": {
+		"en": "Start Steam",
+		"ru": "Запустить Steam",
+   "zh-hans": "启动 Steam",
+   "zh-hant": "啟動 Steam",
+		"de": "Steam starten",
+		"fr": "Démarrer Steam",
+		"ja": "Steamを起動",
+		"ko": "Steam 시작",
+		"it": "Avvia Steam",
+		"pl": "Uruchom Steam",
+		"es": "Iniciar Steam",
+	 "pt-BR": "Iniciar o Steam"
+	},
+	"btn_launch_anyway": {
+		"en": "Launch anyway",
+		"ru": "Запустить всё равно",
+   "zh-hans": "仍然启动",
+   "zh-hant": "仍然啟動",
+		"de": "Trotzdem starten",
+		"fr": "Lancer quand même",
+		"ja": "それでも起動",
+		"ko": "그래도 실행",
+		"it": "Avvia comunque",
+		"pl": "Uruchom mimo to",
+		"es": "Iniciar de todos modos",
+	 "pt-BR": "Iniciar mesmo assim"
+	},
+	"steam_start_failed": {
+		"en": "Failed to start Steam: %v",
+		"ru": "Не удалось запустить Steam: %v",
+   "zh-hans": "启动 Steam 失败：%v",
+   "zh-hant": "啟動 Steam 失敗：%v",
+		"de": "Steam konnte nicht gestartet werden: %v",
+		"fr": "Échec du démarrage de Steam : %v",
+		"ja": "Steamの起動に失敗しました: %v",
+		"ko": "Steam 시작 실패: %v",
+		"it": "Impossibile avviare Steam: %v",
+		"pl": "Nie udało się uruchomić Steam: %v",
+		"es": "Error al iniciar Steam: %v",
+	 "pt-BR": "Falha ao iniciar o Steam: %v"
+	},
+	"steam_start_waiting": {
+		"en": "Starting Steam, waiting for it to come up...",
+		"ru": "Запускаю Steam, жду загрузки...",
+   "zh-hans": "正在启动 Steam，等待其运行...",
+   "zh-hant": "正在啟動 Steam，等待其運行...",
+		"de": "Steam wird gestartet, warte auf Hochfahren...",
+		"fr": "Démarrage de Steam, en attente de son lancement...",
+		"ja": "Steamを起動中、立ち上がりを待っています...",
+		"ko": "Steam을 시작하는 중, 실행되기를 기다리는 중...",
+		"it": "Avvio di Steam in corso, in attesa che si avvii...",
+		"pl": "Uruchamianie Steam, oczekiwanie na start...",
+		"es": "Iniciando Steam, esperando a que arranque...",
+	 "pt-BR": "Iniciando o Steam, aguardando ele abrir..."
+	},
+	"steam_start_timeout": {
+		"en": "Steam did not start in time. Aborting launch.",
+		"ru": "Steam не запустился вовремя. Запуск отменён.",
+   "zh-hans": "Steam 未及时启动。启动已中止。",
+   "zh-hant": "Steam 未及時啟動。啟動已中止。",
+		"de": "Steam wurde nicht rechtzeitig gestartet. Start abgebrochen.",
+		"fr": "Steam n'a pas démarré à temps. Lancement annulé.",
+		"ja": "Steamが時間内に起動しませんでした。起動を中止します。",
+		"ko": "Steam이 제 시간에 시작되지 않았습니다. 실행을 중단합니다.",
+		"it": "Steam non si è avviato in tempo. Avvio annullato.",
+		"pl": "Steam nie uruchomił się na czas. Uruchamianie przerwane.",
+		"es": "Steam no se inició a tiempo. Inicio cancelado.",
+	 "pt-BR": "O Steam não iniciou a tempo. Inicialização cancelada."
+	},
+	"steam_launch_anyway": {
+		"en": "Launching game without Steam running.",
+		"ru": "Запускаю игру без запущенного Steam.",
+   "zh-hans": "在 Steam 未运行的情况下启动游戏。",
+   "zh-hant": "在 Steam 未執行的情況下啟動遊戲。",
+		"de": "Spiel wird ohne laufendes Steam gestartet.",
+		"fr": "Lancement du jeu sans Steam en cours d'exécution.",
+		"ja": "Steamを起動せずにゲームを起動します。",
+		"ko": "Steam이 실행되지 않은 상태로 게임을 실행합니다.",
+		"it": "Avvio del gioco senza Steam in esecuzione.",
+		"pl": "Uruchamianie gry bez uruchomionego Steam.",
+		"es": "Iniciando el juego sin Steam en ejecución.",
+	 "pt-BR": "Iniciando o jogo sem o Steam em execução."
+	},
+
+	"steam_login_prompt": {
+		"en": "Steam is starting up.\n\nPlease log in and wait for the Steam client to fully load, then click Continue.",
+		"ru": "Steam запускается.\n\nВойдите в аккаунт и дождитесь полной загрузки клиента, затем нажмите «Продолжить».",
+		"de": "Steam startet.\n\nBitte melden Sie sich an und warten Sie, bis der Steam-Client vollständig geladen ist, dann klicken Sie auf Weiter.",
+		"es": "Steam se está iniciando.\n\nInicia sesión y espera a que el cliente de Steam se cargue por completo, luego haz clic en Continuar.",
+		"fr": "Steam démarre.\n\nVeuillez vous connecter et attendre que le client Steam soit complètement chargé, puis cliquez sur Continuer.",
+		"it": "Steam si sta avviando.\n\nAccedi e attendi che il client Steam sia completamente caricato, quindi fai clic su Continua.",
+		"ja": "Steamを起動しています。\n\nログインしてSteamクライアントが完全に読み込まれるまで待ち、「続行」をクリックしてください。",
+		"ko": "Steam이 시작 중입니다.\n\n로그인하고 Steam 클라이언트가 완전히 로드될 때까지 기다린 후 계속을 클릭하세요.",
+		"pl": "Steam uruchamia się.\n\nZaloguj się i poczekaj, aż klient Steam w pełni się załaduje, następnie kliknij Kontynuuj.",
+	 "pt-BR": "O Steam está iniciando.\n\nFaça login e aguarde o cliente Steam carregar completamente, depois clique em Continuar.",
+   "zh-hans": "Steam 正在启动。\n\n请登录并等待 Steam 客户端完全加载，然后点击继续。",
+   "zh-hant": "Steam 正在啟動。\n\n請登入並等待 Steam 用戶端完全載入，然後點擊繼續。"
+	},
+
+	"mods_already_enabled": {
+		"en": "✅ Mods are already enabled (the game bundle was patched earlier).",
+		"ru": "✅ Моды уже включены (bundle игры был пропатчен ранее).",
+		"de": "✅ Mods sind bereits aktiviert (das Spiel-Bundle wurde zuvor gepatcht).",
+		"es": "✅ Los mods ya están habilitados (el paquete del juego fue parcheado anteriormente).",
+		"fr": "✅ Les mods sont déjà activés (le bundle du jeu a été patché précédemment).",
+		"it": "✅ Le mod sono già abilitate (il bundle del gioco è stato patchato in precedenza).",
+		"ja": "✅ Modはすでに有効になっています（ゲームバンドルは以前にパッチされています）。",
+		"ko": "✅ 모드가 이미 활성화되어 있습니다 (게임 번들이 이전에 패치되었습니다).",
+		"pl": "✅ Mody są już włączone (pakiet gry został wcześniej załatany).",
+		"pt-BR": "✅ Os mods já estão ativados (o pacote do jogo foi patchado anteriormente).",
+		"zh-hans": "✅ 模组已启用（游戏包之前已打补丁）。",
+		"zh-hant": "✅ 模組已啟用（遊戲包之前已打補丁）。"
+	},
+	"bundle_foreign_patch_warning": {
+		"en": "⚠️ Mods are enabled, but the game was patched by another tool (Autopatcher / dtkit-patch). SMQ cannot disable them — use that tool to revert.",
+		"ru": "⚠️ Моды включены, но игра пропатчена другим инструментом (Autopatcher / dtkit-patch). SMQ не может их выключить — используйте тот инструмент для отката.",
+		"de": "⚠️ Mods sind aktiviert, aber das Spiel wurde von einem anderen Tool gepatcht (Autopatcher / dtkit-patch). SMQ kann sie nicht deaktivieren - verwenden Sie dieses Tool zum Zurücksetzen.",
+		"es": "⚠️ Los mods están habilitados, pero el juego fue parcheado por otra herramienta (Autopatcher / dtkit-patch). SMQ no puede desactivarlos; use esa herramienta para revertir.",
+		"fr": "⚠️ Les mods sont activés, mais le jeu a été patché par un autre outil (Autopatcher / dtkit-patch). SMQ ne peut pas les désactiver — utilisez cet outil pour revenir en arrière.",
+		"it": "⚠️ Le mod sono abilitate, ma il gioco è stato patchato da un altro strumento (Autopatcher / dtkit-patch). SMQ non può disabilitarle — usa quello strumento per ripristinare.",
+		"ja": "⚠️ Modは有効ですが、ゲームは別のツール（Autopatcher / dtkit-patch）によってパッチされています。SMQはそれらを無効にできません — 元に戻すにはそのツールを使用してください。",
+		"ko": "⚠️ 모드가 활성화되어 있지만 게임이 다른 도구(Autopatcher / dtkit-patch)에 의해 패치되었습니다. SMQ는 이를 비활성화할 수 없습니다 — 되돌리려면 해당 도구를 사용하세요.",
+		"pl": "⚠️ Mody są włączone, ale gra została załatana przez inne narzędzie (Autopatcher / dtkit-patch). SMQ nie może ich wyłączyć — użyj tego narzędzia, aby przywrócić.",
+		"pt-BR": "⚠️ Os mods estão ativados, mas o jogo foi patchado por outra ferramenta (Autopatcher / dtkit-patch). O SMQ não pode desativá-los — use essa ferramenta para reverter.",
+		"zh-hans": "⚠️ 模组已启用，但游戏已被其他工具（Autopatcher / dtkit-patch）打补丁。SMQ 无法禁用它们——请使用该工具还原。",
+		"zh-hant": "⚠️ 模組已啟用，但遊戲已被其他工具（Autopatcher / dtkit-patch）打補丁。SMQ 無法禁用它們——請使用該工具還原。"
+	},
+	"bundle_backup_missing": {
+		"en": "❌ Cannot unpatch: bundle_database.data.bak not found. Restore the game via Steam (Verify Integrity of Game Files) if you need to disable mods.",
+		"ru": "❌ Невозможно отключить патч: не найден bundle_database.data.bak. Восстановите игру через Steam (Проверить целостность файлов игры), если нужно отключить моды.",
+		"de": "❌ Kann Patch nicht rückgängig machen: bundle_database.data.bak nicht gefunden. Stellen Sie das Spiel über Steam wieder her (Dateien auf Fehler überprüfen), wenn Sie Mods deaktivieren möchten.",
+		"es": "❌ No se puede desparchear: no se encontró bundle_database.data.bak. Restaura el juego a través de Steam (Verificar integridad de los archivos del juego) si necesitas desactivar los mods.",
+		"fr": "❌ Impossible de dépatcher : bundle_database.data.bak introuvable. Restaurez le jeu via Steam (Vérifier l'intégrité des fichiers du jeu) si vous devez désactiver les mods.",
+		"it": "❌ Impossibile rimuovere la patch: bundle_database.data.bak non trovato. Ripristina il gioco tramite Steam (Verifica integrità dei file di gioco) se devi disabilitare le mod.",
+		"ja": "❌ パッチを解除できません: bundle_database.data.bak が見つかりません。Modを無効にする必要がある場合は、Steamでゲームを復元してください（ゲームファイルの整合性を確認）。",
+		"ko": "❌ 패치를 해제할 수 없습니다: bundle_database.data.bak을 찾을 수 없습니다. 모드를 비활성화해야 하는 경우 Steam을 통해 게임을 복원하세요(게임 파일 무결성 검사).",
+		"pl": "❌ Nie można cofnąć łatki: nie znaleziono bundle_database.data.bak. Przywróć grę przez Steam (Sprawdź integralność plików gry), jeśli chcesz wyłączyć mody.",
+		"pt-BR": "❌ Não é possível desfazer o patch: bundle_database.data.bak não encontrado. Restaure o jogo pelo Steam (Verificar integridade dos arquivos do jogo) se precisar desativar os mods.",
+		"zh-hans": "❌ 无法取消补丁：未找到 bundle_database.data.bak。如果您需要禁用模组，请通过 Steam 恢复游戏（验证游戏文件的完整性）。",
+		"zh-hant": "❌ 無法取消補丁：未找到 bundle_database.data.bak。如果您需要禁用模組，請透過 Steam 還原遊戲（驗證遊戲檔案的完整性）。"
+	},
+	"bundle_offset_missing": {
+		"en": "❌ Bundle patch anchor not found. The game was probably updated, and the patch signature has changed. Please report this.",
+		"ru": "❌ Якорь патча bundle не найден. Скорее всего игра обновилась, и сигнатура патча изменилась. Сообщите об этом разработчику.",
+		"de": "❌ Bundle-Patch-Anker nicht gefunden. Das Spiel wurde wahrscheinlich aktualisiert und die Patch-Signatur hat sich geändert. Bitte melden Sie dies.",
+		"es": "❌ No se encontró el ancla del parche del bundle. Probablemente el juego se actualizó y la firma del parche ha cambiado. Por favor, informe de esto.",
+		"fr": "❌ Ancre de patch de bundle introuvable. Le jeu a probablement été mis à jour et la signature du patch a changé. Veuillez le signaler.",
+		"it": "❌ Ancoraggio della patch del bundle non trovato. Il gioco è stato probabilmente aggiornato e la firma della patch è cambiata. Si prega di segnalarlo.",
+		"ja": "❌ バンドルパッチのアンカーが見つかりません。ゲームが更新され、パッチ署名が変更された可能性があります。これを報告してください。",
+		"ko": "❌ 번들 패치 앵커를 찾을 수 없습니다. 게임이 업데이트되어 패치 서명이 변경되었을 수 있습니다. 이 문제를 보고해 주세요.",
+		"pl": "❌ Nie znaleziono kotwicy łatki pakietu. Gra prawdopodobnie została zaktualizowana, a sygnatura łatki uległa zmianie. Zgłoś to.",
+		"pt-BR": "❌ Âncora de patch do bundle não encontrada. O jogo provavelmente foi atualizado e a assinatura do patch mudou. Por favor, reporte isso.",
+		"zh-hans": "❌ 未找到捆绑包补丁锚点。游戏可能已更新，补丁签名已更改。请报告此问题。",
+		"zh-hant": "❌ 未找到捆綁包補丁錨點。遊戲可能已更新，補丁簽名已更改。請報告此問題。"
+	},
+	"patcher_not_available": {
+		"en": "❌ patcher_not_available.",
+		"ru": "❌ Патчер недоступен.",
+		"de": "❌ Patcher nicht verfügbar.",
+		"es": "❌ Patcher no disponible.",
+		"fr": "❌ Patcher non disponible.",
+		"it": "❌ Patcher non disponibile.",
+		"ja": "❌ パッチャーが利用できません。",
+		"ko": "❌ 패처를 사용할 수 없습니다.",
+		"pl": "❌ Patcher niedostępny.",
+		"pt-BR": "❌ Patcher não disponível.",
+		"zh-hans": "❌ 修补程序不可用。",
+		"zh-hant": "❌ 修補程式不可用。"
+	},
+	"profile_sync_check_title": {
+		"en": "Mods folder changed externally.",
+		"ru": "Папка модов изменена извне.",
+		"de": "Mods-Ordner wurde extern geändert.",
+		"es": "La carpeta de mods cambió externamente.",
+		"fr": "Le dossier des mods a été modifié en externe.",
+		"it": "La cartella delle mod è stata modificata esternamente.",
+		"ja": "Modフォルダが外部から変更されました。",
+		"ko": "모드 폴더가 외부에서 변경되었습니다.",
+		"pl": "Folder modów został zmieniony z zewnątrz.",
+		"pt-BR": "A pasta de mods foi alterada externamente.",
+		"zh-hans": "模组文件夹已从外部更改。",
+		"zh-hant": "模組資料夾已從外部變更。"
+	},
+	"profile_sync_check_message": {
+		"en": "The mods folder contains changes that are not in the active profile.\n\nSave them into the profile, or restore the profile's snapshot into the game folder?",
+		"ru": "Папка модов содержит изменения, которых нет в активном профиле.\n\nСохранить их в профиль или восстановить снимок профиля в папке игры?",
+		"de": "Der Mods-Ordner enthält Änderungen, die nicht im aktiven Profil sind.\n\nIn das Profil speichern oder den Snapshot des Profils im Spielordner wiederherstellen?",
+		"es": "La carpeta de mods contiene cambios que no están en el perfil activo.\n\n¿Guardarlos en el perfil o restaurar la instantánea del perfil en la carpeta del juego?",
+		"fr": "Le dossier des mods contient des modifications qui ne sont pas dans le profil actif.\n\nLes enregistrer dans le profil ou restaurer l'instantané du profil dans le dossier du jeu ?",
+		"it": "La cartella delle mod contiene modifiche che non sono nel profilo attivo.\n\nSalvarle nel profilo o ripristinare l'istantanea del profilo nella cartella di gioco?",
+		"ja": "Modフォルダにアクティブなプロファイルにない変更が含まれています。\n\nプロファイルに保存するか、プロファイルのスナップショットをゲームフォルダに復元しますか？",
+		"ko": "모드 폴더에 활성 프로필에 없는 변경 사항이 있습니다.\n\n프로필에 저장하시겠습니까, 아니면 프로필의 스냅샷을 게임 폴더에 복원하시겠습니까?",
+		"pl": "Folder modów zawiera zmiany, których nie ma w aktywnym profilu.\n\nZapisać je w profilu czy przywrócić migawkę profilu w folderze gry?",
+		"pt-BR": "A pasta de mods contém alterações que não estão no perfil ativo.\n\nSalvá-las no perfil ou restaurar o instantâneo do perfil na pasta do jogo?",
+		"zh-hans": "模组文件夹包含活动配置文件中没有的更改。\n\n将它们保存到配置文件，还是将配置文件的快照还原到游戏文件夹？",
+		"zh-hant": "模組資料夾包含活動設定檔中沒有的變更。\n\n將它們儲存到設定檔，還是將設定檔的快照還原到遊戲資料夾？"
+	},
+	"profile_sync_save_to_profile": {
+		"en": "Save to profile",
+		"ru": "Сохранить в профиль",
+		"de": "In Profil speichern",
+		"es": "Guardar en perfil",
+		"fr": "Enregistrer dans le profil",
+		"it": "Salva nel profilo",
+		"ja": "プロファイルに保存",
+		"ko": "프로필에 저장",
+		"pl": "Zapisz w profilu",
+		"pt-BR": "Salvar no perfil",
+		"zh-hans": "保存到配置文件",
+		"zh-hant": "儲存到設定檔"
+	},
+	"profile_sync_load_from_profile": {
+		"en": "Load from profile",
+		"ru": "Загрузить из профиля",
+		"de": "Aus Profil laden",
+		"es": "Cargar desde perfil",
+		"fr": "Charger depuis le profil",
+		"it": "Carica dal profilo",
+		"ja": "プロファイルから読み込む",
+		"ko": "프로필에서 로드",
+		"pl": "Wczytaj z profilu",
+		"pt-BR": "Carregar do perfil",
+		"zh-hans": "从配置文件加载",
+		"zh-hant": "從設定檔載入"
+	},
+	"profile_sync_skip": {
+		"en": "Skip for now",
+		"ru": "Пропустить пока",
+		"de": "Vorerst überspringen",
+		"es": "Omitir por ahora",
+		"fr": "Ignorer pour l'instant",
+		"it": "Salta per ora",
+		"ja": "今はスキップ",
+		"ko": "지금은 건너뛰기",
+		"pl": "Pomiń na razie",
+		"pt-BR": "Pular por enquanto",
+		"zh-hans": "暂时跳过",
+		"zh-hant": "暫時跳過"
+	},
+	"profile_sync_title": {
+		"en": "Synchronizing profile",
+		"ru": "Синхронизация профиля",
+		"de": "Profil wird synchronisiert",
+		"es": "Sincronizando perfil",
+		"fr": "Synchronisation du profil",
+		"it": "Sincronizzazione del profilo",
+		"ja": "プロファイルを同期中",
+		"ko": "프로필 동기화 중",
+		"pl": "Synchronizacja profilu",
+		"pt-BR": "Sincronizando perfil",
+		"zh-hans": "正在同步配置文件",
+		"zh-hant": "正在同步設定檔"
+	},
+	"profile_sync_message": {
+		"en": "Copying mods folder...",
+		"ru": "Копирование папки модов...",
+		"de": "Mods-Ordner wird kopiert...",
+		"es": "Copiando carpeta de mods...",
+		"fr": "Copie du dossier des mods...",
+		"it": "Copia della cartella delle mod...",
+		"ja": "Modフォルダをコピー中...",
+		"ko": "모드 폴더 복사 중...",
+		"pl": "Kopiowanie folderu modów...",
+		"pt-BR": "Copiando pasta de mods...",
+		"zh-hans": "正在复制模组文件夹...",
+		"zh-hant": "正在複製模組資料夾..."
+	},
+	"profile_sync_success": {
+		"en": "Profile synchronized.",
+		"ru": "Профиль синхронизирован.",
+		"de": "Profil synchronisiert.",
+		"es": "Perfil sincronizado.",
+		"fr": "Profil synchronisé.",
+		"it": "Profilo sincronizzato.",
+		"ja": "プロファイルが同期されました。",
+		"ko": "프로필이 동기화되었습니다.",
+		"pl": "Profil zsynchronizowany.",
+		"pt-BR": "Perfil sincronizado.",
+		"zh-hans": "配置文件已同步。",
+		"zh-hant": "設定檔已同步。"
+	},
+	"profile_sync_failed": {
+		"en": "Profile sync failed: %s",
+		"ru": "Ошибка синхронизации профиля: %s",
+		"de": "Profil-Synchronisierung fehlgeschlagen: %s",
+		"es": "Error de sincronización del perfil: %s",
+		"fr": "Échec de la synchronisation du profil : %s",
+		"it": "Sincronizzazione del profilo fallita: %s",
+		"ja": "プロファイルの同期に失敗しました: %s",
+		"ko": "프로필 동기화 실패: %s",
+		"pl": "Synchronizacja profilu nie powiodła się: %s",
+		"pt-BR": "Falha na sincronização do perfil: %s",
+		"zh-hans": "配置文件同步失败：%s",
+		"zh-hant": "設定檔同步失敗：%s"
+	},
+	"profile_sync_tooltip": {
+		"en": "Synchronize profile with game mods folder",
+		"ru": "Синхронизировать профиль с папкой модов игры",
+		"de": "Profil mit dem Mods-Ordner des Spiels synchronisieren",
+		"es": "Sincronizar perfil con la carpeta de mods del juego",
+		"fr": "Synchroniser le profil avec le dossier des mods du jeu",
+		"it": "Sincronizza il profilo con la cartella delle mod del gioco",
+		"ja": "プロファイルをゲームのModフォルダと同期する",
+		"ko": "프로필을 게임 모드 폴더와 동기화",
+		"pl": "Synchronizuj profil z folderem modów gry",
+		"pt-BR": "Sincronizar perfil com a pasta de mods do jogo",
+		"zh-hans": "将配置文件与游戏模组文件夹同步",
+		"zh-hant": "將設定檔與遊戲模組資料夾同步"
+	},
+	"menu_profiles_sync": {
+		"en": "Synchronize profile",
+		"ru": "Синхронизировать профиль",
+		"de": "Profil synchronisieren",
+		"es": "Sincronizar perfil",
+		"fr": "Synchroniser le profil",
+		"it": "Sincronizza profilo",
+		"ja": "プロファイルを同期",
+		"ko": "프로필 동기화",
+		"pl": "Synchronizuj profil",
+		"pt-BR": "Sincronizar perfil",
+		"zh-hans": "同步配置文件",
+		"zh-hant": "同步設定檔"
+	},
+	"menu_profiles_reset": {
+		"en": "Reset game mods from profile",
+		"ru": "Сбросить моды игры из профиля",
+		"de": "Spielmods aus Profil zurücksetzen",
+		"es": "Restablecer mods del juego desde el perfil",
+		"fr": "Réinitialiser les mods du jeu à partir du profil",
+		"it": "Ripristina le mod del gioco dal profilo",
+		"ja": "プロファイルからゲームのModをリセット",
+		"ko": "프로필에서 게임 모드 재설정",
+		"pl": "Zresetuj mody gry z profilu",
+		"pt-BR": "Redefinir mods do jogo a partir do perfil",
+		"zh-hans": "从配置文件重置游戏模组",
+		"zh-hant": "從設定檔重置遊戲模組"
+	},
+	"profile_reset_title": {
+		"en": "Reset game mods?",
+		"ru": "Сбросить моды игры?",
+		"de": "Spielmods zurücksetzen?",
+		"es": "¿Restablecer mods del juego?",
+		"fr": "Réinitialiser les mods du jeu ?",
+		"it": "Ripristinare le mod del gioco?",
+		"ja": "ゲームのModをリセットしますか？",
+		"ko": "게임 모드를 재설정하시겠습니까?",
+		"pl": "Zresetować mody gry?",
+		"pt-BR": "Redefinir mods do jogo?",
+		"zh-hans": "重置游戏模组？",
+		"zh-hant": "重置遊戲模組？"
+	},
+	"profile_reset_message": {
+		"en": "This will replace the contents of the game's mods folder with the active profile's snapshot.",
+		"ru": "Это заменит содержимое папки модов игры снимком активного профиля.",
+		"de": "Dies ersetzt den Inhalt des Mods-Ordners des Spiels durch den Snapshot des aktiven Profils.",
+		"es": "Esto reemplazará el contenido de la carpeta de mods del juego con la instantánea del perfil activo.",
+		"fr": "Cela remplacera le contenu du dossier des mods du jeu par l'instantané du profil actif.",
+		"it": "Questo sostituirà il contenuto della cartella delle mod del gioco con l'istantanea del profilo attivo.",
+		"ja": "これにより、ゲームのModフォルダの内容がアクティブなプロファイルのスナップショットに置き換えられます。",
+		"ko": "이렇게 하면 게임의 모드 폴더 내용이 활성 프로필의 스냅샷으로 대체됩니다.",
+		"pl": "Spowoduje to zastąpienie zawartości folderu modów gry migawką aktywnego profilu.",
+		"pt-BR": "Isso substituirá o conteúdo da pasta de mods do jogo pelo instantâneo do perfil ativo.",
+		"zh-hans": "这将用活动配置文件的快照替换游戏模组文件夹的内容。",
+		"zh-hant": "這將用活動設定檔的快照替換遊戲模組資料夾的內容。"
+	},
+	"profile_reset_success": {
+		"en": "Game mods reset from profile.",
+		"ru": "Моды игры сброшены из профиля.",
+		"de": "Spielmods aus Profil zurückgesetzt.",
+		"es": "Mods del juego restablecidos desde el perfil.",
+		"fr": "Mods du jeu réinitialisés à partir du profil.",
+		"it": "Mod del gioco ripristinate dal profilo.",
+		"ja": "プロファイルからゲームのModをリセットしました。",
+		"ko": "프로필에서 게임 모드를 재설정했습니다.",
+		"pl": "Mody gry zresetowane z profilu.",
+		"pt-BR": "Mods do jogo redefinidos a partir do perfil.",
+		"zh-hans": "已从配置文件重置游戏模组。",
+		"zh-hant": "已從設定檔重置遊戲模組。"
+	},
+	"menu_backups": {
+		"en": "Backups",
+		"ru": "Резервные копии",
+		"de": "Backups",
+		"es": "Copias de seguridad",
+		"fr": "Sauvegardes",
+		"it": "Backup",
+		"ja": "バックアップ",
+		"ko": "백업",
+		"pl": "Kopie zapasowe",
+		"pt-BR": "Backups",
+		"zh-hans": "备份",
+		"zh-hant": "備份"
+	},
+	"menu_backups_create": {
+		"en": "Backup active profile",
+		"ru": "Создать резервную копию активного профиля",
+		"de": "Aktives Profil sichern",
+		"es": "Copia de seguridad del perfil activo",
+		"fr": "Sauvegarder le profil actif",
+		"it": "Esegui backup del profilo attivo",
+		"ja": "アクティブなプロファイルをバックアップ",
+		"ko": "활성 프로필 백업",
+		"pl": "Utwórz kopię zapasową aktywnego profilu",
+		"pt-BR": "Fazer backup do perfil ativo",
+		"zh-hans": "备份活动配置文件",
+		"zh-hant": "備份活動設定檔"
+	},
+	"menu_backups_restore": {
+		"en": "Restore from backup...",
+		"ru": "Восстановить из резервной копии...",
+		"de": "Aus Backup wiederherstellen...",
+		"es": "Restaurar desde copia de seguridad...",
+		"fr": "Restaurer à partir d'une sauvegarde...",
+		"it": "Ripristina da backup...",
+		"ja": "バックアップから復元...",
+		"ko": "백업에서 복원...",
+		"pl": "Przywróć z kopii zapasowej...",
+		"pt-BR": "Restaurar do backup...",
+		"zh-hans": "从备份还原...",
+		"zh-hant": "從備份還原..."
+	},
+	"menu_backups_open_folder": {
+		"en": "Open backups folder",
+		"ru": "Открыть папку резервных копий",
+		"de": "Backup-Ordner öffnen",
+		"es": "Abrir carpeta de copias de seguridad",
+		"fr": "Ouvrir le dossier des sauvegardes",
+		"it": "Apri cartella dei backup",
+		"ja": "バックアップフォルダを開く",
+		"ko": "백업 폴더 열기",
+		"pl": "Otwórz folder kopii zapasowych",
+		"pt-BR": "Abrir pasta de backups",
+		"zh-hans": "打开备份文件夹",
+		"zh-hant": "開啟備份資料夾"
+	},
+	"backup_created": {
+		"en": "Backup created: %s",
+		"ru": "Резервная копия создана: %s",
+		"de": "Backup erstellt: %s",
+		"es": "Copia de seguridad creada: %s",
+		"fr": "Sauvegarde créée : %s",
+		"it": "Backup creato: %s",
+		"ja": "バックアップが作成されました: %s",
+		"ko": "백업 생성됨: %s",
+		"pl": "Utworzono kopię zapasową: %s",
+		"pt-BR": "Backup criado: %s",
+		"zh-hans": "备份已创建：%s",
+		"zh-hant": "備份已建立：%s"
+	},
+	"backup_failed": {
+		"en": "Backup failed: %s",
+		"ru": "Ошибка создания резервной копии: %s",
+		"de": "Backup fehlgeschlagen: %s",
+		"es": "Error al crear copia de seguridad: %s",
+		"fr": "Échec de la sauvegarde : %s",
+		"it": "Backup fallito: %s",
+		"ja": "バックアップに失敗しました: %s",
+		"ko": "백업 실패: %s",
+		"pl": "Kopia zapasowa nie powiodła się: %s",
+		"pt-BR": "Falha no backup: %s",
+		"zh-hans": "备份失败：%s",
+		"zh-hant": "備份失敗：%s"
+	},
+	"backup_restored": {
+		"en": "Backup restored as profile: %s",
+		"ru": "Резервная копия восстановлена как профиль: %s",
+		"de": "Backup als Profil wiederhergestellt: %s",
+		"es": "Copia de seguridad restaurada como perfil: %s",
+		"fr": "Sauvegarde restaurée en tant que profil : %s",
+		"it": "Backup ripristinato come profilo: %s",
+		"ja": "バックアップがプロファイルとして復元されました: %s",
+		"ko": "백업이 프로필로 복원됨: %s",
+		"pl": "Kopia zapasowa przywrócona jako profil: %s",
+		"pt-BR": "Backup restaurado como perfil: %s",
+		"zh-hans": "备份已还原为配置文件：%s",
+		"zh-hant": "備份已還原為設定檔：%s"
+	},
+	"backup_creating_title": {
+		"en": "Creating backup",
+		"ru": "Создание резервной копии",
+		"de": "Backup wird erstellt",
+		"es": "Creando copia de seguridad",
+		"fr": "Création de la sauvegarde",
+		"it": "Creazione backup",
+		"ja": "バックアップを作成中",
+		"ko": "백업 생성 중",
+		"pl": "Tworzenie kopii zapasowej",
+		"pt-BR": "Criando backup",
+		"zh-hans": "正在创建备份",
+		"zh-hant": "正在建立備份"
+	},
+	"backup_creating_message": {
+		"en": "Archiving active profile...",
+		"ru": "Архивирование активного профиля...",
+		"de": "Aktives Profil wird archiviert...",
+		"es": "Archivando perfil activo...",
+		"fr": "Archivage du profil actif...",
+		"it": "Archiviazione del profilo attivo...",
+		"ja": "アクティブなプロファイルをアーカイブ中...",
+		"ko": "활성 프로필 보관 중...",
+		"pl": "Archiwizowanie aktywnego profilu...",
+		"pt-BR": "Arquivando perfil ativo...",
+		"zh-hans": "正在归档活动配置文件...",
+		"zh-hant": "正在歸檔活動設定檔..."
+	},
+	"backup_restoring_title": {
+		"en": "Restoring backup",
+		"ru": "Восстановление из резервной копии",
+		"de": "Backup wird wiederhergestellt",
+		"es": "Restaurando copia de seguridad",
+		"fr": "Restauration de la sauvegarde",
+		"it": "Ripristino backup",
+		"ja": "バックアップを復元中",
+		"ko": "백업 복원 중",
+		"pl": "Przywracanie kopii zapasowej",
+		"pt-BR": "Restaurando backup",
+		"zh-hans": "正在还原备份",
+		"zh-hant": "正在還原備份"
+	},
+	"backup_restoring_message": {
+		"en": "Extracting archive...",
+		"ru": "Извлечение архива...",
+		"de": "Archiv wird entpackt...",
+		"es": "Extrayendo archivo...",
+		"fr": "Extraction de l'archive...",
+		"it": "Estrazione archivio...",
+		"ja": "アーカイブを展開中...",
+		"ko": "아카이브 추출 중...",
+		"pl": "Rozpakowywanie archiwum...",
+		"pt-BR": "Extraindo arquivo...",
+		"zh-hans": "正在解压档案...",
+		"zh-hant": "正在解壓縮封存..."
+	},
+	"profile_backup_failed": {
+		"en": "Failed to create backup. Profile deletion aborted.",
+		"ru": "Не удалось создать резервную копию. Удаление профиля отменено.",
+		"de": "Backup konnte nicht erstellt werden. Profillöschung abgebrochen.",
+		"es": "No se pudo crear la copia de seguridad. Eliminación del perfil abortada.",
+		"fr": "Échec de la création de la sauvegarde. Suppression du profil annulée.",
+		"it": "Impossibile creare il backup. Eliminazione del profilo annullata.",
+		"ja": "バックアップの作成に失敗しました。プロファイルの削除を中止しました。",
+		"ko": "백업을 생성하지 못했습니다. 프로필 삭제가 중단되었습니다.",
+		"pl": "Nie udało się utworzyć kopii zapasowej. Usuwanie profilu przerwane.",
+		"pt-BR": "Falha ao criar backup. Exclusão do perfil abortada.",
+		"zh-hans": "无法创建备份。配置文件删除已中止。",
+		"zh-hant": "無法建立備份。設定檔刪除已中止。"
+	},
+	"trash_failed_title": {
+		"en": "Could not move to trash",
+		"ru": "Не удалось переместить в корзину",
+		"de": "Konnte nicht in den Papierkorb verschoben werden",
+		"es": "No se pudo mover a la papelera",
+		"fr": "Impossible de déplacer vers la corbeille",
+		"it": "Impossibile spostare nel cestino",
+		"ja": "ゴミ箱に移動できませんでした",
+		"ko": "휴지통으로 이동할 수 없습니다",
+		"pl": "Nie można przenieść do kosza",
+		"pt-BR": "Não foi possível mover para a lixeira",
+		"zh-hans": "无法移到回收站",
+		"zh-hant": "無法移到回收筒"
+	},
+	"trash_failed_text": {
+		"en": "Failed to move '%s' to the system trash:\n%s\n\nDelete permanently?",
+		"ru": "Не удалось переместить '%s' в системную корзину:\n%s\n\nУдалить навсегда?",
+		"de": "Fehler beim Verschieben von '%s' in den Systempapierkorb:\n%s\n\nDauerhaft löschen?",
+		"es": "Error al mover '%s' a la papelera del sistema:\n%s\n\n¿Eliminar permanentemente?",
+		"fr": "Échec du déplacement de '%s' vers la corbeille système :\n%s\n\nSupprimer définitivement ?",
+		"it": "Impossibile spostare '%s' nel cestino di sistema:\n%s\n\nEliminare definitivamente?",
+		"ja": "'%s'をシステムのゴミ箱に移動できませんでした:\n%s\n\n完全に削除しますか？",
+		"ko": "'%s'을(를) 시스템 휴지통으로 이동하지 못했습니다:\n%s\n\n영구 삭제하시겠습니까?",
+		"pl": "Nie udało się przenieść '%s' do kosza systemowego:\n%s\n\nUsunąć trwale?",
+		"pt-BR": "Falha ao mover '%s' para a lixeira do sistema:\n%s\n\nExcluir permanentemente?",
+		"zh-hans": "无法将 '%s' 移到系统回收站：\n%s\n\n永久删除？",
+		"zh-hant": "無法將 '%s' 移到系統回收筒：\n%s\n\n永久刪除？"
+	},
+	"btn_delete_forever": {
+		"en": "Delete forever",
+		"ru": "Удалить навсегда",
+		"de": "Dauerhaft löschen",
+		"es": "Eliminar para siempre",
+		"fr": "Supprimer définitivement",
+		"it": "Elimina definitivamente",
+		"ja": "完全に削除",
+		"ko": "영구 삭제",
+		"pl": "Usuń trwale",
+		"pt-BR": "Excluir permanentemente",
+		"zh-hans": "永久删除",
+		"zh-hant": "永久刪除"
 	}
 }

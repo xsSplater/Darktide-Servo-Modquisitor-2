@@ -98,7 +98,7 @@ func (app *App) DownloadFileWithProgress(ctx context.Context, url, destPath stri
 		app.appendLogToFile(fmt.Sprintf("DownloadFileWithProgress: NewRequest failed: %v", err))
 		return err
 	}
-	req.Header.Set("User-Agent", СonfigFolderSMQ)
+	req.Header.Set("User-Agent", ConfigFolderSMQ)
 	req.Header.Set("Application-Name", appName)
 	req.Header.Set("Application-Version", appVersion)
 	req.Header.Set("Referer", NexusMainURL)
@@ -638,7 +638,7 @@ func (app *App) getPremiumDownloadURL(modID, fileID string) (string, string, err
 	req.Header.Set("Application-Name", appName)
 	req.Header.Set("Application-Version", appVersion)
 	req.Header.Set("Referer", NexusMainURL)
-	req.Header.Set("User-Agent", СonfigFolderSMQ)
+	req.Header.Set("User-Agent", ConfigFolderSMQ)
 
 	client := &http.Client{Timeout: 15 * time.Second}
 	resp, err := client.Do(req)
@@ -696,7 +696,7 @@ func (app *App) getFreeDownloadURL(modID, fileID, key, expires string) (string, 
 	req.Header.Set("Application-Name", appName)
 	req.Header.Set("Application-Version", appVersion)
 	req.Header.Set("Referer", NexusMainURL)
-	req.Header.Set("User-Agent", СonfigFolderSMQ)
+	req.Header.Set("User-Agent", ConfigFolderSMQ)
 
 	client := &http.Client{Timeout: 15 * time.Second}
 	resp, err := client.Do(req)

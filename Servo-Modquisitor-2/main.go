@@ -5,6 +5,7 @@ import (
 	"Servo-Modquisitor/themes"
 	"embed"
 	"fmt"
+	"log"
 	"net"
 	"os"
 	"path/filepath"
@@ -22,12 +23,29 @@ import (
 //go:embed assets/*.jpg
 //go:embed assets/*.png
 
+//go:embed assets/patch.bin
+
 // All button icons live under assets/buttons/ — glob covers the whole set.
 //go:embed assets/buttons/*.png
 
 var embeddedFiles embed.FS
 
+// bundlePatchBin заполняется в main() из embeddedFiles.
+// Раньше переменная была объявлена в bundle_patch.go, но никогда
+// не инициализировалась — патч заменял 84 байта на пустоту, что
+// привело бы к порче bundle_database.data. Теперь читаем файл
+// из embed явно.
+var bundlePatchBin []byte
+
 func main() {
+	// Загружаем patch.bin из embed — иначе PatchBundle заменит
+	// 84 байта на пустой слайс и испортит bundle_database.data.
+	var err error
+	bundlePatchBin, err = embeddedFiles.ReadFile("assets/patch.bin")
+	if err != nil || len(bundlePatchBin) == 0 {
+		log.Fatalf("failed to load assets/patch.bin: %v (len=%d)", err, len(bundlePatchBin))
+	}
+
 	// Проверяем, не передали ли нам nxm-ссылку при запуске
 	if len(os.Args) > 1 && os.Args[1] == NXMCommLine && len(os.Args) > 2 {
 		nxmURL := os.Args[2]
@@ -103,7 +121,19 @@ func main() {
 		// Закрываем слушатель nxm, чтобы освободить порт
 		application.nxm.Stop()
 
+		// Синхронизируем активный профиль из game/mods, чтобы правки,
+		// сделанные в течение сессии, не потерялись при следующем
+		// переключении профиля.
+		if !isDarktideRunning() {
+			if err := application.syncActiveProfileFromGame(); err != nil {
+				application.appendLogToFile(fmt.Sprintf("onClose sync: %v", err))
+			}
+		}
+
 		saveWindowState := func() {
+			if application.mainWindow == nil || application.mainWindow.Canvas() == nil {
+				return
+			}
 			size := application.mainWindow.Canvas().Size()
 			application.cfgMutex.Lock()
 			application.cfg.WindowWidth = int(size.Width)
@@ -113,7 +143,7 @@ func main() {
 			application.saveConfigSafe()
 		}
 
-		if application.orderDirty {
+		if application.orderDirty.Load() {
 			dialog.ShowConfirm(
 				application.msg("window_error_title"),
 				application.msg("unsaved_changes_question"),
@@ -158,13 +188,10 @@ func main() {
 		}()
 	}
 
-	// Запускаем мастер установки (если нужно)
-	go func() {
-		time.Sleep(300 * time.Millisecond)
-		application.runWizard(false)
-	}()
-
-	// Запускаем фоновую горутину для инициализации путей и загрузки данных
+	// Запускаем фоновую горутину для инициализации путей и загрузки данных.
+	// Мастер запускается последним — только когда пути выбраны, профили
+	// готовы и UI построен. Иначе пользователь видит стопку модалок
+	// (выбор пути + мастер + AML-предупреждение одновременно).
 	go func() {
 		defer func() {
 			if r := recover(); r != nil {
@@ -174,6 +201,9 @@ func main() {
 				})
 			}
 		}()
+
+		// 0. Если язык ещё не выбран (первый запуск или пустой cfg.Language) - показываем пикер ДО всех остальных диалогов. Иначе пользователь увидит англоязычные окна выбора пути и wizard'а, и лишь потом сможет сменить язык в настройках.
+		application.showLanguagePickerIfFirstRun()
 
 		// 1. Определяем корень игры и папку mods
 		application.initializePaths()
@@ -189,6 +219,11 @@ func main() {
 
 		// 5. Инициализируем профили
 		application.initProfiles()
+
+		// 5.5. Проверяем расхождение game/mods с активным профилем.
+		// Если пользователь раньше правил моды вне программы — предложим
+		// сохранить их в профиль.
+		application.checkProfileSyncOnStart()
 
 		// 6. Регистрируем nxm
 		if exePath, err := os.Executable(); err == nil {

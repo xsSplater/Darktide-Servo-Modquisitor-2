@@ -14,3 +14,14 @@ fyne_metadata_init.go
 
 # Папка для vscode
 .vscode/
+
+# Сборка
+dist/
+temp_extract/
+*.exe
+
+# Конфиг (у пользователя он в ~/.config, но на всякий случай)
+config.json
+oauth_tokens.json
+nexus_versions.json
+mod_load_order.txt

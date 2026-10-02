@@ -9,7 +9,6 @@ import (
 	"runtime"
 	"strings"
 	"sync"
-	"time"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
@@ -205,10 +204,25 @@ func (app *App) showDiskSearchDialog() chan GameSearchResult {
 
 			if len(found) == 1 {
 				updateStatus(fmt.Sprintf(app.msg("disk_search_status_found"), found[0]))
-				time.Sleep(500 * time.Millisecond)
 				fyne.Do(func() {
 					popUp.Hide()
-					resultChan <- GameSearchResult{Path: found[0], Success: true}
+					// Обязательно даём пользователю подтвердить. Иначе на Linux
+					// с примонтированным Windows-разделом программа молча
+					// подхватит чужую копию игры, и сменить её будет негде.
+					app.showChoiceDialog(
+						app.mainWindow,
+						app.msg("path_found_title"),
+						fmt.Sprintf(app.msg("path_found_message"), found[0]),
+						func(choice int) {
+							if choice == 0 {
+								resultChan <- GameSearchResult{Path: found[0], Success: true}
+							} else {
+								resultChan <- GameSearchResult{Success: false}
+							}
+						},
+						app.msg("btn_yes"),
+						app.msg("btn_choose_other"),
+					)
 				})
 				return
 			}
@@ -313,7 +327,9 @@ func (app *App) searchGameOnDrives(roots []string, ctx context.Context, progress
 		"etc":  true,
 	}
 
-	const maxDepth = 5 // /Steam/steamapps/common/Warhammer... 4 уровня, запас 5
+	// /mnt/games/SteamLibrary/steamapps/common/Warhammer 40,000 DARKTIDE — 6 уровней,
+	// плюс запас на нестандартные установки (вложенные библиотеки Steam).
+	const maxDepth = 8
 
 	var walkDir func(path string, depth int) error
 	walkDir = func(path string, depth int) error {

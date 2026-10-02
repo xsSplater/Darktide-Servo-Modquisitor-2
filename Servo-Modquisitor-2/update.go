@@ -92,6 +92,11 @@ func (app *App) checkSpecialUpdates() {
 	// Проверяем, авторизован ли пользователь
 	if app.getAuthToken() == "" {
 		app.appendLog(app.msg("log_spec_update_not_logged"))
+		// Всё равно отмечаем попытку, чтобы shouldCheckUpdates не спамил
+		app.cfgMutex.Lock()
+		app.cfg.LastUpdateCheck = time.Now().Format(time.RFC3339)
+		app.cfgMutex.Unlock()
+		app.saveConfigSafe()
 		return
 	}
 

@@ -62,3 +62,9 @@ func launchGame(version GameVersion, gameRoot string, skipLauncher bool) error {
 
 	return cmd.Start()
 }
+
+// startSteam запускает клиент Steam через URL-обработчик. Тот же приём,
+// что и для запуска игры: rundll32 + FileProtocolHandler.
+func startSteam() error {
+	return exec.Command("rundll32", "url.dll,FileProtocolHandler", "steam://open/main").Start()
+}

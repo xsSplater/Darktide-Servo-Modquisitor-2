@@ -33,9 +33,10 @@ type ModUpdateChoice struct {
 
 // showInfoDialog показывает информационный диалог с кнопкой OK.
 func (app *App) showInfoDialog(title, message string) {
-	// fyne.Do(func() {
-	dialog.ShowInformation(title, message, app.mainWindow)
-	// })
+	fyne.Do(func() {
+		app.bringToFront()
+		dialog.ShowInformation(title, message, app.mainWindow)
+	})
 }
 
 // showChoiceDialog показывает диалог выбора с произвольным количеством кнопок.
@@ -43,6 +44,7 @@ func (app *App) showInfoDialog(title, message string) {
 func (app *App) showChoiceDialog(parent fyne.Window, title, message string, callback func(int), options ...string) {
 	// Все операции с UI - только в главном потоке
 	fyne.Do(func() {
+		app.bringToFront()
 		// Объявляем popUp ПЕРЕД созданием кнопок
 		var popUp *widget.PopUp
 
@@ -84,6 +86,7 @@ func (app *App) showChoiceDialog(parent fyne.Window, title, message string, call
 // showConfirmDialog показывает диалог подтверждения с двумя кнопками (Да/Нет).
 func (app *App) showConfirmDialog(title, message string, onConfirm func()) {
 	fyne.Do(func() {
+		app.bringToFront()
 		dialog.ShowConfirm(title, message, func(ok bool) {
 			if ok && onConfirm != nil {
 				onConfirm()
@@ -126,10 +129,22 @@ func (app *App) showChoiceDialogAsync(parent fyne.Window, title, message string,
 
 // Основной диалог скачивания (для обычных модов)
 func (app *App) showDownloadDialog(downloadURL, filename string, modName string, fileInfo *FileInfo, modID string) {
-
 	displayFilename := filename
 	if fileInfo != nil && fileInfo.FileName != "" {
 		displayFilename = fileInfo.FileName
+	}
+
+	app.cfgMutex.RLock()
+	autoConfirm := app.cfg.AutoConfirmDownloadEnabled()
+	app.cfgMutex.RUnlock()
+
+	if autoConfirm {
+		// Пользователь явно разрешил пропускать подтверждение.
+		// Consent уже дан им на сайте Nexus при клике
+		// «Mod Manager Download».
+		app.appendLog(fmt.Sprintf(app.msg("log_downloading_mod"), modName))
+		app.startDownload(downloadURL, filename, modName, fileInfo, modID)
+		return
 	}
 
 	app.showChoiceDialog(
@@ -140,7 +155,10 @@ func (app *App) showDownloadDialog(downloadURL, filename string, modName string,
 			if choice != 0 {
 				return
 			}
-			app.startDownload(downloadURL, filename, modName, fileInfo, modID)
+			// callback выполняется в UI-потоке. startDownload внутри делает
+			// fyne.Do + ожидает закрытия канала — синхронный вызов из UI
+			// заклинил бы поток навсегда. Уводим в горутину.
+			go app.startDownload(downloadURL, filename, modName, fileInfo, modID)
 		},
 		app.msg("btn_yes"),
 		app.msg("btn_no"),
@@ -150,6 +168,11 @@ func (app *App) showDownloadDialog(downloadURL, filename string, modName string,
 // startDownload - выполняет скачивание и установку после подтверждения.
 // Длительная работа вынесена в горутину, UI-поток только для dlg.Hide()
 // и прокрутки к установленному моду. Иначе вложенный fyne.Do даёт deadlock.
+//
+// Создание виджетов (bar, dlg) обёрнуто в fyne.Do и синхронизировано
+// через ready-канал: fyne.Do асинхронный, без барьера горутина
+// скачивания стартанула бы раньше, чем bar/dlg будут присвоены, и
+// DownloadFileWithProgress упал бы на nil-pointer при bar.SetValue.
 func (app *App) startDownload(downloadURL, filename, modName string, fileInfo *FileInfo, modID string) {
 	app.appendLog(fmt.Sprintf(app.msg("log_downloading_mod"), modName))
 
@@ -167,17 +190,25 @@ func (app *App) startDownload(downloadURL, filename, modName string, fileInfo *F
 		fallbackFileName = fileInfo.FileName
 	}
 
-	bar := widget.NewProgressBar()
-	bar.SetValue(0)
-	lbl := widget.NewLabel(fmt.Sprintf(app.msg("downloading"), filename))
-	content := container.NewVBox(lbl, bar)
-	dlg := dialog.NewCustom(app.msg("download_title"), app.msg("btn_cancel"), content, app.mainWindow)
-
 	ctx, cancel := context.WithCancel(context.Background())
-	dlg.SetOnClosed(func() {
-		cancel()
+
+	var bar *widget.ProgressBar
+	var dlg *dialog.CustomDialog
+	ready := make(chan struct{})
+
+	fyne.Do(func() {
+		bar = widget.NewProgressBar()
+		bar.SetValue(0)
+		lbl := widget.NewLabel(fmt.Sprintf(app.msg("downloading"), filename))
+		content := container.NewVBox(lbl, bar)
+		dlg = dialog.NewCustom(app.msg("download_title"), app.msg("btn_cancel"), content, app.mainWindow)
+		dlg.SetOnClosed(func() {
+			cancel()
+		})
+		dlg.Show()
+		close(ready)
 	})
-	dlg.Show()
+	<-ready
 
 	// Забираем ModsPath заранее, чтобы не трогать cfg из горутины
 	app.cfgMutex.RLock()
@@ -278,6 +309,20 @@ func (app *App) showDMLDownloadDialog(downloadURL, filename string, fileInfo *Fi
 		displayFilename = fileInfo.FileName
 	}
 
+	app.cfgMutex.RLock()
+	autoConfirm := app.cfg.AutoConfirmDownloadEnabled()
+	app.cfgMutex.RUnlock()
+
+	run := func() {
+		app.startSystemDownload(downloadURL, filename, "Darktide Mod Loader", fileInfo, "19:base", app.installDMLFromArchive, app.msg("installing_dml"), app.msg("dml_updated"))
+	}
+
+	if autoConfirm {
+		app.appendLog(fmt.Sprintf(app.msg("log_downloading_mod"), "Darktide Mod Loader"))
+		run()
+		return
+	}
+
 	app.showChoiceDialog(
 		app.mainWindow,
 		app.msg("confirm_download_title"),
@@ -286,7 +331,9 @@ func (app *App) showDMLDownloadDialog(downloadURL, filename string, fileInfo *Fi
 			if choice != 0 {
 				return
 			}
-			app.startSystemDownload(downloadURL, filename, "Darktide Mod Loader", fileInfo, "19:base", app.installDMLFromArchive, app.msg("installing_dml"), app.msg("dml_updated"))
+			// Тот же случай, что и в showDownloadDialog: run() → startSystemDownload
+			// с fyne.Do + ожиданием. Из UI-потока это deadlock.
+			go run()
 		},
 		app.msg("btn_yes"),
 		app.msg("btn_no"),
@@ -299,6 +346,20 @@ func (app *App) showDMFDownloadDialog(downloadURL, filename string, fileInfo *Fi
 		displayFilename = fileInfo.FileName
 	}
 
+	app.cfgMutex.RLock()
+	autoConfirm := app.cfg.AutoConfirmDownloadEnabled()
+	app.cfgMutex.RUnlock()
+
+	run := func() {
+		app.startSystemDownload(downloadURL, filename, "Darktide Mod Framework", fileInfo, "8:dmf", app.installDMLFromArchive, app.msg("installing_dmf"), app.msg("log_dmf_updated_succ"))
+	}
+
+	if autoConfirm {
+		app.appendLog(fmt.Sprintf(app.msg("log_downloading_mod"), "Darktide Mod Framework"))
+		run()
+		return
+	}
+
 	app.showChoiceDialog(
 		app.mainWindow,
 		app.msg("confirm_download_title"),
@@ -307,7 +368,9 @@ func (app *App) showDMFDownloadDialog(downloadURL, filename string, fileInfo *Fi
 			if choice != 0 {
 				return
 			}
-			app.startSystemDownload(downloadURL, filename, "Darktide Mod Framework", fileInfo, "8:dmf", app.installDMLFromArchive, app.msg("installing_dmf"), app.msg("log_dmf_updated_succ"))
+			// Тот же случай, что и в showDownloadDialog: run() → startSystemDownload
+			// с fyne.Do + ожиданием. Из UI-потока это deadlock.
+			go run()
 		},
 		app.msg("btn_yes"),
 		app.msg("btn_no"),
@@ -320,6 +383,20 @@ func (app *App) showAutopatcherDownloadDialog(downloadURL, filename string, file
 		displayFilename = fileInfo.FileName
 	}
 
+	app.cfgMutex.RLock()
+	autoConfirm := app.cfg.AutoConfirmDownloadEnabled()
+	app.cfgMutex.RUnlock()
+
+	run := func() {
+		app.startSystemDownload(downloadURL, filename, "Darktide Mod Autopatcher", fileInfo, "709:autopatch", app.installAutopatcherFromArchive, app.msg("installing_autopatcher"), app.msg("autopatcher_updated"))
+	}
+
+	if autoConfirm {
+		app.appendLog(fmt.Sprintf(app.msg("log_downloading_mod"), "Darktide Mod Autopatcher"))
+		run()
+		return
+	}
+
 	app.showChoiceDialog(
 		app.mainWindow,
 		app.msg("confirm_download_title"),
@@ -328,7 +405,9 @@ func (app *App) showAutopatcherDownloadDialog(downloadURL, filename string, file
 			if choice != 0 {
 				return
 			}
-			app.startSystemDownload(downloadURL, filename, "Darktide Mod Autopatcher", fileInfo, "709:autopatch", app.installAutopatcherFromArchive, app.msg("installing_autopatcher"), app.msg("autopatcher_updated"))
+			// Тот же случай, что и в showDownloadDialog: run() → startSystemDownload
+			// с fyne.Do + ожиданием. Из UI-потока это deadlock.
+			go run()
 		},
 		app.msg("btn_yes"),
 		app.msg("btn_no"),
@@ -336,18 +415,32 @@ func (app *App) showAutopatcherDownloadDialog(downloadURL, filename string, file
 }
 
 // startSystemDownload - общая логика скачивания для системных модов.
+//
+// Как и startDownload, использует ready-барьер: fyne.Do асинхронный,
+// и без синхронизации горутина скачивания стартанула бы раньше, чем
+// bar/dlg будут присвоены — DownloadFileWithProgress упал бы на
+// nil-pointer при bar.SetValue.
 func (app *App) startSystemDownload(downloadURL, filename, displayName string, fileInfo *FileInfo, cacheKey string, installFunc func(string) error, logInstalling, logSuccess string) {
 	app.appendLog(fmt.Sprintf(app.msg("log_downloading_mod"), displayName))
-	bar := widget.NewProgressBar()
-	lbl := widget.NewLabel(fmt.Sprintf(app.msg("downloading"), filename))
-	content := container.NewVBox(lbl, bar)
-	dlg := dialog.NewCustom(app.msg("download_title"), app.msg("btn_cancel"), content, app.mainWindow)
 
 	ctx, cancel := context.WithCancel(context.Background())
-	dlg.SetOnClosed(func() {
-		cancel()
+
+	var bar *widget.ProgressBar
+	var dlg *dialog.CustomDialog
+	ready := make(chan struct{})
+
+	fyne.Do(func() {
+		bar = widget.NewProgressBar()
+		lbl := widget.NewLabel(fmt.Sprintf(app.msg("downloading"), filename))
+		content := container.NewVBox(lbl, bar)
+		dlg = dialog.NewCustom(app.msg("download_title"), app.msg("btn_cancel"), content, app.mainWindow)
+		dlg.SetOnClosed(func() {
+			cancel()
+		})
+		dlg.Show()
+		close(ready)
 	})
-	dlg.Show()
+	<-ready
 
 	// Копируем ModsPath под мьютексом перед запуском горутины
 	app.cfgMutex.RLock()
@@ -498,6 +591,7 @@ func (app *App) handleNXMLink(nxmURL string) {
 		app.appendLog(app.msg("nxm_already_processing"))
 		return
 	}
+	app.bringToFront()
 
 	u, err := url.Parse(nxmURL)
 	if err != nil {
@@ -547,9 +641,11 @@ func (app *App) handleNXMLink(nxmURL string) {
 				app.appendLog(fmt.Sprintf(app.msg("failed_get_download_link"), err))
 				return
 			}
-			fyne.Do(func() {
-				app.showDMLDownloadDialog(directURL, filename, fileInfo)
-			})
+			// Вызываем напрямую из фоновой горутины: showDMLDownloadDialog
+			// сам делает fyne.Do там, где надо (appendLog, showChoiceDialog),
+			// а startSystemDownload ждёт UI-барьер — если обернуть снаружи,
+			// UI-поток окажется занят и барьер никогда не закроется.
+			app.showDMLDownloadDialog(directURL, filename, fileInfo)
 		}()
 		return
 	}
@@ -578,9 +674,7 @@ func (app *App) handleNXMLink(nxmURL string) {
 				app.appendLog(fmt.Sprintf(app.msg("failed_get_download_link"), err))
 				return
 			}
-			fyne.Do(func() {
-				app.showAutopatcherDownloadDialog(directURL, filename, fileInfo)
-			})
+			app.showAutopatcherDownloadDialog(directURL, filename, fileInfo)
 		}()
 		return
 	}
@@ -615,9 +709,7 @@ func (app *App) handleNXMLink(nxmURL string) {
 				modName = info.Name
 			}
 		}
-		fyne.Do(func() {
-			app.showDownloadDialog(directURL, filename, modName, fileInfo, modID)
-		})
+		app.showDownloadDialog(directURL, filename, modName, fileInfo, modID)
 	}()
 }
 
@@ -702,9 +794,10 @@ func (app *App) showProgressDialog(title, message string) (*widget.ProgressBar, 
 	var dlg *dialog.CustomDialog
 	cancelChan := make(chan struct{})
 	var once sync.Once
-	var closeDialogFunc func()
+	ready := make(chan struct{})
 
 	fyne.Do(func() {
+		app.bringToFront()
 		dlg = dialog.NewCustom(title, app.msg("btn_cancel"), content, app.mainWindow)
 		dlg.Resize(fyne.NewSize(400, 120))
 
@@ -715,9 +808,11 @@ func (app *App) showProgressDialog(title, message string) (*widget.ProgressBar, 
 		})
 
 		dlg.Show()
+		close(ready)
 	})
+	<-ready
 
-	closeDialogFunc = func() {
+	closeDialogFunc := func() {
 		if dlg != nil {
 			fyne.Do(func() {
 				dlg.Hide()
@@ -748,6 +843,8 @@ func (app *App) showUpdateChoiceDialog(updates []*ModUpdateChoice, resultChan ch
 		}{nil, false}
 		return
 	}
+
+	app.bringToFront()
 
 	var popUp *widget.PopUp
 	var items []fyne.CanvasObject
@@ -863,17 +960,15 @@ func (app *App) showUpdateChoiceDialog(updates []*ModUpdateChoice, resultChan ch
 }
 
 // stripHTML удаляет HTML-теги и преобразует <br> и <li> в переносы строк.
+var htmlTagStripRe = regexp.MustCompile(`<[^>]*>`)
+
 func stripHTML(html string) string {
 	replacer := strings.NewReplacer(
-		"<br>", "\n",
-		"<br/>", "\n",
-		"<br />", "\n",
-		"</li>", "\n",
-		"<li>", "- ",
+		"<br>", "\n", "<br/>", "\n", "<br />", "\n",
+		"</li>", "\n", "<li>", "- ",
 	)
 	text := replacer.Replace(html)
-	re := regexp.MustCompile(`<[^>]*>`)
-	text = re.ReplaceAllString(text, "")
+	text = htmlTagStripRe.ReplaceAllString(text, "")
 	return strings.TrimSpace(text)
 }
 
@@ -901,13 +996,27 @@ func (app *App) showCreateProfileDialog() {
 			copyFrom = app.cfg.ActiveProfile
 			app.cfgMutex.RUnlock()
 		}
-		if err := app.createProfile(name, copyFrom); err != nil {
-			app.appendLogToFile(fmt.Sprintf("Failed to create profile: %v", err))
-			app.showInfoDialog(app.msg("error_title"), app.msg("profile_create_failed"))
-			return
-		}
-		app.switchProfile(name)
 		popUp.Hide()
+
+		go func() {
+			// Синхронизируем активный профиль, чтобы копия была свежей.
+			if copyFrom != "" {
+				if err := app.syncActiveProfileFromGame(); err != nil {
+					app.appendLogToFile(fmt.Sprintf("createProfile: sync failed: %v", err))
+					// продолжаем — в профиле останется последняя синхронизация
+				}
+			}
+			if err := app.createProfile(name, copyFrom); err != nil {
+				fyne.Do(func() {
+					app.appendLogToFile(fmt.Sprintf("Failed to create profile: %v", err))
+					app.showInfoDialog(app.msg("error_title"), app.msg("profile_create_failed"))
+				})
+				return
+			}
+			fyne.Do(func() {
+				app.switchProfile(name)
+			})
+		}()
 	})
 
 	btnCancel := widget.NewButton(app.msg("btn_cancel"), func() {
@@ -1020,20 +1129,37 @@ func (app *App) showDeleteProfileDialog() {
 		app.msg("profile_delete_title"),
 		fmt.Sprintf(app.msg("profile_delete_message"), nameToDelete),
 		func() {
-			// Удаление запускаем ТОЛЬКО после того, как переключение
-			// профиля действительно завершилось. Иначе deleteProfile
-			// видит cfg.ActiveProfile = nameToDelete и отклоняет удаление
-			// («cannot delete active profile»), а параллельно с этим
-			// switchProfile ещё копирует моды — файловая гонка.
-			app.switchProfileAsync(target, func() {
-				if err := app.deleteProfile(nameToDelete); err != nil {
-					app.appendLogToFile(fmt.Sprintf("Failed to delete profile: %v", err))
-					app.showInfoDialog(app.msg("error_title"), app.msg("profile_delete_failed"))
+			go func() {
+				// 1. Переключиться на target и дождаться завершения.
+				done := make(chan struct{})
+				fyne.Do(func() {
+					app.switchProfileAsync(target, func() { close(done) })
+				})
+				<-done
+
+				// 2. Бэкап перед удалением.
+				if _, err := app.CreateProfileBackup(nameToDelete); err != nil {
+					fyne.Do(func() {
+						app.appendLogToFile(fmt.Sprintf("deleteProfile: backup failed: %v", err))
+						app.showInfoDialog(app.msg("error_title"), app.msg("profile_backup_failed"))
+					})
 					return
 				}
-				app.refreshProfileList()
-				app.appendLog(fmt.Sprintf(app.msg("profile_deleted"), nameToDelete))
-			})
+
+				// 3. Удаление.
+				if err := app.deleteProfile(nameToDelete); err != nil {
+					fyne.Do(func() {
+						app.appendLogToFile(fmt.Sprintf("Failed to delete profile: %v", err))
+						app.showInfoDialog(app.msg("error_title"), app.msg("profile_delete_failed"))
+					})
+					return
+				}
+
+				fyne.Do(func() {
+					app.refreshProfileList()
+					app.appendLog(fmt.Sprintf(app.msg("profile_deleted"), nameToDelete))
+				})
+			}()
 		},
 	)
 }
@@ -1121,35 +1247,48 @@ func (app *App) showExportProfileDialog() {
 		}
 		dstDir := filepath.FromSlash(uri.Path())
 
-		app.cfgMutex.RLock()
-		profileName := app.cfg.ActiveProfile
-		app.cfgMutex.RUnlock()
+		go func() {
+			// Обязательный синк перед экспортом.
+			if err := app.syncActiveProfileFromGame(); err != nil {
+				app.appendLogToFile(fmt.Sprintf("exportProfile: sync failed: %v", err))
+				fyne.Do(func() {
+					app.showInfoDialog(app.msg("error_title"), err.Error())
+				})
+				return
+			}
 
-		zipPath := filepath.Join(dstDir, profileName+".zip")
+			app.cfgMutex.RLock()
+			profileName := app.cfg.ActiveProfile
+			app.cfgMutex.RUnlock()
 
-		// Создаём временную папку для подготовки архива
-		tmpDir, err := os.MkdirTemp("", "profile-export-")
-		if err != nil {
-			app.appendLogToFile(fmt.Sprintf("Failed to create temp directory: %v", err))
-			return
-		}
-		defer os.RemoveAll(tmpDir)
+			zipPath := filepath.Join(dstDir, profileName+".zip")
 
-		// Копируем содержимое профиля во временную папку
-		srcPath := app.activeProfilePath()
-		tmpProfileDir := filepath.Join(tmpDir, profileName)
-		if err := copyPath(srcPath, tmpProfileDir); err != nil {
-			app.appendLogToFile(fmt.Sprintf("Failed to copy profile to temp: %v", err))
-			return
-		}
+			// Создаём временную папку для подготовки архива
+			tmpDir, err := os.MkdirTemp("", "profile-export-")
+			if err != nil {
+				app.appendLogToFile(fmt.Sprintf("Failed to create temp directory: %v", err))
+				return
+			}
+			defer os.RemoveAll(tmpDir)
 
-		// Архивируем временную папку
-		if err := app.createZipArchive(tmpProfileDir, zipPath); err != nil {
-			app.appendLog(fmt.Sprintf("Failed to create zip archive: %v", err))
-			return
-		}
+			// Копируем содержимое профиля во временную папку
+			srcPath := app.activeProfilePath()
+			tmpProfileDir := filepath.Join(tmpDir, profileName)
+			if err := copyPath(srcPath, tmpProfileDir); err != nil {
+				app.appendLogToFile(fmt.Sprintf("Failed to copy profile to temp: %v", err))
+				return
+			}
 
-		app.appendLog(fmt.Sprintf(app.msg("profile_exported"), zipPath))
+			// Архивируем временную папку
+			if err := app.createZipArchive(tmpProfileDir, zipPath); err != nil {
+				app.appendLog(fmt.Sprintf("Failed to create zip archive: %v", err))
+				return
+			}
+
+			fyne.Do(func() {
+				app.appendLog(fmt.Sprintf(app.msg("profile_exported"), zipPath))
+			})
+		}()
 	}, app.mainWindow)
 	fd.Show()
 	fd.Resize(fyne.NewSize(FileDialogWidth, FileDialogHeight))
@@ -1164,4 +1303,120 @@ func fileInfoSnapshot(fi *FileInfo) (version string, timestamp int64, fileName s
 		return "", 0, ""
 	}
 	return fi.Version, fi.UploadedTimestamp, fi.FileName
+}
+
+// showInfiniteProgressDialog — модальный диалог с инфинитным прогрессом.
+func (app *App) showInfiniteProgressDialog(title, message string) (<-chan struct{}, func()) {
+	bar := widget.NewProgressBarInfinite()
+	bar.Start()
+
+	label := widget.NewLabel(message)
+	label.Wrapping = fyne.TextWrapWord
+
+	content := container.NewVBox(label, bar)
+
+	var dlg *dialog.CustomDialog
+	cancelChan := make(chan struct{})
+	var once sync.Once
+	ready := make(chan struct{})
+
+	fyne.Do(func() {
+		app.bringToFront()
+		dlg = dialog.NewCustom(title, app.msg("btn_cancel"), content, app.mainWindow)
+		dlg.Resize(fyne.NewSize(400, 120))
+		dlg.SetOnClosed(func() {
+			once.Do(func() { close(cancelChan) })
+		})
+		dlg.Show()
+		close(ready)
+	})
+	<-ready
+
+	return cancelChan, func() {
+		if dlg != nil {
+			fyne.Do(func() { dlg.Hide() })
+		}
+	}
+}
+
+// createActiveProfileBackupFromUI — ручное создание бэкапа активного
+// профиля (из меню).
+func (app *App) createActiveProfileBackupFromUI() {
+	go func() {
+		app.cfgMutex.RLock()
+		active := app.cfg.ActiveProfile
+		app.cfgMutex.RUnlock()
+
+		_, closeDialog := app.showInfiniteProgressDialog(
+			app.msg("backup_creating_title"),
+			app.msg("backup_creating_message"),
+		)
+		defer closeDialog()
+
+		// Синк перед бэкапом, чтобы архив был свежим.
+		if err := app.syncActiveProfileFromGame(); err != nil {
+			app.appendLogToFile(fmt.Sprintf("backup: sync failed: %v", err))
+		}
+
+		zipPath, err := app.CreateProfileBackup(active)
+		fyne.Do(func() {
+			if err != nil {
+				app.appendLog(fmt.Sprintf(app.msg("backup_failed"), err.Error()))
+				return
+			}
+			app.appendLog(fmt.Sprintf(app.msg("backup_created"), filepath.Base(zipPath)))
+		})
+	}()
+}
+
+// showRestoreBackupDialog — выбор zip-файла из бэкапов.
+func (app *App) showRestoreBackupDialog() {
+	fd := dialog.NewFileOpen(func(reader fyne.URIReadCloser, err error) {
+		if err != nil || reader == nil {
+			return
+		}
+		defer reader.Close()
+		zipPath := filepath.FromSlash(reader.URI().Path())
+
+		go func() {
+			// Имя целевого профиля: убираем ts_ префикс, добавляем _restored.
+			base := strings.TrimSuffix(filepath.Base(zipPath), ".zip")
+			if idx := strings.Index(base, "_"); idx > 0 {
+				if _, perr := time.Parse("20060102_150405", base[:idx]); perr == nil {
+					base = base[idx+1:]
+				}
+			}
+			profileName := base + "_restored"
+			if app.profileExists(profileName) {
+				profileName = fmt.Sprintf("%s_%d", profileName, time.Now().Unix())
+			}
+
+			_, closeDialog := app.showInfiniteProgressDialog(
+				app.msg("backup_restoring_title"),
+				app.msg("backup_restoring_message"),
+			)
+			defer closeDialog()
+
+			if err := app.restoreProfileFromBackup(zipPath, profileName); err != nil {
+				fyne.Do(func() {
+					app.appendLogToFile(fmt.Sprintf("restore backup: %v", err))
+					app.showInfoDialog(app.msg("error_title"), err.Error())
+				})
+				return
+			}
+
+			fyne.Do(func() {
+				app.refreshProfileList()
+				app.appendLog(fmt.Sprintf(app.msg("backup_restored"), profileName))
+			})
+		}()
+	}, app.mainWindow)
+	fd.SetFilter(storage.NewExtensionFileFilter([]string{".zip"}))
+	fd.Show()
+	fd.Resize(fyne.NewSize(FileDialogWidth, FileDialogHeight))
+}
+
+// openBackupsFolder — открыть папку с бэкапами в файловом менеджере.
+func (app *App) openBackupsFolder() {
+	app.openPathInFileManager(app.backupsDir())
 }

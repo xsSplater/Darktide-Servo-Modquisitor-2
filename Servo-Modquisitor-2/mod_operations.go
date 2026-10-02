@@ -303,7 +303,7 @@ func (app *App) refreshModList() {
 	app.modsMutex.Lock()
 	app.allMods = regMods
 	app.systemMods = sysMods
-	app.orderDirty = false
+	app.orderDirty.Store(false)
 	app.modsMutex.Unlock()
 
 	// Очистка кэша от записей, не соответствующих существующим модам
@@ -363,7 +363,7 @@ func (app *App) toggleModActive(name string, active bool) {
 	for i := range app.allMods {
 		if app.allMods[i].Name == name {
 			app.allMods[i].Active = active
-			app.orderDirty = true
+			app.orderDirty.Store(true)
 			break
 		}
 	}
@@ -392,56 +392,69 @@ func (app *App) findModByName(name string) (checks.ModInfo, bool) {
 	return checks.ModInfo{}, false
 }
 
-func (app *App) removeFromAllMods(name string) {
-	app.modsMutex.Lock()
-	defer app.modsMutex.Unlock()
-	for i, m := range app.allMods {
-		if m.Name == name {
-			app.allMods = append(app.allMods[:i], app.allMods[i+1:]...)
-			break
-		}
-	}
-}
+// func (app *App) removeFromAllMods(name string) {
+// 	app.modsMutex.Lock()
+// 	defer app.modsMutex.Unlock()
+// 	for i, m := range app.allMods {
+// 		if m.Name == name {
+// 			app.allMods = append(app.allMods[:i], app.allMods[i+1:]...)
+// 			break
+// 		}
+// 	}
+// }
 
+// toggleGlobalMods — обработчик кнопки on/off в верхней панели
+// и горячей клавиши Ctrl+O.
+//
+// Логика:
+//  1. Проверяем, что игра вообще поддерживает патч (patcher == PatcherAutoPatch).
+//  2. Вызываем ToggleBundle — он сам определяет состояние:
+//     • чужой патч (DMA/dtkit)  → ErrBundleForeignPatch
+//     • уже пропатчено (любым)  → ErrBundleAlreadyPatched
+//     • нет патча, якорь есть   → PatchBundle → success
+//     • нет патча, якоря нет    → ErrBundlePatchOffset
+//  3. Каждую ветку обрабатываем отдельно:
+//     • foreign/backup/offset — показываем сообщение пользователю;
+//     • already patched — не ошибка, просто «моды уже включены»;
+//     • success — пишем в cfg и обновляем кнопку.
 func (app *App) toggleGlobalMods() {
 	gameRoot, patcher := app.getGameState()
-	switch patcher {
-	case PatcherAutoPatch:
-		err := toggleModsAutoPatch(gameRoot)
-		if err != nil {
-			app.appendLogToFile(fmt.Sprintf(app.msg("log_toggle_fail"), err))
-		} else {
-			enabled := isModsEnabledAutoPatch(gameRoot)
-			app.cfgMutex.Lock()
-			app.cfg.ModsGloballyEnabled = enabled
-			app.cfgMutex.Unlock()
-			state := app.msg("log_mods_enabled")
-			if !enabled {
-				state = app.msg("log_mods_disabled")
-			}
-			app.appendLog(state + app.msg("log_autopatcher"))
-		}
-	case PatcherLegacy:
-		err := toggleModsLegacy(gameRoot)
-		if err != nil {
-			app.appendLog(fmt.Sprintf(app.msg("log_toggle_fail"), err))
-		} else {
-			app.syncModsEnabledState()
-			app.updateToggleButtonText(app.btnToggle)
-			app.cfgMutex.RLock()
-			enabled := app.cfg.ModsGloballyEnabled
-			app.cfgMutex.RUnlock()
-			state := app.msg("log_mods_enabled")
-			if !enabled {
-				state = app.msg("log_mods_disabled")
-			}
-			app.appendLog(state + app.msg("log_autopatcher_old"))
-		}
-	default:
-		app.appendLog(app.msg("log_no_patcher"))
+	if patcher != PatcherAutoPatch || gameRoot == "" {
+		app.appendLog(app.msg("patcher_not_available"))
+		return
+	}
+
+	// Учитывает DLL: если она установлена — управляет флагом
+	// DISABLE_AUTOPATCHER, при этом bundle остаётся согласован.
+	// Возвращаемое состояние намеренно игнорируем: ниже читаем
+	// фактическое с диска через IsModsEnabled. Так UI не разъедется
+	// с реальностью, если какая-то из операций (установка флага или
+	// патч/распатч bundle) частично провалилась.
+	_, err := ToggleBundleWithAutopatcher(gameRoot)
+
+	// ErrBundleAlreadyPatched при включении с DLL — не ошибка;
+	// ErrBundleForeignPatch при выключении — флаг всё равно встанет,
+	// просто bundle может не откатиться.
+	if err != nil {
+		app.appendLogToFile(fmt.Sprintf("toggleGlobalMods: %v", err))
+		// Не выходим: даже при ошибке флаг мог поменяться. Читаем
+		// фактическое состояние и обновляем UI по нему.
+	}
+
+	// Фактическое состояние с диска.
+	enabled := IsModsEnabled(gameRoot)
+
+	app.cfgMutex.Lock()
+	app.cfg.ModsGloballyEnabled = enabled
+	app.cfgMutex.Unlock()
+	app.saveConfigSafe()
+
+	if enabled {
+		app.appendLog(app.msg("log_mods_enabled"))
+	} else {
+		app.appendLog(app.msg("log_mods_disabled"))
 	}
 	app.updateToggleButtonText(app.btnToggle)
-	app.saveConfigSafe()
 }
 
 func (app *App) handleDrop(uris []fyne.URI) {
@@ -456,44 +469,65 @@ func (app *App) handleDrop(uris []fyne.URI) {
 			app.appendLogToFile(fmt.Sprintf(app.msg("log_error_drop"), err))
 			continue
 		}
+
 		if info.IsDir() {
-			app.copyFolder(path, filepath.Join(modsPath, filepath.Base(path)))
-			checks.AutoFixMalformed()
-			app.refreshModList()
-			app.orderDirty = true
-			app.updateTableBorder()
-			app.appendLog(fmt.Sprintf(app.msg("log_installed_folder"), filepath.Base(path)))
-		} else {
-			ext := strings.ToLower(filepath.Ext(path))
-			if ext == ".zip" || ext == ".rar" || ext == ".7z" {
-				go func(p string) {
-					installedName, _, err := app.InstallModFromArchive(p, true, "", "")
+			folderName := filepath.Base(path)
+			dst := filepath.Join(modsPath, folderName)
+
+			// Копирование папки — в горутину: обход дерева и запись
+			// файлов на диск на большом моде могут занять секунды,
+			// а SetOnDropped вызывается в UI-потоке. Без этого UI
+			// подвисает до конца копирования.
+			go func(src, dst, name string) {
+				if err := app.copyFolder(src, dst); err != nil {
+					app.appendLogToFile(fmt.Sprintf(
+						"handleDrop: failed to copy folder %q: %v", name, err))
 					fyne.Do(func() {
-						if err != nil {
-							app.appendLog(fmt.Sprintf(app.msg("log_extract_error"), err))
-							return
-						}
-						checks.AutoFixMalformed()
-						app.fixHubHotkeyMenus()
-						app.refreshModList()
-						if installedName != "" {
-							app.selectAndScrollToMod(installedName)
-							modID, _, _ := extractVersionAndModIDFromFilename(p)
-							if modID != 0 {
-								go app.autoAddModToDatabase(modID, installedName, filepath.Base(p))
-							}
-							app.orderDirty = true
-							app.updateTableBorder()
-							app.appendLog(fmt.Sprintf(app.msg("log_installed"), filepath.Base(p)))
-						} else {
-							app.appendLog(app.msg("log_sorting_files_updated_manual"))
-						}
+						app.appendLog(fmt.Sprintf(app.msg("log_extract_error"), err))
 					})
-				}(path)
-			} else {
-				app.appendLog(app.msg("log_zip_only"))
-			}
+					return
+				}
+				fyne.Do(func() {
+					checks.AutoFixMalformed()
+					app.refreshModList()
+					app.orderDirty.Store(true)
+					app.updateTableBorder()
+					app.appendLog(fmt.Sprintf(app.msg("log_installed_folder"), name))
+				})
+			}(path, dst, folderName)
+			continue
 		}
+
+		ext := strings.ToLower(filepath.Ext(path))
+		if ext != ".zip" && ext != ".rar" && ext != ".7z" {
+			app.appendLog(app.msg("log_zip_only"))
+			continue
+		}
+
+		go func(p string) {
+			installedName, _, err := app.InstallModFromArchive(p, true, "", "")
+			fyne.Do(func() {
+				if err != nil {
+					app.appendLog(fmt.Sprintf(app.msg("log_extract_error"), err))
+					return
+				}
+				checks.AutoFixMalformed()
+				app.fixHubHotkeyMenus()
+				app.refreshModList()
+				if installedName != "" {
+					app.selectAndScrollToMod(installedName)
+					modID, _, _ := extractVersionAndModIDFromFilename(p)
+					if modID != 0 {
+						go app.autoAddModToDatabase(modID, installedName, filepath.Base(p))
+					}
+					app.orderDirty.Store(true)
+					app.updateTableBorder()
+					app.appendLog(fmt.Sprintf(app.msg("log_installed"), filepath.Base(p)))
+				} else {
+					app.appendLog(app.msg("log_sorting_files_updated_manual"))
+				}
+			})
+		}(path)
 	}
 }
 
@@ -840,20 +874,27 @@ func (app *App) copyFolder(src, dst string) error {
 	})
 }
 
+// syncModsEnabledState вычитывает актуальное состояние патча из
+// bundle_database.data и сохраняет его в cfg.ModsGloballyEnabled.
+//
+// Патчер теперь один — наш собственный (bundle_patch.go).
+// PatcherLegacy устарел и не возвращается detectPatcherTypeWithRoot.
 func (app *App) syncModsEnabledState() {
 	gameRoot, patcher := app.getGameState()
-	switch patcher {
-	case PatcherAutoPatch:
-		enabled := isModsEnabledAutoPatch(gameRoot)
-		app.cfgMutex.Lock()
-		app.cfg.ModsGloballyEnabled = enabled
-		app.cfgMutex.Unlock()
-	case PatcherLegacy:
-		enabled := isModsEnabledLegacy(gameRoot)
-		app.cfgMutex.Lock()
-		app.cfg.ModsGloballyEnabled = enabled
-		app.cfgMutex.Unlock()
+
+	// Если игры/патчера нет — просто выходим, не трогаем сохранённое
+	// состояние. Раньше в этом случае конфиг оставался как был, и
+	// пользователь видел то же значение, что и при последнем успешном
+	// старте. Сохраняем прежнее поведение.
+	if patcher != PatcherAutoPatch || gameRoot == "" {
+		return
 	}
+
+	enabled := isModsEnabledAutoPatch(gameRoot)
+
+	app.cfgMutex.Lock()
+	app.cfg.ModsGloballyEnabled = enabled
+	app.cfgMutex.Unlock()
 	app.saveConfigSafe()
 }
 
@@ -881,7 +922,7 @@ func (app *App) moveSelected(delta int) {
 	app.modsMutex.Lock()
 
 	if len(selNames) == 1 {
-		idx := app.findModIndexByName(selNames[0])
+		idx := app.findModIndexByNameLocked(selNames[0])
 		if idx == -1 {
 			app.modsMutex.Unlock()
 			return
@@ -892,7 +933,7 @@ func (app *App) moveSelected(delta int) {
 			return
 		}
 		app.allMods[idx], app.allMods[newIdx] = app.allMods[newIdx], app.allMods[idx]
-		app.orderDirty = true
+		app.orderDirty.Store(true)
 	} else {
 		var selected []checks.ModInfo
 		var others []checks.ModInfo
@@ -925,7 +966,7 @@ func (app *App) moveSelected(delta int) {
 		result = append(result, selected...)
 		result = append(result, others[insertIdx:]...)
 		app.allMods = result
-		app.orderDirty = true
+		app.orderDirty.Store(true)
 	}
 
 	app.modsMutex.Unlock()
@@ -954,7 +995,7 @@ func (app *App) moveSelectedToTop() {
 		}
 	}
 	app.allMods = append(selected, others...)
-	app.orderDirty = true
+	app.orderDirty.Store(true)
 
 	app.modsMutex.Unlock()
 
@@ -982,7 +1023,7 @@ func (app *App) moveSelectedToBottom() {
 		}
 	}
 	app.allMods = append(others, selected...)
-	app.orderDirty = true
+	app.orderDirty.Store(true)
 
 	app.modsMutex.Unlock()
 
@@ -1031,7 +1072,7 @@ func (app *App) moveSelectedToPosition() {
 	result = append(result, others[targetIdx:]...)
 
 	app.allMods = result
-	app.orderDirty = true
+	app.orderDirty.Store(true)
 
 	app.modsMutex.Unlock()
 
@@ -1041,9 +1082,18 @@ func (app *App) moveSelectedToPosition() {
 	app.forceRefreshTable()
 }
 
+// findModIndexByName — публичная версия, берёт RLock.
+// Использовать только когда мьютекс НЕ удерживается вызывающим.
 func (app *App) findModIndexByName(name string) int {
 	app.modsMutex.RLock()
 	defer app.modsMutex.RUnlock()
+	return app.findModIndexByNameLocked(name)
+}
+
+// findModIndexByNameLocked — вызывающий ОБЯЗАН держать modsMutex
+// (RLock или Lock). Реентерабельности в RWMutex нет, поэтому
+// внутри уже взятых блокировок надо звать только эту версию.
+func (app *App) findModIndexByNameLocked(name string) int {
 	for i, m := range app.allMods {
 		if m.Name == name {
 			return i
@@ -1077,6 +1127,15 @@ const (
 	archiveKindMod     archiveKind = iota // обычный мод (одна или несколько папок)
 	archiveKindSorting                    // файлы сортировки (mod_database.json / mandatory_rules)
 	archiveKindProgram                    // архив самой программы Servo-Modquisitor
+	// archiveKindGameOverlay — архив, который повторяет структуру
+	// корня игры: содержит папку mods/ плюс сопутствующие файлы
+	// (bat-скрипты, tools/, вспомогательные exe). Устанавливается
+	// целиком в корень игры, а не в <game>/mods/<wrapper>.
+	//
+	// Пример: Custom Assets (Nexus mod 1200) — папка-обёртка
+	// Custom-Assets-patcher содержит CUSTOM_ASSETS_PATCH.bat,
+	// mods/CustomAssets/ и tools/custom-assets-patcher.exe.
+	archiveKindGameOverlay
 )
 
 // InstallModFromArchive — оркестратор установки. Реальная работа разбита
@@ -1112,6 +1171,29 @@ func (app *App) InstallModFromArchive(archivePath string, activate bool, knownVe
 			return "", "", err
 		}
 		return "", "", nil
+
+	case archiveKindGameOverlay:
+		if gameRoot == "" {
+			return "", "", fmt.Errorf("game root not set")
+		}
+		names, err := app.installGameOverlay(tmpDir, gameRoot)
+		if err != nil {
+			return "", "", err
+		}
+		if len(names) == 0 {
+			// Overlay без модов — только файлы уровня корня (например,
+			// патчер без модов). Ничего активировать не нужно.
+			app.appendLogToFile("Game overlay installed without mods")
+			return "", "", nil
+		}
+		// Первый мод — «главный» для UI и обратной совместимости.
+		installedName := names[0]
+
+		modID, version := app.resolveModIDAndVersion(archivePath, installedName, knownVersion)
+		app.finalizeModInstallUI(installedName, activate, archivePath)
+		app.cacheInstalledVersion(modID, installedName, version)
+
+		return installedName, version, nil
 	}
 
 	// 3. Обычный мод: копируем файлы.
@@ -1140,6 +1222,58 @@ func (app *App) InstallModFromArchive(archivePath string, activate bool, knownVe
 // Шаги установки
 // ─────────────────────────────────────────────────────────────────
 
+// detectOverlayWrapper ищет папку-обёртку вида Custom-Assets-patcher:
+// в корне tmpDir ровно одна директория, внутри неё есть mods/ и
+// хотя бы что-то ещё (bat, tools/, exe).
+//
+// Возвращает путь к обёртке или "" если не найдено.
+func detectOverlayWrapper(tmpDir string) string {
+	entries, err := os.ReadDir(tmpDir)
+	if err != nil || len(entries) != 1 || !entries[0].IsDir() {
+		return ""
+	}
+	wrapper := filepath.Join(tmpDir, entries[0].Name())
+
+	inner, err := os.ReadDir(wrapper)
+	if err != nil {
+		return ""
+	}
+	hasMods := false
+	hasOther := false
+	for _, e := range inner {
+		if e.IsDir() && strings.EqualFold(e.Name(), "mods") {
+			hasMods = true
+		} else {
+			hasOther = true
+		}
+	}
+	if hasMods && hasOther {
+		return wrapper
+	}
+	return ""
+}
+
+// unwrapFolder поднимает содержимое wrapper/* на уровень tmpDir/*.
+// Обёртка удаляется.
+func (app *App) unwrapFolder(wrapper, tmpDir string) error {
+	entries, err := os.ReadDir(wrapper)
+	if err != nil {
+		return err
+	}
+	for _, e := range entries {
+		src := filepath.Join(wrapper, e.Name())
+		dst := filepath.Join(tmpDir, e.Name())
+		if err := os.Rename(src, dst); err != nil {
+			// Кросс-девайс fallback: копируем и удаляем.
+			if cpErr := copyPath(src, dst); cpErr != nil {
+				return cpErr
+			}
+			os.RemoveAll(src)
+		}
+	}
+	return os.RemoveAll(wrapper)
+}
+
 // prepareInstallTempDir создаёт временную папку для распаковки, опционально
 // удаляет старую папку обновляемого мода, распаковывает архив и нормализует
 // структуру.
@@ -1156,7 +1290,6 @@ func (app *App) prepareInstallTempDir(archivePath, modNameToUpdate string) (stri
 	baseTemp := app.getProgramTempDir()
 	tmpDir, err := os.MkdirTemp(baseTemp, "servo-mod-")
 	if err != nil {
-		// fallback на системную temp
 		tmpDir, err = os.MkdirTemp("", "servo-mod-")
 		if err != nil {
 			app.appendLogToFile(fmt.Sprintf(app.msg("log_update_failed_temp_dir"), err))
@@ -1170,8 +1303,24 @@ func (app *App) prepareInstallTempDir(archivePath, modNameToUpdate string) (stri
 		return "", err
 	}
 
-	// Нормализуем структуру — не критично, если не удастся (бывает архив
-	// сортировки или программы).
+	// Unwrap game-overlay обёрток (Custom-Assets-patcher):
+	// папка-обёртка с mods/ и содержимым корня игры поднимается
+	// на уровень tmpDir. Затем classifyArchive увидит mods/ в корне
+	// и обработает как archiveKindGameOverlay.
+	//
+	// ВАЖНО: это должно идти ДО normalizeArchiveStructure — иначе
+	// Этап 1 нормализации сам «поднимет» mods/* и удалит обёртку
+	// вместе со всем остальным (bat, tools/).
+	if wrapper := detectOverlayWrapper(tmpDir); wrapper != "" {
+		app.appendLogToFile(fmt.Sprintf(
+			"Unwrapping game-overlay wrapper: %s", filepath.Base(wrapper)))
+		if err := app.unwrapFolder(wrapper, tmpDir); err != nil {
+			app.appendLogToFile(fmt.Sprintf(
+				"unwrapFolder failed for %s: %v", wrapper, err))
+			// Не прерываем — пусть normalize попробует.
+		}
+	}
+
 	if err := app.normalizeArchiveStructure(tmpDir); err != nil {
 		app.appendLog(fmt.Sprintf(app.msg("log_failed_normalize"), err))
 	}
@@ -1182,6 +1331,7 @@ func (app *App) prepareInstallTempDir(archivePath, modNameToUpdate string) (stri
 // classifyArchive определяет тип архива по его содержимому:
 //   - программа (в корне <AppName>.exe),
 //   - файлы сортировки (в корне mod_database.json / mandatory_rules),
+//   - game overlay (в корне mods/ + что-то ещё),
 //   - обычный мод.
 //
 // Читает только корень tmpDir — вложенные каталоги не считаются.
@@ -1192,11 +1342,12 @@ func classifyArchive(tmpDir string) archiveKind {
 		return archiveKindProgram
 	}
 
-	// Архив сортировки — mod_database.json и/или mandatory_rules в корне.
 	entries, err := os.ReadDir(tmpDir)
 	if err != nil {
 		return archiveKindMod
 	}
+
+	// Архив сортировки — mod_database.json и/или mandatory_rules в корне.
 	for _, e := range entries {
 		if e.IsDir() {
 			continue
@@ -1205,6 +1356,20 @@ func classifyArchive(tmpDir string) archiveKind {
 			return archiveKindSorting
 		}
 	}
+
+	// Game overlay — есть папка mods/ в корне.
+	// После unwrap-шага (см. detectOverlayWrapper / unwrapFolder)
+	// сюда попадают архивы вида Custom-Assets-patcher.
+	//
+	// Если mods/ — единственный элемент в корне, это тоже сработает:
+	// результат идентичен обычной установке (game/mods/MyMod/).
+	// Разницы в поведении нет, а логика одна.
+	for _, e := range entries {
+		if e.IsDir() && strings.EqualFold(e.Name(), "mods") {
+			return archiveKindGameOverlay
+		}
+	}
+
 	return archiveKindMod
 }
 
@@ -1262,6 +1427,46 @@ func (app *App) installSortingArchive(tmpDir, modsPath string) error {
 	app.syncVersionCache()
 	app.logVersions()
 	return nil
+}
+
+// installGameOverlay копирует содержимое tmpDir прямо в корень игры.
+//
+// Используется для архивов, повторяющих структуру game root: bat-скрипт
+// плюс tools/ плюс mods/. Пример: Custom Assets (Nexus mod 1200).
+//
+// Копирование сливающее: если game/mods/ уже существует, содержимое
+// mods/CustomAssets/ из архива добавится рядом с существующими модами,
+// а не заменит всю папку mods.
+//
+// Возвращает список имён модов, найденных в mods/, — чтобы вызывающий
+// код мог добавить их в load order и обновить UI.
+func (app *App) installGameOverlay(tmpDir, gameRoot string) ([]string, error) {
+	if gameRoot == "" {
+		return nil, fmt.Errorf("game root not set")
+	}
+
+	// Копируем всё как есть в корень игры.
+	if err := copyPath(tmpDir, gameRoot); err != nil {
+		return nil, fmt.Errorf("copy overlay to game root: %w", err)
+	}
+	app.appendLogToFile(fmt.Sprintf(
+		"Game overlay installed to: %s", gameRoot))
+
+	// Собираем имена модов из mods/.
+	modsDir := filepath.Join(tmpDir, "mods")
+	entries, err := os.ReadDir(modsDir)
+	if err != nil {
+		// Папки mods/ может не быть — тогда это overlay без модов
+		// (просто вспомогательные файлы). Не ошибка.
+		return nil, nil
+	}
+	var names []string
+	for _, e := range entries {
+		if e.IsDir() {
+			names = append(names, e.Name())
+		}
+	}
+	return names, nil
 }
 
 // installModFiles копирует содержимое tmpDir в целевую папку менеджера.
@@ -1436,7 +1641,7 @@ func (app *App) finalizeModInstallUI(installedName string, activate bool, archiv
 			}
 			app.modsMutex.Unlock()
 
-			app.orderDirty = true
+			app.orderDirty.Store(true)
 			app.updateTableBorder()
 		}
 
@@ -1506,7 +1711,10 @@ func (app *App) updateModFromNexus(mod *checks.ModInfo, skipConfirm bool) {
 			fmt.Sprintf(app.msg("manual_mod_update_warning"), mod.Name),
 			func(choice int) {
 				if choice == 0 {
-					app.doUpdateModFromNexus(mod, modID, modIDStr, cacheKey, skipConfirm)
+					// callback — UI-поток, а doUpdateModFromNexus →
+					// showDownloadDialog → startDownload с fyne.Do + wait.
+					// Обязательно уводим в горутину.
+					go app.doUpdateModFromNexus(mod, modID, modIDStr, cacheKey, skipConfirm)
 				}
 			},
 			app.msg("btn_continue"),
@@ -1801,7 +2009,7 @@ func (app *App) removeSelectedMods() {
 		app.syncProfileFromGame()
 
 		fyne.Do(func() {
-			app.orderDirty = false
+			app.orderDirty.Store(false)
 			app.updateTableBorder()
 			app.refreshModList()
 			app.filterModList()
@@ -1835,7 +2043,7 @@ func (app *App) removeSelectedMods() {
 				app.updateUpDownButtons()
 			}
 
-			app.orderDirty = false
+			app.orderDirty.Store(false)
 			app.updateTableBorder()
 			app.appendLog(app.msg("log_selected_mods_removed"))
 		})
@@ -1858,7 +2066,7 @@ func (app *App) removeAllMods() {
 	app.displayedMods = []checks.ModInfo{}
 	app.modsMutex.Unlock()
 
-	app.orderDirty = false
+	app.orderDirty.Store(false)
 	app.selectedModName = ""
 	app.selectedModIndex.Store(-1)
 
@@ -2065,10 +2273,14 @@ func (app *App) cacheModVersion(cacheKey, folderName, version string, timestamp 
 	app.saveNexusVersionCache()
 }
 
-// removeModFromData удаляет мод из внутренних структур и возвращает индекс, на котором он находился в displayedMods
+// removeModFromData удаляет мод из внутренних структур и возвращает
+// индекс, на котором он находился в displayedMods.
+//
+// ВАЖНО: selectedModName — обычная строка, а не atomic. Менять её
+// разрешено ТОЛЬКО из UI-потока (всегда под fyne.Do). Поэтому здесь
+// вместо прямой записи используется fyne.Do.
 func (app *App) removeModFromData(modName string) (indexInDisplayed int, found bool) {
 	app.modsMutex.Lock()
-	defer app.modsMutex.Unlock()
 	for i, m := range app.allMods {
 		if m.Name == modName {
 			app.allMods = append(app.allMods[:i], app.allMods[i+1:]...)
@@ -2083,9 +2295,14 @@ func (app *App) removeModFromData(modName string) (indexInDisplayed int, found b
 			break
 		}
 	}
-	if app.selectedModName == modName {
-		app.selectedModName = ""
-		app.selectedModIndex.Store(-1)
+	clearSelection := app.selectedModName == modName
+	app.modsMutex.Unlock()
+
+	if clearSelection {
+		fyne.Do(func() {
+			app.selectedModName = ""
+			app.selectedModIndex.Store(-1)
+		})
 	}
 	return indexInDisplayed, found
 }

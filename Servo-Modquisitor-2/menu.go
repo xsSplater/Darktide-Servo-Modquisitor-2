@@ -241,6 +241,38 @@ func (app *App) buildMainMenu() *fyne.MainMenu {
 	showListAfterSortItem.CheckedIcon = checkedIcon
 	showListAfterSortItem.UncheckedIcon = uncheckedIcon
 
+	// Auto focus window — поднимать ли окно при показе диалогов.
+	app.cfgMutex.RLock()
+	autoFocus := app.cfg.AutoFocusEnabled()
+	app.cfgMutex.RUnlock()
+	autoFocusItem := fyne.NewMenuItem(app.msg("setting_auto_focus_window"), func() {
+		app.cfgMutex.Lock()
+		v := !app.cfg.AutoFocusEnabled()
+		app.cfg.AutoFocusWindow = &v
+		app.cfgMutex.Unlock()
+		app.saveConfigSafe()
+		app.mainWindow.SetMainMenu(app.buildMainMenu())
+	})
+	autoFocusItem.Checked = autoFocus
+	autoFocusItem.CheckedIcon = checkedIcon
+	autoFocusItem.UncheckedIcon = uncheckedIcon
+
+	// Auto confirm download — пропускать ли диалог подтверждения.
+	app.cfgMutex.RLock()
+	autoConfirm := app.cfg.AutoConfirmDownloadEnabled()
+	app.cfgMutex.RUnlock()
+	autoConfirmItem := fyne.NewMenuItem(app.msg("setting_auto_confirm_download"), func() {
+		app.cfgMutex.Lock()
+		v := !app.cfg.AutoConfirmDownloadEnabled()
+		app.cfg.AutoConfirmDownload = &v
+		app.cfgMutex.Unlock()
+		app.saveConfigSafe()
+		app.mainWindow.SetMainMenu(app.buildMainMenu())
+	})
+	autoConfirmItem.Checked = autoConfirm
+	autoConfirmItem.CheckedIcon = checkedIcon
+	autoConfirmItem.UncheckedIcon = uncheckedIcon
+
 	quitItem := fyne.NewMenuItemWithIcon(
 		app.msg("menu_quit"),
 		loadMenuIcon("exit.png"),
@@ -318,6 +350,34 @@ func (app *App) buildMainMenu() *fyne.MainMenu {
 			app.msg("menu_profiles_export"),
 			loadMenuIcon("profile_export.png"),
 			func() { app.showExportProfileDialog() }),
+		fyne.NewMenuItemSeparator(),
+		fyne.NewMenuItemWithIcon(
+			app.msg("menu_profiles_sync"),
+			loadMenuIcon("sync_n.png"),
+			func() { app.SyncProfileManually() }),
+		fyne.NewMenuItemSeparator(),
+		fyne.NewMenuItemWithIcon(
+			app.msg("menu_profiles_reset"),
+			loadMenuIcon("reset_yellow.png"),
+			func() { app.ResetGameModsWithConfirm() }),
+	)
+
+	backupsMenu := fyne.NewMenuWithIcon(
+		app.msg("menu_backups"),
+		loadMenuIcon("archive.png"),
+		fyne.NewMenuItemWithIcon(
+			app.msg("menu_backups_create"),
+			loadMenuIcon("save.png"),
+			func() { app.createActiveProfileBackupFromUI() }),
+		fyne.NewMenuItemWithIcon(
+			app.msg("menu_backups_restore"),
+			loadMenuIcon("import.png"),
+			func() { app.showRestoreBackupDialog() }),
+		fyne.NewMenuItemSeparator(),
+		fyne.NewMenuItemWithIcon(
+			app.msg("menu_backups_open_folder"),
+			loadMenuIcon("folder_open.png"),
+			func() { app.openBackupsFolder() }),
 	)
 
 	// GUIDES MENU
@@ -339,6 +399,13 @@ func (app *App) buildMainMenu() *fyne.MainMenu {
 				u, _ := url.Parse(YouTubeGuideProfil)
 				_ = app.myApp.OpenURL(u)
 			}),
+		// fyne.NewMenuItemWithIcon(
+		// 	app.msg("menu_guides_video_profiles"),
+		// 	loadMenuIcon("video.png"),
+		// 	func() {
+		// 		u, _ := url.Parse(YouTubeGuideProfil)
+		// 		_ = app.myApp.OpenURL(u)
+		// 	}),
 		fyne.NewMenuItemWithIcon(
 			app.msg("menu_guides_video_hti"),
 			loadMenuIcon("video.png"),
@@ -442,6 +509,14 @@ func (app *App) buildMainMenu() *fyne.MainMenu {
 	showSystemItem.CheckedIcon = checkedIcon
 	showSystemItem.UncheckedIcon = uncheckedIcon
 
+	// Смена пути к игре: полезно, когда программа нашла не ту копию
+	// (например, на Linux — Windows-раздел), и надо перевыбрать.
+	changePathItem := fyne.NewMenuItemWithIcon(
+		app.msg("menu_change_game_path"),
+		loadMenuIcon("folder_open.png"),
+		func() { app.changeGamePath() },
+	)
+
 	// SETTINGS MENU
 	settingsMenu := fyne.NewMenuWithIcon(app.msg("menu_settings"), loadMenuIcon("cog.png"),
 		langMenu,
@@ -452,6 +527,11 @@ func (app *App) buildMainMenu() *fyne.MainMenu {
 		forceEnglishItem,
 		showListAfterSortItem,
 		showSystemItem,
+		fyne.NewMenuItemSeparator(),
+		autoFocusItem,
+		autoConfirmItem,
+		fyne.NewMenuItemSeparator(),
+		changePathItem,
 		fyne.NewMenuItemSeparator(),
 		quitItem,
 	)
@@ -474,6 +554,8 @@ func (app *App) buildMainMenu() *fyne.MainMenu {
 		amlUSConfMenu,
 		fyne.NewMenuSeparator(),
 		profileMenu,
+		fyne.NewMenuSeparator(),
+		backupsMenu,
 
 		// Right Align
 		guidesMenu,

@@ -1,6 +1,6 @@
 //go:build windows
-
 // Servo-Modquisitor-2/window_state_windows.go
+
 package main
 
 import (
@@ -8,15 +8,7 @@ import (
 	"unsafe"
 )
 
-var (
-	procFindWindowW = user32.NewProc("FindWindowW")
-	procShowWindow  = user32.NewProc("ShowWindow")
-	procIsZoomed    = user32.NewProc("IsZoomed")
-)
-
-const (
-	SW_MAXIMIZE = 3
-)
+const SW_MAXIMIZE = 3
 
 // maximizeWindowByTitle пытается найти окно по заголовку и максимизировать его.
 func maximizeWindowByTitle(title string) {

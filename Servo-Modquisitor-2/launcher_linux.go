@@ -553,3 +553,10 @@ func launchGame(version GameVersion, gameRoot string, skipLauncher bool) error {
 		return fmt.Errorf("%s", errGameVersionUnknown)
 	}
 }
+
+// startSteam запускает клиент Steam через URL-обработчик. Steam сам
+// регистрирует схему steam:// при установке, поэтому xdg-open найдёт
+// нужный десктопный файл и запустит клиент, даже если он сейчас выключен.
+func startSteam() error {
+	return exec.Command("xdg-open", "steam://open/main").Start()
+}

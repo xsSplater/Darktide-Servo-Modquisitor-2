@@ -141,32 +141,41 @@ func TestCompareVersions(t *testing.T) {
 	}
 }
 
-func TestIsModsEnabledLegacy(t *testing.T) {
+// TestIsModsEnabledAutoPatch — состояние патча определяется наличием
+// тега .patch_999 в bundle_database.data (см. bundle_patch.go).
+func TestIsModsEnabledAutoPatch(t *testing.T) {
 	dir := t.TempDir()
-	// Создаём папку bundle и файл бэкапа (означает, что моды включены)
 	bundleDir := filepath.Join(dir, "bundle")
 	if err := os.Mkdir(bundleDir, 0755); err != nil {
 		t.Fatalf("mkdir bundle: %v", err)
 	}
-	bakFile := filepath.Join(bundleDir, "bundle_database.data.bak")
-	if err := os.WriteFile(bakFile, []byte("backup"), 0644); err != nil {
-		t.Fatalf("write bak: %v", err)
-	}
-	if !isModsEnabledLegacy(dir) {
-		t.Error("isModsEnabledLegacy returned false when backup exists")
+	dbFile := filepath.Join(bundleDir, "bundle_database.data")
+
+	// 1. Файла нет → false
+	if isModsEnabledAutoPatch(dir) {
+		t.Error("missing db should not be reported as patched")
 	}
 
-	// Удаляем бэкап — моды выключены
-	if err := os.Remove(bakFile); err != nil {
-		t.Fatalf("remove bak: %v", err)
+	// 2. Файл есть, тега нет → false
+	if err := os.WriteFile(dbFile, []byte("some unpatched data"), 0644); err != nil {
+		t.Fatalf("write db: %v", err)
 	}
-	if isModsEnabledLegacy(dir) {
-		t.Error("isModsEnabledLegacy returned true when backup missing")
+	if isModsEnabledAutoPatch(dir) {
+		t.Error("db without .patch_999 should not be reported as patched")
 	}
 
-	// Пустой gameRoot
-	if isModsEnabledLegacy("") {
-		t.Error("isModsEnabledLegacy returned true for empty gameRoot")
+	// 3. Тег есть → true
+	patchedBody := "9ba626afa44a3aa3.patch_999 and some more bytes"
+	if err := os.WriteFile(dbFile, []byte(patchedBody), 0644); err != nil {
+		t.Fatalf("write patched db: %v", err)
+	}
+	if !isModsEnabledAutoPatch(dir) {
+		t.Error("db with .patch_999 should be reported as patched")
+	}
+
+	// 4. Пустой gameRoot → false
+	if isModsEnabledAutoPatch("") {
+		t.Error("empty gameRoot should return false")
 	}
 }
 

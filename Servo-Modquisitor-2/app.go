@@ -6,13 +6,13 @@ import (
 	"Servo-Modquisitor/sorter"
 	"Servo-Modquisitor/themes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"image/color"
 	"log"
 	"net/url"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -23,8 +23,6 @@ import (
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/widget"
-
-	"github.com/zalando/go-keyring"
 )
 
 type Config struct {
@@ -56,6 +54,17 @@ type Config struct {
 	Theme                     string  `json:"theme"`
 	UpdateCheckFrequency      string  `json:"update_check_frequency"`
 	ActiveProfile             string  `json:"active_profile"`
+	// Указатели, а не bool: nil = «не задано», используется дефолт.
+	// Так старые config.json (без этих ключей) не ломают поведение:
+	// окно продолжит подниматься на передний план, а подтверждение
+	// скачивания останется включённым.
+	AutoFocusWindow     *bool `json:"auto_focus_window,omitempty"`
+	AutoConfirmDownload *bool `json:"auto_confirm_download,omitempty"`
+
+	// Синхронизация профилей
+	LastProfileSync       string `json:"last_profile_sync,omitempty"`
+	ProfileSyncAutoChoice string `json:"profile_sync_auto_choice,omitempty"` // "" | "save" | "load"
+	BackupsLimit          int    `json:"backups_limit,omitempty"`
 }
 
 type ModVersionInfo struct {
@@ -70,8 +79,19 @@ type ModVersionInfo struct {
 //
 // ПОРЯДОК ВЗЯТИЯ МЬЮТЕКСОВ (если нужно несколько одновременно):
 //
-//	cfgMutex → modsMutex → loadOrderMutex
-//	gameRootMutex, pathsMutex — независимы (берутся по одному).
+//	loadOrderMutex → cfgMutex
+//	loadOrderMutex → modsMutex   (кратковременно, через buildLoadOrderEntries)
+//	cfgMutex → modsMutex         (например, в loadDataAfterInit)
+//
+// loadOrderMutex — внешний по отношению к cfgMutex и modsMutex.
+// Внутри loadOrderMutex нельзя: appendLog (делает fyne.Do), showChoiceDialog*,
+// refreshModList, любой другой вызов Fyne API. Для лога из-под
+// loadOrderMutex используйте только appendLogToFile.
+//
+// gameRootMutex, pathsMutex, logFileMu — независимы (берутся по одному).
+// Мьютексы кэшей (VersionCache.mu, ChangelogCache.mu, OAuthState.mu,
+// NXMListener.mu) — локальные для своих сервисов, с чужими мьютексами
+// не пересекаются.
 //
 // Обратный порядок запрещён. Мьютексы кэшей (VersionCache.mu,
 // ChangelogCache.mu, OAuthState.mu, NXMListener.mu) — локальные для
@@ -170,6 +190,7 @@ type App struct {
 	btnEditVersion      *CustomButton
 	searchClearBtn      *CustomButton
 	btnAMLConfig        *CustomButton
+	profileSyncBtn      *CustomButton
 
 	selectColumnBgRes fyne.Resource
 	toggleOffIcon     fyne.Resource
@@ -207,7 +228,8 @@ type App struct {
 	loggedIn atomic.Bool
 
 	// ─── Лог ───────────────────────────────────────────────────────
-	logFile *os.File
+	logFile   *os.File
+	logFileMu sync.Mutex // сериализует запись в logFile из разных горутин
 
 	// ─── Сеть ──────────────────────────────────────────────────────
 	nxm *NXMListener
@@ -368,7 +390,7 @@ func (app *App) saveNexusVersionCache() {
 
 func configFilePath() string {
 	dir, _ := os.UserConfigDir()
-	appDir := filepath.Join(dir, СonfigFolderSMQ)
+	appDir := filepath.Join(dir, ConfigFolderSMQ)
 	if err := os.MkdirAll(appDir, 0755); err != nil {
 		log.Printf("Failed to create config directory: %v", err)
 	}
@@ -482,47 +504,32 @@ func (app *App) syncVersionCache() {
 	}
 }
 
-func (app *App) loadLanguage(lang string) error {
-	data, err := embeddedFiles.ReadFile(FileNameMessages)
-	if err != nil {
-		return fmt.Errorf("cannot read messages.json: %w", err)
-	}
-	if !json.Valid(data) {
-		var syntaxErr *json.SyntaxError
-		dummy := make(map[string]map[string]string)
-		if err := json.Unmarshal(data, &dummy); err != nil {
-			if errors.As(err, &syntaxErr) {
-				line, col := 1, 1
-				for i := 0; i < int(syntaxErr.Offset) && i < len(data); i++ {
-					if data[i] == '\n' {
-						line++
-						col = 1
-					} else {
-						col++
-					}
-				}
-				start := int(syntaxErr.Offset) - 30
-				if start < 0 {
-					start = 0
-				}
-				end := int(syntaxErr.Offset) + 30
-				if end > len(data) {
-					end = len(data)
-				}
-				snippet := string(data[start:end])
-				return fmt.Errorf("JSON error in messages.json at line %d, col %d: %v\nnear: ...%s...", line, col, syntaxErr, snippet)
-			}
-			return fmt.Errorf("messages.json is not valid JSON: %w", err)
+var (
+	rawMessages     map[string]map[string]string
+	rawMessagesOnce sync.Once
+	rawMessagesErr  error
+)
+
+func loadRawMessages() (map[string]map[string]string, error) {
+	rawMessagesOnce.Do(func() {
+		data, err := embeddedFiles.ReadFile(FileNameMessages)
+		if err != nil {
+			rawMessagesErr = fmt.Errorf("cannot read messages.json: %w", err)
+			return
 		}
-		return fmt.Errorf("messages.json is not valid JSON (unknown error)")
-	}
+		if err := json.Unmarshal(data, &rawMessages); err != nil {
+			rawMessagesErr = fmt.Errorf("cannot unmarshal messages.json: %w", err)
+		}
+	})
+	return rawMessages, rawMessagesErr
+}
 
-	var raw map[string]map[string]string
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return fmt.Errorf("cannot unmarshal messages.json: %w", err)
+func (app *App) loadLanguage(lang string) error {
+	raw, err := loadRawMessages()
+	if err != nil {
+		return err
 	}
-
-	newMessages := make(map[string]string)
+	newMessages := make(map[string]string, len(raw))
 	for key, trans := range raw {
 		if val, ok := trans[lang]; ok && val != "" {
 			newMessages[key] = val
@@ -599,7 +606,8 @@ func (app *App) loadModDatabase(filename string) error {
 	app.cfgMutex.Lock()
 	app.cfg.LastModDatabaseVersion = container.Version
 	app.cfgMutex.Unlock()
-	saveConfig(app.cfg)
+	app.saveConfigSafe()
+	// saveConfig(app.cfg)
 	return nil
 }
 
@@ -617,12 +625,14 @@ func (app *App) isModActive(name string) bool {
 }
 
 func (app *App) logVersions() {
+	extVer := checks.GetExternalVersion()
 	app.cfgMutex.RLock()
 	dbVer := app.cfg.LastModDatabaseVersion
 	app.cfgMutex.RUnlock()
+
 	app.appendLog(fmt.Sprintf(app.msg("log_version_program"), AppVersion))
-	app.appendLog(fmt.Sprintf(app.msg("log_version_sort"), checks.GetExternalVersion()))
-	app.appendLogToFile(fmt.Sprintf("mandatory_obsolete_incompatible_dependencies.json version: %s", checks.GetExternalVersion()))
+	app.appendLog(fmt.Sprintf(app.msg("log_version_sort"), extVer))
+	app.appendLogToFile(fmt.Sprintf("mandatory_obsolete_incompatible_dependencies.json version: %s", extVer))
 	app.appendLog(fmt.Sprintf(app.msg("log_version_moddb"), dbVer))
 	app.appendLogToFile(fmt.Sprintf("mod_database.json version: %s", dbVer))
 }
@@ -724,6 +734,49 @@ func (app *App) initializePaths() {
 	app.setGamePaths(selectedPath)
 }
 
+// changeGamePath сбрасывает сохранённые пути и запускает процедуру
+// выбора игры заново. Нужна, когда авто-поиск нашёл не ту копию
+// (например, на Linux с примонтированным Windows-разделом) и
+// пользователю нужно перевыбрать вручную.
+//
+// Вызывается из UI-потока (пункт меню), поэтому pathsInitialized
+// трогаем напрямую, без fyne.Do.
+func (app *App) changeGamePath() {
+	app.showConfirmDialog(
+		app.msg("change_game_path_title"),
+		app.msg("change_game_path_message"),
+		func() {
+			// Сбрасываем флаг и сохранённые пути, чтобы initializePaths
+			// заново прошёл весь путь: autoFind → diskSearch → manual.
+			app.pathsInitialized = false
+
+			app.cfgMutex.Lock()
+			app.cfg.ModsPath = ""
+			app.cfg.GameRoot = ""
+			app.cfgMutex.Unlock()
+			app.saveConfigSafe()
+
+			go func() {
+				app.initializePaths()
+
+				root, _ := app.getGameState()
+				if root == "" {
+					// Пользователь отменил выбор — оставляем как есть.
+					app.appendLogToFile("changeGamePath: cancelled by user")
+					return
+				}
+
+				app.setGlobalDataDir()
+
+				fyne.Do(func() {
+					app.reloadAfterPathChange()
+					app.appendLog(fmt.Sprintf("Game root changed to: %s", root))
+				})
+			}()
+		},
+	)
+}
+
 func findGameRootFrom(startDir string) string {
 	dir := startDir
 	for {
@@ -742,20 +795,58 @@ func findGameRootFrom(startDir string) string {
 	return ""
 }
 
-func autoFindGameRoot() string {
-	possibleRoots := []string{
-		"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Warhammer 40,000 DARKTIDE",
-		"C:\\Program Files\\Steam\\steamapps\\common\\Warhammer 40,000 DARKTIDE",
-		"D:\\SteamLibrary\\steamapps\\common\\Warhammer 40,000 DARKTIDE",
-		"E:\\SteamLibrary\\steamapps\\common\\Warhammer 40,000 DARKTIDE",
-		"F:\\SteamLibrary\\steamapps\\common\\Warhammer 40,000 DARKTIDE",
-		"C:\\XboxGames\\Warhammer 40,000 Darktide\\Content",
+// isGameRoot проверяет, что в папке есть признаки корня Darktide.
+// Используется autoFindGameRoot и внешними вызовами, чтобы не
+// дублировать логику проверки.
+func isGameRoot(path string) bool {
+	if path == "" {
+		return false
 	}
-	for _, path := range possibleRoots {
-		if _, err := os.Stat(filepath.Join(path, "binaries")); err == nil {
-			return path
+	if _, err := os.Stat(filepath.Join(path, "binaries")); err == nil {
+		return true
+	}
+	if _, err := os.Stat(filepath.Join(path, "content")); err == nil {
+		return true
+	}
+	return false
+}
+
+// autoFindGameRoot ищет установку Darktide в стандартных местах для
+// текущей ОС. Возвращает пустую строку, если ничего не нашли —
+// вызывающая сторона перейдёт к диалогу ручного выбора.
+//
+// Поддерживаем только Windows и Linux.
+func autoFindGameRoot() string {
+	var candidates []string
+
+	switch runtime.GOOS {
+	case "windows":
+		candidates = []string{
+			"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Warhammer 40,000 DARKTIDE",
+			"C:\\Program Files\\Steam\\steamapps\\common\\Warhammer 40,000 DARKTIDE",
+			"D:\\SteamLibrary\\steamapps\\common\\Warhammer 40,000 DARKTIDE",
+			"E:\\SteamLibrary\\steamapps\\common\\Warhammer 40,000 DARKTIDE",
+			"F:\\SteamLibrary\\steamapps\\common\\Warhammer 40,000 DARKTIDE",
+			"C:\\XboxGames\\Warhammer 40,000 Darktide\\Content",
 		}
-		if _, err := os.Stat(filepath.Join(path, "content")); err == nil {
+
+	case "linux":
+		home, _ := os.UserHomeDir()
+		candidates = []string{
+			// Steam native
+			filepath.Join(home, ".steam", "steam", "steamapps", "common", "Warhammer 40,000 DARKTIDE"),
+			filepath.Join(home, ".steam", "root", "steamapps", "common", "Warhammer 40,000 DARKTIDE"),
+			filepath.Join(home, ".local", "share", "Steam", "steamapps", "common", "Warhammer 40,000 DARKTIDE"),
+			// Flatpak Steam
+			filepath.Join(home, ".var", "app", "com.valvesoftware.Steam", "data", "Steam", "steamapps", "common", "Warhammer 40,000 DARKTIDE"),
+			filepath.Join(home, ".var", "app", "com.valvesoftware.Steam", ".local", "share", "Steam", "steamapps", "common", "Warhammer 40,000 DARKTIDE"),
+			// Snap Steam
+			filepath.Join(home, "snap", "steam", "common", ".local", "share", "Steam", "steamapps", "common", "Warhammer 40,000 DARKTIDE"),
+		}
+	}
+
+	for _, path := range candidates {
+		if isGameRoot(path) {
 			return path
 		}
 	}
@@ -844,6 +935,8 @@ func (app *App) loadDataAfterInit() {
 	suppressAML := app.cfg.SuppressAMLWarning
 	app.cfgMutex.RUnlock()
 
+	checks.SetTrashFunc(moveToTrash)
+
 	checks.SetLanguage(lang)
 
 	checks.InitGlobals(
@@ -870,7 +963,10 @@ func (app *App) loadDataAfterInit() {
 
 	sorter.SetFolderExistsFunc(checks.FolderExists)
 	sorter.SetListModFoldersFunc(checks.ListModFolders)
-	sorter.SetLogFunc(func(text string) { app.appendLog(text) })
+	// appendLogToFile не трогает UI и не вызывает fyne.Do — значит,
+	// sorter может спокойно писать лог, пока app.loadOrderMutex держится
+	// (runAllChecks вызывает sorter.CreateLoadOrderFromActive внутри него).
+	sorter.SetLogFunc(app.appendLogToFile)
 	sorter.SetSortMessages(app.msg("sort_ru_warning"), app.msg("sort_en_warning"))
 	sorter.SetHeaderFunc(checks.WriteLoadOrderHeader)
 	sorter.SetLogMessages(app.msg("log_create_mlot"), app.msg("log_mlot_created"))
@@ -904,12 +1000,15 @@ func (app *App) loadDataAfterInit() {
 
 	app.syncVersionCache()
 	if app.logFile != nil {
-		fmt.Fprintf(app.logFile, "Program version: %s\n", AppVersion)
-		fmt.Fprintf(app.logFile, "mandatory_obsolete_incompatible_dependencies.json version: %s\n", checks.GetExternalVersion())
 		app.cfgMutex.RLock()
 		dbVer := app.cfg.LastModDatabaseVersion
 		app.cfgMutex.RUnlock()
-		fmt.Fprintf(app.logFile, "mod_database.json version: %s\n", dbVer)
+
+		app.appendLogToFile(fmt.Sprintf("Program version: %s", AppVersion))
+		app.appendLogToFile(fmt.Sprintf(
+			"mandatory_obsolete_incompatible_dependencies.json version: %s",
+			checks.GetExternalVersion()))
+		app.appendLogToFile(fmt.Sprintf("mod_database.json version: %s", dbVer))
 	}
 	sorter.LoadSortOrders(checks.GlobalDataDir())
 
@@ -923,6 +1022,17 @@ func (app *App) loadDataAfterInit() {
 		app.msg("linux_xbox_not_supported"),
 	)
 	app.launchGameFunc = launchGame
+
+	// Диагностика: одна строка в лог-файл, чтобы при разборе проблем
+	// с путями сразу было видно, что определилось.
+	gameRoot, patcher := app.getGameState()
+	app.cfgMutex.RLock()
+	modsPath = app.cfg.ModsPath
+	app.cfgMutex.RUnlock()
+	app.appendLogToFile(fmt.Sprintf(
+		"Init: GOOS=%s gameRoot=%q modsPath=%q patcher=%d",
+		runtime.GOOS, gameRoot, modsPath, patcher,
+	))
 
 	app.syncModsEnabledState()
 
@@ -989,7 +1099,7 @@ func (app *App) isLoggedIn() bool {
 // Дорогостоящая операция — вызывать редко: старт, успешный
 // token-exchange, логаут, провал refresh.
 func (app *App) refreshLoginState() {
-	_, err := keyring.Get(keyringService, "access_token")
+	_, err := getStoredToken(keyAccessToken)
 	app.loggedIn.Store(err == nil)
 }
 
@@ -1368,52 +1478,59 @@ func (app *App) switchProfileAsync(name string, onDone func()) {
 		return
 	}
 
-	// UI-часть — сразу, в текущем UI-потоке
-	if app.orderDirty {
+	// Сохраняем отложенный порядок в UI-потоке.
+	if app.orderDirty.Load() {
 		app.saveCurrentOrder()
-		app.orderDirty = false
+		app.orderDirty.Store(false)
 		app.stopBlinkSaveButton()
 		app.updateTableBorder()
 	}
 
 	go func() {
-		// onDone вызывается в UI-потоке после завершения горутины.
-		// Даже если внутри случится ранний return (ошибка копирования),
-		// колбэк сработает — и вызывающий код сможет показать ошибку.
 		if onDone != nil {
 			defer fyne.Do(onDone)
 		}
 
-		srcMods := filepath.Join(app.profilePath(name), "mods")
+		// 1. Синхронизируем активный профиль из game/mods (атомарно).
+		if err := app.syncActiveProfileFromGame(); err != nil {
+			app.appendLogToFile(fmt.Sprintf("switchProfile: sync failed: %v", err))
+			return
+		}
+
 		app.cfgMutex.RLock()
-		dstMods := app.cfg.ModsPath
+		gamePath := app.cfg.ModsPath
 		app.cfgMutex.RUnlock()
 
-		if _, err := os.Stat(dstMods); err == nil {
-			entries, _ := os.ReadDir(dstMods)
-			for _, e := range entries {
-				if e.IsDir() {
-					modName := e.Name()
-					if modName != "base" && modName != "dmf" && modName != "autopatch" {
-						os.RemoveAll(filepath.Join(dstMods, modName))
-					}
-				}
+		// 2. Копируем целевой профиль в staging.
+		srcMods := filepath.Join(app.profilePath(name), "mods")
+		staging := gamePath + ".staging"
+		_ = os.RemoveAll(staging)
+
+		if err := copyPath(srcMods, staging); err != nil {
+			_ = os.RemoveAll(staging)
+			app.appendLogToFile(fmt.Sprintf("switchProfile: copy to staging: %v", err))
+			return
+		}
+
+		// 3. Убираем старую game/mods в корзину.
+		if _, err := os.Stat(gamePath); err == nil {
+			if err := app.RemoveDirWithTrashFallback(gamePath, "mods"); err != nil {
+				_ = os.RemoveAll(staging)
+				app.appendLogToFile(fmt.Sprintf("switchProfile: trash game/mods: %v", err))
+				return
 			}
 		}
 
-		if err := copyPath(srcMods, dstMods); err != nil {
-			app.appendLogToFile(fmt.Sprintf("Failed to copy mods from profile '%s': %v", name, err))
+		// 4. Ставим staging на место.
+		if err := os.Rename(staging, gamePath); err != nil {
+			app.appendLogToFile(fmt.Sprintf("switchProfile: rename staging: %v", err))
 			return
 		}
-		cleanupModsFolder(dstMods)
 
-		app.cleanupProfileRoot(app.profilePath(name))
-
-		var newCache map[string]ModVersionInfo
-		if tempCache := NewVersionCache(nil); true {
-			tempCache.LoadFromProfile(app.profilePath(name))
-			newCache = tempCache.Snapshot()
-		}
+		// 5. Кэш версий нового профиля.
+		tempCache := NewVersionCache(nil)
+		tempCache.LoadFromProfile(app.profilePath(name))
+		newCache := tempCache.Snapshot()
 
 		app.cfgMutex.Lock()
 		app.cfg.ActiveProfile = name
@@ -1424,11 +1541,14 @@ func (app *App) switchProfileAsync(name string, onDone func()) {
 		checks.SetProfileDataDir(app.activeProfilePath())
 		app.updateSorterOutputPath()
 
+		// 6. Только сигнатура. saveCurrentOrder здесь НЕ вызываем:
+		//    load order нового профиля уже лежит в <profile>/mods/ и был скопирован в game/mods шагом 2. Если бы мы вызвали saveCurrentOrder, он бы перезаписал его списком app.allMods из СТАРОГО профиля.
+		app.updateProfileSyncSignature()
+
 		fyne.Do(func() {
 			app.refreshProfileList()
 			app.refreshModList()
-			app.saveCurrentOrder()
-			app.orderDirty = false
+			app.orderDirty.Store(false)
 			app.stopBlinkSaveButton()
 			app.updateTableBorder()
 			app.filterModList()
@@ -1504,11 +1624,10 @@ func (app *App) deleteProfile(name string) error {
 	if name == current {
 		return fmt.Errorf("cannot delete active profile")
 	}
-	if err := os.RemoveAll(app.profilePath(name)); err != nil {
+	if err := app.RemoveDirWithTrashFallback(app.profilePath(name), name); err != nil {
 		return err
 	}
 	app.appendLogToFile(fmt.Sprintf("Deleted profile: %s", name))
-	app.refreshProfileList()
 	return nil
 }
 
@@ -1683,11 +1802,147 @@ func (app *App) syncLoadOrderToGame() {
 	app.syncLoadOrderToGameLocked()
 }
 
+// performFirstRunSetup помечает первичную настройку завершённой и
+// запускает мастер установки. Единственное место, откуда мастер
+// стартует автоматически — так первичный запуск остаётся линейным
+// и предсказуемым.
 func (app *App) performFirstRunSetup() {
 	app.cfgMutex.Lock()
 	app.cfg.InitialSetupDone = true
 	app.cfgMutex.Unlock()
-	saveConfig(app.cfg)
+	app.saveConfigSafe()
+
+	go app.runWizard(false)
+}
+
+// showLanguagePickerIfFirstRun показывает выбор языка при самом первом
+// запуске. Вызывается ПЕРЕД initializePaths/loadDataAfterInit, чтобы
+// все последующие диалоги (пути, wizard, AML-предупреждение) были уже
+// на выбранном языке.
+//
+// Если InitialSetupDone == true — no-op: язык уже выбран ранее.
+//
+// Блокирует вызывающую горутину до выбора пользователя. Вызывать
+// ТОЛЬКО из фоновой горутины (внутри fyne.DoAndWait + ожидание канала).
+func (app *App) showLanguagePickerIfFirstRun() {
+	app.cfgMutex.RLock()
+	done := app.cfg.InitialSetupDone
+	current := app.cfg.Language
+	app.cfgMutex.RUnlock()
+
+	// Показываем пикер, если:
+	//   - setup ещё не проходили (свежий install), ИЛИ
+	//   - cfg.Language пустой — это означает, что язык так и не выбрали
+	//     (например, старый config.json без поля language, или запись
+	//     повреждена). Тогда fallback на английский даёт неверный UI,
+	//     хотя пользователь мог быть русскоязычным.
+	if done && current != "" {
+		return
+	}
+
+	// Названия языков — эндонимы (на самом языке), не переводятся.
+	// Первый — English, чтобы англоязычный пользователь мог сразу ОК.
+	languages := []struct {
+		code  string
+		label string
+	}{
+		{"en", app.msg("menu_lang_en")},
+		{"ru", app.msg("menu_lang_ru")},
+		{"de", app.msg("menu_lang_de")},
+		{"es", app.msg("menu_lang_es")},
+		{"fr", app.msg("menu_lang_fr")},
+		{"it", app.msg("menu_lang_it")},
+		{"ja", app.msg("menu_lang_ja")},
+		{"ko", app.msg("menu_lang_ko")},
+		{"pl", app.msg("menu_lang_pl")},
+		{"pt-BR", app.msg("menu_lang_pt-BR")},
+		{"zh-hans", app.msg("menu_lang_zh-hans")},
+		{"zh-hant", app.msg("menu_lang_zh-hant")},
+	}
+
+	// Индекс текущего языка в списке. На первом запуске cfg.Language
+	// ещё "en" (defaultConfig), реального выбора пользователя не было.
+	// Поэтому пытаемся предвыбрать системную локаль: русский пользователь сразу увидит «Русский» и нажмёт только OK.
+	//
+	// Если система не поддерживается (fi-FI, tr-TR, …) — оставляем
+	// текущий (en) или ранее сохранённый выбор.
+	curIdx := 0
+	for i, l := range languages {
+		if l.code == current {
+			curIdx = i
+			break
+		}
+	}
+	if sysCode := mapSystemLocaleToSupported(systemLocale()); sysCode != "" {
+		for i, l := range languages {
+			if l.code == sysCode {
+				curIdx = i
+				break
+			}
+		}
+	}
+
+	labels := make([]string, len(languages))
+	for i, l := range languages {
+		labels[i] = l.label
+	}
+
+	chosen := make(chan string, 1)
+
+	fyne.DoAndWait(func() {
+		app.bringToFront()
+
+		sel := widget.NewSelect(labels, nil)
+		sel.SetSelectedIndex(curIdx)
+
+		var popUp *widget.PopUp
+		okBtn := widget.NewButton(app.msg("btn_ok"), func() {
+			idx := sel.SelectedIndex()
+			if idx < 0 || idx >= len(languages) {
+				idx = curIdx
+			}
+			if popUp != nil {
+				popUp.Hide()
+			}
+			chosen <- languages[idx].code
+		})
+
+		content := container.NewVBox(
+			widget.NewLabelWithStyle(
+				app.msg("menu_language"),
+				fyne.TextAlignCenter,
+				fyne.TextStyle{Bold: true},
+			),
+			widget.NewSeparator(),
+			widget.NewLabel(app.msg("choose_lang")),
+			sel,
+			widget.NewSeparator(),
+			container.NewCenter(okBtn),
+		)
+
+		popUp = widget.NewModalPopUp(content, app.mainWindow.Canvas())
+		popUp.Resize(fyne.NewSize(420, 240))
+		popUp.Show()
+	})
+
+	code := <-chosen
+
+	if err := app.loadLanguage(code); err != nil {
+		app.appendLogToFile(fmt.Sprintf("Failed to load language %q: %v", code, err))
+	}
+	app.cfgMutex.Lock()
+	app.cfg.Language = code
+	app.cfgMutex.Unlock()
+	app.saveConfigSafe()
+
+	// Обновляем заголовок окна и меню на новый язык. Само окно уже
+	// построено — просто перекрашиваем тексты.
+	fyne.Do(func() {
+		app.mainWindow.SetTitle(app.getTitle() + " v" + AppVersion)
+		app.mainWindow.SetMainMenu(app.buildMainMenu())
+	})
+
+	app.appendLogToFile(fmt.Sprintf("First-run language selected: %s", code))
 }
 
 func (app *App) shouldCheckUpdates() bool {
@@ -1744,5 +1999,67 @@ func pickBaseTheme(name string) fyne.Theme {
 		return &themes.HighContrastTheme{}
 	default:
 		return &themes.ForcedDarkTheme{}
+	}
+}
+
+// bringToFront поднимает главное окно на передний план. Вызывать
+// перед показом любого диалога, чтобы пользователь его увидел, даже
+// если сейчас он в браузере или другом приложении.
+func (app *App) bringToFront() {
+	app.cfgMutex.RLock()
+	enabled := app.cfg.AutoFocusEnabled()
+	app.cfgMutex.RUnlock()
+	if !enabled {
+		return
+	}
+	bringWindowToFront(app.mainWindow)
+}
+
+// AutoFocusEnabled — поднимать ли окно на передний план при показе
+// диалогов. Дефолт: включено (nil трактуется как «да»), чтобы
+// поведение совпадало с тем, что было до появления настройки.
+func (c Config) AutoFocusEnabled() bool {
+	return c.AutoFocusWindow == nil || *c.AutoFocusWindow
+}
+
+// AutoConfirmDownloadEnabled — пропускать ли диалог подтверждения
+// скачивания. Дефолт: выключено — пользователь должен явно
+// согласиться.
+func (c Config) AutoConfirmDownloadEnabled() bool {
+	return c.AutoConfirmDownload != nil && *c.AutoConfirmDownload
+}
+
+// RemoveDirWithTrashFallback перемещает директорию в системную корзину.
+// Если корзина недоступна (нет утилиты, cross-volume, файл занят) —
+// спрашивает пользователя и при подтверждении удаляет навсегда.
+//
+// ВНИМАНИЕ: вызывает showChoiceDialogSync, поэтому вызывать ТОЛЬКО из
+// фоновой горутины. Возвращает ошибку, если пользователь отменил.
+func (app *App) RemoveDirWithTrashFallback(path, what string) error {
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		return nil
+	}
+
+	if err := moveToTrash(path); err == nil {
+		app.appendLogToFile(fmt.Sprintf("Moved to trash: %s", path))
+		return nil
+	} else {
+		app.appendLogToFile(fmt.Sprintf("Trash failed for %s: %v", path, err))
+
+		choice := app.showChoiceDialogSync(
+			app.mainWindow,
+			app.msg("trash_failed_title"),
+			fmt.Sprintf(app.msg("trash_failed_text"), what, err.Error()),
+			app.msg("btn_delete_forever"),
+			app.msg("btn_cancel"),
+		)
+		if choice != 0 {
+			return fmt.Errorf("user cancelled")
+		}
+		if err := os.RemoveAll(path); err != nil {
+			return err
+		}
+		app.appendLogToFile(fmt.Sprintf("Permanently deleted: %s", path))
+		return nil
 	}
 }

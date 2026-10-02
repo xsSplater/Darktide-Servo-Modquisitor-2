@@ -8,11 +8,9 @@ import (
 	"fmt"
 	"image/color"
 	"net/url"
-	"os"
-	"os/exec"
 	"path/filepath"
-	"runtime"
 	"strings"
+	"sync/atomic"
 	"time"
 
 	"fyne.io/fyne/v2"
@@ -26,10 +24,10 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-// createTableRow — пустая строка с заданной минимальной высотой.
+// createTableRow - пустая строка с заданной минимальной высотой.
 // Используется и для системной таблицы, и как шаблон ячейки основной
 // таблицы: Fyne в templateSize() создаёт свежий экземпляр через
-// CreateCell и берёт его MinSize — здесь эту высоту задаёт пустая
+// CreateCell и берёт его MinSize - здесь эту высоту задаёт пустая
 // widget.Label (её MinSize ≈ высота строки текста), а spacer задаёт
 // нижнюю границу TableRowHeight.
 func createTableRow(height float32) fyne.CanvasObject {
@@ -39,7 +37,7 @@ func createTableRow(height float32) fyne.CanvasObject {
 	return container.NewStack(spacer, lbl)
 }
 
-// VBoxWithSpacing — вертикальный layout с заданным отступом между элементами.
+// VBoxWithSpacing - вертикальный layout с заданным отступом между элементами.
 type VBoxWithSpacing struct {
 	Spacing float32
 }
@@ -83,7 +81,7 @@ func (v VBoxWithSpacing) MinSize(objects []fyne.CanvasObject) fyne.Size {
 	return fyne.NewSize(maxWidth, totalHeight)
 }
 
-// buildUI — оркестратор сборки главного окна. Вся конкретика разложена
+// buildUI - оркестратор сборки главного окна. Вся конкретика разложена
 // по build-методам ниже: каждый отвечает за одну область UI и
 // устанавливает соответствующие поля App.
 func (app *App) buildUI() {
@@ -117,7 +115,7 @@ func (app *App) buildUI() {
 // Иконки для toggle-кнопки (on/off) сохраняются в App, потому что нужны
 // в updateToggleButtonText при смене темы или состояния.
 func (app *App) buildControlButtons() {
-	// ─── Иконки ────────────────────────────────────────────────────
+	// Иконки ────────────────────────────────────────────────────
 	upRes := app.loadIconResource("up", "assets/buttons/up.png")
 	downRes := app.loadIconResource("down", "assets/buttons/down.png")
 	topRes := app.loadIconResource("top", "assets/buttons/top.png")
@@ -154,7 +152,7 @@ func (app *App) buildControlButtons() {
 		app.selectColumnBgRes = fyne.NewStaticResource("Yellow_BG_col", colImgData)
 	}
 
-	// ─── Перемещение / выбор ──────────────────────────────────────
+	// Перемещение / выбор ──────────────────────────────────────
 	app.moveToTopBtn = NewIconButton(topRes, func() { app.moveSelectedToTop() })
 	app.moveToTopBtn.SetToolTip(app.msg("btn_move_to_top_tooltip"))
 
@@ -172,7 +170,7 @@ func (app *App) buildControlButtons() {
 	app.deselectAllBtn = NewIconButton(selectAllDeRes, func() { app.selectAllMods(false) })
 	app.deselectAllBtn.SetToolTip(app.msg("btn_deselect_all_tooltip"))
 
-	// ─── Удаление ─────────────────────────────────────────────────
+	// Удаление ─────────────────────────────────────────────────
 	app.btnRemoveAll = NewIconButton(trashXRes, func() {
 		app.showConfirmDialog(
 			app.msg("confirm_remove_all_title"),
@@ -196,7 +194,7 @@ func (app *App) buildControlButtons() {
 	})
 	app.btnRemoveSelected.SetToolTip(app.msg("btn_remove_selected_tooltip"))
 
-	// ─── Версия / порядок ─────────────────────────────────────────
+	// Версия / порядок ─────────────────────────────────────────
 	app.btnEditVersion = NewIconButton(editVersionRes, func() {
 		if app.selectedModName == "" {
 			return
@@ -215,18 +213,9 @@ func (app *App) buildControlButtons() {
 	app.btnDown = NewIconButton(downRes, func() { app.moveSelected(1) })
 	app.btnDown.SetToolTip(app.msg("btn_down_tooltip"))
 
-	// ─── Сохранение / обновление ──────────────────────────────────
+	// Сохранение / обновление ──────────────────────────────────
 	app.btnSaveOrder = NewIconButton(saveRes, func() {
-		if app.orderDirty {
-			app.saveCurrentOrder()
-			app.orderDirty = false
-			app.refreshModList()
-			app.appendLog(app.msg("log_order_saved"))
-			app.stopBlinkSaveButton()
-			app.updateTableBorder()
-		} else {
-			app.appendLog(app.msg("log_order_unchanged"))
-		}
+		app.saveOrderFromUI(nil)
 	})
 	app.btnSaveOrder.SetToolTip(app.msg("btn_save_order_tooltip"))
 
@@ -239,7 +228,7 @@ func (app *App) buildControlButtons() {
 	app.btnToggle.SetToolTip(app.msg("btn_toggle_tooltip"))
 	app.updateToggleButtonText(app.btnToggle)
 
-	// ─── Массовые операции ────────────────────────────────────────
+	// Массовые операции ────────────────────────────────────────
 	app.enableSelectedBtn = NewIconButton(checkedBoxRes, func() { app.setSelectedActive(true) })
 	app.enableSelectedBtn.SetToolTip(app.msg("btn_enable_selected_tooltip"))
 
@@ -252,7 +241,7 @@ func (app *App) buildControlButtons() {
 	app.disableAllBtn = NewIconButton(disableAllRes, func() { app.setAllModsActive(false) })
 	app.disableAllBtn.SetToolTip(app.msg("btn_disable_all_tooltip"))
 
-	// ─── Управление, установка, обновления ───────────────────────
+	// Управление, установка, обновления ───────────────────────
 	app.manageBtn = NewIconButton(cogRes, func() { app.toggleManagePanel() })
 	app.manageBtn.SetToolTip(app.msg("btn_manage_mods_tooltip"))
 
@@ -293,7 +282,7 @@ func (app *App) buildControlButtons() {
 	})
 	app.btnUpdateAll.SetToolTip(app.msg("btn_update_all_premium_only"))
 
-	// ─── Запуск игры ──────────────────────────────────────────────
+	// Запуск игры ──────────────────────────────────────────────
 	gameRoot, _ := app.getGameState()
 	gameVer := detectGameVersion(gameRoot)
 	if gameVer == VersionUnknown {
@@ -310,22 +299,22 @@ func (app *App) buildControlButtons() {
 		app.btnLaunchNoLauncher.SetToolTip(app.msg("btn_launch_nolauncher_long_tooltip"))
 	}
 
-	// ─── Кнопка удаления мода в карточке описания ────────────────
+	// Кнопка удаления мода в карточке описания ────────────────
 	app.btnRemove = NewIconButton(trashRes, func() { app.confirmRemoveSelectedDescription() })
 	app.btnRemove.SetToolTip(app.msg("btn_remove_tooltip"))
 
-	// ─── Кнопка "обновить мод" в карточке ────────────────────────
+	// Кнопка "обновить мод" в карточке ────────────────────────
 	app.btnUpdateMod = NewIconButton(updateRes, func() { app.updateModFromDescription() })
 	app.btnUpdateMod.SetToolTip(app.msg("btn_update_mod_premium_only"))
 
-	// ─── Кнопка "открыть папку" в карточке ───────────────────────
+	// Кнопка "открыть папку" в карточке ───────────────────────
 	app.openFolderBtn = NewIconButton(folderRes, func() { app.openSelectedModFolder() })
 	app.openFolderBtn.Importance = widget.MediumImportance
 	app.openFolderBtn.SetToolTip(app.msg("open_mod_folder_tooltip"))
 }
 
 // loadIconResource читает иконку из embed, логирует ошибку и возвращает
-// StaticResource. При ошибке возвращает nil — Fyne корректно обрабатывает
+// StaticResource. При ошибке возвращает nil - Fyne корректно обрабатывает
 // nil-иконки (кнопка останется без картинки).
 func (app *App) loadIconResource(name, path string) fyne.Resource {
 	data, err := embeddedFiles.ReadFile(path)
@@ -340,11 +329,11 @@ func (app *App) loadIconResource(name, path string) fyne.Resource {
 // Мелкие обработчики кнопок (вынесены из closures для читаемости)
 // ─────────────────────────────────────────────────────────────────
 
-// refreshWithDirtyCheck — логика кнопки "обновить список": если есть
+// refreshWithDirtyCheck - логика кнопки "обновить список": если есть
 // несохранённые изменения, спрашивает пользователя, что делать.
 // Использует асинхронный диалог, чтобы не блокировать горутину.
 func (app *App) refreshWithDirtyCheck() {
-	if app.orderDirty {
+	if app.orderDirty.Load() {
 		app.showChoiceDialog(
 			app.mainWindow,
 			app.msg("warning_title"),
@@ -353,17 +342,13 @@ func (app *App) refreshWithDirtyCheck() {
 				// callback выполняется в UI-потоке, поэтому fyne.Do не нужен
 				switch choice {
 				case 0:
-					app.saveCurrentOrder()
-					app.orderDirty = false
-					app.stopBlinkSaveButton()
-					app.updateTableBorder()
-					app.appendLog(app.msg("log_order_saved"))
-					app.refreshModList()
-					app.appendLog(app.msg("log_list_refreshed"))
+					app.saveOrderFromUI(func() {
+						app.appendLog(app.msg("log_list_refreshed"))
+					})
 				case 1:
-					// Отмена — ничего не делаем
+					// Отмена - ничего не делаем
 				case 2:
-					app.orderDirty = false
+					app.orderDirty.Store(false)
 					app.stopBlinkSaveButton()
 					app.updateTableBorder()
 					app.refreshModList()
@@ -375,7 +360,7 @@ func (app *App) refreshWithDirtyCheck() {
 			app.msg("btn_refresh_anyway"),
 		)
 	} else {
-		// Если изменений нет — просто обновляем список.
+		// Если изменений нет - просто обновляем список.
 		// Функция может вызываться из горутины, поэтому используем fyne.Do.
 		fyne.Do(func() {
 			app.refreshModList()
@@ -384,7 +369,37 @@ func (app *App) refreshWithDirtyCheck() {
 	}
 }
 
-// toggleManagePanel — логика кнопки-шестерёнки: показать/скрыть панель
+// saveOrderFromUI — вызывается из UI-потока. Само сохранение уходит
+// в горутину, чтобы UI не блокировался на loadOrderMutex (его может
+// держать фон, например runAllChecks → sorter.CreateLoadOrderFromActive).
+//
+// onDone == nil: после сохранения вызывается refreshModList().
+// onDone != nil: вызывающий сам решает, что делать (в UI-потоке).
+func (app *App) saveOrderFromUI(onDone func()) {
+	if !app.orderDirty.Load() {
+		app.appendLog(app.msg("log_order_unchanged"))
+		if onDone != nil {
+			onDone()
+		}
+		return
+	}
+	go func() {
+		app.saveCurrentOrder()
+		fyne.Do(func() {
+			app.orderDirty.Store(false)
+			app.stopBlinkSaveButton()
+			app.updateTableBorder()
+			app.appendLog(app.msg("log_order_saved"))
+			if onDone != nil {
+				onDone()
+			} else {
+				app.refreshModList()
+			}
+		})
+	}()
+}
+
+// toggleManagePanel - логика кнопки-шестерёнки: показать/скрыть панель
 // массовых операций и колонку чекбоксов.
 func (app *App) toggleManagePanel() {
 	if app.managePanel.Visible() {
@@ -405,7 +420,7 @@ func (app *App) toggleManagePanel() {
 	app.managePanel.Refresh()
 }
 
-// pickAndInstallArchive — логика кнопки "установить мод": открывает
+// pickAndInstallArchive - логика кнопки "установить мод": открывает
 // диалог выбора архива и запускает установку.
 func (app *App) pickAndInstallArchive() {
 	fd := dialog.NewFileOpen(func(reader fyne.URIReadCloser, err error) {
@@ -437,7 +452,7 @@ func (app *App) pickAndInstallArchive() {
 	fd.Resize(fyne.NewSize(FileDialogWidth, FileDialogHeight))
 }
 
-// launchGameFromUI — логика кнопок запуска игры (обычной и без лаунчера).
+// launchGameFromUI - логика кнопок запуска игры (обычной и без лаунчера).
 func (app *App) launchGameFromUI(skipLauncher bool) {
 	gameRoot, _ := app.getGameState()
 	go func(root string) {
@@ -446,13 +461,126 @@ func (app *App) launchGameFromUI(skipLauncher bool) {
 			return
 		}
 		ver := detectGameVersion(root)
+
+		// Steam-версии нужен запущенный Steam в обоих режимах:
+		//  - через steam://rungameid, чтобы клиент подхватил игру;
+		//  - при прямом запуске через Proton, потому что игра зовёт
+		//    SteamAPI_Init() и без клиента не инициализируется.
+		// Xbox-версия Steam не использует, для неё проверку пропускаем.
+		if ver == VersionSteam && !app.ensureSteamRunning() {
+			return
+		}
+
 		if err := app.launchGameFunc(ver, root, skipLauncher); err != nil {
 			app.appendLog(fmt.Sprintf(app.msg("launch_error"), err))
 		}
 	}(gameRoot)
 }
 
-// confirmRemoveSelectedDescription — логика кнопки удаления в карточке
+// ensureSteamRunning проверяет, запущен ли Steam, и если нет —
+// предлагает пользователю варианты. Возвращает true, если можно
+// продолжать запуск игры.
+//
+// ВАЖНО: вызывать ТОЛЬКО из фоновой горутины (использует
+// showChoiceDialogSync, который блокируется до ответа пользователя).
+func (app *App) ensureSteamRunning() bool {
+	if isSteamRunning() {
+		return true
+	}
+
+	choice := app.showChoiceDialogSync(
+		app.mainWindow,
+		app.msg("steam_not_running_title"),
+		app.msg("steam_not_running_message"),
+		app.msg("btn_start_steam"),
+		app.msg("btn_launch_anyway"),
+		app.msg("btn_cancel"),
+	)
+
+	switch choice {
+	case 0:
+		if err := startSteam(); err != nil {
+			app.appendLog(fmt.Sprintf(app.msg("steam_start_failed"), err))
+			return false
+		}
+		app.appendLog(app.msg("steam_start_waiting"))
+
+		// Ждём только появления процесса — это гарантирует, что
+		// xdg-open/rundll32 сработал. Дальше (логин, выбор аккаунта,
+		// обновления клиента) — забота пользователя.
+		if !waitFor(isSteamRunning, 20*time.Second) {
+			app.appendLog(app.msg("steam_start_timeout"))
+			return false
+		}
+
+		// Даём пользователю явно подтвердить готовность. Модальный
+		// диалог сам поднимется поверх окна Steam, пользователь залогинится,
+		// вернётся в наш диалог и нажмёт «Продолжить».
+		return app.confirmSteamLoggedIn()
+
+	case 1:
+		app.appendLog(app.msg("steam_launch_anyway"))
+		return true
+
+	default:
+		// Отмена — молча выходим.
+		return false
+	}
+}
+
+// confirmSteamLoggedIn показывает модальный диалог и блокирует
+// вызывающую горутину до тех пор, пока пользователь не подтвердит,
+// что залогинился в Steam (или не отменит запуск).
+//
+// Нужен потому, что определить программно момент «Steam готов
+// принимать игру» невозможно: steamwebhelper поднимается ещё на
+// экране выбора аккаунта, а до логина SteamAPI не работает.
+// Вызывать ТОЛЬКО из фоновой горутины.
+func (app *App) confirmSteamLoggedIn() bool {
+	resultChan := make(chan bool, 1)
+
+	fyne.Do(func() {
+		app.bringToFront()
+
+		var popUp *widget.PopUp
+
+		okBtn := widget.NewButton(app.msg("btn_continue"), func() {
+			if popUp != nil {
+				popUp.Hide()
+			}
+			resultChan <- true
+		})
+		cancelBtn := widget.NewButton(app.msg("btn_cancel"), func() {
+			if popUp != nil {
+				popUp.Hide()
+			}
+			resultChan <- false
+		})
+
+		msg := widget.NewLabel(app.msg("steam_login_prompt"))
+		msg.Wrapping = fyne.TextWrapWord
+
+		content := container.NewVBox(
+			widget.NewLabelWithStyle(
+				app.msg("steam_not_running_title"),
+				fyne.TextAlignCenter,
+				fyne.TextStyle{Bold: true},
+			),
+			widget.NewSeparator(),
+			msg,
+			widget.NewSeparator(),
+			container.NewCenter(container.NewHBox(okBtn, cancelBtn)),
+		)
+
+		popUp = widget.NewModalPopUp(content, app.mainWindow.Canvas())
+		popUp.Resize(fyne.NewSize(450, 220))
+		popUp.Show()
+	})
+
+	return <-resultChan
+}
+
+// confirmRemoveSelectedDescription - логика кнопки удаления в карточке
 // описания: подтверждение + удаление + восстановление выделения.
 func (app *App) confirmRemoveSelectedDescription() {
 	if app.selectedModName == "" {
@@ -465,13 +593,22 @@ func (app *App) confirmRemoveSelectedDescription() {
 		return
 	}
 
+	// Снимок displayedMods под RLock — параллельная фоновая
+	// перестройка списка не должна гоняться с этим чтением.
+	app.modsMutex.RLock()
+	displayedNames := make([]string, len(app.displayedMods))
+	for i := range app.displayedMods {
+		displayedNames[i] = app.displayedMods[i].Name
+	}
+	app.modsMutex.RUnlock()
+
 	var nextModName string
-	for i, m := range app.displayedMods {
-		if m.Name == modName {
-			if i+1 < len(app.displayedMods) {
-				nextModName = app.displayedMods[i+1].Name
+	for i, n := range displayedNames {
+		if n == modName {
+			if i+1 < len(displayedNames) {
+				nextModName = displayedNames[i+1]
 			} else if i-1 >= 0 {
-				nextModName = app.displayedMods[i-1].Name
+				nextModName = displayedNames[i-1]
 			}
 			break
 		}
@@ -486,28 +623,41 @@ func (app *App) confirmRemoveSelectedDescription() {
 			oldIndex, _ := app.removeModFromData(modName)
 
 			app.updateModCounter()
-			app.modTable.Length = func() (int, int) { return len(app.displayedMods), TableColumnCount }
+			app.modTable.Length = func() (int, int) {
+				app.modsMutex.RLock()
+				n := len(app.displayedMods)
+				app.modsMutex.RUnlock()
+				return n, TableColumnCount
+			}
 			app.modTable.Refresh()
 			app.updateTableBorder()
 			app.appendLog(fmt.Sprintf(app.msg("log_deleted"), modName))
 
 			app.saveCurrentOrder()
 			app.syncProfileFromGame()
-			app.orderDirty = false
+			app.orderDirty.Store(false)
 			app.updateTableBorder()
 
+			// Обновляем снимок после удаления.
+			app.modsMutex.RLock()
+			displayedNames = displayedNames[:0]
+			for i := range app.displayedMods {
+				displayedNames = append(displayedNames, app.displayedMods[i].Name)
+			}
+			app.modsMutex.RUnlock()
+
 			if nextModName != "" {
-				for i, m := range app.displayedMods {
-					if m.Name == nextModName {
+				for i, n := range displayedNames {
+					if n == nextModName {
 						app.modTable.Select(widget.TableCellID{Row: i, Col: 0}, 0)
 						app.modTable.ScrollTo(widget.TableCellID{Row: i, Col: 0})
 						break
 					}
 				}
-			} else if len(app.displayedMods) > 0 {
+			} else if len(displayedNames) > 0 {
 				newIndex := oldIndex
-				if newIndex >= len(app.displayedMods) {
-					newIndex = len(app.displayedMods) - 1
+				if newIndex >= len(displayedNames) {
+					newIndex = len(displayedNames) - 1
 				}
 				if newIndex >= 0 {
 					app.modTable.Select(widget.TableCellID{Row: newIndex, Col: 0}, 0)
@@ -523,7 +673,7 @@ func (app *App) confirmRemoveSelectedDescription() {
 	)
 }
 
-// updateModFromDescription — логика кнопки "обновить мод" в карточке:
+// updateModFromDescription - логика кнопки "обновить мод" в карточке:
 // определяет системный/обычный мод, запускает нужный сценарий в фоне.
 func (app *App) updateModFromDescription() {
 	if app.selectedModName == "" {
@@ -552,7 +702,7 @@ func (app *App) updateModFromDescription() {
 	}()
 }
 
-// openSelectedModFolder — логика кнопки "открыть папку мода" в карточке.
+// openSelectedModFolder - логика кнопки "открыть папку мода" в карточке.
 func (app *App) openSelectedModFolder() {
 	if app.selectedModName == "" {
 		return
@@ -561,26 +711,14 @@ func (app *App) openSelectedModFolder() {
 	if !ok || mod.MissingFolder {
 		return
 	}
-	modPath := filepath.Join(app.cfg.ModsPath, mod.Name)
-	if _, err := os.Stat(modPath); err != nil {
+	app.cfgMutex.RLock()
+	modsPath := app.cfg.ModsPath
+	app.cfgMutex.RUnlock()
+	if modsPath == "" {
 		return
 	}
-	var cmd *exec.Cmd
-	switch runtime.GOOS {
-	case "windows":
-		cmd = exec.Command("explorer", modPath)
-	case "linux":
-		cmd = exec.Command("xdg-open", modPath)
-	case "darwin":
-		cmd = exec.Command("open", modPath)
-	default:
-		u, _ := url.Parse("file://" + filepath.ToSlash(modPath))
-		_ = app.myApp.OpenURL(u)
-		return
-	}
-	if cmd != nil {
-		cmd.Start()
-	}
+	modPath := filepath.Join(modsPath, mod.Name)
+	app.openPathInFileManager(modPath)
 }
 
 // ─────────────────────────────────────────────────────────────────
@@ -913,15 +1051,15 @@ func (app *App) buildSystemModsTable() {
 	app.systemModsTableSpacer.SetMinSize(fyne.NewSize(
 		1, SystemTableRowHeight*float32(len(app.systemMods))))
 
-	container := container.NewStack(app.systemModsTableSpacer, app.systemModsTable)
+	sysContainer := container.NewStack(app.systemModsTableSpacer, app.systemModsTable)
 
 	app.cfgMutex.RLock()
 	showSys := app.cfg.ShowSystemMods
 	app.cfgMutex.RUnlock()
 	if !showSys {
-		container.Hide()
+		sysContainer.Hide()
 	}
-	app.systemModsTableContainer = container
+	app.systemModsTableContainer = sysContainer
 }
 
 // buildSystemStatusLabel собирает двухстрочный статус для системной
@@ -984,7 +1122,7 @@ func (app *App) buildModsTable() {
 		switch id.Col {
 		case 0:
 			cont.Objects = nil
-			if !mod.IsSystem {
+			if !mod.IsSystem && app.showSelectColumn {
 				cont.Add(app.buildSelectCheckboxColumn(id.Row, mod))
 			} else {
 				cont.Add(widget.NewLabel(""))
@@ -1082,7 +1220,7 @@ func (app *App) modRowBackgroundColor(row int, mod *checks.ModInfo, th fyne.Them
 	}
 }
 
-// buildSelectCheckboxColumn — ячейка колонки 0: чекбокс выделения поверх
+// buildSelectCheckboxColumn - ячейка колонки 0: чекбокс выделения поверх
 // опционального фонового изображения.
 func (app *App) buildSelectCheckboxColumn(row int, mod *checks.ModInfo) fyne.CanvasObject {
 	th := app.myApp.Settings().Theme()
@@ -1120,16 +1258,26 @@ func (app *App) buildSelectCheckboxColumn(row int, mod *checks.ModInfo) fyne.Can
 	return container.NewStack(bgStack...)
 }
 
-// reassignSelectionAfterUncheck — если сняли галку с текущего выбранного
+// reassignSelectionAfterUncheck - если сняли галку с текущего выбранного
 // мода, переносим выделение на первую оставшуюся выделенную строку.
 func (app *App) reassignSelectionAfterUncheck(name string) {
+	app.modsMutex.RLock()
+	names := make([]string, len(app.displayedMods))
+	selected := make([]bool, len(app.displayedMods))
+	for i := range app.displayedMods {
+		names[i] = app.displayedMods[i].Name
+		selected[i] = app.displayedMods[i].Selected
+	}
+	app.modsMutex.RUnlock()
+
 	newSelRow := -1
-	for i, dm := range app.displayedMods {
-		if dm.Selected && dm.Name != name {
+	for i := range names {
+		if selected[i] && names[i] != name {
 			newSelRow = i
 			break
 		}
 	}
+
 	if newSelRow >= 0 {
 		app.modTable.Select(widget.TableCellID{Row: newSelRow, Col: 0}, 0)
 		return
@@ -1141,7 +1289,7 @@ func (app *App) reassignSelectionAfterUncheck(name string) {
 	app.updateUpDownButtons()
 }
 
-// buildActiveCheckboxColumn — колонка 1: чекбокс активности мода.
+// buildActiveCheckboxColumn - колонка 1: чекбокс активности мода.
 func (app *App) buildActiveCheckboxColumn(row int, mod *checks.ModInfo) fyne.CanvasObject {
 	name := mod.Name
 	check := widget.NewCheck("", nil)
@@ -1156,14 +1304,14 @@ func (app *App) buildActiveCheckboxColumn(row int, mod *checks.ModInfo) fyne.Can
 	return check
 }
 
-// buildNumberColumn — колонка 2: порядковый номер строки.
+// buildNumberColumn - колонка 2: порядковый номер строки.
 func (app *App) buildNumberColumn(row int, th fyne.Theme, variant fyne.ThemeVariant) fyne.CanvasObject {
 	t := canvas.NewText(fmt.Sprintf("%2d", row+1), th.Color(theme.ColorNameForeground, variant))
 	t.Alignment = fyne.TextAlignCenter
 	return t
 }
 
-// buildNameColumn — колонка 3: имя мода.
+// buildNameColumn - колонка 3: имя мода.
 func (app *App) buildNameColumn(row int, mod *checks.ModInfo) fyne.CanvasObject {
 	display := mod.DisplayName
 	if display == "" {
@@ -1176,14 +1324,14 @@ func (app *App) buildNameColumn(row int, mod *checks.ModInfo) fyne.CanvasObject 
 	return label
 }
 
-// buildDateColumn — колонка 4: дата установки.
+// buildDateColumn - колонка 4: дата установки.
 func (app *App) buildDateColumn(mod *checks.ModInfo, th fyne.Theme, variant fyne.ThemeVariant) fyne.CanvasObject {
 	t := canvas.NewText(app.formatDate(mod.ModTime, app.cfg.DateFormat), th.Color(theme.ColorNameForeground, variant))
 	t.Alignment = fyne.TextAlignCenter
 	return t
 }
 
-// buildStatusColumn — колонка 5: основной и дополнительный статус.
+// buildStatusColumn - колонка 5: основной и дополнительный статус.
 func (app *App) buildStatusColumn(mod *checks.ModInfo, th fyne.Theme, variant fyne.ThemeVariant) fyne.CanvasObject {
 	mainText, mainColor, subText, subColor := app.computeStatusTexts(mod, th, variant)
 
@@ -1205,7 +1353,7 @@ func (app *App) buildStatusColumn(mod *checks.ModInfo, th fyne.Theme, variant fy
 	return box
 }
 
-// computeStatusTexts — определяет тексты и цвета для колонки статуса.
+// computeStatusTexts - определяет тексты и цвета для колонки статуса.
 func (app *App) computeStatusTexts(mod *checks.ModInfo, th fyne.Theme, variant fyne.ThemeVariant) (string, color.Color, string, color.Color) {
 	var mainText string
 	var mainColor color.Color
@@ -1248,7 +1396,7 @@ func (app *App) computeStatusTexts(mod *checks.ModInfo, th fyne.Theme, variant f
 	}
 }
 
-// buildNoteColumn — колонка 6: примечание в горизонтальном скролле.
+// buildNoteColumn - колонка 6: примечание в горизонтальном скролле.
 func (app *App) buildNoteColumn(mod *checks.ModInfo) fyne.CanvasObject {
 	label := widget.NewLabel(mod.Note)
 	label.Wrapping = fyne.TextWrapOff
@@ -1257,7 +1405,7 @@ func (app *App) buildNoteColumn(mod *checks.ModInfo) fyne.CanvasObject {
 	return scroll
 }
 
-// onModRowSelected — логика OnSelected основной таблицы.
+// onModRowSelected - логика OnSelected основной таблицы.
 func (app *App) onModRowSelected(id widget.TableCellID) {
 	if app.suppressSelectionEvents {
 		return
@@ -1314,17 +1462,25 @@ func (app *App) buildBottomPanel() fyne.CanvasObject {
 	app.profileLabel.TextStyle = fyne.TextStyle{Bold: true}
 
 	app.profileSelect = widget.NewSelect([]string{}, func(s string) {
-		if s != app.cfg.ActiveProfile {
+		app.cfgMutex.RLock()
+		active := app.cfg.ActiveProfile
+		app.cfgMutex.RUnlock()
+		if s != active {
 			app.switchProfile(s)
 		}
 	})
 	app.profileSelect.PlaceHolder = app.msg("profile_select_placeholder")
+
+	syncRes := app.loadIconResource("profile_sync", "assets/buttons/sync_n.png")
+	app.profileSyncBtn = NewIconButton(syncRes, func() { app.SyncProfileManually() })
+	app.profileSyncBtn.SetToolTip(app.msg("profile_sync_tooltip"))
 
 	content := container.NewHBox(
 		app.counterLabel,
 		layout.NewSpacer(),
 		app.profileLabel,
 		app.profileSelect,
+		app.profileSyncBtn,
 	)
 	return container.NewBorder(nil, nil, nil, nil, content)
 }
@@ -1557,7 +1713,7 @@ func (app *App) refreshThemeColors() {
 // Логирование
 // ─────────────────────────────────────────────────────────────────
 
-// maxLogSegments — верхняя граница числа сегментов в лог-виджете.
+// maxLogSegments - верхняя граница числа сегментов в лог-виджете.
 // Без неё Segments растёт монотонно за всё время работы приложения
 // (а appendLog вызывается в т.ч. на каждую операцию с модом), и через
 // несколько часов работы UI начинает тормозить из-за отрисовки
@@ -1566,9 +1722,7 @@ const maxLogSegments = 500
 
 func (app *App) appendLog(text string) {
 	if app.logWindow == nil {
-		if app.logFile != nil {
-			fmt.Fprintln(app.logFile, time.Now().Format(LogTimeFormat), text)
-		}
+		app.appendLogToFile(text)
 		return
 	}
 	fyne.Do(func() {
@@ -1588,7 +1742,7 @@ func (app *App) appendLog(text string) {
 		}
 		app.logWindow.Segments = append(app.logWindow.Segments, seg)
 		// (#20) Обрезаем буфер. Копирование слайса дешевле, чем
-		// перерисовка тысяч сегментов; делаем это батчами — только
+		// перерисовка тысяч сегментов; делаем это батчами - только
 		// когда превысили лимит, оставляя ровно maxLogSegments.
 		if len(app.logWindow.Segments) > maxLogSegments {
 			tail := make([]widget.RichTextSegment, maxLogSegments)
@@ -1600,9 +1754,7 @@ func (app *App) appendLog(text string) {
 			app.consoleScroll.ScrollToBottom()
 		}
 	})
-	if app.logFile != nil {
-		fmt.Fprintln(app.logFile, time.Now().Format(LogTimeFormat), text)
-	}
+	app.appendLogToFile(text)
 }
 
 func (app *App) appendCenteredLog(text string) {
@@ -1640,6 +1792,10 @@ func (app *App) updateDescriptionForMod(name string) {
 		return
 	}
 
+	app.cfgMutex.RLock()
+	dateFormat := app.cfg.DateFormat
+	app.cfgMutex.RUnlock()
+
 	if app.openFolderBtn != nil {
 		if mod.MissingFolder || mod.Name == "" {
 			app.openFolderBtn.Disable()
@@ -1661,11 +1817,14 @@ func (app *App) updateDescriptionForMod(name string) {
 	}
 	authorText := fmt.Sprintf(app.msg("author_label"), author)
 	if !mod.OriginalUpload.IsZero() {
-		authorText += fmt.Sprintf("          %s: %s", app.msg("original_upload_label"), app.formatDate(mod.OriginalUpload, app.cfg.DateFormat))
+		authorText += fmt.Sprintf("          %s: %s",
+			app.msg("original_upload_label"),
+			app.formatDate(mod.OriginalUpload, dateFormat))
 	}
 	app.descAuthor.SetText(authorText)
 
-	app.descInstalled.SetText(fmt.Sprintf(app.msg("installed_label"), app.formatDate(mod.ModTime, app.cfg.DateFormat)))
+	app.descInstalled.SetText(fmt.Sprintf(app.msg("installed_label"),
+		app.formatDate(mod.ModTime, dateFormat)))
 
 	if app.descLocalVersion != nil {
 		var cacheKey string
@@ -1694,7 +1853,9 @@ func (app *App) updateDescriptionForMod(name string) {
 				}
 
 				if !mod.LastUpdated.IsZero() {
-					localText += fmt.Sprintf("          %s: %s", app.msg("last_updated_label"), app.formatDate(mod.LastUpdated, app.cfg.DateFormat))
+					localText += fmt.Sprintf("          %s: %s",
+						app.msg("last_updated_label"),
+						app.formatDate(mod.LastUpdated, dateFormat))
 				}
 
 				app.descLocalVersion.SetText(localText)
@@ -1708,7 +1869,8 @@ func (app *App) updateDescriptionForMod(name string) {
 
 	if app.descLastUpdated != nil {
 		if !mod.LastUpdated.IsZero() {
-			app.descLastUpdated.SetText(fmt.Sprintf("Last updated: %s", app.formatDate(mod.LastUpdated, app.cfg.DateFormat)))
+			app.descLastUpdated.SetText(fmt.Sprintf("Last updated: %s",
+				app.formatDate(mod.LastUpdated, dateFormat)))
 		} else {
 			app.descLastUpdated.SetText("")
 		}
@@ -1716,7 +1878,8 @@ func (app *App) updateDescriptionForMod(name string) {
 
 	if app.descOriginalUpload != nil {
 		if !mod.OriginalUpload.IsZero() {
-			app.descOriginalUpload.SetText(fmt.Sprintf("Original upload: %s", app.formatDate(mod.OriginalUpload, app.cfg.DateFormat)))
+			app.descOriginalUpload.SetText(fmt.Sprintf("Original upload: %s",
+				app.formatDate(mod.OriginalUpload, dateFormat)))
 		} else {
 			app.descOriginalUpload.SetText("")
 		}
@@ -1788,12 +1951,19 @@ func (app *App) updateDescriptionForMod(name string) {
 		}
 	}
 
-	if mod.Incompatible {
-		// Копия списка под checksDataMutex — без прямого чтения
-		// глобального слайса, который может быть перезаписан в
-		// checks.LoadExternalLists.
-		for _, pair := range checks.GetIncompatiblePairs() {
-			if pair.Mod1 == mod.Name || pair.Mod2 == mod.Name {
+	// Блок конфликта: сначала сбрасываем состояние, затем пытаемся найти
+	// актуальную пару. Если mod.Incompatible == true, но ни одной валидной
+	// пары не найдено (например, второй мод удалили) — оставляем скрытым
+	// с пустым текстом, а не тащим прошлое значение.
+	if app.descConflict != nil {
+		app.descConflict.SetText("")
+		app.descConflict.Hide()
+
+		if mod.Incompatible {
+			for _, pair := range checks.GetIncompatiblePairs() {
+				if pair.Mod1 != mod.Name && pair.Mod2 != mod.Name {
+					continue
+				}
 				other := pair.Mod1
 				if other == mod.Name {
 					other = pair.Mod2
@@ -1803,16 +1973,11 @@ func (app *App) updateDescriptionForMod(name string) {
 				}
 				if desc := checks.GetIncompatibleDesc(pair.Mod1, pair.Mod2); desc != "" {
 					app.descConflict.SetText(desc)
-				} else {
-					app.descConflict.SetText("")
+					app.descConflict.Show()
 				}
-				app.descConflict.Show()
 				break
 			}
 		}
-	} else {
-		app.descConflict.Hide()
-		app.descConflict.SetText("")
 	}
 
 	if app.descExtraContainer != nil {
@@ -1902,11 +2067,11 @@ func (app *App) updateDescriptionForMod(name string) {
 // enrichModFromNexus асинхронно подтягивает метаданные с Nexus.
 //
 // (#4) Раньше функция писала mod.LastUpdated / mod.OriginalUpload прямо
-// в переданный указатель из горутины — это была гонка с UI-потоком,
+// в переданный указатель из горутины - это была гонка с UI-потоком,
 // который читал эти же поля для отрисовки. Теперь значения собираются
 // в локальные переменные и переносятся в allMods под modsMutex.Lock.
 //
-// Параметр mod — это снимок ModInfo (не указатель), поэтому поля можно
+// Параметр mod - это снимок ModInfo (не указатель), поэтому поля можно
 // безопасно читать из горутины.
 func (app *App) enrichModFromNexus(mod *checks.ModInfo) {
 	if app.getAuthToken() == "" || mod.URL == "" {
@@ -1917,7 +2082,7 @@ func (app *App) enrichModFromNexus(mod *checks.ModInfo) {
 		return
 	}
 
-	// Снимок имени — mod может быть указателем в displayedMods, которую
+	// Снимок имени - mod может быть указателем в displayedMods, которую
 	// перестроит UI. Работаем со строкой, а не с полем.
 	modName := mod.Name
 
@@ -1937,7 +2102,7 @@ func (app *App) enrichModFromNexus(mod *checks.ModInfo) {
 		cacheKey := fmt.Sprintf("%d:%s", modID, modName)
 		app.setLatestVersion(cacheKey, fileInfo.Version)
 
-		// Локальные переменные — не пишем в mod (это поле displayedMods).
+		// Локальные переменные - не пишем в mod (это поле displayedMods).
 		var newLastUpdated time.Time
 		var newOriginalUpload time.Time
 
@@ -1955,8 +2120,9 @@ func (app *App) enrichModFromNexus(mod *checks.ModInfo) {
 			if entry != nil && entry.NexusFilePattern == "" {
 				pattern := extractPatternFromFilename(fileInfo.FileName)
 				if pattern != "" {
-					entry.NexusFilePattern = pattern
-					checks.UpdateModDBEntry(*entry)
+					updated := *entry
+					updated.NexusFilePattern = pattern
+					checks.UpdateModDBEntry(updated)
 					checks.SaveModDatabase()
 					app.appendLog(fmt.Sprintf(app.msg("log_autosaved_stable_pattern"), modName, pattern))
 				}
@@ -1964,7 +2130,7 @@ func (app *App) enrichModFromNexus(mod *checks.ModInfo) {
 		}
 
 		fyne.Do(func() {
-			// (#4) Запись в allMods — под modsMutex.
+			// (#4) Запись в allMods - под modsMutex.
 			app.modsMutex.Lock()
 			for i := range app.allMods {
 				if app.allMods[i].Name == modName {
@@ -1984,30 +2150,53 @@ func (app *App) enrichModFromNexus(mod *checks.ModInfo) {
 
 func (app *App) updateToggleButtonText(btn *CustomButton) {
 	gameRoot, patcher := app.getGameState()
-	switch patcher {
-	case PatcherAutoPatch:
-		if isModsEnabledAutoPatch(gameRoot) {
-			btn.icon = app.toggleOnIcon
-		} else {
-			btn.icon = app.toggleOffIcon
-		}
-	case PatcherLegacy:
-		if isModsEnabledLegacy(gameRoot) {
-			btn.icon = app.toggleOnIcon
-		} else {
-			btn.icon = app.toggleOffIcon
-		}
-	default:
+	if patcher == PatcherNone || gameRoot == "" {
 		btn.icon = app.toggleOffIcon
 		btn.Disable()
+		btn.Refresh()
 		return
 	}
-	btn.text = ""
-	btn.Enable()
+
+	// DLL установлена: состояние берём из флага DISABLE_AUTOPATCHER.
+	// Bundle мог быть пропатчен самой DLL — это не «чужой патч»,
+	// а штатное поведение.
+	if AutopatcherDLLInstalled(gameRoot) {
+		if AutopatcherDisabled(gameRoot) {
+			btn.icon = app.toggleOffIcon
+		} else {
+			btn.icon = app.toggleOnIcon
+		}
+		btn.SetToolTip(app.msg("btn_toggle_tooltip"))
+		btn.Enable()
+		btn.Refresh()
+		return
+	}
+
+	// DLL нет — смотрим на bundle, как раньше.
+	patchedBy := BundlePatchedBy(gameRoot)
+	switch patchedBy {
+	case "SMQ":
+		btn.icon = app.toggleOnIcon
+		btn.SetToolTip(app.msg("btn_toggle_tooltip"))
+		btn.Enable()
+	case "unknown":
+		// Действительно чужой патч: ни .patch_999, ни boot_bundle_next_patch,
+		// а что-то ещё.
+		btn.icon = app.toggleOnIcon
+		btn.SetToolTip(app.msg("bundle_foreign_patch_warning"))
+		btn.Enable()
+	default:
+		btn.icon = app.toggleOffIcon
+		btn.SetToolTip(app.msg("btn_toggle_tooltip"))
+		btn.Enable()
+	}
 	btn.Refresh()
 }
 
 func (app *App) updateUpDownButtons() {
+	// Снимок selectedModName — читается в UI-потоке, но фоновая
+	// removeModFromData теперь пишет его через fyne.Do, т.е. тоже
+	// в UI-потоке. Прямое чтение безопасно, потому что мы сами в UI.
 	if app.selectedModName == "" {
 		app.btnUp.Disable()
 		app.btnDown.Disable()
@@ -2026,6 +2215,8 @@ func (app *App) updateUpDownButtons() {
 		app.moveToBottomBtn.Refresh()
 		return
 	}
+
+	app.modsMutex.RLock()
 	idx := -1
 	for i, m := range app.displayedMods {
 		if m.Name == app.selectedModName {
@@ -2033,6 +2224,9 @@ func (app *App) updateUpDownButtons() {
 			break
 		}
 	}
+	total := len(app.displayedMods)
+	app.modsMutex.RUnlock()
+
 	app.selectedModIndex.Store(int32(idx))
 	if idx < 0 {
 		app.btnUp.Disable()
@@ -2043,7 +2237,7 @@ func (app *App) updateUpDownButtons() {
 		if idx == 0 {
 			app.btnUp.Disable()
 		}
-		if idx == len(app.displayedMods)-1 {
+		if idx == total-1 {
 			app.btnDown.Disable()
 		}
 	}
@@ -2056,10 +2250,10 @@ type modFilterFunc func(checks.ModInfo) bool
 // filterModList строит app.displayedMods из app.allMods согласно
 // текущему фильтру и поиску.
 //
-// (#4) Раньше функция читала app.allMods без modsMutex — это была гонка
+// (#4) Раньше функция читала app.allMods без modsMutex - это была гонка
 // с фоновыми горутинами (removeSelectedMods → removeModFromData, которая
 // держит Lock). Теперь весь блок построения нового списка идёт под
-// modsMutex.Lock — UI-обновления (Refresh, Scroll) вынесены за скобки.
+// modsMutex.Lock - UI-обновления (Refresh, Scroll) вынесены за скобки.
 func (app *App) filterModList() {
 	if app.modTable == nil {
 		app.appendLogToFile("filterModList: modTable is nil, skipping")
@@ -2118,7 +2312,7 @@ func (app *App) filterModList() {
 	}
 	search := strings.ToLower(app.searchEntry.Text)
 
-	// (#4) Построение displayedMods — под modsMutex.Lock, потому что
+	// (#4) Построение displayedMods - под modsMutex.Lock, потому что
 	// allMods может писаться из фоновой горутины.
 	app.modsMutex.Lock()
 	newDisplayed := make([]checks.ModInfo, 0, len(app.allMods))
@@ -2232,7 +2426,7 @@ func (app *App) setSelectedActive(active bool) {
 	}
 	app.modsMutex.Unlock()
 	if changed {
-		app.orderDirty = true
+		app.orderDirty.Store(true)
 		fyne.Do(func() {
 			app.updateTableBorder()
 			app.filterModList()
@@ -2259,7 +2453,7 @@ func (app *App) setAllModsActive(active bool) {
 	}
 	app.modsMutex.Unlock()
 	if changed {
-		app.orderDirty = true
+		app.orderDirty.Store(true)
 		fyne.Do(func() {
 			app.updateTableBorder()
 			app.filterModList()
@@ -2267,13 +2461,13 @@ func (app *App) setAllModsActive(active bool) {
 	}
 }
 
-func (app *App) startBlink(btn *CustomButton, activeFlag *bool, condition func() bool) {
-	if *activeFlag {
+func (app *App) startBlink(btn *CustomButton, activeFlag *atomic.Bool, condition func() bool) {
+	if activeFlag.Load() {
 		return
 	}
-	*activeFlag = true
+	activeFlag.Store(true)
 	go func() {
-		for *activeFlag && condition() {
+		for activeFlag.Load() && condition() {
 			fyne.Do(func() {
 				btn.Importance = widget.WarningImportance
 				btn.Refresh()
@@ -2294,21 +2488,21 @@ func (app *App) startBlink(btn *CustomButton, activeFlag *bool, condition func()
 
 func (app *App) startBlinkSaveButton() {
 	app.startBlink(app.btnSaveOrder, &app.blinkSaveOrderActive, func() bool {
-		return app.orderDirty
+		return app.orderDirty.Load()
 	})
 }
 
 func (app *App) stopBlinkSaveButton() {
-	app.blinkSaveOrderActive = false
+	app.blinkSaveOrderActive.Store(false)
 }
 
 func (app *App) updateTableBorder() {
 	if app.tableBorder == nil {
 		return
 	}
-	if app.orderDirty {
+	if app.orderDirty.Load() {
 		app.tableBorder.Show()
-		if !app.blinkSaveOrderActive {
+		if !app.blinkSaveOrderActive.Load() {
 			app.startBlinkSaveButton()
 		}
 	} else {
@@ -2333,13 +2527,21 @@ func (app *App) selectAndScrollToMod(modName string) {
 	}
 	time.AfterFunc(50*time.Millisecond, func() {
 		fyne.Do(func() {
-			for i, m := range app.displayedMods {
-				if m.Name == modName {
-					app.modTable.Select(widget.TableCellID{Row: i, Col: 0}, 0)
-					app.modTable.ScrollTo(widget.TableCellID{Row: i, Col: 0})
-					return
+			app.modsMutex.RLock()
+			idx := -1
+			for i := range app.displayedMods {
+				if app.displayedMods[i].Name == modName {
+					idx = i
+					break
 				}
 			}
+			app.modsMutex.RUnlock()
+
+			if idx < 0 {
+				return
+			}
+			app.modTable.Select(widget.TableCellID{Row: idx, Col: 0}, 0)
+			app.modTable.ScrollTo(widget.TableCellID{Row: idx, Col: 0})
 		})
 	})
 }
@@ -2349,11 +2551,11 @@ func (app *App) selectAndScrollToMod(modName string) {
 //
 // (#4) Было две ошибки:
 //  1. Индексы. Таблица построена по displayedMods, а синхронизация
-//     шла по allMods[i] — при активном фильтре/поиске индексы не
+//     шла по allMods[i] - при активном фильтре/поиске индексы не
 //     совпадали, и флаг Selected улетал не тому моду.
 //  2. Мьютекс. allMods защищён modsMutex, а функция писала в него
 //     под Lock (это правильно), но читала displayedMods по позиции
-//     — а displayedMods перестраивается filterModList'ом из UI-потока,
+//     - а displayedMods перестраивается filterModList'ом из UI-потока,
 //     и чтение длины без Lock могло разъехаться с реальным размером.
 //
 // Теперь: снимок выделения берём по displayedMods, а обновляем
@@ -2407,10 +2609,19 @@ func (app *App) applySelectionFromMods() {
 
 	app.modTable.ClearSelection()
 
+	app.modsMutex.RLock()
+	names := make([]string, len(app.displayedMods))
+	selectedFlags := make([]bool, len(app.displayedMods))
+	for i := range app.displayedMods {
+		names[i] = app.displayedMods[i].Name
+		selectedFlags[i] = app.displayedMods[i].Selected
+	}
+	app.modsMutex.RUnlock()
+
 	var selectedNames []string
-	for _, m := range app.displayedMods {
-		if m.Selected {
-			selectedNames = append(selectedNames, m.Name)
+	for i := range names {
+		if selectedFlags[i] {
+			selectedNames = append(selectedNames, names[i])
 		}
 	}
 
@@ -2423,15 +2634,15 @@ func (app *App) applySelectionFromMods() {
 		return
 	}
 
-	for i, m := range app.displayedMods {
-		if m.Selected {
+	for i := range names {
+		if selectedFlags[i] {
 			app.modTable.Select(widget.TableCellID{Row: i, Col: 0}, fyne.KeyModifierControl)
 		}
 	}
 
 	app.selectedModName = selectedNames[0]
-	for i, m := range app.displayedMods {
-		if m.Name == app.selectedModName {
+	for i := range names {
+		if names[i] == app.selectedModName {
 			app.selectedModIndex.Store(int32(i))
 			break
 		}
@@ -2445,30 +2656,205 @@ func (app *App) applySelectionFromMods() {
 func (app *App) setupShortcuts() {
 	canvas := app.mainWindow.Canvas()
 
+	// Сохранение списка - CTRL+S
 	canvas.AddShortcut(&desktop.CustomShortcut{
 		KeyName:  fyne.KeyS,
 		Modifier: fyne.KeyModifierControl,
 	}, func(shortcut fyne.Shortcut) {
-		if app.orderDirty {
-			app.saveCurrentOrder()
-			app.orderDirty = false
-			app.refreshModList()
-			app.appendLog(app.msg("log_order_saved"))
-			app.stopBlinkSaveButton()
-			app.updateTableBorder()
-			app.appendLogToFile("Сохранено сочетанием CTRL+S")
-		} else {
-			app.appendLog(app.msg("log_order_unchanged"))
-		}
+		app.saveOrderFromUI(nil)
+		app.appendLog("CTRL+S")
 	})
 
+	// Поиск - Ctrl+F
 	canvas.AddShortcut(&desktop.CustomShortcut{
 		KeyName:  fyne.KeyF,
 		Modifier: fyne.KeyModifierControl,
 	}, func(shortcut fyne.Shortcut) {
 		if app.searchEntry != nil {
 			canvas.Focus(app.searchEntry)
-			app.appendLogToFile("Переход к поиску сочетанием Ctrl+F")
+			app.appendLog("Ctrl+F")
 		}
 	})
+
+	// Выделить всё / снять выделение - Ctrl+A
+	//
+	// Если фокус сейчас в текстовом поле (searchEntry, moveToEntry или Entry внутри диалога) - Ctrl+A должен работать как «выделить весь текст», а не как «выделить все моды».
+	// Canvas-level shortcuts перехватывают событие до того, как его получит виджет, поэтому проверяем фокус и сами вызываем SelectAll на Entry.
+	canvas.AddShortcut(&fyne.ShortcutSelectAll{}, func(shortcut fyne.Shortcut) {
+		if _, ok := canvas.Focused().(*widget.Entry); ok {
+			return
+		}
+		app.selectAllModsToggle()
+		app.appendLog("Ctrl+A")
+	})
+
+	// Автосортировка - Ctrl+T
+	canvas.AddShortcut(&desktop.CustomShortcut{
+		KeyName:  fyne.KeyT,
+		Modifier: fyne.KeyModifierControl,
+	}, func(shortcut fyne.Shortcut) {
+		go app.runAllChecks()
+		app.appendLog("Ctrl+T")
+	})
+
+	// Обновить список - Ctrl+R
+	// refreshWithDirtyCheck сам покажет диалог, если есть несохранённые изменения.
+	canvas.AddShortcut(&desktop.CustomShortcut{
+		KeyName:  fyne.KeyR,
+		Modifier: fyne.KeyModifierControl,
+	}, func(shortcut fyne.Shortcut) {
+		go app.refreshWithDirtyCheck()
+		app.appendLog("Ctrl+R")
+	})
+
+	// Проверить обновления - Ctrl+U
+	canvas.AddShortcut(&desktop.CustomShortcut{
+		KeyName:  fyne.KeyU,
+		Modifier: fyne.KeyModifierControl,
+	}, func(shortcut fyne.Shortcut) {
+		go app.checkNexusUpdates()
+		app.appendLog("Ctrl+U")
+	})
+
+	// Вкл/выкл модов глобально - Ctrl+O
+	// Вызываем напрямую, как кнопка в верхней панели. toggleGlobalMods сам логирует результат.
+	canvas.AddShortcut(&desktop.CustomShortcut{
+		KeyName:  fyne.KeyO,
+		Modifier: fyne.KeyModifierControl,
+	}, func(shortcut fyne.Shortcut) {
+		app.toggleGlobalMods()
+		app.appendLog("Ctrl+O")
+	})
+
+	// Панель управления модами - Ctrl+M
+	canvas.AddShortcut(&desktop.CustomShortcut{
+		KeyName:  fyne.KeyM,
+		Modifier: fyne.KeyModifierControl,
+	}, func(shortcut fyne.Shortcut) {
+		app.toggleManagePanel()
+		app.appendLog("Ctrl+M")
+	})
+
+	// Удалить выделенные моды - Ctrl+Delete (с модификатором работает).
+	canvas.AddShortcut(&desktop.CustomShortcut{
+		KeyName:  fyne.KeyDelete,
+		Modifier: fyne.KeyModifierControl,
+	}, func(shortcut fyne.Shortcut) {
+		app.deleteSelectedModsWithConfirm()
+		app.appendLog("Ctrl+Delete")
+	})
+
+	// Запуск игры - Ctrl+F5 / Ctrl+F6 (альтернатива для тех, кому
+	// нравится с модификатором).
+	canvas.AddShortcut(&desktop.CustomShortcut{
+		KeyName:  fyne.KeyF5,
+		Modifier: fyne.KeyModifierControl,
+	}, func(shortcut fyne.Shortcut) {
+		app.launchGameFromUI(true)
+		app.appendLog("Ctrl+F5")
+	})
+	canvas.AddShortcut(&desktop.CustomShortcut{
+		KeyName:  fyne.KeyF6,
+		Modifier: fyne.KeyModifierControl,
+	}, func(shortcut fyne.Shortcut) {
+		app.launchGameFromUI(false)
+		app.appendLog("Ctrl+F6")
+	})
+
+	// Запуск игры без модификатора - F5 (быстрый), F6 (обычный).
+	// rawShortcut возвращает ровно то ShortcutName, которое Fyne
+	// генерирует для чистых функциональных клавиш.
+	canvas.AddShortcut(&desktop.CustomShortcut{KeyName: fyne.KeyF5, Modifier: 0}, func(_ fyne.Shortcut) {
+		app.launchGameFromUI(true)
+		app.appendLog("F5")
+	})
+	canvas.AddShortcut(&desktop.CustomShortcut{KeyName: fyne.KeyF6, Modifier: 0}, func(_ fyne.Shortcut) {
+		app.launchGameFromUI(false)
+		app.appendLog("F6")
+	})
+
+	// Удаление выделенных модов без модификатора - Delete.
+	//
+	// ВАЖНО: Delete используется в Entry для удаления символов. Чтобы
+	// не мешать вводу, проверяем фокус: если он в текстовом поле —
+	// не перехватываем.
+	canvas.AddShortcut(&desktop.CustomShortcut{KeyName: fyne.KeyDelete, Modifier: 0}, func(_ fyne.Shortcut) {
+		if f := canvas.Focused(); f != nil {
+			if _, ok := f.(*widget.Entry); ok {
+				f.TypedKey(&fyne.KeyEvent{Name: fyne.KeyDelete})
+				return
+			}
+		}
+		app.deleteSelectedModsWithConfirm()
+		app.appendLog("Delete")
+	})
+}
+
+// selectAllModsToggle вызывается по Ctrl+A. Если хоть один мод уже
+// выделен - снимаем выделение. Иначе выделяем все видимые моды и
+// показываем панель массовых операций.
+func (app *App) selectAllModsToggle() {
+	app.modsMutex.RLock()
+	anySelected := false
+	for _, m := range app.displayedMods {
+		if m.Selected {
+			anySelected = true
+			break
+		}
+	}
+	app.modsMutex.RUnlock()
+
+	if !anySelected {
+		// Показываем панель безусловно — не полагаемся на Visible(),
+		// который в Fyne может врать для контейнеров внутри VBox.
+		app.showManagePanelForce()
+	}
+
+	app.selectAllMods(!anySelected)
+}
+
+// showManagePanelForce включает панель массовых операций и колонку
+// чекбоксов, не проверяя текущее состояние. Идемпотентна — повторный
+// вызов ничего не сломает.
+func (app *App) showManagePanelForce() {
+	if app.managePanel == nil {
+		return
+	}
+	app.managePanel.Show()
+	app.showSelectColumn = true
+
+	if app.headerTable != nil {
+		app.headerTable.SetColumnWidth(0, ColSelectWidth)
+		app.headerTable.Refresh()
+	}
+	if app.modTable != nil {
+		app.modTable.SetColumnWidth(0, ColSelectWidth)
+		app.modTable.Refresh()
+	}
+	app.managePanel.Refresh()
+
+	// Show() меняет флаг Visible, но родительский VBox не пересчитывает
+	// layout сам по себе. Без перерисовки всего дерева панель остаётся
+	// в VBox с нулевой высотой и визуально не появляется. Canvas.Refresh
+	// обходит дерево рекурсивно и вызывает Layout там, где нужно.
+	if app.mainWindow != nil && app.mainWindow.Canvas() != nil {
+		app.mainWindow.Canvas().Refresh(app.mainWindow.Content())
+	}
+}
+
+// deleteSelectedModsWithConfirm вызывается по Ctrl+Delete. Использует
+// тот же диалог, что и кнопка массового удаления - единообразно и
+// безопасно (случайное нажатие Ctrl+Delete ничего не удалит без
+// подтверждения).
+func (app *App) deleteSelectedModsWithConfirm() {
+	sel := app.selectedMods()
+	if len(sel) == 0 {
+		app.appendLog(app.msg("no_mods_selected"))
+		return
+	}
+	app.showConfirmDialog(
+		app.msg("confirm_remove_selected_title"),
+		fmt.Sprintf(app.msg("confirm_remove_selected_text"), len(sel)),
+		func() { app.removeSelectedMods() },
+	)
 }

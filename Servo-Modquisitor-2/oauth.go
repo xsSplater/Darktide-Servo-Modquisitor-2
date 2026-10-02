@@ -18,7 +18,6 @@ import (
 	_ "embed"
 
 	"fyne.io/fyne/v2"
-	"github.com/zalando/go-keyring"
 )
 
 //go:embed assets/mechanicus.png
@@ -131,81 +130,122 @@ func (app *App) startCallbackServer() {
 		exchangeMutex.Unlock()
 
 		expiry := time.Now().Add(time.Duration(token.ExpiresIn) * time.Second)
-		if err := app.saveOAuthTokens(token.AccessToken, token.RefreshToken, expiry); err != nil {
-			app.appendLogToFile(fmt.Sprintf("Failed to save OAuth tokens: %v", err))
-		}
+		saveErr := app.saveOAuthTokens(token.AccessToken, token.RefreshToken, expiry)
 
 		fyne.Do(func() {
 			app.mainWindow.SetMainMenu(app.buildMainMenu())
+
+			if saveErr != nil {
+				app.appendLogToFile(fmt.Sprintf("Failed to save OAuth tokens: %v", saveErr))
+				app.showInfoDialog(
+					app.msg("oauth_success_title"),
+					fmt.Sprintf("%s\n\nWarning: tokens could not be stored: %v",
+						app.msg("oauth_success_message"), saveErr),
+				)
+				return
+			}
+
 			app.appendLog(app.msg("oauth_login_success"))
+			app.bringToFront()
 			app.showInfoDialog(
 				app.msg("oauth_success_title"),
 				app.msg("oauth_success_message"),
 			)
+			time.AfterFunc(500*time.Millisecond, func() {
+				fyne.Do(func() { app.bringToFront() })
+			})
 		})
 
 		imgBase64 := base64.StdEncoding.EncodeToString(mechanicusPNG)
 		imgSrc := "data:image/png;base64," + imgBase64
+
+		// Локализованные строки для HTML-страницы. Если ключа нет в
+		// messages.json — используем безопасный английский fallback,
+		// чтобы страница не оставалась пустой.
+		title := app.msg("oauth_success_title")
+		if title == "" {
+			title = "Authorisation successful!"
+		}
+		msg := app.msg("oauth_success_message")
+		if msg == "" {
+			msg = "You have successfully authenticated with your Nexus Mods account."
+		}
+		nexusClose := app.msg("oauth_success_nexus_close")
+		if nexusClose == "" {
+			nexusClose = "The login page on Nexus Mods can be closed as well."
+		}
+		closeText := app.msg("oauth_success_close")
+		if closeText == "" {
+			closeText = "You may close this window now."
+		}
+
+		app.cfgMutex.RLock()
+		langTag := app.cfg.Language
+		app.cfgMutex.RUnlock()
+		if langTag == "" {
+			langTag = "en"
+		}
+
 		successHTML := `<!DOCTYPE html>
-			<html lang="en">
-			<head>
-				<meta charset="UTF-8">
-				<title>Login Successful - Servo-Modquisitor</title>
-				<style>
-					body {
-						background-color: #000000;
-						color: #c0ff1a;
-						font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-						display: flex;
-						justify-content: center;
-						align-items: center;
-						height: 100vh;
-						margin: 0;
-					}
-					.card {
-						background: #111111;
-						border: 1px solid #c0ff1a;
-						border-radius: 16px;
-						padding: 40px;
-						text-align: center;
-						max-width: 666px;
-					}
-					img.logo {
-						width: 100%;
-						max-width: 444px;
-						height: auto;
-						margin-bottom: 24px;
-						display: inline-block;
-						animation: gentlePulse 5s ease-in-out infinite;
-						will-change: transform, filter;
-						border-radius: 16px;
-					}
-					@keyframes gentlePulse {
-						0% { transform: scale(1); filter: drop-shadow(0 0 2px #c0ff1a) drop-shadow(0 0 4px #c0ff1a); }
-						50% { transform: scale(1.01); filter: drop-shadow(0 0 3px #c0ff1a) drop-shadow(0 0 6px #c0ff1a); }
-						100% { transform: scale(1); filter: drop-shadow(0 0 2px #c0ff1a) drop-shadow(0 0 4px #c0ff1a); }
-					}
-					h1 { font-size: 3.3rem; margin: 0 0 10px 0; }
-					h2 { margin: 20px 0 0 0; font-size: 2.4rem; font-weight: 400; color: #ff8866; animation: gentleClosePulse 1s ease-in-out infinite; }
-					@keyframes gentleClosePulse {
-						0%, 100% { text-shadow: 0 0 2px #ff5533, 0 0 3px #ff2222; opacity: 0.85; }
-						50% { text-shadow: 0 0 5px #ff5533, 0 0 10px #ff2222; opacity: 1; }
-					}
-					p { margin: 0 0 20px 0; font-size: 16px; color: #dddddd; }
-				</style>
-			</head>
-			<body>
-				<div class="card">
-					<img class="logo" src="` + imgSrc + `" alt="Servo-Modquisitor Logo">
-					<h1>Authorisation successful!</h1>
-					<p>You have successfully authenticated with your Nexus Mods account.</p>
-					<p>The login page on Nexus Mods can be closed as well.</p>
-					<p> </p>
-					<p> </p>
-					<h2>You may close this window now.</h2>
-				</div>
-			</body>
-			</html>`
+<html lang="` + langTag + `">
+<head>
+	<meta charset="UTF-8">
+	<title>` + title + ` - Servo-Modquisitor</title>
+	<style>
+		body {
+			background-color: #000000;
+			color: #c0ff1a;
+			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			height: 100vh;
+			margin: 0;
+		}
+		.card {
+			background: #111111;
+			border: 1px solid #c0ff1a;
+			border-radius: 16px;
+			padding: 40px;
+			text-align: center;
+			max-width: 666px;
+		}
+		img.logo {
+			width: 100%;
+			max-width: 444px;
+			height: auto;
+			margin-bottom: 24px;
+			display: inline-block;
+			animation: gentlePulse 5s ease-in-out infinite;
+			will-change: transform, filter;
+			border-radius: 16px;
+		}
+		@keyframes gentlePulse {
+			0% { transform: scale(1); filter: drop-shadow(0 0 2px #c0ff1a) drop-shadow(0 0 4px #c0ff1a); }
+			50% { transform: scale(1.01); filter: drop-shadow(0 0 3px #c0ff1a) drop-shadow(0 0 6px #c0ff1a); }
+			100% { transform: scale(1); filter: drop-shadow(0 0 2px #c0ff1a) drop-shadow(0 0 4px #c0ff1a); }
+		}
+		h1 { font-size: 3.3rem; margin: 0 0 10px 0; }
+		h2 { margin: 20px 0 0 0; font-size: 2.4rem; font-weight: 400; color: #ff8866; animation: gentleClosePulse 1s ease-in-out infinite; }
+		@keyframes gentleClosePulse {
+			0%, 100% { text-shadow: 0 0 2px #ff5533, 0 0 3px #ff2222; opacity: 0.85; }
+			50% { text-shadow: 0 0 5px #ff5533, 0 0 10px #ff2222; opacity: 1; }
+		}
+		p { margin: 0 0 20px 0; font-size: 16px; color: #dddddd; }
+	</style>
+</head>
+<body>
+	<div class="card">
+		<img class="logo" src="` + imgSrc + `" alt="Servo-Modquisitor Logo">
+		<h1>` + title + `</h1>
+		<p>` + msg + `</p>
+		<p>` + nexusClose + `</p>
+		<p> </p>
+		<p> </p>
+		<h2>` + closeText + `</h2>
+	</div>
+</body>
+</html>`
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		w.Write([]byte(successHTML))
 
@@ -261,9 +301,9 @@ func (app *App) exchangeCodeForToken(code, verifier string) (*OAuthTokenResponse
 }
 
 func (app *App) refreshAccessToken() error {
-	refreshToken, err := keyring.Get(keyringService, "refresh_token")
+	refreshToken, err := getStoredToken(keyRefreshToken)
 	if err != nil {
-		return fmt.Errorf("no refresh token in keyring: %w", err)
+		return fmt.Errorf("no refresh token: %w", err)
 	}
 	data := url.Values{}
 	data.Set("grant_type", "refresh_token")
@@ -291,18 +331,18 @@ func (app *App) refreshAccessToken() error {
 		return err
 	}
 	expiry := time.Now().Add(time.Duration(token.ExpiresIn) * time.Second)
-	if err := app.saveOAuthTokens(token.AccessToken, token.RefreshToken, expiry); err != nil {
+	if err := saveTokensToStore(token.AccessToken, token.RefreshToken, expiry); err != nil {
 		return err
 	}
 	return nil
 }
 
 func (app *App) getAuthToken() string {
-	accessToken, err := keyring.Get(keyringService, "access_token")
+	accessToken, err := getStoredToken(keyAccessToken)
 	if err != nil {
 		return ""
 	}
-	expiryStr, err := keyring.Get(keyringService, "expiry")
+	expiryStr, err := getStoredToken(keyExpiry)
 	if err != nil {
 		return ""
 	}
@@ -314,36 +354,32 @@ func (app *App) getAuthToken() string {
 		return accessToken
 	}
 	if err := app.refreshAccessToken(); err == nil {
-		newToken, _ := keyring.Get(keyringService, "access_token")
+		newToken, _ := getStoredToken(keyAccessToken)
 		return newToken
 	}
-	keyring.Delete(keyringService, "access_token")
-	keyring.Delete(keyringService, "refresh_token")
-	keyring.Delete(keyringService, "expiry")
+	deleteAllStoredTokens()
 	app.loggedIn.Store(false)
-	fyne.Do(func() { app.mainWindow.SetMainMenu(app.buildMainMenu()) })
+	if app.mainWindow != nil {
+		fyne.Do(func() { app.mainWindow.SetMainMenu(app.buildMainMenu()) })
+	}
 	return ""
 }
 
 func (app *App) logoutOAuth() {
-	keyring.Delete(keyringService, "access_token")
-	keyring.Delete(keyringService, "refresh_token")
-	keyring.Delete(keyringService, "expiry")
+	deleteAllStoredTokens()
 	app.loggedIn.Store(false)
-	app.mainWindow.SetMainMenu(app.buildMainMenu())
+	if app.mainWindow != nil {
+		fyne.Do(func() {
+			app.mainWindow.SetMainMenu(app.buildMainMenu())
+		})
+	}
 	app.appendLog(app.msg("oauth_logout_success"))
 }
 
 // saveOAuthTokens сохраняет токены в системное хранилище и помечает
 // пользователя как залогиненного.
 func (app *App) saveOAuthTokens(access, refresh string, expiry time.Time) error {
-	if err := keyring.Set(keyringService, "access_token", access); err != nil {
-		return err
-	}
-	if err := keyring.Set(keyringService, "refresh_token", refresh); err != nil {
-		return err
-	}
-	if err := keyring.Set(keyringService, "expiry", expiry.Format(time.RFC3339)); err != nil {
+	if err := saveTokensToStore(access, refresh, expiry); err != nil {
 		return err
 	}
 	app.loggedIn.Store(true)

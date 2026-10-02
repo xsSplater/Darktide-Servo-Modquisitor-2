@@ -65,6 +65,13 @@ var (
 	globalDataDir  string
 )
 
+// trashFunc — устанавливается из main при старте. Если nil,
+// RemoveMod откатывается на os.RemoveAll.
+var trashFunc func(string) error
+
+// SetTrashFunc устанавливает функцию перемещения в системную корзину.
+func SetTrashFunc(fn func(string) error) { trashFunc = fn }
+
 // getModsDir возвращает путь к папке модов.
 func getModsDir() string {
 	pathsMutex.RLock()
@@ -173,6 +180,7 @@ func FolderExists(name string) bool {
 	return info != nil && info.IsDir()
 }
 
+// Пробуем удалять в Корзину,а не навсегда.
 func RemoveMod(name string) {
 	path := filepath.Join(getModsDir(), name)
 	info, err := os.Lstat(path)
@@ -180,10 +188,15 @@ func RemoveMod(name string) {
 		return
 	}
 	if info.Mode()&os.ModeSymlink != 0 {
-		os.Remove(path)
-	} else {
-		os.RemoveAll(path)
+		_ = os.Remove(path)
+		return
 	}
+	if trashFunc != nil {
+		if err := trashFunc(path); err == nil {
+			return
+		}
+	}
+	_ = os.RemoveAll(path)
 }
 
 func ListModFolders() []string {
@@ -1267,17 +1280,6 @@ func SaveModDatabase() error {
 }
 
 func GetModDBEntry(folder string) *ModDBEntry {
-	modDBMutex.RLock()
-	defer modDBMutex.RUnlock()
-	if modDBMap == nil {
-		return nil
-	}
-	return modDBMap[strings.ToLower(folder)]
-}
-
-// getModDBEntryLocked - внутренняя функция, предполагает, что вызывающий уже взял блокировку,
-// но для безопасности используем RLock.
-func getModDBEntryLocked(folder string) *ModDBEntry {
 	modDBMutex.RLock()
 	defer modDBMutex.RUnlock()
 	if modDBMap == nil {

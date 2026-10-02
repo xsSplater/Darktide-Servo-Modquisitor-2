@@ -14,12 +14,14 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strconv"
 	"strings"
 	"time"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/widget"
+	golocale "github.com/jeandeaual/go-locale"
 )
 
 // checkIncompatible проверяет, является ли мод несовместимым с любым
@@ -37,18 +39,19 @@ const (
 	VersionXbox
 )
 
+// PatcherType — состояние патчера игры. Реализация одна: SMQ сам патчит
+// bundle_database.data (см. bundle_patch.go). PatcherLegacy убран:
+// логика dtkit-patch теперь встроена в Go.
 type PatcherType int
 
 const (
 	PatcherNone PatcherType = iota
-	PatcherLegacy
 	PatcherAutoPatch
 )
 
 var (
 	errGameVersionUnknown  string
 	errDarktideExeNotFound string
-	errGameRootNotFound    string
 	errWineNotFound        string
 	errXboxOnLinux         string
 )
@@ -56,7 +59,6 @@ var (
 func SetLauncherMessages(verUnknown, exeNotFound, rootNotFound string) {
 	errGameVersionUnknown = verUnknown
 	errDarktideExeNotFound = exeNotFound
-	errGameRootNotFound = rootNotFound
 }
 
 func SetLinuxLauncherMessages(wineNotFound, xboxOnLinux string) {
@@ -126,9 +128,11 @@ func (app *App) makeRedCRTGradient(w, h int) *image.NRGBA {
 
 func (app *App) runAllChecks() {
 	app.appendLogToFile("// " + app.msg("log_start"))
-
+	if app.mainWindow == nil || app.mainWindow.Canvas() == nil {
+		app.appendLogToFile("runAllChecks: mainWindow not ready, aborting")
+		return
+	}
 	checks.CheckInstallation(app.mainWindow)
-
 	checks.EnsureModLoadOrder(app.mainWindow)
 
 	if !checks.CheckObsoleteMods(app.mainWindow) {
@@ -222,6 +226,9 @@ func (app *App) runAllChecks() {
 
 	app.loadOrderMutex.Unlock()
 
+	app.appendLog(app.msg("log_create_mlot"))
+	app.appendLog(app.msg("log_mlot_created"))
+
 	// Логируем финальный порядок (для отладки) - читаем ModsPath под мьютексом
 	app.cfgMutex.RLock()
 	modsPath := app.cfg.ModsPath
@@ -240,8 +247,16 @@ func (app *App) runAllChecks() {
 	}
 	app.appendLog(app.msg("done"))
 
-	// Тихое обновление данных без изменения выделения и прокрутки
-	savedMod := app.selectedModName
+	// Тихое обновление данных без изменения выделения и прокрутки.
+	// runAllChecks крутится в фоновой горутине, а selectedModName
+	// пишется в UI-потоке — берём снимок через fyne.Do.
+	var savedMod string
+	done := make(chan struct{})
+	fyne.Do(func() {
+		savedMod = app.selectedModName
+		close(done)
+	})
+	<-done
 
 	// Финальное обновление UI в зависимости от настройки
 	// Чтение настройки под мьютексом
@@ -321,6 +336,8 @@ func (app *App) appendLogToFile(msg string) {
 	if app.logFile == nil {
 		return
 	}
+	app.logFileMu.Lock()
+	defer app.logFileMu.Unlock()
 	fmt.Fprintln(app.logFile, time.Now().Format(LogTimeFormat), msg)
 }
 
@@ -424,113 +441,96 @@ func (app *App) fixHubHotkeyMenus() {
 	}
 }
 
-func extractModIDFromKey(key string) int {
-	parts := strings.SplitN(key, ":", 2)
-	if len(parts) == 2 {
-		id, err := strconv.Atoi(parts[0])
-		if err == nil {
-			return id
-		}
-	}
-	return 0
-}
-
-// detectPatcherTypeWithRoot определяет тип патчера по переданному корню игры.
+// detectPatcherTypeWithRoot определяет, есть ли у игры bundle-каталог
+// с bundle_database.data — то есть можем ли мы её патчить.
+//
+// Раньше функция искала файлы сторонних патчеров (toggle_*.cmd,
+// _dt_mod_autopatch.dll, dtkit-patch). Это было хрупко: пользователь
+// мог удалить эти файлы, а патчер (DLL) оставался живым — SMQ терял
+// способность понять, что игра вообще модифицируема.
+//
+// Теперь SMQ сам себе патчер (bundle_patch.go), и наличие
+// bundle_database.data — единственное, что важно.
 func detectPatcherTypeWithRoot(gameRoot string) PatcherType {
 	if gameRoot == "" {
 		return PatcherNone
 	}
-	if _, err := os.Stat(filepath.Join(gameRoot, "toggle_dt_mod_autopatch.cmd")); err == nil {
-		return PatcherAutoPatch
+	dbPath := filepath.Join(gameRoot, "bundle", "bundle_database.data")
+	if _, err := os.Stat(dbPath); err != nil {
+		return PatcherNone
 	}
-	if _, err := os.Stat(filepath.Join(gameRoot, "binaries", "plugins", "_dt_mod_autopatch.dll")); err == nil {
-		return PatcherAutoPatch
-	}
-	if _, err := os.Stat(filepath.Join(gameRoot, "tools", "dtkit-patch")); err == nil {
-		return PatcherLegacy
-	}
-	if _, err := os.Stat(filepath.Join(gameRoot, "toggle_darktide_mods.bat")); err == nil {
-		return PatcherLegacy
-	}
-	return PatcherNone
+	return PatcherAutoPatch
 }
 
-// isModsEnabledAutoPatch теперь принимает gameRoot.
+// isModsEnabledAutoPatch сообщает, включены ли моды.
+//
+// Источник истины зависит от наличия _dt_mod_autopatch.dll:
+//   - DLL установлена  → флаг mods/DISABLE_AUTOPATCHER (его читает DLL);
+//   - DLL не установлена → тег .patch_999 в bundle_database.data.
+//
+// Оба варианта собраны в IsModsEnabled (bundle_patch.go) — единая точка
+// правды, чтобы UI и логика Toggle не разъезжались.
 func isModsEnabledAutoPatch(gameRoot string) bool {
-	if gameRoot == "" {
-		return false
-	}
-	_, err := os.Stat(filepath.Join(gameRoot, "DISABLE_AUTOPATCHER"))
-	return os.IsNotExist(err)
-}
-
-// toggleModsAutoPatch теперь принимает gameRoot.
-func toggleModsAutoPatch(gameRoot string) error {
-	if gameRoot == "" {
-		return fmt.Errorf("game root not found")
-	}
-	if isModsEnabledAutoPatch(gameRoot) {
-		f, _ := os.Create(filepath.Join(gameRoot, "DISABLE_AUTOPATCHER"))
-		if f != nil {
-			f.Close()
-		}
-		bak := filepath.Join(gameRoot, "bundle", "bundle_database.data.bak")
-		original := filepath.Join(gameRoot, "bundle", "bundle_database.data")
-		if _, err := os.Stat(bak); err == nil {
-			os.Rename(bak, original)
-		}
-	} else {
-		os.Remove(filepath.Join(gameRoot, "DISABLE_AUTOPATCHER"))
-	}
-	return nil
-}
-
-func toggleModsLegacy(gameRoot string) error {
-	if gameRoot == "" {
-		return fmt.Errorf("%s", errGameRootNotFound)
-	}
-	bat := filepath.Join(gameRoot, "toggle_darktide_mods.bat")
-	if _, err := os.Stat(bat); err != nil {
-		dtkit := filepath.Join(gameRoot, "tools", "dtkit-patch")
-		if _, err := os.Stat(dtkit); err == nil {
-			cmd := exec.Command(dtkit, "--toggle", "bundle")
-			return cmd.Run()
-		}
-		return fmt.Errorf("no supported patcher found")
-	}
-	cmd := exec.Command(bat)
-	if err := cmd.Run(); err != nil {
-		return err
-	}
-	return nil
+	return IsModsEnabled(gameRoot)
 }
 
 // closeApp безопасно закрывает главное окно и завершает программу.
+// Вызывается и из UI (меню, OnClosed), и из фоновых горутин
+// (initializePaths, setGamePaths) — поэтому Window.Close() обязан идти
+// через fyne.Do.
+//
+// os.Exit(0) — после Close. Окно всё равно уничтожается драйвером
+// асинхронно; для выхода процесса важен только Close(), который
+// гарантирует корректное освобождение порта NXM.
 func (app *App) closeApp() {
 	app.nxm.Stop()
-	app.mainWindow.Close()
+	if app.mainWindow != nil {
+		fyne.Do(func() {
+			app.mainWindow.Close()
+		})
+	}
 	os.Exit(0)
 }
 
 // sanitizeFilename проверяет, что имя файла безопасно для сохранения в папку mods.
 // Возвращает очищенное имя или ошибку.
+var windowsReservedNames = map[string]bool{
+	"CON": true, "PRN": true, "AUX": true, "NUL": true,
+	"COM1": true, "COM2": true, "COM3": true, "COM4": true,
+	"COM5": true, "COM6": true, "COM7": true, "COM8": true, "COM9": true,
+	"LPT1": true, "LPT2": true, "LPT3": true, "LPT4": true,
+	"LPT5": true, "LPT6": true, "LPT7": true, "LPT8": true, "LPT9": true,
+}
+
 func sanitizeFilename(filename string) (string, error) {
 	if filename == "" {
 		return "", fmt.Errorf("empty filename")
 	}
-	// filepath.Base удаляет все разделители и приводит к простому имени
-	base := filepath.Base(filename)
+	normalized := strings.ReplaceAll(filename, "\\", "/")
+	base := filepath.Base(normalized)
+
 	if base == "." || base == ".." {
 		return "", fmt.Errorf("invalid filename: %s", filename)
 	}
-	// Запрещаем абсолютные пути (filepath.Base уже убрал разделители, но проверим на всякий случай)
 	if filepath.IsAbs(base) {
 		return "", fmt.Errorf("absolute path not allowed: %s", filename)
 	}
-	// Проверяем, что в имени нет запрещённых символов (дополнительная защита)
 	if strings.ContainsAny(base, "/\\") {
 		return "", fmt.Errorf("filename contains path separators: %s", filename)
 	}
+
+	// Windows: имена с хвостовой точкой или пробелом молча обрезаются
+	base = strings.TrimRight(base, ". ")
+	if base == "" {
+		return "", fmt.Errorf("filename becomes empty after trimming: %s", filename)
+	}
+
+	// Windows: зарезервированные имена (CON, NUL, COM1…)
+	stem := strings.ToUpper(strings.TrimSuffix(base, filepath.Ext(base)))
+	if windowsReservedNames[stem] {
+		return "", fmt.Errorf("filename uses reserved Windows name: %s", filename)
+	}
+
 	return base, nil
 }
 
@@ -565,27 +565,47 @@ func (app *App) createSettingsBackup() {
 	app.appendLogToFile(fmt.Sprintf("Backup created: %s", backupPath))
 }
 
-// getUserSettingsPath возвращает путь к файлу настроек игры
+// getUserSettingsPath возвращает путь к файлу настроек игры.
+// Порядок поиска:
+//  1. Windows: %APPDATA%\Fatshark\Darktide\user_settings.config
+//     (работает и для Steam, и для Xbox — у обоих один и тот же путь).
+//  2. Linux Proton: <steamapps>/compatdata/1361210/pfx/drive_c/users/steamuser/...
+//     Перебираются все Steam-библиотеки (native, Flatpak, Snap, доп. диски).
+//  3. Linux Wine (legacy): $HOME/.config/Fatshark/Darktide/user_settings.config.
+//  4. Fallback: рядом с mods (если игра установлена рядом с программой).
 func (app *App) getUserSettingsPath() string {
-	// Для Windows Steam
+	// 1. Windows
 	if appData := os.Getenv("APPDATA"); appData != "" {
 		path := filepath.Join(appData, "Fatshark", "Darktide", "user_settings.config")
-		if _, err := os.Stat(path); err == nil {
+		if fileExists(path) {
+			app.appendLogToFile(fmt.Sprintf("user_settings.config found (Windows): %s", path))
 			return path
 		}
 	}
-	// Для Linux (Wine) — возможный путь
+
+	// 2. Linux Proton
+	if p := findProtonSettingsPath(); p != "" {
+		app.appendLogToFile(fmt.Sprintf("user_settings.config found (Proton): %s", p))
+		return p
+	}
+
+	// 3. Linux Wine legacy
 	if home := os.Getenv("HOME"); home != "" {
 		path := filepath.Join(home, ".config", "Fatshark", "Darktide", "user_settings.config")
-		if _, err := os.Stat(path); err == nil {
+		if fileExists(path) {
+			app.appendLogToFile(fmt.Sprintf("user_settings.config found (Wine legacy): %s", path))
 			return path
 		}
 	}
-	// fallback: рядом с mods (если не нашли в стандартных местах)
+
+	// 4. Fallback — путь, которого, скорее всего, нет. Возвращаем
+	// его для консистентности: вызывающий код покажет «файл не найден».
 	app.cfgMutex.RLock()
 	modsPath := app.cfg.ModsPath
 	app.cfgMutex.RUnlock()
-	return filepath.Join(modsPath, "..", "user_settings.config")
+	fallback := filepath.Join(modsPath, "..", "user_settings.config")
+	app.appendLogToFile(fmt.Sprintf("user_settings.config not found, fallback: %s", fallback))
+	return fallback
 }
 
 // getProgramTempDir возвращает путь к временной папке внутри директории программы.
@@ -652,16 +672,6 @@ func (app *App) ensureDir(path string) error {
 		}
 	}
 	return os.MkdirAll(path, 0755)
-}
-
-// isModsEnabledLegacy определяет, включены ли моды для Legacy-патчера (toggle_darktide_mods.bat).
-// Возвращает true, если моды включены (бэкап-файл отсутствует).
-func isModsEnabledLegacy(gameRoot string) bool {
-	if gameRoot == "" {
-		return false
-	}
-	_, err := os.Stat(filepath.Join(gameRoot, "bundle", "bundle_database.data.bak"))
-	return err == nil // true если бэкап есть (моды включены)
 }
 
 // removeModFromCache удаляет запись о моде из кэша версий активного
@@ -752,55 +762,7 @@ func (app *App) createZipArchive(src, dst string) error {
 
 // extractZipArchive распаковывает zip-архив в папку dst с защитой от path traversal.
 func (app *App) extractZipArchive(src, dst string) error {
-	r, err := zip.OpenReader(src)
-	if err != nil {
-		return err
-	}
-	defer r.Close()
-
-	for _, f := range r.File {
-		// 1. Запрещаем абсолютные пути и обход каталогов
-		if filepath.IsAbs(f.Name) || strings.Contains(f.Name, "..") {
-			return fmt.Errorf("invalid path in archive: %s", f.Name)
-		}
-
-		// 2. Строим безопасный путь внутри dst
-		targetPath := filepath.Join(dst, f.Name)
-
-		// 3. Дополнительная проверка: убеждаемся, что путь действительно внутри dst
-		rel, err := filepath.Rel(dst, targetPath)
-		if err != nil || strings.HasPrefix(rel, "..") {
-			return fmt.Errorf("path traversal attempt: %s", f.Name)
-		}
-
-		if f.FileInfo().IsDir() {
-			if err := os.MkdirAll(targetPath, 0755); err != nil {
-				return err
-			}
-			continue
-		}
-
-		if err := os.MkdirAll(filepath.Dir(targetPath), 0755); err != nil {
-			return err
-		}
-
-		rc, err := f.Open()
-		if err != nil {
-			return err
-		}
-		defer rc.Close()
-
-		out, err := os.Create(targetPath)
-		if err != nil {
-			return err
-		}
-		defer out.Close()
-
-		if _, err := io.Copy(out, rc); err != nil {
-			return err
-		}
-	}
-	return nil
+	return app.extractZipWithSTARRY(src, dst)
 }
 
 // isVersionToken проверяет, что строка выглядит как часть версии (содержит точку или букву, не является датой).
@@ -849,17 +811,14 @@ func isDateToken(s string) bool {
 func extractVersionAndModIDFromFilename(filename string) (modID int, version string, ok bool) {
 	name := filepath.Base(filename)
 	ext := filepath.Ext(name)
-	if ext != "" && !strings.ContainsAny(ext, " \t") {
-		// Проверяем, что расширение содержит хотя бы одну букву
-		hasLetter := false
-		for _, ch := range ext[1:] { // пропускаем точку
-			if (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') {
-				hasLetter = true
-				break
-			}
-		}
-		if hasLetter {
-			name = name[:len(name)-len(ext)]
+	if ext != "" {
+		// Расширение файла — только если после точки есть хотя бы одна буква
+		// или если это известное расширение (.zip, .rar, .7z, .mod).
+		extLower := strings.ToLower(ext)
+		knownExt := extLower == ".zip" || extLower == ".rar" ||
+			extLower == ".7z" || extLower == ".mod"
+		if knownExt {
+			name = strings.TrimSuffix(name, ext)
 		}
 	}
 
@@ -963,8 +922,12 @@ func compareVersions(v1, v2 string) int {
 	if v1 == "" || v2 == "" {
 		return 0
 	}
-	parts1 := strings.Split(v1, ".")
-	parts2 := strings.Split(v2, ".")
+	// Отделяем pre-release: "1.0.0-rc1" → "1.0.0" + "rc1"
+	main1, pre1 := splitPrerelease(v1)
+	main2, pre2 := splitPrerelease(v2)
+
+	parts1 := strings.Split(main1, ".")
+	parts2 := strings.Split(main2, ".")
 	maxLen := len(parts1)
 	if len(parts2) > maxLen {
 		maxLen = len(parts2)
@@ -979,7 +942,26 @@ func compareVersions(v1, v2 string) int {
 			return 1
 		}
 	}
-	return 0
+	// Основные версии равны: pre-release < релиза
+	if pre1 == "" && pre2 == "" {
+		return 0
+	}
+	if pre1 == "" {
+		return 1 // v1 — релиз, v2 — pre-release
+	}
+	if pre2 == "" {
+		return -1
+	}
+	return strings.Compare(pre1, pre2)
+}
+
+func splitPrerelease(v string) (main, pre string) {
+	for _, sep := range []string{"-", "+"} {
+		if idx := strings.Index(v, sep); idx != -1 {
+			return v[:idx], v[idx+1:]
+		}
+	}
+	return v, ""
 }
 
 func getPart(parts []string, i int) string {
@@ -987,4 +969,152 @@ func getPart(parts []string, i int) string {
 		return parts[i]
 	}
 	return "0"
+}
+
+// / systemLocale возвращает предпочтительную системную локаль в формате
+// BCP 47 ("ru-RU", "en-US", "zh-Hans-CN"). Пустая строка — если
+// определить не удалось или библиотека вернула ошибку.
+//
+// go-locale — тот же пакет, что использует Fyne внутри updateLocalizer.
+// Отдельный вызов безопасен: он просто читает env/системные API, ничего
+// не кэширует между вызовами.
+func systemLocale() string {
+	locales, err := golocale.GetLocales()
+	if err != nil || len(locales) == 0 {
+		return ""
+	}
+	return locales[0]
+}
+
+// mapSystemLocaleToSupported пытается сопоставить системную локаль
+// (например, "ru-RU", "en_US", "zh-Hans-CN") с одним из кодов,
+// поддерживаемых приложением. Возвращает "" если совпадения нет —
+// вызывающий оставит текущий выбор.
+//
+// Формат входа: BCP 47 ("ru-RU") или POSIX ("ru_RU"). Оба варианта
+// нормализуются к нижнему регистру с дефисом.
+func mapSystemLocaleToSupported(locale string) string {
+	if locale == "" {
+		return ""
+	}
+	s := strings.ToLower(locale)
+	s = strings.ReplaceAll(s, "_", "-")
+
+	parts := strings.Split(s, "-")
+	if len(parts) == 0 {
+		return ""
+	}
+	base := parts[0]
+
+	// Особые случаи: регион/скрипт значим.
+	switch base {
+	case "pt":
+		// У нас только pt-BR. pt-PT тоже мапим на pt-BR — лучше, чем
+		// ничего, раз всё равно перевод близкий.
+		return "pt-BR"
+	case "zh":
+		if len(parts) > 1 {
+			switch parts[1] {
+			case "hans", "cn", "sg":
+				return "zh-hans"
+			case "hant", "tw", "hk", "mo":
+				return "zh-hant"
+			}
+		}
+		return "zh-hans" // fallback
+	}
+
+	// Простые двухбуквенные коды — совпадают с нашими 1:1.
+	switch base {
+	case "en", "ru", "de", "es", "fr", "it", "ja", "ko", "pl":
+		return base
+	}
+	return ""
+}
+
+// waitFor периодически опрашивает cond до true или таймаута.
+// Возвращает true, если cond стал true, false если таймаут.
+func waitFor(cond func() bool, timeout time.Duration) bool {
+	deadline := time.Now().Add(timeout)
+	for time.Now().Before(deadline) {
+		if cond() {
+			return true
+		}
+		time.Sleep(300 * time.Millisecond)
+	}
+	return cond()
+}
+
+// openPathInFileManager открывает папку в системном файловом менеджере.
+//
+// На Linux одного xdg-open недостаточно: он может не найти обработчик
+// (минимальные DE, отсутствие файлового менеджера, поломанный
+// mimeapps.list) и молча упасть — тогда пользователь видит «ничего не
+// происходит» без единой строчки в логе. Перебираем несколько
+// бэкендов и логируем каждый провал, чтобы при разборе проблем было
+// видно, что именно не сработало.
+func (app *App) openPathInFileManager(path string) {
+	if path == "" {
+		return
+	}
+	if _, err := os.Stat(path); err != nil {
+		app.appendLogToFile(fmt.Sprintf(
+			"openPathInFileManager: path not found %q: %v", path, err))
+		return
+	}
+
+	switch runtime.GOOS {
+	case "windows":
+		cmd := exec.Command("explorer", path)
+		if err := cmd.Start(); err != nil {
+			app.appendLogToFile(fmt.Sprintf(
+				"explorer failed for %q: %v", path, err))
+		}
+		return
+
+	case "linux":
+		candidates := [][]string{
+			{"xdg-open", path},
+			{"gio", "open", path},
+			{"kde-open5", path},
+			{"kde-open", path},
+			{"exo-open", path},
+			{"nautilus", path},
+			{"dolphin", path},
+			{"thunar", path},
+			{"pcmanfm", path},
+		}
+		for _, c := range candidates {
+			bin, err := exec.LookPath(c[0])
+			if err != nil {
+				continue // утилита не установлена, пробуем следующую
+			}
+			cmd := exec.Command(bin, c[1:]...)
+			if err := cmd.Start(); err != nil {
+				app.appendLogToFile(fmt.Sprintf(
+					"%s failed for %q: %v", c[0], path, err))
+				continue
+			}
+			// Start() вернул nil — exec прошёл. Не ждём Wait:
+			// xdg-open / gio отдают процесс менеджеру и завершаются сами.
+			app.appendLogToFile(fmt.Sprintf("Opened %q via %s", path, c[0]))
+
+			// Фоновый Wait, чтобы собрать зомби и увидеть ненулевой exit.
+			go func(name string, cmd *exec.Cmd) {
+				if err := cmd.Wait(); err != nil {
+					app.appendLogToFile(fmt.Sprintf(
+						"%s exited for %q: %v", name, path, err))
+				}
+			}(c[0], cmd)
+			return
+		}
+		app.appendLog(fmt.Sprintf(
+			"Could not open %q: no file manager backend found", path))
+
+	default:
+		// darwin и прочее — не целевая платформа, но пусть будет.
+		if err := exec.Command("open", path).Start(); err != nil {
+			app.appendLogToFile(fmt.Sprintf("open failed for %q: %v", path, err))
+		}
+	}
 }

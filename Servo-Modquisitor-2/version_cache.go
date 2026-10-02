@@ -317,6 +317,17 @@ func parseVersionCacheJSON(data []byte) (map[string]ModVersionInfo, error) {
 	return out, nil
 }
 
+func extractModIDFromKey(key string) int {
+	parts := strings.SplitN(key, ":", 2)
+	if len(parts) == 2 {
+		id, err := strconv.Atoi(parts[0])
+		if err == nil {
+			return id
+		}
+	}
+	return 0
+}
+
 // sortedCacheKeys сортирует ключи кэша по числовому modID, затем по строке —
 // чтобы вывод файла был стабильным и диффы при правках были минимальные.
 func sortedCacheKeys(items map[string]ModVersionInfo) []string {

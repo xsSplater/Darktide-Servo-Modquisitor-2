@@ -14,11 +14,13 @@ import (
 // app.selectedModName, app.orderDirty и т.д. Никакие call-sites менять
 // не требуется.
 type UIState struct {
-	selectedModIndex        atomic.Int32
-	selectedModName         string
-	showSelectColumn        bool
-	orderDirty              bool
-	blinkSaveOrderActive    bool
+	selectedModIndex atomic.Int32
+	selectedModName  string
+	showSelectColumn bool
+	// orderDirty и blinkSaveOrderActive читаются из горутины мигания
+	// кнопки Save (startBlink), поэтому держим их atomic.Bool.
+	orderDirty              atomic.Bool
+	blinkSaveOrderActive    atomic.Bool
 	suppressSelectionEvents bool
 	pathsInitialized        bool
 	amlDetected             atomic.Bool
