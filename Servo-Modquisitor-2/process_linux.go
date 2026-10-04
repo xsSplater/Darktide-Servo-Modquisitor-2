@@ -9,24 +9,51 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+
+	"golang.org/x/sys/unix"
 )
 
+// lockFileHandle держим открытым до выхода процесса: ядро снимает
+// flock автоматически при завершении (в т.ч. по крашу).
+var lockFileHandle *os.File
+
+// isAlreadyRunning — single-instance через flock(LOCK_EX|LOCK_NB).
+//
+// Файл НЕ удаляем после открытия: имя /tmp/servo-modquisitor.lock —
+// просто якорь. Состояние «занято» живёт в ядре (flock), а не в ФС.
+// При завершении процесса ядро снимает лок само — файл остаётся, но
+// следующий запуск спокойно получит на нём эксклюзивный flock.
+//
+// Раньше здесь был O_CREATE|O_EXCL + os.Remove — модель «существование
+// файла = занято». Она ломалась: удаление файла освобождало имя,
+// следующий процесс создавал его заново и работал параллельно.
+// Плюс краш оставлял файл навсегда → программа не запускалась.
 func isAlreadyRunning() bool {
 	lockFile := "/tmp/servo-modquisitor.lock"
-	f, err := os.OpenFile(lockFile, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0644)
+
+	f, err := os.OpenFile(lockFile, os.O_CREATE|os.O_RDWR, 0644)
 	if err != nil {
-		// Файл уже существует - другой процесс держит его (или старый висит)
+		// Не смогли открыть даже для чтения — что-то не так,
+		// безопаснее считать, что уже запущено.
 		return true
 	}
-	defer f.Close()
 
-	// Удаляем файл из файловой системы, но оставляем открытый дескриптор.
-	// При завершении процесса дескриптор закроется, и файл исчезнет окончательно.
-	os.Remove(lockFile)
+	// LOCK_EX | LOCK_NB: эксклюзивный, не блокирующий.
+	// EWOULDBLOCK → лок уже держит другой процесс.
+	err = unix.Flock(int(f.Fd()), unix.LOCK_EX|unix.LOCK_NB)
+	if err != nil {
+		f.Close()
+		return true
+	}
 
-	// Записываем PID (необязательно, но полезно для отладки)
+	// Лок наш. Файл НЕ удаляем — иначе следующий процесс
+	// создаст новый по тому же пути и получит лок без конфликта.
+	// Пишем PID для отладки.
+	_ = f.Truncate(0)
+	_, _ = f.Seek(0, 0)
 	fmt.Fprintf(f, "%d", os.Getpid())
 
+	lockFileHandle = f
 	return false
 }
 

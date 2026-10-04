@@ -29,10 +29,17 @@ type PROCESSENTRY32 struct {
 }
 
 func isAlreadyRunning() bool {
-	mutexName, _ := syscall.UTF16PtrFromString("Global\\Servo-Modquisitor-Mutex")
+	// Без "Global\\" — мьютекс в namespace текущей сессии.
+	// Это то, что нужно для single-instance: у каждой сессии
+	// свой экземпляр программы.
+	mutexName, _ := syscall.UTF16PtrFromString("Servo-Modquisitor-Mutex")
 	ret, _, err := procCreateMutexW.Call(0, 0, uintptr(unsafe.Pointer(mutexName)))
 	if ret == 0 {
-		return false
+		// Не смогли создать мьютекс. Раньше возвращали false —
+		// запускали второй инстанс. Безопаснее считать, что уже
+		// запущено: пользователь скорее перезапустит, чем
+		// получит дубль.
+		return true
 	}
 	if errno, ok := err.(syscall.Errno); ok && errno == ERROR_ALREADY_EXISTS {
 		return true

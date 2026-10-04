@@ -1420,3 +1420,55 @@ func (app *App) showRestoreBackupDialog() {
 func (app *App) openBackupsFolder() {
 	app.openPathInFileManager(app.backupsDir())
 }
+
+// showEditUserNoteDialog открывает модальное окно редактирования
+// пользовательской заметки к моду.
+func (app *App) showEditUserNoteDialog(modName, displayName string) {
+	current := app.userNotes.Get(modName)
+
+	entry := widget.NewMultiLineEntry()
+	entry.SetText(current)
+	entry.SetPlaceHolder(app.msg("user_note_placeholder"))
+	entry.Wrapping = fyne.TextWrapWord
+
+	var popUp *widget.PopUp
+
+	saveBtn := widget.NewButton(app.msg("btn_save"), func() {
+		app.userNotes.Set(modName, entry.Text)
+		if err := app.userNotes.Save(); err != nil {
+			app.appendLogToFile(fmt.Sprintf("Failed to save user_notes.json: %v", err))
+			app.showInfoDialog(app.msg("error_title"), err.Error())
+		} else {
+			app.appendLogToFile(fmt.Sprintf("User note saved for %s", modName))
+		}
+		popUp.Hide()
+		app.refreshModList()
+		app.updateDescriptionForMod(modName)
+	})
+
+	clearBtn := widget.NewButton(app.msg("btn_clear"), func() {
+		entry.SetText("")
+	})
+
+	cancelBtn := widget.NewButton(app.msg("btn_cancel"), func() {
+		popUp.Hide()
+	})
+
+	title := fmt.Sprintf(app.msg("user_note_title"), displayName)
+	if displayName == "" {
+		title = fmt.Sprintf(app.msg("user_note_title"), modName)
+	}
+
+	content := container.NewVBox(
+		widget.NewLabelWithStyle(title, fyne.TextAlignCenter, fyne.TextStyle{Bold: true}),
+		widget.NewSeparator(),
+		entry,
+		widget.NewSeparator(),
+		container.NewCenter(container.NewHBox(saveBtn, clearBtn, cancelBtn)),
+	)
+
+	popUp = widget.NewModalPopUp(content, app.mainWindow.Canvas())
+	popUp.Resize(fyne.NewSize(600, 400))
+	popUp.Show()
+	app.mainWindow.Canvas().Focus(entry)
+}

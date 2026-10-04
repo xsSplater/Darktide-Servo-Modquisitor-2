@@ -517,6 +517,50 @@ func (app *App) buildMainMenu() *fyne.MainMenu {
 		func() { app.changeGamePath() },
 	)
 
+	// Ярлык быстрого запуска игры на рабочем столе.
+	createShortcutItem := fyne.NewMenuItemWithIcon(
+		app.msg("menu_create_shortcut"),
+		loadMenuIcon("play_fast.png"),
+		func() {
+			go func() {
+				path, err := app.createDesktopShortcut()
+				if err != nil {
+					fyne.Do(func() {
+						app.appendLog(fmt.Sprintf(app.msg("shortcut_create_failed"), err.Error()))
+						app.showInfoDialog(
+							app.msg("error_title"),
+							fmt.Sprintf(app.msg("shortcut_create_failed"), err.Error()),
+						)
+					})
+					return
+				}
+				fyne.Do(func() {
+					app.appendLog(fmt.Sprintf(app.msg("shortcut_created"), path))
+					app.showInfoDialog(
+						app.msg("shortcut_created_title"),
+						fmt.Sprintf(app.msg("shortcut_created_message"), path),
+					)
+				})
+			}()
+		},
+	)
+
+	// Auto-sort before launch — при запуске игры из UI сначала
+	// выполняется полная проверка как по кнопке автосортировки.
+	app.cfgMutex.RLock()
+	autoSortLaunch := app.cfg.AutoSortBeforeLaunch
+	app.cfgMutex.RUnlock()
+	autoSortLaunchItem := fyne.NewMenuItem(app.msg("setting_auto_sort_before_launch"), func() {
+		app.cfgMutex.Lock()
+		app.cfg.AutoSortBeforeLaunch = !app.cfg.AutoSortBeforeLaunch
+		app.cfgMutex.Unlock()
+		app.saveConfigSafe()
+		app.mainWindow.SetMainMenu(app.buildMainMenu())
+	})
+	autoSortLaunchItem.Checked = autoSortLaunch
+	autoSortLaunchItem.CheckedIcon = checkedIcon
+	autoSortLaunchItem.UncheckedIcon = uncheckedIcon
+
 	// SETTINGS MENU
 	settingsMenu := fyne.NewMenuWithIcon(app.msg("menu_settings"), loadMenuIcon("cog.png"),
 		langMenu,
@@ -530,8 +574,10 @@ func (app *App) buildMainMenu() *fyne.MainMenu {
 		fyne.NewMenuItemSeparator(),
 		autoFocusItem,
 		autoConfirmItem,
+		autoSortLaunchItem,
 		fyne.NewMenuItemSeparator(),
 		changePathItem,
+		createShortcutItem,
 		fyne.NewMenuItemSeparator(),
 		quitItem,
 	)

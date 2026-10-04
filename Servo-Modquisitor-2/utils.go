@@ -126,37 +126,50 @@ func (app *App) makeRedCRTGradient(w, h int) *image.NRGBA {
 	return img
 }
 
+// runAllChecks — обёртка для кнопки «Автосортировка» и Ctrl+T.
+// Открывает mod_load_order.txt (если включена настройка
+// ShowModListAfterSort) после завершения проверок.
 func (app *App) runAllChecks() {
+	app.runAllChecksInternal(true)
+}
+
+// runAllChecksInternal — сердце автосортировки.
+//
+// openFileAtEnd == false используется при запуске игры с включённой
+// опцией «Автосортировка перед запуском»: пользователь хочет играть,
+// а не читать файл, поэтому редактор по умолчанию не открываем даже
+// если ShowModListAfterSort включён.
+//
+// Возвращает true, если все проверки прошли и можно продолжать
+// (в частности, запустить игру). false — если пользователь отменил
+// один из шагов (например, открыл страницу с отсутствующим
+// required-модом и пошёл его качать).
+func (app *App) runAllChecksInternal(openFileAtEnd bool) bool {
 	app.appendLogToFile("// " + app.msg("log_start"))
 	if app.mainWindow == nil || app.mainWindow.Canvas() == nil {
 		app.appendLogToFile("runAllChecks: mainWindow not ready, aborting")
-		return
+		return false
 	}
 	checks.CheckInstallation(app.mainWindow)
 	checks.EnsureModLoadOrder(app.mainWindow)
 
 	if !checks.CheckObsoleteMods(app.mainWindow) {
-		return
+		return false
 	}
-
 	if !checks.CheckMalformed(app.mainWindow) {
-		return
+		return false
 	}
-
 	if !checks.CheckEmptyFolders(app.mainWindow) {
-		return
+		return false
 	}
-
 	if !checks.CheckIncompatible(app.mainWindow) {
-		return
+		return false
 	}
-
 	if !checks.CheckDependencies(app.mainWindow) {
-		return
+		return false
 	}
-
 	if !checks.CheckBrokenMods(app.mainWindow) {
-		return
+		return false
 	}
 
 	// 1. Перечитываем самый свежий сохранённый файл
@@ -165,7 +178,6 @@ func (app *App) runAllChecks() {
 	})
 
 	// 2. Собираем активные моды для сортировки
-	// Защищённое чтение allMods и cfg.Language
 	app.modsMutex.RLock()
 	activeNames := []string{}
 	notActive := make(map[string]bool)
@@ -178,10 +190,11 @@ func (app *App) runAllChecks() {
 	}
 	app.modsMutex.RUnlock()
 
-	// Если активных модов нет - просто завершаем
+	// Если активных модов нет — сортировать нечего, но игру
+	// запускать можно: пользователь так настроил.
 	if len(activeNames) == 0 {
 		app.appendLog(app.msg("done"))
-		return
+		return true
 	}
 
 	// Копируем язык под мьютексом
@@ -189,13 +202,8 @@ func (app *App) runAllChecks() {
 	lang := app.cfg.Language
 	app.cfgMutex.RUnlock()
 
-	// Весь блок записи файла — под loadOrderMutex. Иначе Ctrl+S
-	// во время runAllChecks перезапишет файл in-memory порядком,
-	// который устарел уже через миллисекунду, и syncLoadOrderToGame
-	// утащит в игру этот устаревший вариант.
 	app.loadOrderMutex.Lock()
 
-	// Создаём порядок в папке профиля (путь уже установлен через updateSorterOutputPath)
 	sorter.CreateLoadOrderFromActive(activeNames, lang)
 
 	// Дописываем неактивные моды в файл профиля
@@ -221,7 +229,6 @@ func (app *App) runAllChecks() {
 		app.appendLogToFile(fmt.Sprintf("Failed to open profile load order for append: %v", err))
 	}
 
-	// Копируем итоговый файл из профиля в игровую папку (чтобы игра его видела)
 	app.syncLoadOrderToGameLocked()
 
 	app.loadOrderMutex.Unlock()
@@ -229,7 +236,7 @@ func (app *App) runAllChecks() {
 	app.appendLog(app.msg("log_create_mlot"))
 	app.appendLog(app.msg("log_mlot_created"))
 
-	// Логируем финальный порядок (для отладки) - читаем ModsPath под мьютексом
+	// Логируем финальный порядок для отладки.
 	app.cfgMutex.RLock()
 	modsPath := app.cfg.ModsPath
 	app.cfgMutex.RUnlock()
@@ -238,8 +245,7 @@ func (app *App) runAllChecks() {
 		app.appendLogToFile("=== Final load order after sorting ===")
 		scanner := bufio.NewScanner(strings.NewReader(string(data)))
 		for scanner.Scan() {
-			line := scanner.Text()
-			app.appendLogToFile(line)
+			app.appendLogToFile(scanner.Text())
 		}
 		app.appendLogToFile("=== End of load order ===")
 	} else {
@@ -248,8 +254,6 @@ func (app *App) runAllChecks() {
 	app.appendLog(app.msg("done"))
 
 	// Тихое обновление данных без изменения выделения и прокрутки.
-	// runAllChecks крутится в фоновой горутине, а selectedModName
-	// пишется в UI-потоке — берём снимок через fyne.Do.
 	var savedMod string
 	done := make(chan struct{})
 	fyne.Do(func() {
@@ -258,8 +262,6 @@ func (app *App) runAllChecks() {
 	})
 	<-done
 
-	// Финальное обновление UI в зависимости от настройки
-	// Чтение настройки под мьютексом
 	app.cfgMutex.RLock()
 	showAfterSort := app.cfg.ShowModListAfterSort
 	app.cfgMutex.RUnlock()
@@ -268,8 +270,9 @@ func (app *App) runAllChecks() {
 		app.refreshModList()
 		app.forceRefreshTable()
 
-		if showAfterSort {
-			// Открыть файл (как было)
+		// Открываем файл только если функция вызвана как «кнопка
+		// автосортировки», а не как предполётная проверка.
+		if openFileAtEnd && showAfterSort {
 			app.cfgMutex.RLock()
 			absPath, _ := filepath.Abs(filepath.Join(app.cfg.ModsPath, FileNameLoadOrder))
 			app.cfgMutex.RUnlock()
@@ -282,9 +285,10 @@ func (app *App) runAllChecks() {
 			}
 		}
 
-		// Восстанавливаем выделение в любом случае
 		app.restoreSelectedMod(savedMod)
 	})
+
+	return true
 }
 
 func (app *App) forceRefreshTable() {

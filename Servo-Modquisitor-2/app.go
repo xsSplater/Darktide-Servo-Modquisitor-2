@@ -65,6 +65,16 @@ type Config struct {
 	LastProfileSync       string `json:"last_profile_sync,omitempty"`
 	ProfileSyncAutoChoice string `json:"profile_sync_auto_choice,omitempty"` // "" | "save" | "load"
 	BackupsLimit          int    `json:"backups_limit,omitempty"`
+
+	// AutoSortBeforeLaunch — при запуске игры из UI сначала выполняются
+	// проверки и сортировка (как по кнопке «Автосортировка»), затем
+	// запускается игра. Диалоги показываются: пользователь может
+	// отменить шаг (например, открыть страницу required-мода —
+	// тогда игра не запустится).
+	//
+	// На ярлык «Quick Launch» (--play) не влияет: там тихий режим
+	// без проверок.
+	AutoSortBeforeLaunch bool `json:"auto_sort_before_launch,omitempty"`
 }
 
 type ModVersionInfo struct {
@@ -137,6 +147,8 @@ type App struct {
 	versionCache *VersionCache
 	changelog    *ChangelogCache
 
+	userNotes *userNotesStore
+
 	// ─── UI-виджеты ────────────────────────────────────────────────
 	// Всё ниже — только для главного потока Fyne.
 	modTable                 *widget.Table
@@ -191,6 +203,7 @@ type App struct {
 	searchClearBtn      *CustomButton
 	btnAMLConfig        *CustomButton
 	profileSyncBtn      *CustomButton
+	btnEditNote         *CustomButton
 
 	selectColumnBgRes fyne.Resource
 	toggleOffIcon     fyne.Resource
@@ -208,15 +221,16 @@ type App struct {
 	descLastUpdated    *widget.Label
 	descOriginalUpload *widget.Label
 	descConflict       *widget.Label
+	descUserNote       *widget.Label
 	profileLabel       *widget.Label
 
-	moveToEntry   *widget.Entry
-	searchEntry   *widget.Entry
-	descURL       *widget.Hyperlink
-	githubLink    *widget.Hyperlink
-	logWindow     *widget.RichText
-	filterSelect  *widget.Select
-	profileSelect *widget.Select
+	moveToEntry    *widget.Entry
+	searchEntry    *widget.Entry
+	descURL        *widget.Hyperlink
+	sourceCodeLink *widget.Hyperlink
+	logWindow      *widget.RichText
+	filterSelect   *widget.Select
+	profileSelect  *widget.Select
 
 	// ─── OAuth ─────────────────────────────────────────────────────
 	oauth *OAuthState
@@ -233,6 +247,11 @@ type App struct {
 
 	// ─── Сеть ──────────────────────────────────────────────────────
 	nxm *NXMListener
+
+	// pendingNXMURL — URL, пришедший при старте, когда программа
+	// ещё не была запущена. Обрабатывается после старта NXMListener,
+	// когда уже есть gameRoot/ModsPath и загружены переводы.
+	pendingNXMURL string
 
 	// ─── Тема ──────────────────────────────────────────────────────
 	// lastAppliedTheme хранит тему, для которой refreshThemeColors уже
@@ -332,6 +351,8 @@ func NewApp(cfg *Config, myApp fyne.App) *App {
 		root = getGameRootLegacy()
 	}
 	app.setGameState(root, detectPatcherTypeWithRoot(root))
+
+	app.userNotes = newUserNotesStore()
 
 	return app
 }
@@ -960,6 +981,14 @@ func (app *App) loadDataAfterInit() {
 			return 0
 		},
 	)
+
+	if err := app.userNotes.Load(); err != nil {
+		app.appendLogToFile(fmt.Sprintf("Failed to load user_notes.json: %v", err))
+	}
+
+	checks.SetUserNotesGetter(func(folder string) string {
+		return app.userNotes.Get(folder)
+	})
 
 	sorter.SetFolderExistsFunc(checks.FolderExists)
 	sorter.SetListModFoldersFunc(checks.ListModFolders)
@@ -1783,9 +1812,11 @@ func (app *App) updateSorterOutputPath() {
 // профиля в игровую папку. Вызывающий ОБЯЗАН держать app.loadOrderMutex.
 func (app *App) syncLoadOrderToGameLocked() {
 	app.cfgMutex.RLock()
-	src := filepath.Join(app.activeProfilePath(), "mods", FileNameLoadOrder)
-	dst := filepath.Join(app.cfg.ModsPath, FileNameLoadOrder)
+	profile := app.cfg.ActiveProfile
+	mods := app.cfg.ModsPath
 	app.cfgMutex.RUnlock()
+	src := filepath.Join(app.profilePath(profile), "mods", FileNameLoadOrder)
+	dst := filepath.Join(mods, FileNameLoadOrder)
 	if err := copyFile(src, dst); err != nil {
 		app.appendLogToFile(fmt.Sprintf("Failed to copy load order to game folder: %v", err))
 	} else {

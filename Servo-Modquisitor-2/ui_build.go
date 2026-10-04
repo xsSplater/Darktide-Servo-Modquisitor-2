@@ -453,6 +453,14 @@ func (app *App) pickAndInstallArchive() {
 }
 
 // launchGameFromUI - логика кнопок запуска игры (обычной и без лаунчера).
+//
+// Если включена настройка AutoSortBeforeLaunch — сначала выполняем
+// полную проверку (как по кнопке «Автосортировка»): obsolete, malformed,
+// empty, incompatible, dependencies, broken, плюс пересортировка
+// mod_load_order.txt. Диалоги показываются; пользователь может
+// отменить шаг (например, открыть страницу required-мода) — тогда
+// игра не запустится. Файл mod_load_order.txt в конце не открывается,
+// чтобы не мешать старту.
 func (app *App) launchGameFromUI(skipLauncher bool) {
 	gameRoot, _ := app.getGameState()
 	go func(root string) {
@@ -461,6 +469,17 @@ func (app *App) launchGameFromUI(skipLauncher bool) {
 			return
 		}
 		ver := detectGameVersion(root)
+
+		// Предполётная проверка + сортировка.
+		app.cfgMutex.RLock()
+		autoSort := app.cfg.AutoSortBeforeLaunch
+		app.cfgMutex.RUnlock()
+		if autoSort {
+			if !app.runAllChecksInternal(false) {
+				app.appendLogToFile("launch: aborted by user during pre-launch checks")
+				return
+			}
+		}
 
 		// Steam-версии нужен запущенный Steam в обоих режимах:
 		//  - через steam://rungameid, чтобы клиент подхватил игру;
@@ -1490,7 +1509,7 @@ func (app *App) buildBottomPanel() fyne.CanvasObject {
 // ─────────────────────────────────────────────────────────────────
 
 // buildDescriptionCard собирает правую верхнюю карточку с описанием мода.
-// Устанавливает поля descTitle, descAuthor, descBody, descURL, githubLink,
+// Устанавливает поля descTitle, descAuthor, descBody, descURL, sourceCodeLink,
 // descConflict, descCardBgRect, descExtraContainer, descCardContent,
 // descCardScroll.
 //
@@ -1508,21 +1527,46 @@ func (app *App) buildDescriptionCard() fyne.CanvasObject {
 	app.descBody = widget.NewLabel(app.msg("desc_placeholder"))
 	app.descBody.Wrapping = fyne.TextWrapWord
 	app.descURL = widget.NewHyperlink("", nil)
-	app.githubLink = widget.NewHyperlink("", nil)
-	app.githubLink.Alignment = fyne.TextAlignLeading
+	app.sourceCodeLink = widget.NewHyperlink("", nil)
+	app.sourceCodeLink.Alignment = fyne.TextAlignLeading
 
 	app.descLocalVersion = widget.NewLabel("")
+
 	app.descLatestVersion = widget.NewLabel("")
+
 	app.descLastUpdated = widget.NewLabel("")
+
 	app.descOriginalUpload = widget.NewLabel("")
+
 	app.descConflict = widget.NewLabel("")
 	app.descConflict.Wrapping = fyne.TextWrapWord
 	app.descConflict.Hide()
+
+	app.descUserNote = widget.NewLabel("")
+	app.descUserNote.Wrapping = fyne.TextWrapWord
+	app.descUserNote.Hide()
 
 	app.descCardBgRect = canvas.NewRectangle(th.Color(themes.ColorDescCardBg, variant))
 	app.descCardBgRect.CornerRadius = 12
 	app.descCardBgRect.StrokeWidth = 0.5
 	app.descCardBgRect.StrokeColor = th.Color(themes.ColorDescCardStroke, variant)
+
+	editNoteRes := app.loadIconResource("edit_note", "assets/buttons/edit_sv.png")
+	app.btnEditNote = NewIconButton(editNoteRes, func() {
+		if app.selectedModName == "" {
+			return
+		}
+		mod, ok := app.findModByName(app.selectedModName)
+		if !ok {
+			return
+		}
+		display := mod.DisplayName
+		if display == "" {
+			display = mod.Name
+		}
+		app.showEditUserNoteDialog(mod.Name, display)
+	})
+	app.btnEditNote.SetToolTip(app.msg("btn_edit_note_tooltip"))
 
 	app.descExtraContainer = container.NewVBox()
 
@@ -1534,6 +1578,7 @@ func (app *App) buildDescriptionCard() fyne.CanvasObject {
 		app.descTitle,
 		layout.NewSpacer(),
 		widget.NewSeparator(),
+		app.btnEditNote,
 		app.btnUpdateMod,
 		app.openFolderBtn,
 		app.btnRemove,
@@ -1549,11 +1594,12 @@ func (app *App) buildDescriptionCard() fyne.CanvasObject {
 			titleSep,
 			app.descAuthor,
 			widget.NewSeparator(),
-			container.NewHBox(widget.NewLabel(""), app.descURL, widget.NewLabel("  "), app.githubLink),
+			container.NewHBox(widget.NewLabel(""), app.descURL, widget.NewLabel("  "), app.sourceCodeLink),
 			widget.NewSeparator(),
 			container.NewHBox(widget.NewLabel(""), app.descLocalVersion),
 			widget.NewSeparator(),
 			app.descConflict,
+			app.descUserNote,
 		),
 	)
 
@@ -1701,7 +1747,7 @@ func (app *App) refreshThemeColors() {
 		app.moveToTopBtn, app.moveToBottomBtn, app.btnAMLConfig,
 		app.selectAllBtn, app.deselectAllBtn, app.enableSelectedBtn,
 		app.disableSelectedBtn, app.enableAllBtn, app.disableAllBtn, app.btnEditVersion,
-		app.manageBtn, app.searchClearBtn, app.btnRemoveAll, app.btnRemoveSelected,
+		app.manageBtn, app.searchClearBtn, app.btnRemoveAll, app.btnRemoveSelected, app.btnEditNote,
 	} {
 		if btn != nil {
 			btn.Refresh()
@@ -1784,12 +1830,25 @@ func (app *App) updateDescriptionForMod(name string) {
 		if app.descCardScroll != nil {
 			app.descCardScroll.Refresh()
 		}
+		if app.descUserNote != nil {
+			app.descUserNote.Hide()
+		}
 		return
 	}
 
 	mod, ok := app.findModByName(name)
 	if !ok {
 		return
+	}
+
+	if app.descUserNote != nil {
+		un := app.userNotes.Get(mod.Name)
+		if un != "" {
+			app.descUserNote.SetText("📝 " + un)
+			app.descUserNote.Show()
+		} else {
+			app.descUserNote.Hide()
+		}
 	}
 
 	app.cfgMutex.RLock()
@@ -1936,18 +1995,18 @@ func (app *App) updateDescriptionForMod(name string) {
 		app.descURL.SetText("")
 	}
 
-	if app.githubLink != nil {
-		if mod.GitHubURL != "" {
-			if u, err := url.Parse(mod.GitHubURL); err == nil {
-				app.githubLink.SetURL(u)
-				app.githubLink.SetText(app.msg("source_code_url"))
+	if app.sourceCodeLink != nil {
+		if mod.SourceCodeURL != "" {
+			if u, err := url.Parse(mod.SourceCodeURL); err == nil {
+				app.sourceCodeLink.SetURL(u)
+				app.sourceCodeLink.SetText(app.msg("source_code_url"))
 			} else {
-				app.githubLink.SetURL(nil)
-				app.githubLink.SetText("")
+				app.sourceCodeLink.SetURL(nil)
+				app.sourceCodeLink.SetText("")
 			}
 		} else {
-			app.githubLink.SetURL(nil)
-			app.githubLink.SetText("")
+			app.sourceCodeLink.SetURL(nil)
+			app.sourceCodeLink.SetText("")
 		}
 	}
 

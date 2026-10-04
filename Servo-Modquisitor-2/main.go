@@ -9,6 +9,7 @@ import (
 	"net"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"fyne.io/fyne/v2"
@@ -46,20 +47,50 @@ func main() {
 		log.Fatalf("failed to load assets/patch.bin: %v (len=%d)", err, len(bundlePatchBin))
 	}
 
-	// Проверяем, не передали ли нам nxm-ссылку при запуске
-	if len(os.Args) > 1 && os.Args[1] == NXMCommLine && len(os.Args) > 2 {
-		nxmURL := os.Args[2]
-		// Пытаемся подключиться к уже запущенному экземпляру
-		conn, err := net.Dial(NXMProtocol, NXMAddress)
-		if err == nil {
+	// Ищем nxm-ссылку в аргументах. Поддерживаем оба формата:
+	//   servo-modquisitor-2 --nxm "nxm://..."
+	//   servo-modquisitor-2 "nxm://..."       ← .desktop с %u на Linux
+	args := os.Args[1:]
+	var nxmURL string
+	for i := 0; i < len(args); i++ {
+		if args[i] == NXMCommLine && i+1 < len(args) {
+			nxmURL = args[i+1]
+			break
+		}
+	}
+	if nxmURL == "" {
+		for _, a := range args {
+			if strings.HasPrefix(a, "nxm://") {
+				nxmURL = a
+				break
+			}
+		}
+	}
+
+	if nxmURL != "" {
+		// Оптимизация: если запущен живой инстанс — перекинуть URL и выйти.
+		// Это НЕ замена single-instance check: isAlreadyRunning() ниже
+		// сработает, даже если TCP не прошёл.
+		if conn, err := net.Dial(NXMProtocol, NXMAddress); err == nil {
 			fmt.Fprintln(conn, nxmURL)
 			conn.Close()
 			os.Exit(0)
 		}
-		// Если не удалось - это первый экземпляр, продолжаем обычный запуск
+		// Не выходим: TCP — best-effort. Проверку single-instance
+		// пройдём общей веткой ниже.
 	}
 
-	// Проверяем, не запущен ли уже другой экземпляр (использует системный диалог, не требует Fyne)
+	// Ярлык быстрого запуска: --play. Обрабатываем ДО проверки
+	// single-instance, чтобы не мешать пользователю, когда менеджер
+	// уже открыт — просто тихо запускаем игру и выходим.
+	if len(os.Args) > 1 && os.Args[1] == QuickLaunchCommLine {
+		runQuickLaunch()
+		return
+	}
+
+	// Single-instance — единственный источник истины, независимо от nxmURL.
+	// TCP выше — только best-effort оптимизация «перекинуть URL живому
+	// инстансу и выйти, не открывая второе окно».
 	if isAlreadyRunning() {
 		showAlreadyRunningDialog()
 		os.Exit(0)
@@ -69,6 +100,7 @@ func main() {
 	myApp := app.NewWithID(AppID)
 	cfg := loadConfig()
 	application := NewApp(cfg, myApp)
+	application.pendingNXMURL = nxmURL
 
 	// Очищаем временные папки от предыдущих запусков
 	cleanProgramTempDirs()
@@ -232,6 +264,18 @@ func main() {
 
 		// 7. Запускаем слушатель
 		application.nxm.Start()
+
+		// 7.5. Если URL пришёл при старте — обрабатываем после того,
+		// как listener готов и пути загружены. Проверяем, что окно
+		// действительно готово, иначе handleNXMLink может дёрнуть
+		// диалоги раньше, чем UI построен.
+		if application.pendingNXMURL != "" {
+			url := application.pendingNXMURL
+			application.pendingNXMURL = ""
+			fyne.Do(func() {
+				application.handleNXMLink(url)
+			})
+		}
 	}()
 
 	// Запускаем главный цикл событий

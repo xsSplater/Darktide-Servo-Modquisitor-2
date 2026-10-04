@@ -65,6 +65,17 @@ var (
 	globalDataDir  string
 )
 
+// getUserNote — устанавливается из App. Возвращает пользовательскую
+// заметку по имени папки мода, либо "".
+var getUserNote func(string) string
+
+func SetUserNotesGetter(fn func(string) string) {
+	getUserNote = fn
+}
+
+// userNotePrefix отделяет пользовательскую заметку от базы.
+const userNotePrefix = "📝 "
+
 // trashFunc — устанавливается из main при старте. Если nil,
 // RemoveMod откатывается на os.RemoveAll.
 var trashFunc func(string) error
@@ -244,7 +255,7 @@ type ModInfo struct {
 	Name              string
 	Note              string
 	URL               string
-	GitHubURL         string
+	SourceCodeURL     string
 	Category          string
 	NexusVersion      string
 	NexusSummary      string
@@ -263,7 +274,6 @@ type ModDBEntry struct {
 	Author           string            `json:"author"`
 	Category         string            `json:"category"`
 	URL              string            `json:"url"`
-	GitHubURL        string            `json:"github_url"`
 	SourceCodeURL    string            `json:"source_code_url"`
 	Note             map[string]string `json:"note"`
 }
@@ -415,13 +425,18 @@ func GetModsInfo(lang string, forceEnglish bool) []ModInfo {
 		if db, ok := modDBMap[strings.ToLower(name)]; ok && db.Folder != "" {
 			mod.Author = db.Author
 			mod.URL = db.URL
-			mod.GitHubURL = db.GitHubURL
+			mod.SourceCodeURL = db.SourceCodeURL
 			mod.Description = PickLocalized(db.Description, lang)
 			// Не перезаписываем Note: если выше уже проставлена
 			// структурная причина (disabled-префикс, копия), она
 			// должна сохраниться. joinNotes склеивает обе заметки
 			// через разделитель, сохраняя порядок (структурная — первая).
 			mod.Note = JoinNotes(mod.Note, PickLocalized(db.Note, lang))
+			if getUserNote != nil {
+				if un := getUserNote(name); un != "" {
+					mod.Note = JoinNotes(mod.Note, userNotePrefix+un)
+				}
+			}
 			if forceEnglish {
 				if enName := PickLocalized(db.Name, "en"); enName != "" {
 					mod.DisplayName = enName
@@ -452,10 +467,15 @@ func GetModsInfo(lang string, forceEnglish bool) []ModInfo {
 			if db, ok := modDBMap[strings.ToLower(entry.Name)]; ok && db.Folder != "" {
 				mod.Author = db.Author
 				mod.URL = db.URL
-				mod.GitHubURL = db.GitHubURL
+				mod.SourceCodeURL = db.SourceCodeURL
 				mod.Category = db.Category
 				mod.Description = PickLocalized(db.Description, lang)
 				mod.Note = PickLocalized(db.Note, lang)
+				if getUserNote != nil {
+					if un := getUserNote(entry.Name); un != "" {
+						mod.Note = JoinNotes(mod.Note, userNotePrefix+un)
+					}
+				}
 				if forceEnglish {
 					if enName := PickLocalized(db.Name, "en"); enName != "" {
 						mod.DisplayName = enName
@@ -483,9 +503,14 @@ func GetModsInfo(lang string, forceEnglish bool) []ModInfo {
 		if db, ok := modDBMap["autopatch"]; ok && db.Folder != "" {
 			mod.Author = db.Author
 			mod.URL = db.URL
-			mod.GitHubURL = db.GitHubURL
+			mod.SourceCodeURL = db.SourceCodeURL
 			mod.Description = PickLocalized(db.Description, lang)
 			mod.Note = PickLocalized(db.Note, lang)
+			if getUserNote != nil {
+				if un := getUserNote(mod.Name); un != "" {
+					mod.Note = JoinNotes(mod.Note, userNotePrefix+un)
+				}
+			}
 			if forceEnglish {
 				if enName := PickLocalized(db.Name, "en"); enName != "" {
 					mod.DisplayName = enName

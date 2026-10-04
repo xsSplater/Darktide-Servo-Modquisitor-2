@@ -11,7 +11,7 @@ import (
 // ───────────── Программа ─────────────────────────────────────────
 const (
 	AppName         = "Servo-Modquisitor-2"
-	AppVersion      = "4.5.0"
+	AppVersion      = "4.7.5"
 	AppID           = "com.xssplater.servo-modquisitor"
 	AppIcon         = "assets/icon.png"
 	ConfigFolderSMQ = "Servo-Modquisitor"
@@ -99,6 +99,11 @@ const (
 	NXMAddress      = "localhost:31338" // Порт для приёма nxm-ссылок
 	OAuthListenAddr = "localhost:31337" // Порт для OAuth-колбэка (не менять!)
 	NXMCommLine     = "--nxm"
+
+	// QuickLaunchCommLine — флаг для ярлыка «быстрый запуск игры».
+	// Обрабатывается в main() ДО проверки single-instance: запускаем
+	// игру без UI, не блокируясь на «программа уже запущена».
+	QuickLaunchCommLine = "--play"
 )
 
 // ───────────── Форматы времени ───────────────────────────────────

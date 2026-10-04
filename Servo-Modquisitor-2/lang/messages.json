@@ -588,18 +588,18 @@
 	 "pt-BR": "🔄 Verificar atualizações"
 	},
 	"btn_check_updates_tooltip": {
-		"en": "Checks for updates for all your mods on Nexus. Mods must be installed through ModQuisitor!",
-		"ru": "Проверяет обновления для всех ваших модов на Nexus. Моды должны быть установлены через МодКвизитор!",
-   "zh-hans": "检查 Nexus 上所有模组的更新。模组必须通过 ModQuisitor 安装！",
-   "zh-hant": "檢查 Nexus 上所有模組的更新。模組必須通過 ModQuisitor 安裝！",
-		"de": "Prüft auf Updates für alle Ihre Mods auf Nexus. Mods müssen über ModQuisitor installiert sein!",
-		"fr": "Vérifie les mises à jour de tous vos mods sur Nexus. Les mods doivent être installés via ModQuisitor !",
-		"ja": "Nexus上のすべてのMODの更新を確認します。MODはModQuisitorからインストールされている必要があります！",
-		"ko": "Nexus에서 모든 모드의 업데이트를 확인합니다. 모드는 ModQuisitor를 통해 설치해야 합니다!",
-		"it": "Controlla gli aggiornamenti per tutte le tue mod su Nexus. Le mod devono essere installate tramite ModQuisitor!",
-		"pl": "Sprawdza aktualizacje wszystkich twoich modów na Nexus. Mody muszą być zainstalowane przez ModQuisitor!",
-		"es": "Busca actualizaciones para todos tus mods en Nexus. ¡Los mods deben instalarse a través de ModQuisitor!",
-	 "pt-BR": "Verifica atualizações de todos os seus mods no Nexus. Os mods devem ser instalados através do ModQuisitor!"
+		"en": "Checks for updates for all your mods on Nexus. Mods must be installed through ModQuisitor!\n\n[CTRL]+[U]",
+		"ru": "Проверяет обновления для всех ваших модов на Nexus. Моды должны быть установлены через МодКвизитор!\n\n[CTRL]+[U]",
+   "zh-hans": "检查 Nexus 上所有模组的更新。模组必须通过 ModQuisitor 安装！\n\n[CTRL]+[U]",
+   "zh-hant": "檢查 Nexus 上所有模組的更新。模組必須通過 ModQuisitor 安裝！\n\n[CTRL]+[U]",
+		"de": "Prüft auf Updates für alle Ihre Mods auf Nexus. Mods müssen über ModQuisitor installiert sein!\n\n[STRG]+[U]",
+		"fr": "Vérifie les mises à jour de tous vos mods sur Nexus. Les mods doivent être installés via ModQuisitor !\n\n[CTRL]+[U]",
+		"ja": "Nexus上のすべてのMODの更新を確認します。MODはModQuisitorからインストールされている必要があります！\n\n[CTRL]+[U]",
+		"ko": "Nexus에서 모든 모드의 업데이트를 확인합니다. 모드는 ModQuisitor를 통해 설치해야 합니다!\n\n[CTRL]+[U]",
+		"it": "Controlla gli aggiornamenti per tutte le tue mod su Nexus. Le mod devono essere installate tramite ModQuisitor!\n\n[CTRL]+[U]",
+		"pl": "Sprawdza aktualizacje wszystkich twoich modów na Nexus. Mody muszą być zainstalowane przez ModQuisitor!\n\n[CTRL]+[U]",
+		"es": "Busca actualizaciones para todos tus mods en Nexus. ¡Los mods deben instalarse a través de ModQuisitor!\n\n[CTRL]+[U]",
+	 "pt-BR": "Verifica atualizações de todos os seus mods no Nexus. Os mods devem ser instalados através do ModQuisitor!\n\n[CTRL]+[U]"
 	},
 	"btn_choose_other": {
 		"en": "Choose other",
@@ -672,18 +672,18 @@
 	 "pt-BR": "Desmarcar todos"
 	},
 	"btn_deselect_all_tooltip": {
-		"en": "Deselects mods to stop managing them.",
-		"ru": "Снимает выделение с модов для прекращения управления ими.",
-   "zh-hans": "取消选择模组以停止管理它们。",
-   "zh-hant": "取消選擇模組以停止管理它們。",
-		"de": "Hebt die Auswahl von Mods auf, um sie nicht mehr zu verwalten.",
-		"fr": "Désélectionne les mods pour arrêter de les gérer.",
-		"ja": "MODの選択を解除して管理を停止します。",
-		"ko": "모드 선택을 해제하여 관리를 중지합니다.",
-		"it": "Deseleziona le mod per smettere di gestirle.",
-		"pl": "Odznacza mody, aby przestać nimi zarządzać.",
-		"es": "Deselecciona mods para dejar de administrarlos.",
-	 "pt-BR": "Desmarca mods para parar de gerenciá-los."
+		"en": "Deselects mods to stop managing them.\n\n[CTRL]+[A]",
+		"ru": "Снимает выделение с модов для прекращения управления ими.\n\n[CTRL]+[A]",
+   "zh-hans": "取消选择模组以停止管理它们。\n\n[CTRL]+[A]",
+   "zh-hant": "取消選擇模組以停止管理它們。\n\n[CTRL]+[A]",
+		"de": "Hebt die Auswahl von Mods auf, um sie nicht mehr zu verwalten.\n\n[STRG]+[A]",
+		"fr": "Désélectionne les mods pour arrêter de les gérer.\n\n[CTRL]+[A]",
+		"ja": "MODの選択を解除して管理を停止します。\n\n[CTRL]+[A]",
+		"ko": "모드 선택을 해제하여 관리를 중지합니다.\n\n[CTRL]+[A]",
+		"it": "Deseleziona le mod per smettere di gestirle.\n\n[CTRL]+[A]",
+		"pl": "Odznacza mody, aby przestać nimi zarządzać.\n\n[CTRL]+[A]",
+		"es": "Deselecciona mods para dejar de administrarlos.\n\n[CTRL]+[A]",
+	 "pt-BR": "Desmarca mods para parar de gerenciá-los.\n\n[CTRL]+[A]"
 	},
 	"btn_disable_all_mods": {
 		"en": "Disable All Mods",
@@ -951,89 +951,47 @@
 		"es": "Le permite instalar mods desde un archivo (o puede arrastrar y soltar un archivo en esta ventana).",
 	 "pt-BR": "Permite instalar mods a partir de um arquivo (ou você pode arrastar e soltar um arquivo nesta janela)."
 	},
-	"btn_launch_game": {
-		"en": "▶ Launch Game",
-		"ru": "▶ Запуск игры",
-   "zh-hans": "▶ 启动游戏",
-   "zh-hant": "▶ 啟動遊戲",
-		"de": "▶ Spiel starten",
-		"fr": "▶ Lancer le jeu",
-		"ja": "▶ ゲームを起動",
-		"ko": "▶ 게임 실행",
-		"it": "▶ Avvia gioco",
-		"pl": "▶ Uruchom grę",
-		"es": "▶ Iniciar juego",
-	 "pt-BR": "▶ Iniciar jogo"
-	},
 	"btn_launch_game_tooltip": {
-		"en": "Launches Darktide in the standard way via the launcher.",
-		"ru": "Запускает Darktide стандартным способом через лаунчер.",
-   "zh-hans": "通过启动器以标准方式启动 Darktide。",
-   "zh-hant": "通過啟動器以標準方式啟動 Darktide。",
-		"de": "Startet Darktide auf dem Standardweg über den Launcher.",
-		"fr": "Lance Darktide de manière standard via le lanceur.",
-		"ja": "ランチャーを介して標準的な方法でDarktideを起動します。",
-		"ko": "런처를 통해 표준 방식으로 Darktide를 실행합니다.",
-		"it": "Avvia Darktide nel modo standard tramite il launcher.",
-		"pl": "Uruchamia Darktide w standardowy sposób przez launcher.",
-		"es": "Inicia Darktide de la manera estándar a través del lanzador.",
-	 "pt-BR": "Inicia o Darktide da maneira padrão através do lançador."
-	},
-	"btn_launch_nolauncher_long": {
-		"en": "🚀 Quick Launch",
-		"ru": "🚀 Быстрый запуск",
-   "zh-hans": "🚀 快速启动",
-   "zh-hant": "🚀 快速啟動",
-		"de": "🚀 Schnellstart",
-		"fr": "🚀 Lancement rapide",
-		"ja": "🚀 クイック起動",
-		"ko": "🚀 빠른 실행",
-		"it": "🚀 Avvio rapido",
-		"pl": "🚀 Szybkie uruchamianie",
-		"es": "🚀 Inicio rápido",
-	 "pt-BR": "🚀 Início Rápido"
+		"en": "Launches Darktide in the standard way via the launcher.\n\n[F6]",
+		"ru": "Запускает Darktide стандартным способом через лаунчер.\n\n[F6]",
+   "zh-hans": "通过启动器以标准方式启动 Darktide。\n\n[F6]",
+   "zh-hant": "通過啟動器以標準方式啟動 Darktide。\n\n[F6]",
+		"de": "Startet Darktide auf dem Standardweg über den Launcher.\n\n[F6]",
+		"fr": "Lance Darktide de manière standard via le lanceur.\n\n[F6]",
+		"ja": "ランチャーを介して標準的な方法でDarktideを起動します。\n\n[F6]",
+		"ko": "런처를 통해 표준 방식으로 Darktide를 실행합니다.\n\n[F6]",
+		"it": "Avvia Darktide nel modo standard tramite il launcher.\n\n[F6]",
+		"pl": "Uruchamia Darktide w standardowy sposób przez launcher.\n\n[F6]",
+		"es": "Inicia Darktide de la manera estándar a través del lanzador.\n\n[F6]",
+	 "pt-BR": "Inicia o Darktide da maneira padrão através do lançador.\n\n[F6]"
 	},
 	"btn_launch_nolauncher_long_tooltip": {
-		"en": "Quickly launches Darktide bypassing the launcher.",
-		"ru": "Быстро запускает Darktide мимо лаунчера.",
-   "zh-hans": "绕过启动器快速启动 Darktide。",
-   "zh-hant": "繞過啟動器快速啟動 Darktide。",
-		"de": "Startet Darktide schnell unter Umgehung des Launchers.",
-		"fr": "Lance rapidement Darktide en contournant le lanceur.",
-		"ja": "ランチャーをバイパスしてDarktideを素早く起動します。",
-		"ko": "런처를 우회하여 Darktide를 빠르게 실행합니다.",
-		"it": "Avvia rapidamente Darktide bypassando il launcher.",
-		"pl": "Szybko uruchamia Darktide z pominięciem lauchera.",
-		"es": "Inicia rápidamente Darktide omitiendo el lanzador.",
-	 "pt-BR": "Inicia rapidamente o Darktide ignorando o lançador."
-	},
-	"btn_manage_mods": {
-		"en": "⚙ Mod Management ⚙",
-		"ru": "⚙ Управление модами ⚙",
-   "zh-hans": "⚙ 模组管理 ⚙",
-   "zh-hant": "⚙ 模組管理 ⚙",
-		"de": "⚙ Mod-Verwaltung ⚙",
-		"fr": "⚙ Gestion des mods ⚙",
-		"ja": "⚙ MOD管理 ⚙",
-		"ko": "⚙ 모드 관리 ⚙",
-		"it": "⚙ Gestione mod ⚙",
-		"pl": "⚙ Zarządzanie modami ⚙",
-		"es": "⚙ Gestión de mods ⚙",
-	 "pt-BR": "⚙ Gerenciamento de Mods ⚙"
+		"en": "Quickly launches Darktide bypassing the launcher.\n\n[F5]",
+		"ru": "Быстро запускает Darktide мимо лаунчера.\n\n[F5]",
+   "zh-hans": "绕过启动器快速启动 Darktide。\n\n[F5]",
+   "zh-hant": "繞過啟動器快速啟動 Darktide。\n\n[F5]",
+		"de": "Startet Darktide schnell unter Umgehung des Launchers.\n\n[F5]",
+		"fr": "Lance rapidement Darktide en contournant le lanceur.\n\n[F5]",
+		"ja": "ランチャーをバイパスしてDarktideを素早く起動します。\n\n[F5]",
+		"ko": "런처를 우회하여 Darktide를 빠르게 실행합니다.\n\n[F5]",
+		"it": "Avvia rapidamente Darktide bypassando il launcher.\n\n[F5]",
+		"pl": "Szybko uruchamia Darktide z pominięciem lauchera.\n\n[F5]",
+		"es": "Inicia rápidamente Darktide omitiendo el lanzador.\n\n[F5]",
+	 "pt-BR": "Inicia rapidamente o Darktide ignorando o lançador.\n\n[F5]"
 	},
 	"btn_manage_mods_tooltip": {
-		"en": "Opens the mod control panel: select mods, then move them, turn them on, turn them off, delete them...",
-		"ru": "Открывает панель управления модами: выделяйте моды, перемещайте, включайте, выключайте, удаляйте...",
-   "zh-hans": "打开模组控制面板：选择模组，然后移动、启用、禁用、删除...",
-   "zh-hant": "開啟模組控制面板：選擇模組，然後移動、啟用、停用、刪除...",
-		"de": "Öffnet die Mod-Steuerung: Mods auswählen, verschieben, aktivieren, deaktivieren, löschen...",
-		"fr": "Ouvre le panneau de contrôle des mods : sélectionnez les mods, déplacez-les, activez-les, désactivez-les, supprimez-les...",
-		"ja": "MODコントロールパネルを開きます：MODを選択し、移動、有効化、無効化、削除...",
-		"ko": "모드 제어판을 엽니다: 모드를 선택하고, 이동하고, 켜고, 끄고, 삭제합니다...",
-		"it": "Apre il pannello di controllo delle mod: seleziona le mod, spostale, attivale, disattivale, eliminale...",
-		"pl": "Otwiera panel sterowania modami: zaznacz mody, przesuwaj je, włączaj, wyłączaj, usuwaj...",
-		"es": "Abre el panel de control de mods: selecciona mods, muévelos, actívalos, desactívalos, elimínalos...",
-	 "pt-BR": "Abre o painel de controle de mods: selecione mods, mova-os, ative-os, desative-os, exclua-os..."
+		"en": "Opens the mod control panel: select mods, then move them, turn them on, turn them off, delete them.\n\n[CTRL]+[M]",
+		"ru": "Открывает панель управления модами: выделяйте моды, перемещайте, включайте, выключайте, удаляйте.\n\n[CTRL]+[M]",
+   "zh-hans": "打开模组控制面板：选择模组，然后移动、启用、禁用、删除.\n\n[CTRL]+[M]",
+   "zh-hant": "開啟模組控制面板：選擇模組，然後移動、啟用、停用、刪除.\n\n[CTRL]+[M]",
+		"de": "Öffnet die Mod-Steuerung: Mods auswählen, verschieben, aktivieren, deaktivieren, löschen.\n\n[STRG]+[M]",
+		"fr": "Ouvre le panneau de contrôle des mods : sélectionnez les mods, déplacez-les, activez-les, désactivez-les, supprimez-les.\n\n[CTRL]+[M]",
+		"ja": "MODコントロールパネルを開きます：MODを選択し、移動、有効化、無効化、削除.\n\n[CTRL]+[M]",
+		"ko": "모드 제어판을 엽니다: 모드를 선택하고, 이동하고, 켜고, 끄고, 삭제합니다.\n\n[CTRL]+[M]",
+		"it": "Apre il pannello di controllo delle mod: seleziona le mod, spostale, attivale, disattivale, eliminale.\n\n[CTRL]+[M]",
+		"pl": "Otwiera panel sterowania modami: zaznacz mody, przesuwaj je, włączaj, wyłączaj, usuwaj.\n\n[CTRL]+[M]",
+		"es": "Abre el panel de control de mods: selecciona mods, muévelos, actívalos, desactívalos, elimínalos.\n\n[CTRL]+[M]",
+	 "pt-BR": "Abre o painel de controle de mods: selecione mods, mova-os, ative-os, desative-os, exclua-os.\n\n[CTRL]+[M]"
 	},
 	"btn_move_to_bottom_tooltip": {
 		"en": "Moves the selected mods to the very bottom of the list.",
@@ -1246,32 +1204,32 @@
 	 "pt-BR": "🔄 Atualizar mesmo assim"
 	},
 	"btn_refresh_tooltip": {
-		"en": "Updates the mod list. Save your changes or they will be lost!",
-		"ru": "Обновляет список модов. Сохраните изменения иначе они будут потеряны!",
-   "zh-hans": "更新模组列表。请保存更改，否则会丢失！",
-   "zh-hant": "更新模組列表。請儲存更改，否則會遺失！",
-		"de": "Aktualisiert die Mod-Liste. Speichern Sie Ihre Änderungen, sonst gehen sie verloren!",
-		"fr": "Met à jour la liste des mods. Enregistrez vos modifications ou elles seront perdues !",
-		"ja": "MODリストを更新します。変更を保存しないと失われます！",
-		"ko": "모드 목록을 업데이트합니다. 변경 사항을 저장하지 않으면 손실됩니다!",
-		"it": "Aggiorna la lista delle mod. Salva le modifiche o andranno perse!",
-		"pl": "Aktualizuje listę modów. Zapisz zmiany, w przeciwnym razie zostaną utracone!",
-		"es": "Actualiza la lista de mods. ¡Guarda tus cambios o se perderán!",
-	 "pt-BR": "Atualiza a lista de mods. Salve suas alterações ou elas serão perdidas!"
+		"en": "Refreshes the mod list.\n\n[CTRL]+[R]",
+		"ru": "Обновляет список модов.\n\n[CTRL]+[R]",
+   "zh-hans": "刷新模组列表。\n\n[CTRL]+[R]",
+   "zh-hant": "重新整理模組清單。\n\n[CTRL]+[R]",
+		"de": "Aktualisiert die Mod-Liste.\n\n[STRG]+[R]",
+		"fr": "Actualise la liste des mods.\n\n[CTRL]+[R]",
+		"ja": "MODリストを更新します。\n\n[CTRL]+[R]",
+		"ko": "모드 목록을 새로 고칩니다.\n\n[CTRL]+[R]",
+		"it": "Aggiorna l'elenco delle mod.\n\n[CTRL]+[R]",
+		"pl": "Odświeża listę modów.\n\n[CTRL]+[R]",
+		"es": "Actualiza la lista de mods.\n\n[CTRL]+[R]",
+	 "pt-BR": "Atualiza a lista de mods.\n\n[CTRL]+[R]"
 	},
 	"btn_remove_tooltip": {
-		"de": "Entfernt diesen Mod.",
-		"en": "Removes this mod.",
-		"es": "Elimina este mod.",
-		"fr": "Supprime ce mod.",
-		"it": "Rimuove questo mod.",
-		"ja": "このModを削除します。",
-		"ko": "이 모드를 제거합니다.",
-		"pl": "Usuwa ten mod.",
-	 "pt-BR": "Remove este mod.",
-		"ru": "Удаляет данный мод.",
-   "zh-hans": "删除此模组。",
-   "zh-hant": "刪除此模組。"
+		"de": "Entfernt diesen Mod.\n\n[DELETE]",
+		"en": "Removes this mod.\n\n[DELETE]",
+		"es": "Elimina este mod.\n\n[DELETE]",
+		"fr": "Supprime ce mod.\n\n[DELETE]",
+		"it": "Rimuove questo mod.\n\n[DELETE]",
+		"ja": "このMODを削除します。\n\n[DELETE]",
+		"ko": "이 모드를 제거합니다.\n\n[DELETE]",
+		"pl": "Usuwa ten mod.\n\n[DELETE]",
+	 "pt-BR": "Remove este mod.\n\n[DELETE]",
+		"ru": "Удаляет данный мод.\n\n[DELETE]",
+   "zh-hans": "删除此模组。\n\n[DELETE]",
+   "zh-hant": "刪除此模組。\n\n[DELETE]"
 	},
 	"btn_remove_all_tooltip": {
 		"en": "Permanently removes all mods (except DML and DMF).",
@@ -1288,18 +1246,18 @@
 	 "pt-BR": "Remove permanentemente todos os mods (exceto DML e DMF)."
 	},
 	"btn_remove_selected_tooltip": {
-		"en": "Permanently deletes mods marked with managed checkboxes in the list.",
-		"ru": "Безвозвратно удаляет моды, выделенные в списке галочками управления.",
-   "zh-hans": "永久删除列表中用管理复选框标记的模组。",
-   "zh-hant": "永久刪除列表中用管理複選框標記的模組。",
-		"de": "Löscht dauerhaft Mods, die in der Liste mit Kontrollkästchen markiert sind.",
-		"fr": "Supprime définitivement les mods marqués par des cases à cocher dans la liste.",
-		"ja": "リスト内の管理チェックボックスでマークされたMODを完全に削除します。",
-		"ko": "목록에서 관리 확인란으로 표시된 모드를 영구적으로 삭제합니다.",
-		"it": "Elimina permanentemente le mod contrassegnate con caselle di controllo nella lista.",
-		"pl": "Trwale usuwa mody oznaczone w liście za pomocą pól wyboru.",
-		"es": "Elimina permanentemente los mods marcados con casillas de verificación en la lista.",
-	 "pt-BR": "Exclui permanentemente os mods marcados com caixas de seleção na lista."
+		"en": "Permanently deletes mods marked with managed checkboxes in the list.\n\n[DELETE]",
+		"ru": "Безвозвратно удаляет моды, выделенные в списке галочками управления.\n\n[DELETE]",
+   "zh-hans": "永久删除列表中用管理复选框标记的模组。\n\n[DELETE]",
+   "zh-hant": "永久刪除列表中用管理複選框標記的模組。\n\n[DELETE]",
+		"de": "Löscht dauerhaft Mods, die in der Liste mit Kontrollkästchen markiert sind.\n\n[DELETE]",
+		"fr": "Supprime définitivement les mods marqués par des cases à cocher dans la liste.\n\n[DELETE]",
+		"ja": "リスト内の管理チェックボックスでマークされたMODを完全に削除します。\n\n[DELETE]",
+		"ko": "목록에서 관리 확인란으로 표시된 모드를 영구적으로 삭제합니다.\n\n[DELETE]",
+		"it": "Elimina permanentemente le mod contrassegnate con caselle di controllo nella lista.\n\n[DELETE]",
+		"pl": "Trwale usuwa mody oznaczone w liście za pomocą pól wyboru.\n\n[DELETE]",
+		"es": "Elimina permanentemente los mods marcados con casillas de verificación en la lista.\n\n[DELETE]",
+	 "pt-BR": "Exclui permanentemente os mods marcados com caixas de seleção na lista.\n\n[DELETE]"
 	},
 	"btn_save": {
 		"en": "💾 Save",
@@ -1330,18 +1288,18 @@
 	 "pt-BR": "💾 Salvar e atualizar"
 	},
 	"btn_save_order_tooltip": {
-		"en": "Saves the current list of mods, including for subsequent auto-sorting.",
-		"ru": "Сохраняет текущий список модов, в т.ч. для последующей автосортировки.",
-   "zh-hans": "保存当前模组列表，包括用于后续自动排序。",
-   "zh-hant": "儲存目前模組列表，包括用於後續自動排序。",
-		"de": "Speichert die aktuelle Liste der Mods, auch für die spätere automatische Sortierung.",
-		"fr": "Enregistre la liste actuelle des mods, y compris pour le tri automatique ultérieur.",
-		"ja": "現在のMODリストを保存します（後続の自動ソート用にも）。",
-		"ko": "현재 모드 목록을 저장합니다(이후 자동 정렬용으로도).",
-		"it": "Salva la lista attuale delle mod, anche per il successivo auto-ordinamento.",
-		"pl": "Zapisuje bieżącą listę modów, również do późniejszego automatycznego sortowania.",
-		"es": "Guarda la lista actual de mods, incluso para el auto-ordenamiento posterior.",
-	 "pt-BR": "Salva a lista atual de mods, inclusive para classificação automática subsequente."
+		"en": "Saves the current list of mods, including for subsequent auto-sorting.\n\n[CTRL]+[S]",
+		"ru": "Сохраняет текущий список модов, в т.ч. для последующей автосортировки.\n\n[CTRL]+[S]",
+   "zh-hans": "保存当前模组列表，包括用于后续自动排序。\n\n[CTRL]+[S]",
+   "zh-hant": "儲存目前模組列表，包括用於後續自動排序。\n\n[CTRL]+[S]",
+		"de": "Speichert die aktuelle Liste der Mods, auch für die spätere automatische Sortierung.\n\n[STRG]+[S]",
+		"fr": "Enregistre la liste actuelle des mods, y compris pour le tri automatique ultérieur.\n\n[CTRL]+[S]",
+		"ja": "現在のMODリストを保存します（後続の自動ソート用にも）。\n\n[CTRL]+[S]",
+		"ko": "현재 모드 목록을 저장합니다(이후 자동 정렬용으로도).\n\n[CTRL]+[S]",
+		"it": "Salva la lista attuale delle mod, anche per il successivo auto-ordinamento.\n\n[CTRL]+[S]",
+		"pl": "Zapisuje bieżącą listę modów, również do późniejszego automatycznego sortowania.\n\n[CTRL]+[S]",
+		"es": "Guarda la lista actual de mods, incluso para el auto-ordenamiento posterior.\n\n[CTRL]+[S]",
+	 "pt-BR": "Salva a lista atual de mods, inclusive para classificação automática subsequente.\n\n[CTRL]+[S]"
 	},
 	"btn_select_all": {
 		"en": "Select All",
@@ -1358,32 +1316,32 @@
 	 "pt-BR": "Selecionar todos"
 	},
 	"btn_select_all_tooltip": {
-		"en": "Selects all mods in the list to manage them.",
-		"ru": "Выделяет все моды в списке для управления ими.",
-   "zh-hans": "选择列表中的所有模组以进行管理。",
-   "zh-hant": "選擇列表中的所有模組以進行管理。",
-		"de": "Wählt alle Mods in der Liste aus, um sie zu verwalten.",
-		"fr": "Sélectionne tous les mods de la liste pour les gérer.",
-		"ja": "リスト内のすべてのMODを選択して管理します。",
-		"ko": "목록의 모든 모드를 선택하여 관리합니다.",
-		"it": "Seleziona tutte le mod nella lista per gestirle.",
-		"pl": "Zaznacza wszystkie mody na liście, aby nimi zarządzać.",
-		"es": "Selecciona todos los mods en la lista para administrarlos.",
-	 "pt-BR": "Seleciona todos os mods na lista para gerenciá-los."
+		"en": "Selects all mods in the list to manage them.\n\n[CTRL]+[A]",
+		"ru": "Выделяет все моды в списке для управления ими.\n\n[CTRL]+[A]",
+   "zh-hans": "选择列表中的所有模组以进行管理。\n\n[CTRL]+[A]",
+   "zh-hant": "選擇列表中的所有模組以進行管理。\n\n[CTRL]+[A]",
+		"de": "Wählt alle Mods in der Liste aus, um sie zu verwalten.\n\n[STRG]+[A]",
+		"fr": "Sélectionne tous les mods de la liste pour les gérer.\n\n[CTRL]+[A]",
+		"ja": "リスト内のすべてのMODを選択して管理します。\n\n[CTRL]+[A]",
+		"ko": "목록의 모든 모드를 선택하여 관리합니다.\n\n[CTRL]+[A]",
+		"it": "Seleziona tutte le mod nella lista per gestirle.\n\n[CTRL]+[A]",
+		"pl": "Zaznacza wszystkie mody na liście, aby nimi zarządzać.\n\n[CTRL]+[A]",
+		"es": "Selecciona todos los mods en la lista para administrarlos.\n\n[CTRL]+[A]",
+	 "pt-BR": "Seleciona todos os mods na lista para gerenciá-los.\n\n[CTRL]+[A]"
 	},
 	"btn_sort_checks_tooltip": {
-		"en": "Runs diagnostics on your mods, troubleshoots and sorts them.",
-		"ru": "Запускает диагностику ваших модов, устраняет неисправности и сортирует.",
-   "zh-hans": "对您的模组运行诊断、排除故障并排序。",
-   "zh-hant": "對您的模組執行診斷、排除故障並排序。",
-		"de": "Führt eine Diagnose Ihrer Mods durch, behebt Probleme und sortiert sie.",
-		"fr": "Exécute un diagnostic sur vos mods, les dépanne et les trie.",
-		"ja": "MODの診断を実行し、トラブルシューティングとソートを行います。",
-		"ko": "모드 진단을 실행하고 문제를 해결하고 정렬합니다.",
-		"it": "Esegue la diagnostica delle tue mod, le risolve e le ordina.",
-		"pl": "Przeprowadza diagnostykę twoich modów, rozwiązuje problemy i sortuje je.",
-		"es": "Ejecuta diagnósticos en sus mods, soluciona problemas y los ordena.",
-	 "pt-BR": "Executa diagnósticos em seus mods, soluciona problemas e os classifica."
+		"en": "Runs diagnostics on your mods, troubleshoots and sorts them.\n\n[CTRL]+[T]",
+		"ru": "Запускает диагностику ваших модов, устраняет неисправности и сортирует.\n\n[CTRL]+[T]",
+   "zh-hans": "对您的模组运行诊断、排除故障并排序。\n\n[CTRL]+[T]",
+   "zh-hant": "對您的模組執行診斷、排除故障並排序。\n\n[CTRL]+[T]",
+		"de": "Führt eine Diagnose Ihrer Mods durch, behebt Probleme und sortiert sie.\n\n[STRG]+[T]",
+		"fr": "Exécute un diagnostic sur vos mods, les dépanne et les trie.\n\n[CTRL]+[T]",
+		"ja": "MODの診断を実行し、トラブルシューティングとソートを行います。\n\n[CTRL]+[T]",
+		"ko": "모드 진단을 실행하고 문제를 해결하고 정렬합니다.\n\n[CTRL]+[T]",
+		"it": "Esegue la diagnostica delle tue mod, le risolve e le ordina.\n\n[CTRL]+[T]",
+		"pl": "Przeprowadza diagnostykę twoich modów, rozwiązuje problemy i sortuje je.\n\n[CTRL]+[T]",
+		"es": "Ejecuta diagnósticos en sus mods, soluciona problemas y los ordena.\n\n[CTRL]+[T]",
+	 "pt-BR": "Executa diagnósticos em seus mods, soluciona problemas e os classifica.\n\n[CTRL]+[T]"
 	},
 	"btn_continue": {
 		"en": "Continue",
@@ -1400,18 +1358,18 @@
 	 "pt-BR": "Continuar"
 	},
 	"btn_toggle_tooltip": {
-		"en": "Disable/Enable mods in the game.",
-		"ru": "Выключает/включает моды в игре.",
-   "zh-hans": "在游戏中禁用/启用模组。",
-   "zh-hant": "在遊戲中停用/啟用模組。",
-		"de": "Mods im Spiel deaktivieren/aktivieren.",
-		"fr": "Désactiver/Activer les mods dans le jeu.",
-		"ja": "ゲーム内のMODを無効/有効にします。",
-		"ko": "게임 내 모드를 비활성화/활성화합니다.",
-		"it": "Disabilita/Abilita le mod nel gioco.",
-		"pl": "Wyłącz/Włącz mody w grze.",
-		"es": "Desactivar/Activar mods en el juego.",
-	 "pt-BR": "Desativar/Ativar mods no jogo."
+		"en": "Disable/Enable mods in the game.\n\n[CTRL]+[O]",
+		"ru": "Выключает/включает моды в игре.\n\n[CTRL]+[O]",
+   "zh-hans": "在游戏中禁用/启用模组。\n\n[CTRL]+[O]",
+   "zh-hant": "在遊戲中停用/啟用模組。\n\n[CTRL]+[O]",
+		"de": "Mods im Spiel deaktivieren/aktivieren.\n\n[STRG]+[O]",
+		"fr": "Désactiver/Activer les mods dans le jeu.\n\n[CTRL]+[O]",
+		"ja": "ゲーム内のMODを無効/有効にします。\n\n[CTRL]+[O]",
+		"ko": "게임 내 모드를 비활성화/활성화합니다.\n\n[CTRL]+[O]",
+		"it": "Disabilita/Abilita le mod nel gioco.\n\n[CTRL]+[O]",
+		"pl": "Wyłącz/Włącz mody w grze.\n\n[CTRL]+[O]",
+		"es": "Desactivar/Activar mods en el juego.\n\n[CTRL]+[O]",
+	 "pt-BR": "Desativar/Ativar mods no jogo.\n\n[CTRL]+[O]"
 	},
 	"btn_up_tooltip": {
 		"en": "Moves the selected mods up one line.",
@@ -1440,20 +1398,6 @@
 		"pl": "Aktualizuje wszystkie mody na liście. Wymaga konta Premium!",
 		"es": "Actualiza todos los mods en la lista. ¡Requiere Premium!",
 	 "pt-BR": "Atualiza todos os mods na lista. Requer uma conta Premium!"
-	},
-	"btn_update_all_tooltip": {
-		"en": "Updates all mods in the list.",
-		"ru": "Обновляет все моды в списке.",
-   "zh-hans": "更新列表中的所有模组。",
-   "zh-hant": "更新列表中的所有模組。",
-		"de": "Aktualisiert alle Mods in der Liste.",
-		"fr": "Met à jour tous les mods de la liste.",
-		"ja": "リスト内のすべてのMODを更新します。",
-		"ko": "목록의 모든 모드를 업데이트합니다.",
-		"it": "Aggiorna tutte le mod nella lista.",
-		"pl": "Aktualizuje wszystkie mody na liście.",
-		"es": "Actualiza todos los mods en la lista.",
-	 "pt-BR": "Atualiza todos os mods na lista."
 	},
 	"btn_update_mod_premium_only": {
 		"de": "Mod schnell aktualisieren. Premium erforderlich!",
@@ -10279,9 +10223,9 @@
 		"ja": "✅ Modはすでに有効になっています（ゲームバンドルは以前にパッチされています）。",
 		"ko": "✅ 모드가 이미 활성화되어 있습니다 (게임 번들이 이전에 패치되었습니다).",
 		"pl": "✅ Mody są już włączone (pakiet gry został wcześniej załatany).",
-		"pt-BR": "✅ Os mods já estão ativados (o pacote do jogo foi patchado anteriormente).",
-		"zh-hans": "✅ 模组已启用（游戏包之前已打补丁）。",
-		"zh-hant": "✅ 模組已啟用（遊戲包之前已打補丁）。"
+	 "pt-BR": "✅ Os mods já estão ativados (o pacote do jogo foi patchado anteriormente).",
+   "zh-hans": "✅ 模组已启用（游戏包之前已打补丁）。",
+   "zh-hant": "✅ 模組已啟用（遊戲包之前已打補丁）。"
 	},
 	"bundle_foreign_patch_warning": {
 		"en": "⚠️ Mods are enabled, but the game was patched by another tool (Autopatcher / dtkit-patch). SMQ cannot disable them — use that tool to revert.",
@@ -10293,9 +10237,9 @@
 		"ja": "⚠️ Modは有効ですが、ゲームは別のツール（Autopatcher / dtkit-patch）によってパッチされています。SMQはそれらを無効にできません — 元に戻すにはそのツールを使用してください。",
 		"ko": "⚠️ 모드가 활성화되어 있지만 게임이 다른 도구(Autopatcher / dtkit-patch)에 의해 패치되었습니다. SMQ는 이를 비활성화할 수 없습니다 — 되돌리려면 해당 도구를 사용하세요.",
 		"pl": "⚠️ Mody są włączone, ale gra została załatana przez inne narzędzie (Autopatcher / dtkit-patch). SMQ nie może ich wyłączyć — użyj tego narzędzia, aby przywrócić.",
-		"pt-BR": "⚠️ Os mods estão ativados, mas o jogo foi patchado por outra ferramenta (Autopatcher / dtkit-patch). O SMQ não pode desativá-los — use essa ferramenta para reverter.",
-		"zh-hans": "⚠️ 模组已启用，但游戏已被其他工具（Autopatcher / dtkit-patch）打补丁。SMQ 无法禁用它们——请使用该工具还原。",
-		"zh-hant": "⚠️ 模組已啟用，但遊戲已被其他工具（Autopatcher / dtkit-patch）打補丁。SMQ 無法禁用它們——請使用該工具還原。"
+	 "pt-BR": "⚠️ Os mods estão ativados, mas o jogo foi patchado por outra ferramenta (Autopatcher / dtkit-patch). O SMQ não pode desativá-los — use essa ferramenta para reverter.",
+   "zh-hans": "⚠️ 模组已启用，但游戏已被其他工具（Autopatcher / dtkit-patch）打补丁。SMQ 无法禁用它们——请使用该工具还原。",
+   "zh-hant": "⚠️ 模組已啟用，但遊戲已被其他工具（Autopatcher / dtkit-patch）打補丁。SMQ 無法禁用它們——請使用該工具還原。"
 	},
 	"bundle_backup_missing": {
 		"en": "❌ Cannot unpatch: bundle_database.data.bak not found. Restore the game via Steam (Verify Integrity of Game Files) if you need to disable mods.",
@@ -10307,9 +10251,9 @@
 		"ja": "❌ パッチを解除できません: bundle_database.data.bak が見つかりません。Modを無効にする必要がある場合は、Steamでゲームを復元してください（ゲームファイルの整合性を確認）。",
 		"ko": "❌ 패치를 해제할 수 없습니다: bundle_database.data.bak을 찾을 수 없습니다. 모드를 비활성화해야 하는 경우 Steam을 통해 게임을 복원하세요(게임 파일 무결성 검사).",
 		"pl": "❌ Nie można cofnąć łatki: nie znaleziono bundle_database.data.bak. Przywróć grę przez Steam (Sprawdź integralność plików gry), jeśli chcesz wyłączyć mody.",
-		"pt-BR": "❌ Não é possível desfazer o patch: bundle_database.data.bak não encontrado. Restaure o jogo pelo Steam (Verificar integridade dos arquivos do jogo) se precisar desativar os mods.",
-		"zh-hans": "❌ 无法取消补丁：未找到 bundle_database.data.bak。如果您需要禁用模组，请通过 Steam 恢复游戏（验证游戏文件的完整性）。",
-		"zh-hant": "❌ 無法取消補丁：未找到 bundle_database.data.bak。如果您需要禁用模組，請透過 Steam 還原遊戲（驗證遊戲檔案的完整性）。"
+	 "pt-BR": "❌ Não é possível desfazer o patch: bundle_database.data.bak não encontrado. Restaure o jogo pelo Steam (Verificar integridade dos arquivos do jogo) se precisar desativar os mods.",
+   "zh-hans": "❌ 无法取消补丁：未找到 bundle_database.data.bak。如果您需要禁用模组，请通过 Steam 恢复游戏（验证游戏文件的完整性）。",
+   "zh-hant": "❌ 無法取消補丁：未找到 bundle_database.data.bak。如果您需要禁用模組，請透過 Steam 還原遊戲（驗證遊戲檔案的完整性）。"
 	},
 	"bundle_offset_missing": {
 		"en": "❌ Bundle patch anchor not found. The game was probably updated, and the patch signature has changed. Please report this.",
@@ -10321,9 +10265,9 @@
 		"ja": "❌ バンドルパッチのアンカーが見つかりません。ゲームが更新され、パッチ署名が変更された可能性があります。これを報告してください。",
 		"ko": "❌ 번들 패치 앵커를 찾을 수 없습니다. 게임이 업데이트되어 패치 서명이 변경되었을 수 있습니다. 이 문제를 보고해 주세요.",
 		"pl": "❌ Nie znaleziono kotwicy łatki pakietu. Gra prawdopodobnie została zaktualizowana, a sygnatura łatki uległa zmianie. Zgłoś to.",
-		"pt-BR": "❌ Âncora de patch do bundle não encontrada. O jogo provavelmente foi atualizado e a assinatura do patch mudou. Por favor, reporte isso.",
-		"zh-hans": "❌ 未找到捆绑包补丁锚点。游戏可能已更新，补丁签名已更改。请报告此问题。",
-		"zh-hant": "❌ 未找到捆綁包補丁錨點。遊戲可能已更新，補丁簽名已更改。請報告此問題。"
+	 "pt-BR": "❌ Âncora de patch do bundle não encontrada. O jogo provavelmente foi atualizado e a assinatura do patch mudou. Por favor, reporte isso.",
+   "zh-hans": "❌ 未找到捆绑包补丁锚点。游戏可能已更新，补丁签名已更改。请报告此问题。",
+   "zh-hant": "❌ 未找到捆綁包補丁錨點。遊戲可能已更新，補丁簽名已更改。請報告此問題。"
 	},
 	"patcher_not_available": {
 		"en": "❌ patcher_not_available.",
@@ -10335,9 +10279,9 @@
 		"ja": "❌ パッチャーが利用できません。",
 		"ko": "❌ 패처를 사용할 수 없습니다.",
 		"pl": "❌ Patcher niedostępny.",
-		"pt-BR": "❌ Patcher não disponível.",
-		"zh-hans": "❌ 修补程序不可用。",
-		"zh-hant": "❌ 修補程式不可用。"
+	 "pt-BR": "❌ Patcher não disponível.",
+   "zh-hans": "❌ 修补程序不可用。",
+   "zh-hant": "❌ 修補程式不可用。"
 	},
 	"profile_sync_check_title": {
 		"en": "Mods folder changed externally.",
@@ -10349,9 +10293,9 @@
 		"ja": "Modフォルダが外部から変更されました。",
 		"ko": "모드 폴더가 외부에서 변경되었습니다.",
 		"pl": "Folder modów został zmieniony z zewnątrz.",
-		"pt-BR": "A pasta de mods foi alterada externamente.",
-		"zh-hans": "模组文件夹已从外部更改。",
-		"zh-hant": "模組資料夾已從外部變更。"
+	 "pt-BR": "A pasta de mods foi alterada externamente.",
+   "zh-hans": "模组文件夹已从外部更改。",
+   "zh-hant": "模組資料夾已從外部變更。"
 	},
 	"profile_sync_check_message": {
 		"en": "The mods folder contains changes that are not in the active profile.\n\nSave them into the profile, or restore the profile's snapshot into the game folder?",
@@ -10363,9 +10307,9 @@
 		"ja": "Modフォルダにアクティブなプロファイルにない変更が含まれています。\n\nプロファイルに保存するか、プロファイルのスナップショットをゲームフォルダに復元しますか？",
 		"ko": "모드 폴더에 활성 프로필에 없는 변경 사항이 있습니다.\n\n프로필에 저장하시겠습니까, 아니면 프로필의 스냅샷을 게임 폴더에 복원하시겠습니까?",
 		"pl": "Folder modów zawiera zmiany, których nie ma w aktywnym profilu.\n\nZapisać je w profilu czy przywrócić migawkę profilu w folderze gry?",
-		"pt-BR": "A pasta de mods contém alterações que não estão no perfil ativo.\n\nSalvá-las no perfil ou restaurar o instantâneo do perfil na pasta do jogo?",
-		"zh-hans": "模组文件夹包含活动配置文件中没有的更改。\n\n将它们保存到配置文件，还是将配置文件的快照还原到游戏文件夹？",
-		"zh-hant": "模組資料夾包含活動設定檔中沒有的變更。\n\n將它們儲存到設定檔，還是將設定檔的快照還原到遊戲資料夾？"
+	 "pt-BR": "A pasta de mods contém alterações que não estão no perfil ativo.\n\nSalvá-las no perfil ou restaurar o instantâneo do perfil na pasta do jogo?",
+   "zh-hans": "模组文件夹包含活动配置文件中没有的更改。\n\n将它们保存到配置文件，还是将配置文件的快照还原到游戏文件夹？",
+   "zh-hant": "模組資料夾包含活動設定檔中沒有的變更。\n\n將它們儲存到設定檔，還是將設定檔的快照還原到遊戲資料夾？"
 	},
 	"profile_sync_save_to_profile": {
 		"en": "Save to profile",
@@ -10377,9 +10321,9 @@
 		"ja": "プロファイルに保存",
 		"ko": "프로필에 저장",
 		"pl": "Zapisz w profilu",
-		"pt-BR": "Salvar no perfil",
-		"zh-hans": "保存到配置文件",
-		"zh-hant": "儲存到設定檔"
+	 "pt-BR": "Salvar no perfil",
+   "zh-hans": "保存到配置文件",
+   "zh-hant": "儲存到設定檔"
 	},
 	"profile_sync_load_from_profile": {
 		"en": "Load from profile",
@@ -10391,9 +10335,9 @@
 		"ja": "プロファイルから読み込む",
 		"ko": "프로필에서 로드",
 		"pl": "Wczytaj z profilu",
-		"pt-BR": "Carregar do perfil",
-		"zh-hans": "从配置文件加载",
-		"zh-hant": "從設定檔載入"
+	 "pt-BR": "Carregar do perfil",
+   "zh-hans": "从配置文件加载",
+   "zh-hant": "從設定檔載入"
 	},
 	"profile_sync_skip": {
 		"en": "Skip for now",
@@ -10405,9 +10349,9 @@
 		"ja": "今はスキップ",
 		"ko": "지금은 건너뛰기",
 		"pl": "Pomiń na razie",
-		"pt-BR": "Pular por enquanto",
-		"zh-hans": "暂时跳过",
-		"zh-hant": "暫時跳過"
+	 "pt-BR": "Pular por enquanto",
+   "zh-hans": "暂时跳过",
+   "zh-hant": "暫時跳過"
 	},
 	"profile_sync_title": {
 		"en": "Synchronizing profile",
@@ -10419,9 +10363,9 @@
 		"ja": "プロファイルを同期中",
 		"ko": "프로필 동기화 중",
 		"pl": "Synchronizacja profilu",
-		"pt-BR": "Sincronizando perfil",
-		"zh-hans": "正在同步配置文件",
-		"zh-hant": "正在同步設定檔"
+	 "pt-BR": "Sincronizando perfil",
+   "zh-hans": "正在同步配置文件",
+   "zh-hant": "正在同步設定檔"
 	},
 	"profile_sync_message": {
 		"en": "Copying mods folder...",
@@ -10433,9 +10377,9 @@
 		"ja": "Modフォルダをコピー中...",
 		"ko": "모드 폴더 복사 중...",
 		"pl": "Kopiowanie folderu modów...",
-		"pt-BR": "Copiando pasta de mods...",
-		"zh-hans": "正在复制模组文件夹...",
-		"zh-hant": "正在複製模組資料夾..."
+	 "pt-BR": "Copiando pasta de mods...",
+   "zh-hans": "正在复制模组文件夹...",
+   "zh-hant": "正在複製模組資料夾..."
 	},
 	"profile_sync_success": {
 		"en": "Profile synchronized.",
@@ -10447,9 +10391,9 @@
 		"ja": "プロファイルが同期されました。",
 		"ko": "프로필이 동기화되었습니다.",
 		"pl": "Profil zsynchronizowany.",
-		"pt-BR": "Perfil sincronizado.",
-		"zh-hans": "配置文件已同步。",
-		"zh-hant": "設定檔已同步。"
+	 "pt-BR": "Perfil sincronizado.",
+   "zh-hans": "配置文件已同步。",
+   "zh-hant": "設定檔已同步。"
 	},
 	"profile_sync_failed": {
 		"en": "Profile sync failed: %s",
@@ -10461,9 +10405,9 @@
 		"ja": "プロファイルの同期に失敗しました: %s",
 		"ko": "프로필 동기화 실패: %s",
 		"pl": "Synchronizacja profilu nie powiodła się: %s",
-		"pt-BR": "Falha na sincronização do perfil: %s",
-		"zh-hans": "配置文件同步失败：%s",
-		"zh-hant": "設定檔同步失敗：%s"
+	 "pt-BR": "Falha na sincronização do perfil: %s",
+   "zh-hans": "配置文件同步失败：%s",
+   "zh-hant": "設定檔同步失敗：%s"
 	},
 	"profile_sync_tooltip": {
 		"en": "Synchronize profile with game mods folder",
@@ -10475,9 +10419,9 @@
 		"ja": "プロファイルをゲームのModフォルダと同期する",
 		"ko": "프로필을 게임 모드 폴더와 동기화",
 		"pl": "Synchronizuj profil z folderem modów gry",
-		"pt-BR": "Sincronizar perfil com a pasta de mods do jogo",
-		"zh-hans": "将配置文件与游戏模组文件夹同步",
-		"zh-hant": "將設定檔與遊戲模組資料夾同步"
+	 "pt-BR": "Sincronizar perfil com a pasta de mods do jogo",
+   "zh-hans": "将配置文件与游戏模组文件夹同步",
+   "zh-hant": "將設定檔與遊戲模組資料夾同步"
 	},
 	"menu_profiles_sync": {
 		"en": "Synchronize profile",
@@ -10489,9 +10433,9 @@
 		"ja": "プロファイルを同期",
 		"ko": "프로필 동기화",
 		"pl": "Synchronizuj profil",
-		"pt-BR": "Sincronizar perfil",
-		"zh-hans": "同步配置文件",
-		"zh-hant": "同步設定檔"
+	 "pt-BR": "Sincronizar perfil",
+   "zh-hans": "同步配置文件",
+   "zh-hant": "同步設定檔"
 	},
 	"menu_profiles_reset": {
 		"en": "Reset game mods from profile",
@@ -10503,9 +10447,9 @@
 		"ja": "プロファイルからゲームのModをリセット",
 		"ko": "프로필에서 게임 모드 재설정",
 		"pl": "Zresetuj mody gry z profilu",
-		"pt-BR": "Redefinir mods do jogo a partir do perfil",
-		"zh-hans": "从配置文件重置游戏模组",
-		"zh-hant": "從設定檔重置遊戲模組"
+	 "pt-BR": "Redefinir mods do jogo a partir do perfil",
+   "zh-hans": "从配置文件重置游戏模组",
+   "zh-hant": "從設定檔重置遊戲模組"
 	},
 	"profile_reset_title": {
 		"en": "Reset game mods?",
@@ -10517,9 +10461,9 @@
 		"ja": "ゲームのModをリセットしますか？",
 		"ko": "게임 모드를 재설정하시겠습니까?",
 		"pl": "Zresetować mody gry?",
-		"pt-BR": "Redefinir mods do jogo?",
-		"zh-hans": "重置游戏模组？",
-		"zh-hant": "重置遊戲模組？"
+	 "pt-BR": "Redefinir mods do jogo?",
+   "zh-hans": "重置游戏模组？",
+   "zh-hant": "重置遊戲模組？"
 	},
 	"profile_reset_message": {
 		"en": "This will replace the contents of the game's mods folder with the active profile's snapshot.",
@@ -10531,9 +10475,9 @@
 		"ja": "これにより、ゲームのModフォルダの内容がアクティブなプロファイルのスナップショットに置き換えられます。",
 		"ko": "이렇게 하면 게임의 모드 폴더 내용이 활성 프로필의 스냅샷으로 대체됩니다.",
 		"pl": "Spowoduje to zastąpienie zawartości folderu modów gry migawką aktywnego profilu.",
-		"pt-BR": "Isso substituirá o conteúdo da pasta de mods do jogo pelo instantâneo do perfil ativo.",
-		"zh-hans": "这将用活动配置文件的快照替换游戏模组文件夹的内容。",
-		"zh-hant": "這將用活動設定檔的快照替換遊戲模組資料夾的內容。"
+	 "pt-BR": "Isso substituirá o conteúdo da pasta de mods do jogo pelo instantâneo do perfil ativo.",
+   "zh-hans": "这将用活动配置文件的快照替换游戏模组文件夹的内容。",
+   "zh-hant": "這將用活動設定檔的快照替換遊戲模組資料夾的內容。"
 	},
 	"profile_reset_success": {
 		"en": "Game mods reset from profile.",
@@ -10545,9 +10489,9 @@
 		"ja": "プロファイルからゲームのModをリセットしました。",
 		"ko": "프로필에서 게임 모드를 재설정했습니다.",
 		"pl": "Mody gry zresetowane z profilu.",
-		"pt-BR": "Mods do jogo redefinidos a partir do perfil.",
-		"zh-hans": "已从配置文件重置游戏模组。",
-		"zh-hant": "已從設定檔重置遊戲模組。"
+	 "pt-BR": "Mods do jogo redefinidos a partir do perfil.",
+   "zh-hans": "已从配置文件重置游戏模组。",
+   "zh-hant": "已從設定檔重置遊戲模組。"
 	},
 	"menu_backups": {
 		"en": "Backups",
@@ -10559,9 +10503,9 @@
 		"ja": "バックアップ",
 		"ko": "백업",
 		"pl": "Kopie zapasowe",
-		"pt-BR": "Backups",
-		"zh-hans": "备份",
-		"zh-hant": "備份"
+	 "pt-BR": "Backups",
+   "zh-hans": "备份",
+   "zh-hant": "備份"
 	},
 	"menu_backups_create": {
 		"en": "Backup active profile",
@@ -10573,9 +10517,9 @@
 		"ja": "アクティブなプロファイルをバックアップ",
 		"ko": "활성 프로필 백업",
 		"pl": "Utwórz kopię zapasową aktywnego profilu",
-		"pt-BR": "Fazer backup do perfil ativo",
-		"zh-hans": "备份活动配置文件",
-		"zh-hant": "備份活動設定檔"
+	 "pt-BR": "Fazer backup do perfil ativo",
+   "zh-hans": "备份活动配置文件",
+   "zh-hant": "備份活動設定檔"
 	},
 	"menu_backups_restore": {
 		"en": "Restore from backup...",
@@ -10587,9 +10531,9 @@
 		"ja": "バックアップから復元...",
 		"ko": "백업에서 복원...",
 		"pl": "Przywróć z kopii zapasowej...",
-		"pt-BR": "Restaurar do backup...",
-		"zh-hans": "从备份还原...",
-		"zh-hant": "從備份還原..."
+	 "pt-BR": "Restaurar do backup...",
+   "zh-hans": "从备份还原...",
+   "zh-hant": "從備份還原..."
 	},
 	"menu_backups_open_folder": {
 		"en": "Open backups folder",
@@ -10601,9 +10545,9 @@
 		"ja": "バックアップフォルダを開く",
 		"ko": "백업 폴더 열기",
 		"pl": "Otwórz folder kopii zapasowych",
-		"pt-BR": "Abrir pasta de backups",
-		"zh-hans": "打开备份文件夹",
-		"zh-hant": "開啟備份資料夾"
+	 "pt-BR": "Abrir pasta de backups",
+   "zh-hans": "打开备份文件夹",
+   "zh-hant": "開啟備份資料夾"
 	},
 	"backup_created": {
 		"en": "Backup created: %s",
@@ -10615,9 +10559,9 @@
 		"ja": "バックアップが作成されました: %s",
 		"ko": "백업 생성됨: %s",
 		"pl": "Utworzono kopię zapasową: %s",
-		"pt-BR": "Backup criado: %s",
-		"zh-hans": "备份已创建：%s",
-		"zh-hant": "備份已建立：%s"
+	 "pt-BR": "Backup criado: %s",
+   "zh-hans": "备份已创建：%s",
+   "zh-hant": "備份已建立：%s"
 	},
 	"backup_failed": {
 		"en": "Backup failed: %s",
@@ -10629,9 +10573,9 @@
 		"ja": "バックアップに失敗しました: %s",
 		"ko": "백업 실패: %s",
 		"pl": "Kopia zapasowa nie powiodła się: %s",
-		"pt-BR": "Falha no backup: %s",
-		"zh-hans": "备份失败：%s",
-		"zh-hant": "備份失敗：%s"
+	 "pt-BR": "Falha no backup: %s",
+   "zh-hans": "备份失败：%s",
+   "zh-hant": "備份失敗：%s"
 	},
 	"backup_restored": {
 		"en": "Backup restored as profile: %s",
@@ -10643,9 +10587,9 @@
 		"ja": "バックアップがプロファイルとして復元されました: %s",
 		"ko": "백업이 프로필로 복원됨: %s",
 		"pl": "Kopia zapasowa przywrócona jako profil: %s",
-		"pt-BR": "Backup restaurado como perfil: %s",
-		"zh-hans": "备份已还原为配置文件：%s",
-		"zh-hant": "備份已還原為設定檔：%s"
+	 "pt-BR": "Backup restaurado como perfil: %s",
+   "zh-hans": "备份已还原为配置文件：%s",
+   "zh-hant": "備份已還原為設定檔：%s"
 	},
 	"backup_creating_title": {
 		"en": "Creating backup",
@@ -10657,9 +10601,9 @@
 		"ja": "バックアップを作成中",
 		"ko": "백업 생성 중",
 		"pl": "Tworzenie kopii zapasowej",
-		"pt-BR": "Criando backup",
-		"zh-hans": "正在创建备份",
-		"zh-hant": "正在建立備份"
+	 "pt-BR": "Criando backup",
+   "zh-hans": "正在创建备份",
+   "zh-hant": "正在建立備份"
 	},
 	"backup_creating_message": {
 		"en": "Archiving active profile...",
@@ -10671,9 +10615,9 @@
 		"ja": "アクティブなプロファイルをアーカイブ中...",
 		"ko": "활성 프로필 보관 중...",
 		"pl": "Archiwizowanie aktywnego profilu...",
-		"pt-BR": "Arquivando perfil ativo...",
-		"zh-hans": "正在归档活动配置文件...",
-		"zh-hant": "正在歸檔活動設定檔..."
+	 "pt-BR": "Arquivando perfil ativo...",
+   "zh-hans": "正在归档活动配置文件...",
+   "zh-hant": "正在歸檔活動設定檔..."
 	},
 	"backup_restoring_title": {
 		"en": "Restoring backup",
@@ -10685,9 +10629,9 @@
 		"ja": "バックアップを復元中",
 		"ko": "백업 복원 중",
 		"pl": "Przywracanie kopii zapasowej",
-		"pt-BR": "Restaurando backup",
-		"zh-hans": "正在还原备份",
-		"zh-hant": "正在還原備份"
+	 "pt-BR": "Restaurando backup",
+   "zh-hans": "正在还原备份",
+   "zh-hant": "正在還原備份"
 	},
 	"backup_restoring_message": {
 		"en": "Extracting archive...",
@@ -10699,9 +10643,9 @@
 		"ja": "アーカイブを展開中...",
 		"ko": "아카이브 추출 중...",
 		"pl": "Rozpakowywanie archiwum...",
-		"pt-BR": "Extraindo arquivo...",
-		"zh-hans": "正在解压档案...",
-		"zh-hant": "正在解壓縮封存..."
+	 "pt-BR": "Extraindo arquivo...",
+   "zh-hans": "正在解压档案...",
+   "zh-hant": "正在解壓縮封存..."
 	},
 	"profile_backup_failed": {
 		"en": "Failed to create backup. Profile deletion aborted.",
@@ -10713,9 +10657,9 @@
 		"ja": "バックアップの作成に失敗しました。プロファイルの削除を中止しました。",
 		"ko": "백업을 생성하지 못했습니다. 프로필 삭제가 중단되었습니다.",
 		"pl": "Nie udało się utworzyć kopii zapasowej. Usuwanie profilu przerwane.",
-		"pt-BR": "Falha ao criar backup. Exclusão do perfil abortada.",
-		"zh-hans": "无法创建备份。配置文件删除已中止。",
-		"zh-hant": "無法建立備份。設定檔刪除已中止。"
+	 "pt-BR": "Falha ao criar backup. Exclusão do perfil abortada.",
+   "zh-hans": "无法创建备份。配置文件删除已中止。",
+   "zh-hant": "無法建立備份。設定檔刪除已中止。"
 	},
 	"trash_failed_title": {
 		"en": "Could not move to trash",
@@ -10727,9 +10671,9 @@
 		"ja": "ゴミ箱に移動できませんでした",
 		"ko": "휴지통으로 이동할 수 없습니다",
 		"pl": "Nie można przenieść do kosza",
-		"pt-BR": "Não foi possível mover para a lixeira",
-		"zh-hans": "无法移到回收站",
-		"zh-hant": "無法移到回收筒"
+	 "pt-BR": "Não foi possível mover para a lixeira",
+   "zh-hans": "无法移到回收站",
+   "zh-hant": "無法移到回收筒"
 	},
 	"trash_failed_text": {
 		"en": "Failed to move '%s' to the system trash:\n%s\n\nDelete permanently?",
@@ -10741,9 +10685,9 @@
 		"ja": "'%s'をシステムのゴミ箱に移動できませんでした:\n%s\n\n完全に削除しますか？",
 		"ko": "'%s'을(를) 시스템 휴지통으로 이동하지 못했습니다:\n%s\n\n영구 삭제하시겠습니까?",
 		"pl": "Nie udało się przenieść '%s' do kosza systemowego:\n%s\n\nUsunąć trwale?",
-		"pt-BR": "Falha ao mover '%s' para a lixeira do sistema:\n%s\n\nExcluir permanentemente?",
-		"zh-hans": "无法将 '%s' 移到系统回收站：\n%s\n\n永久删除？",
-		"zh-hant": "無法將 '%s' 移到系統回收筒：\n%s\n\n永久刪除？"
+	 "pt-BR": "Falha ao mover '%s' para a lixeira do sistema:\n%s\n\nExcluir permanentemente?",
+   "zh-hans": "无法将 '%s' 移到系统回收站：\n%s\n\n永久删除？",
+   "zh-hant": "無法將 '%s' 移到系統回收筒：\n%s\n\n永久刪除？"
 	},
 	"btn_delete_forever": {
 		"en": "Delete forever",
@@ -10755,8 +10699,151 @@
 		"ja": "完全に削除",
 		"ko": "영구 삭제",
 		"pl": "Usuń trwale",
-		"pt-BR": "Excluir permanentemente",
-		"zh-hans": "永久删除",
-		"zh-hant": "永久刪除"
+	 "pt-BR": "Excluir permanentemente",
+   "zh-hans": "永久删除",
+   "zh-hant": "永久刪除"
+	},
+
+	"menu_create_shortcut": {
+		"en": "Create desktop shortcut…",
+		"ru": "Создать ярлык быстрого запуска…",
+		"de": "Desktop-Verknüpfung erstellen…",
+		"es": "Crear acceso directo en el escritorio…",
+		"fr": "Créer un raccourci sur le bureau…",
+		"it": "Crea collegamento sul desktop…",
+		"ja": "デスクトップショートカットを作成…",
+		"ko": "바탕 화면 바로 가기 만들기…",
+		"pl": "Utwórz skrót na pulpicie…",
+	 "pt-BR": "Criar atalho na área de trabalho…",
+   "zh-hans": "创建桌面快捷方式…",
+   "zh-hant": "建立桌面捷徑…"
+	},
+	"shortcut_created_title": {
+		"en": "Shortcut created",
+		"ru": "Ярлык создан",
+		"de": "Verknüpfung erstellt",
+		"es": "Acceso directo creado",
+		"fr": "Raccourci créé",
+		"it": "Collegamento creato",
+		"ja": "ショートカットを作成しました",
+		"ko": "바로 가기 생성됨",
+		"pl": "Utworzono skrót",
+	 "pt-BR": "Atalho criado",
+   "zh-hans": "快捷方式已创建",
+   "zh-hant": "捷徑已建立"
+	},
+	"shortcut_created_message": {
+		"en": "Shortcut created:\n\n%s",
+		"ru": "Ярлык создан:\n\n%s",
+		"de": "Verknüpfung erstellt:\n\n%s",
+		"es": "Acceso directo creado:\n\n%s",
+		"fr": "Raccourci créé :\n\n%s",
+		"it": "Collegamento creato:\n\n%s",
+		"ja": "ショートカットを作成しました:\n\n%s",
+		"ko": "바로 가기 생성됨:\n\n%s",
+		"pl": "Utworzono skrót:\n\n%s",
+	 "pt-BR": "Atalho criado:\n\n%s",
+   "zh-hans": "快捷方式已创建：\n\n%s",
+   "zh-hant": "捷徑已建立：\n\n%s"
+	},
+	"shortcut_created": {
+		"en": "Desktop shortcut created: %s",
+		"ru": "Ярлык на рабочем столе создан: %s",
+		"de": "Desktop-Verknüpfung erstellt: %s",
+		"es": "Acceso directo en el escritorio creado: %s",
+		"fr": "Raccourci sur le bureau créé : %s",
+		"it": "Collegamento sul desktop creato: %s",
+		"ja": "デスクトップショートカットを作成しました: %s",
+		"ko": "바탕 화면 바로 가기 생성됨: %s",
+		"pl": "Utworzono skrót na pulpicie: %s",
+	 "pt-BR": "Atalho na área de trabalho criado: %s",
+   "zh-hans": "桌面快捷方式已创建：%s",
+   "zh-hant": "桌面捷徑已建立：%s"
+	},
+	"shortcut_create_failed": {
+		"en": "Could not create shortcut: %s",
+		"ru": "Не удалось создать ярлык: %s",
+		"de": "Verknüpfung konnte nicht erstellt werden: %s",
+		"es": "No se pudo crear el acceso directo: %s",
+		"fr": "Impossible de créer le raccourci : %s",
+		"it": "Impossibile creare il collegamento: %s",
+		"ja": "ショートカットを作成できませんでした: %s",
+		"ko": "바로 가기를 만들 수 없습니다: %s",
+		"pl": "Nie można utworzyć skrótu: %s",
+	 "pt-BR": "Não foi possível criar o atalho: %s",
+   "zh-hans": "无法创建快捷方式：%s",
+   "zh-hant": "無法建立捷徑：%s"
+	},
+
+	"setting_auto_sort_before_launch": {
+		"de": "Mods vor dem Start des Spiels automatisch sortieren",
+		"en": "Auto-sort mods before launching game",
+		"es": "Ordenar mods automáticamente antes de iniciar el juego",
+		"fr": "Trier automatiquement les mods avant de lancer le jeu",
+		"it": "Ordina automaticamente le mod prima di avviare il gioco",
+		"ja": "ゲーム起動前にMODを自動並べ替え",
+		"ko": "게임 실행 전 모드 자동 정렬",
+		"pl": "Automatycznie sortuj mody przed uruchomieniem gry",
+	 "pt-BR": "Classificar mods automaticamente antes de iniciar o jogo",
+		"ru": "Автосортировка модов перед запуском игры",
+   "zh-hans": "启动游戏前自动排序模组",
+   "zh-hant": "啟動遊戲前自動排序模組"
+	},
+
+	"btn_edit_note_tooltip": {
+		"en": "Edit your personal note for this mod",
+		"ru": "Редактировать личную заметку для этого мода",
+		"de": "Persönliche Notiz bearbeiten",
+		"fr": "Modifier votre note personnelle",
+		"es": "Editar tu nota personal para este mod",
+		"it": "Modifica la tua nota personale per questa mod",
+		"ja": "このMODの個人メモを編集",
+		"ko": "이 모드에 대한 개인 메모 편집",
+		"pl": "Edytuj swoją osobistą notatkę dla tego moda",
+	 "pt-BR": "Editar sua nota pessoal para este mod",
+   "zh-hans": "编辑此模组的个人备注",
+   "zh-hant": "編輯此模組的個人備註"
+	},
+	"user_note_title": {
+		"en": "Personal note for \"%s\"",
+		"ru": "Личная заметка для «%s»",
+		"de": "Persönliche Notiz für \"%s\"",
+		"fr": "Note personnelle pour « %s »",
+		"es": "Nota personal para \"%s\"",
+		"it": "Nota personale per \"%s\"",
+		"ja": "「%s」の個人メモ",
+		"ko": "\"%s\"에 대한 개인 메모",
+		"pl": "Osobista notatka dla \"%s\"",
+	 "pt-BR": "Nota pessoal para \"%s\"",
+   "zh-hans": "\"%s\" 的个人备注",
+   "zh-hant": "\"%s\" 的個人備註"
+	},
+	"user_note_placeholder": {
+		"en": "Write your own note for the mod.",
+		"ru": "Напишите свою заметку для мода.",
+		"de": "Schreibe deine eigene Notiz für den Mod.",
+		"fr": "Écrivez votre propre note pour le mod.",
+		"es": "Escribe tu propia nota para el mod.",
+		"it": "Scrivi la tua nota per la mod.",
+		"ja": "このMODに自分のメモを書き込む。",
+		"ko": "이 모드에 대한 자신만의 메모를 작성하세요.",
+		"pl": "Napisz własną notatkę dla moda.",
+	 "pt-BR": "Escreva sua própria nota para o mod.",
+   "zh-hans": "为此模组写下你自己的备注。",
+   "zh-hant": "為此模組寫下你自己的備註。"
+	},
+	"btn_clear": {
+		"en": "Clear",
+		"ru": "Очистить",
+		"de": "Löschen",
+		"fr": "Effacer",
+		"es": "Limpiar",
+		"it": "Cancella",
+		"ja": "クリア",
+		"ko": "지우기",
+		"pl": "Wyczyść",
+	 "pt-BR": "Limpar",
+   "zh-hans": "清除",
+   "zh-hant": "清除"
 	}
 }
