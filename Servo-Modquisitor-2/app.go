@@ -982,12 +982,39 @@ func (app *App) loadDataAfterInit() {
 		},
 	)
 
+	// setModActiveFunc — единая точка смены активности мода из checks.
+	// Работает и на включение, и на выключение (второй аргумент).
+	//
+	// Реализация — тонкая обёртка над toggleModActive, но с переносом
+	// в UI-поток: CheckDependencies вызывается из фоновой горутины
+	// (runAllChecksInternal), а toggleModActive трогает виджеты
+	// (filterModList, forceRefreshTable).
+	checks.SetModActiveFunc(func(name string, active bool) bool {
+		fyne.DoAndWait(func() {
+			app.toggleModActive(name, active)
+		})
+		return true
+	})
+
+	// showChoiceDialogRows — многострочный вариант диалога выбора.
+	// Регистрируется отдельно от showChoiceDialog (в InitGlobals),
+	// потому что используется не везде, а только там, где кнопки
+	// не влезают в одну строку (CheckDependencies).
+	checks.SetShowChoiceDialogRowsFunc(
+		func(parent fyne.Window, title, msg string, rows [][]string) int {
+			return app.showChoiceDialogRowsSync(parent, title, msg, rows...)
+		})
+
 	if err := app.userNotes.Load(); err != nil {
 		app.appendLogToFile(fmt.Sprintf("Failed to load user_notes.json: %v", err))
 	}
 
 	checks.SetUserNotesGetter(func(folder string) string {
 		return app.userNotes.Get(folder)
+	})
+
+	checks.SetShowChoiceDialogRowsFunc(func(parent fyne.Window, title, msg string, rows [][]string) int {
+		return app.showChoiceDialogRowsSync(parent, title, msg, rows...)
 	})
 
 	sorter.SetFolderExistsFunc(checks.FolderExists)

@@ -28,6 +28,23 @@ var (
 	writeHeaderFunc func(*os.File, string)
 )
 
+// DanglingDependency — активный мод, у которого required-зависимость
+// отсутствует (не установлена или выключена).
+//
+// Возвращается из CreateLoadOrderFromActive, чтобы вызывающий мог
+// предупредить пользователя ПОСЛЕ сортировки. Это именно предупреждение,
+// а не блокировка: сортировка идёт своим ходом, рёбра без цели просто
+// отбрасываются.
+//
+// ВАЖНО: сюда попадают только настоящие зависимости из поля
+// "dependencies" (dependent requires required). Правила порядка
+// (mandatory chain, load_order) — это про порядок, а не про
+// «мод отсутствует», поэтому они сюда НЕ попадают.
+type DanglingDependency struct {
+	Dependent string
+	Required  string
+}
+
 type ModDependency struct {
 	Dependent string
 	Required  string
@@ -87,7 +104,7 @@ func LoadSortOrders(dataDir string) {
 	cachedEnglishOrder = readSortOrder(filepath.Join(dataDir, "english_sort_order.txt"))
 }
 
-func CreateLoadOrderFromActive(activeMods []string, lang string) {
+func CreateLoadOrderFromActive(activeMods []string, lang string) []DanglingDependency {
 	sorterDataMutex.RLock()
 	customOrder := loadCustomOrder(lang)
 	mandatory := mandatoryOrder
@@ -103,6 +120,32 @@ func CreateLoadOrderFromActive(activeMods []string, lang string) {
 		activeSet[m] = true
 	}
 
+	// ── Собираем «висячие» зависимости ДО сортировки ───────────────
+	//
+	// Используем только `deps` (реальные зависимости из JSON), а не
+	// allDeps: mandatory chain и load_order — это ограничения на
+	// ПОРЯДОК, а не «required должен быть установлен». Флагать их как
+	// missing — значит заваливать пользователя ложными срабатываниями.
+	var dangling []DanglingDependency
+	if len(deps) > 0 {
+		seen := make(map[string]bool, len(deps))
+		for _, dep := range deps {
+			if !activeSet[dep.Dependent] || activeSet[dep.Required] {
+				continue
+			}
+			key := dep.Dependent + "|" + dep.Required
+			if seen[key] {
+				continue
+			}
+			seen[key] = true
+			dangling = append(dangling, DanglingDependency{
+				Dependent: dep.Dependent,
+				Required:  dep.Required,
+			})
+		}
+	}
+
+	// ── Дальше — существующая логика сортировки и записи файла ────
 	var finalOrder []string
 	added := make(map[string]bool)
 
@@ -112,14 +155,12 @@ func CreateLoadOrderFromActive(activeMods []string, lang string) {
 			added[m] = true
 		}
 	}
-
 	for _, m := range customOrder {
 		if activeSet[m] && folderExists(m) && !added[m] {
 			finalOrder = append(finalOrder, m)
 			added[m] = true
 		}
 	}
-
 	var rest []string
 	for m := range activeSet {
 		if !added[m] && folderExists(m) {
@@ -134,14 +175,14 @@ func CreateLoadOrderFromActive(activeMods []string, lang string) {
 			continue
 		}
 		allDeps = append(allDeps, ModDependency{
-			Required:  rule.Before, // Зависимость ДО
-			Dependent: rule.After,  // Зависимый ПОСЛЕ
+			Required:  rule.Before,
+			Dependent: rule.After,
 		})
 	}
 	for i := 0; i < len(mandatory)-1; i++ {
 		allDeps = append(allDeps, ModDependency{
-			Required:  mandatory[i],   // Зависимость ДО
-			Dependent: mandatory[i+1], // Зависимый ПОСЛЕ
+			Required:  mandatory[i],
+			Dependent: mandatory[i+1],
 		})
 	}
 	sortedRest := topologicalSort(rest, allDeps)
@@ -152,14 +193,14 @@ func CreateLoadOrderFromActive(activeMods []string, lang string) {
 		if logFunc != nil {
 			logFunc("loadOrderOutputPath is not set")
 		}
-		return
+		return dangling
 	}
 	file, err := os.Create(outPath)
 	if err != nil {
 		if logFunc != nil {
 			logFunc(fmt.Sprintf("Failed to create load order file: %v", err))
 		}
-		return
+		return dangling
 	}
 	defer file.Close()
 
@@ -173,6 +214,8 @@ func CreateLoadOrderFromActive(activeMods []string, lang string) {
 	if logFunc != nil {
 		logFunc(logMLOTCreated)
 	}
+
+	return dangling
 }
 
 func loadCustomOrder(lang string) []string {

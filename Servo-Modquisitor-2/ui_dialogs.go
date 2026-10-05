@@ -78,7 +78,30 @@ func (app *App) showChoiceDialog(parent fyne.Window, title, message string, call
 		)
 
 		popUp = widget.NewModalPopUp(content, parent.Canvas())
-		popUp.Resize(fyne.NewSize(DialogMinWidth500, DialogMinHeight200))
+
+		// Размер по содержимому: длинные локализованные подписи и
+		// 5+ кнопок в фиксированные 500px не влезают — Fyne обрезает
+		// правую часть. Берём natural size плюс отступы, но не меньше
+		// прежнего минимума и не больше 90% родительского канваса.
+		sz := content.MinSize()
+		w := sz.Width + 60
+		h := sz.Height + 60
+		if w < DialogMinWidth500 {
+			w = DialogMinWidth500
+		}
+		if h < DialogMinHeight200 {
+			h = DialogMinHeight200
+		}
+		if parent != nil && parent.Canvas() != nil {
+			ps := parent.Canvas().Size()
+			if maxW := ps.Width * 0.9; w > maxW {
+				w = maxW
+			}
+			if maxH := ps.Height * 0.9; h > maxH {
+				h = maxH
+			}
+		}
+		popUp.Resize(fyne.NewSize(w, h))
 		popUp.Show()
 	})
 }
@@ -127,6 +150,98 @@ func (app *App) showChoiceDialogAsync(parent fyne.Window, title, message string,
 	app.showChoiceDialog(parent, title, message, callback, options...)
 }
 
+// showChoiceDialogRows — вариант showChoiceDialog, в котором кнопки
+// разложены по строкам. Индексы в callback — плоские: сначала все
+// кнопки первой строки, потом второй, слева-направо. Логика вызывающего
+// кода, построенная на едином actions-массиве, остаётся верной.
+func (app *App) showChoiceDialogRows(parent fyne.Window, title, message string, callback func(int), rows ...[]string) {
+	fyne.Do(func() {
+		app.bringToFront()
+		var popUp *widget.PopUp
+
+		flatIdx := 0
+		var rowContainers []fyne.CanvasObject
+		for _, rowOpts := range rows {
+			if len(rowOpts) == 0 {
+				continue
+			}
+			rowObjs := make([]fyne.CanvasObject, 0, len(rowOpts))
+			for _, opt := range rowOpts {
+				idx := flatIdx
+				flatIdx++
+				btn := widget.NewButton(opt, func() {
+					if popUp != nil {
+						popUp.Hide()
+					}
+					if callback != nil {
+						callback(idx)
+					}
+				})
+				rowObjs = append(rowObjs, btn)
+			}
+			rowContainers = append(rowContainers,
+				container.NewCenter(container.NewHBox(rowObjs...)))
+		}
+
+		titleLabel := widget.NewLabelWithStyle(title, fyne.TextAlignCenter, fyne.TextStyle{Bold: true})
+		msgLabel := widget.NewLabel(message)
+		msgLabel.Wrapping = fyne.TextWrapWord
+
+		content := container.NewVBox(
+			titleLabel,
+			widget.NewSeparator(),
+			msgLabel,
+			widget.NewSeparator(),
+		)
+		for _, rc := range rowContainers {
+			content.Add(rc)
+		}
+
+		popUp = widget.NewModalPopUp(content, parent.Canvas())
+
+		// Размер по содержимому + страховка от 500px-минимума и 90% канваса.
+		sz := content.MinSize()
+		w := sz.Width + 60
+		h := sz.Height + 60
+		if w < DialogMinWidth500 {
+			w = DialogMinWidth500
+		}
+		if h < DialogMinHeight200 {
+			h = DialogMinHeight200
+		}
+		if parent != nil && parent.Canvas() != nil {
+			ps := parent.Canvas().Size()
+			if maxW := ps.Width * 0.9; w > maxW {
+				w = maxW
+			}
+			if maxH := ps.Height * 0.9; h > maxH {
+				h = maxH
+			}
+		}
+		popUp.Resize(fyne.NewSize(w, h))
+		popUp.Show()
+	})
+}
+
+// showChoiceDialogRowsSync — синхронный вариант showChoiceDialogRows
+// для фоновых горутин. По контракту совпадает с showChoiceDialogSync:
+// блокирует вызывающую горутину, при таймауте возвращает -1.
+func (app *App) showChoiceDialogRowsSync(parent fyne.Window, title, message string, rows ...[]string) int {
+	resultChan := make(chan int, 1)
+	app.showChoiceDialogRows(parent, title, message, func(choice int) {
+		resultChan <- choice
+	}, rows...)
+
+	select {
+	case choice := <-resultChan:
+		return choice
+	case <-time.After(5 * time.Minute):
+		app.appendLogToFile(fmt.Sprintf(
+			"showChoiceDialogRowsSync: timeout waiting for user choice (title=%q)", title))
+		return -1
+	}
+}
+
 // Основной диалог скачивания (для обычных модов)
 func (app *App) showDownloadDialog(downloadURL, filename string, modName string, fileInfo *FileInfo, modID string) {
 	displayFilename := filename
@@ -140,9 +255,7 @@ func (app *App) showDownloadDialog(downloadURL, filename string, modName string,
 
 	if autoConfirm {
 		// Пользователь явно разрешил пропускать подтверждение.
-		// Consent уже дан им на сайте Nexus при клике
-		// «Mod Manager Download».
-		app.appendLog(fmt.Sprintf(app.msg("log_downloading_mod"), modName))
+		// Consent уже дан им на сайте Nexus при клике «Mod Manager Download».
 		app.startDownload(downloadURL, filename, modName, fileInfo, modID)
 		return
 	}
@@ -318,7 +431,6 @@ func (app *App) showDMLDownloadDialog(downloadURL, filename string, fileInfo *Fi
 	}
 
 	if autoConfirm {
-		app.appendLog(fmt.Sprintf(app.msg("log_downloading_mod"), "Darktide Mod Loader"))
 		run()
 		return
 	}
@@ -355,7 +467,7 @@ func (app *App) showDMFDownloadDialog(downloadURL, filename string, fileInfo *Fi
 	}
 
 	if autoConfirm {
-		app.appendLog(fmt.Sprintf(app.msg("log_downloading_mod"), "Darktide Mod Framework"))
+		// app.appendLog(fmt.Sprintf(app.msg("log_downloading_mod"), "Darktide Mod Framework"))
 		run()
 		return
 	}
@@ -392,7 +504,6 @@ func (app *App) showAutopatcherDownloadDialog(downloadURL, filename string, file
 	}
 
 	if autoConfirm {
-		app.appendLog(fmt.Sprintf(app.msg("log_downloading_mod"), "Darktide Mod Autopatcher"))
 		run()
 		return
 	}

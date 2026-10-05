@@ -610,15 +610,20 @@ func (app *App) autoAddModToDatabase(modID int, folderName string, fileName ...s
 		app.appendLogToFile(fmt.Sprintf(app.msg("log_failed_to_save_mod_db"), err))
 	} else {
 		app.appendLog(fmt.Sprintf(app.msg("log_mod_db_updated"), folderName))
-		// Забираем свежий список из modDBMap (внутри GetModDBList уже
-		// взята блокировка modDBMutex в пакете checks).
 		newDB := checks.GetModDBList()
 		app.modsMutex.Lock()
 		app.modDatabase = newDB
 		app.modsMutex.Unlock()
 		checks.SetModDatabase(newDB)
+
+		// refreshModList НЕ вызываем: мод уже в списке после
+		// finalizeModInstallUI, а мы лишь дополняем запись в базе
+		// (author/description/pattern). Полный refreshModList по 267
+		// модам ради одного поля — заметный фриз UI.
 		fyne.Do(func() {
-			app.refreshModList()
+			if app.selectedModName == folderName {
+				app.updateDescriptionForMod(folderName)
+			}
 		})
 	}
 }

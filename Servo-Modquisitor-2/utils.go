@@ -172,10 +172,37 @@ func (app *App) runAllChecksInternal(openFileAtEnd bool) bool {
 		return false
 	}
 
-	// 1. Перечитываем самый свежий сохранённый файл
-	fyne.Do(func() {
-		app.refreshModList()
-	})
+	// 1. Перечитываем состояние с диска — но ТОЛЬКО если в памяти
+	// нет несохранённых изменений.
+	//
+	// Безусловный refreshModList здесь — источник плавающего бага:
+	// CheckDependencies выше мог выключить мод (allMods[X].Active =
+	// false, orderDirty = true), а refreshModList перечитывает
+	// mod_load_order.txt, где мод ещё помечен активным, и затирает
+	// только что сделанное переключение — вплоть до сброса
+	// orderDirty. Мод снова попадает в активную сортировку.
+	//
+	// Guard !orderDirty сохраняет «подхват внешних правок»
+	// (ручное редактирование mod_load_order.txt при отсутствии
+	// pending-изменений) и при этом уважает in-memory изменения.
+	//
+	// DoAndWait, а не Do: activeNames ниже строятся из app.allMods,
+	// и при отсутствии pending-изменений нам действительно нужно
+	// дождаться, пока refreshModList применит свежий снимок с диска,
+	// прежде чем его читать. Асинхронный Do здесь дал бы гонку
+	// с RLock ниже (см. памятку: «DoAndWait — когда нужно
+	// дождаться UI-обновления перед продолжением работы»).
+	//
+	// Внимание: refreshModList не вызывает fyne.Do/DoAndWait
+	// внутри (проверено по всему call-tree: filterModList,
+	// forceRefreshTable, updateSystemModsTable, pruneVersionCache,
+	// updateTableBorder — прямые UI-вызовы, без обёрток).
+	// Значит, вложенного DoAndWait не будет и deadlock-а тоже.
+	if !app.orderDirty.Load() {
+		fyne.DoAndWait(func() {
+			app.refreshModList()
+		})
+	}
 
 	// 2. Собираем активные моды для сортировки
 	app.modsMutex.RLock()
@@ -204,7 +231,7 @@ func (app *App) runAllChecksInternal(openFileAtEnd bool) bool {
 
 	app.loadOrderMutex.Lock()
 
-	sorter.CreateLoadOrderFromActive(activeNames, lang)
+	dangling := sorter.CreateLoadOrderFromActive(activeNames, lang)
 
 	// Дописываем неактивные моды в файл профиля
 	profileOrderPath := filepath.Join(app.activeProfilePath(), "mods", FileNameLoadOrder)
@@ -235,6 +262,35 @@ func (app *App) runAllChecksInternal(openFileAtEnd bool) bool {
 
 	app.appendLog(app.msg("log_create_mlot"))
 	app.appendLog(app.msg("log_mlot_created"))
+
+	// Предупреждение о висячих зависимостях.
+	//
+	// CheckDependencies (до сортировки) уже показал диалог, но пользователь
+	// мог нажать Skip — тогда мы продолжаем с проблемными зависимостями.
+	// Здесь фиксируем это в логе, чтобы пользователь не забыл.
+	if len(dangling) > 0 {
+		app.appendLog(fmt.Sprintf(app.msg("sort_dangling_deps_header"), len(dangling)))
+		for _, d := range dangling {
+			depName := d.Dependent
+			if entry := checks.GetModDBEntry(d.Dependent); entry != nil {
+				if n := checks.PickLocalized(entry.Name, lang); n != "" {
+					depName = n
+				}
+			}
+			reqName := d.Required
+			if entry := checks.GetModDBEntry(d.Required); entry != nil {
+				if n := checks.PickLocalized(entry.Name, lang); n != "" {
+					reqName = n
+				}
+			}
+			app.appendLog(fmt.Sprintf(app.msg("sort_dangling_deps_line"), depName, reqName))
+		}
+		app.appendLogToFile(fmt.Sprintf(
+			"sort: %d dangling dependency entries (folder names):", len(dangling)))
+		for _, d := range dangling {
+			app.appendLogToFile(fmt.Sprintf("  - %s requires %s", d.Dependent, d.Required))
+		}
+	}
 
 	// Логируем финальный порядок для отладки.
 	app.cfgMutex.RLock()

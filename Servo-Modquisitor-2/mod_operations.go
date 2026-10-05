@@ -118,13 +118,17 @@ func (app *App) refreshModList() {
 		})
 	}
 
-	// Цикл для обработки обычных модов (regMods)
-	// Один снимок на всю функцию — не дёргаем мьютекс в цикле
+	// Снимки за цикл: GetObsoleteMods/GetMandatoryOrder возвращают
+	// полную копию слайса при каждом вызове, а IsMandatoryMod берёт
+	// RLock. На 267 модах это давало сотни аллокаций и lock/unlock
+	// на пустом месте — существенная часть задержки refreshModList.
 	incompatiblePairs := checks.GetIncompatiblePairs()
+	obsoleteSnapshot := checks.GetObsoleteMods()
+	mandatorySnapshot := checks.GetMandatoryOrder()
 
 	for i := range regMods {
-		regMods[i].Obsolete = helpers.ContainsString(checks.GetObsoleteMods(), regMods[i].Name)
-		regMods[i].Mandatory = checks.IsMandatoryMod(regMods[i].Name)
+		regMods[i].Obsolete = helpers.ContainsString(obsoleteSnapshot, regMods[i].Name)
+		regMods[i].Mandatory = helpers.ContainsString(mandatorySnapshot, regMods[i].Name)
 		regMods[i].Incompatible = app.checkIncompatible(regMods[i].Name)
 
 		// Описание несовместимости в таблице в Примечании
@@ -314,6 +318,8 @@ func (app *App) refreshModList() {
 	app.updateSystemModsTable()
 
 	app.forceRefreshTable()
+
+	app.updateTableBorder()
 }
 
 func (app *App) updateSystemModsTable() {

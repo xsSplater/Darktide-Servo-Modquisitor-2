@@ -71,7 +71,12 @@ func main() {
 		// Оптимизация: если запущен живой инстанс — перекинуть URL и выйти.
 		// Это НЕ замена single-instance check: isAlreadyRunning() ниже
 		// сработает, даже если TCP не прошёл.
-		if conn, err := net.Dial(NXMProtocol, NXMAddress); err == nil {
+		//
+		// DialTimeout, а не Dial: у Dial нет таймаута на установление
+		// соединения, и при недоступном/зависшем порту он ждёт дефолтный
+		// таймаут ядра (до минуты). Пользователь в это время видит
+		// «программа думает». 800 мс хватает на любой localhost с запасом.
+		if conn, err := net.DialTimeout(NXMProtocol, NXMAddress, nxmDialTimeout); err == nil {
 			fmt.Fprintln(conn, nxmURL)
 			conn.Close()
 			os.Exit(0)

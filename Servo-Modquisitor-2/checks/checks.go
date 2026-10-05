@@ -48,14 +48,19 @@ var (
 	// держит указатель на map, которую App подменяет целиком.
 	msgGetter        func(string) string
 	showChoiceDialog func(fyne.Window, string, string, ...string) int
-	openURL          func(string)
-	modsDir          string
-	isModActiveFunc  func(string) bool
-	modDBMap         map[string]*ModDBEntry
-	modDBMutex       sync.RWMutex // защищает modDBMap
-	externalVersion  string
-	extVersionMutex  sync.RWMutex // защищает externalVersion
-	getInstalledAt   func(string) int64
+	// showChoiceDialogRows — то же самое, но кнопки разложены по строкам.
+	// Используется там, где в одну строку кнопки не влезают (например,
+	// CheckDependencies с 5 действиями и длинными локализованными
+	// подписями).
+	showChoiceDialogRows func(fyne.Window, string, string, [][]string) int
+	openURL              func(string)
+	modsDir              string
+	isModActiveFunc      func(string) bool
+	modDBMap             map[string]*ModDBEntry
+	modDBMutex           sync.RWMutex // защищает modDBMap
+	externalVersion      string
+	extVersionMutex      sync.RWMutex // защищает externalVersion
+	getInstalledAt       func(string) int64
 
 	// pathsMutex защищает modsDir, profileDataDir, globalDataDir.
 	// Порядок: pathsMutex — внутренний (вкладывается в modDBMutex,
@@ -72,6 +77,21 @@ var getUserNote func(string) string
 func SetUserNotesGetter(fn func(string) string) {
 	getUserNote = fn
 }
+
+// setModActiveFunc — устанавливается из App. Меняет состояние
+// активности мода по имени папки: active==true включает, active==false
+// выключает. Возвращает true, если удалось.
+//
+// Нужен именно колбэк (а не прямой вызов App): checks не должен знать
+// про App. Порядок вызова как у isModActiveFunc — регистрируется в
+// InitGlobals-окружении при старте.
+//
+// Заменяет прежний SetEnableModFunc: одна функция вместо двух, потому
+// что и «включить», и «выключить» — одна операция toggleModActive.
+var setModActiveFunc func(string, bool) bool
+
+// SetModActiveFunc устанавливает функцию переключения активности мода.
+func SetModActiveFunc(fn func(string, bool) bool) { setModActiveFunc = fn }
 
 // userNotePrefix отделяет пользовательскую заметку от базы.
 const userNotePrefix = "📝 "
@@ -129,6 +149,12 @@ func InitGlobals(
 	isModActiveFunc = isActiveFn
 	refreshModListFunc = refreshFn
 	getInstalledAt = installedAtGetter
+}
+
+// SetShowChoiceDialogRowsFunc устанавливает колбэк многострочного диалога.
+// Регистрируется из App на старте — рядом с остальными UI-колбэками.
+func SetShowChoiceDialogRowsFunc(fn func(fyne.Window, string, string, [][]string) int) {
+	showChoiceDialogRows = fn
 }
 
 func SetProfileDataDir(path string) {
@@ -704,7 +730,13 @@ type IncompatiblePair struct {
 	Desc map[string]string `json:"desc"`
 	Type string            `json:"type,omitempty"`
 }
-type Dependency struct{ Dependent, Required, RequiredURL string }
+
+// Dependency — одна запись из массива "dependencies" в mandatory_obsolete_incompatible_dependencies.json.
+type Dependency struct {
+	Dependent   string `json:"dependent"`
+	Required    string `json:"required"`
+	RequiredURL string `json:"url"`
+}
 
 func LoadExternalLists(filename string) error {
 	dir := getGlobalDataDir()
@@ -1121,48 +1153,344 @@ func pairKey(pair IncompatiblePair) string {
 	return pair.Mod2 + "|" + pair.Mod1
 }
 
+// appendLogToFileSafe — не паникует, если appendLog не установлен.
+// Нужна на путях, где мы не можем гарантировать инициализацию
+// (например, ранние проверки).
+func appendLogToFileSafe(msg string) {
+	if appendLog != nil {
+		appendLog(msg)
+	}
+}
+
+// CheckDependencies проверяет активные моды на отсутствующие зависимости.
+//
+// Все проблемы собираются за один проход и показываются ОДНИМ диалогом.
+// В диалоге используются display-имена модов (из mod_database), а не
+// имена папок; в лог пишутся имена папок — для отладки.
+//
+// Зависимости делятся на две группы:
+//   - required-мод УСТАНОВЛЕН (папка есть), но выключен → предлагаем
+//     включить, скачивать нечего;
+//   - required-мод не установлен → предлагаем страницу Nexus.
+//
+// Кнопки разложены на две строки:
+//
+//	строка 1 (безопасные): Skip | Enable required | Open pages
+//	строка 2 (разрушительные): Disable dependents | Delete dependents
+//
+// Так разрушительные действия визуально отделены от конструктивных,
+// и пользователь не промахивается по кнопке.
+//
+// Возвращает:
+//
+//	true  — можно продолжать (зависимости в порядке, включили нужные,
+//	        отключили/удалили зависимые, или пользователь выбрал Skip);
+//	false — пользователь открыл страницу required-мода и ушёл его
+//	        ставить.
 func CheckDependencies(window fyne.Window) bool {
-	// Копируем список зависимостей под защитой мьютекса
 	checksDataMutex.RLock()
 	depsCopy := make([]Dependency, len(Dependencies))
 	copy(depsCopy, Dependencies)
 	checksDataMutex.RUnlock()
 
-	for {
-		var found *Dependency
-		for _, dep := range depsCopy {
-			if isModActiveFunc != nil && isModActiveFunc(dep.Dependent) && !isModActiveFunc(dep.Required) {
-				d := dep
-				found = &d
+	if isModActiveFunc == nil || len(depsCopy) == 0 {
+		appendLog(msgGetter("no_dependency_issues"))
+		return true
+	}
+
+	lang := getCurrentLang()
+
+	type missingItem struct {
+		dep           Dependency
+		dependentName string // display name зависимого мода
+		requiredName  string // display name требуемого мода
+		installed     bool   // папка required-мода существует
+	}
+
+	var missing []missingItem
+	for _, dep := range depsCopy {
+		if !isModActiveFunc(dep.Dependent) {
+			continue
+		}
+		if isModActiveFunc(dep.Required) {
+			continue
+		}
+		missing = append(missing, missingItem{
+			dep:           dep,
+			dependentName: getDisplayName(dep.Dependent, lang),
+			requiredName:  getDisplayName(dep.Required, lang),
+			installed:     FolderExists(dep.Required),
+		})
+	}
+
+	if len(missing) == 0 {
+		appendLog(msgGetter("no_dependency_issues"))
+		return true
+	}
+
+	// Разбиваем на группы — от этого зависит набор кнопок.
+	var enableable, downloadable []missingItem
+	for _, m := range missing {
+		if m.installed {
+			enableable = append(enableable, m)
+		} else {
+			downloadable = append(downloadable, m)
+		}
+	}
+
+	// Уникальные имена целевых модов для действий. Один мод может
+	// быть зависимым сразу от нескольких required (CustomCharacterBots:
+	// SoloPlay + BetterBots) или несколько зависимых могут требовать
+	// один required (три мода требуют SoloPlay). В обоих случаях
+	// итерация по всем записям missing выполняла бы действие несколько
+	// раз: toggleModActive и RemoveMod идемпотентны, но плодят
+	// дублирующиеся записи в логе и лишние refreshModList.
+	//
+	// Отображаем в диалоге по-прежнему по парам (пользователь должен
+	// видеть каждую проблему), а действуем — по уникальным именам.
+	uniqueDependents := make([]string, 0, len(missing))
+	seenDependents := make(map[string]bool, len(missing))
+	for _, m := range missing {
+		if !seenDependents[m.dep.Dependent] {
+			seenDependents[m.dep.Dependent] = true
+			uniqueDependents = append(uniqueDependents, m.dep.Dependent)
+		}
+	}
+
+	uniqueRequired := make([]string, 0, len(enableable))
+	seenRequired := make(map[string]bool, len(enableable))
+	for _, m := range enableable {
+		if !seenRequired[m.dep.Required] {
+			seenRequired[m.dep.Required] = true
+			uniqueRequired = append(uniqueRequired, m.dep.Required)
+		}
+	}
+
+	// Лог: имена папок + статус (для grep).
+	appendLog(fmt.Sprintf(msgGetter("dependency_missing_header"), len(missing)))
+	for _, m := range missing {
+		tag := "not installed"
+		if m.installed {
+			tag = "installed, disabled"
+		}
+		appendLog(fmt.Sprintf("  - %s requires %s [%s]",
+			m.dep.Dependent, m.dep.Required, tag))
+	}
+
+	// Сообщение: display names + статус.
+	lines := make([]string, 0, len(missing))
+	for _, m := range missing {
+		suffix := msgGetter("dependency_suffix_missing")
+		if m.installed {
+			suffix = msgGetter("dependency_suffix_installed")
+		}
+		lines = append(lines, fmt.Sprintf(
+			msgGetter("dependency_missing_line"),
+			m.dependentName, m.requiredName, suffix))
+	}
+	message := fmt.Sprintf(msgGetter("dependency_missing_header_short"),
+		len(missing), len(uniqueDependents)) +
+		"\n\n" + strings.Join(lines, "\n")
+
+	type depAction struct {
+		label string
+		run   func() bool
+	}
+	var actions []depAction
+
+	// ─── Строка 1: безопасные ────────────────────────────────────
+
+	// Skip — всегда.
+	actions = append(actions, depAction{
+		label: msgGetter("skip"),
+		run: func() bool {
+			appendLog(msgGetter("dependency_skipped"))
+			return true
+		},
+	})
+
+	// Enable required — только если есть что включать.
+	if len(uniqueRequired) > 0 {
+		// Снимок display-имён для логов: у нас остались только имена
+		// папок, а показать в логе хочется «человеческое» имя.
+		// Собираем map из исходного enableable — там уже есть пары.
+		requiredDisplay := make(map[string]string, len(enableable))
+		for _, m := range enableable {
+			if _, ok := requiredDisplay[m.dep.Required]; !ok {
+				requiredDisplay[m.dep.Required] = m.requiredName
+			}
+		}
+
+		enableList := uniqueRequired // capture
+		var label string
+		if len(enableList) == 1 {
+			label = fmt.Sprintf(msgGetter("dependency_btn_enable_one"),
+				requiredDisplay[enableList[0]])
+		} else {
+			label = fmt.Sprintf(msgGetter("dependency_btn_enable_all"),
+				len(enableList))
+		}
+		actions = append(actions, depAction{
+			label: label,
+			run: func() bool {
+				if setModActiveFunc == nil {
+					appendLogToFileSafe("dependency: setModActiveFunc is not set")
+					return true
+				}
+				for _, required := range enableList {
+					if setModActiveFunc(required, true) {
+						appendLog(fmt.Sprintf(msgGetter("dependency_enabled"),
+							requiredDisplay[required]))
+					} else {
+						appendLogToFileSafe(fmt.Sprintf(
+							"dependency: failed to enable %s", required))
+					}
+				}
+				return true
+			},
+		})
+	}
+
+	// Open pages — только если есть downloadable с URL.
+	if len(downloadable) > 0 {
+		hasURL := false
+		for _, m := range downloadable {
+			if m.dep.RequiredURL != "" {
+				hasURL = true
 				break
 			}
 		}
-		if found == nil {
-			appendLog(msgGetter("no_dependency_issues"))
-			return true
-		}
-		appendLog(fmt.Sprintf(msgGetter("dependency_error_list"), found.Dependent, found.Required))
-		choice := showChoiceDialog(window, msgGetter("dependency_title"),
-			fmt.Sprintf(msgGetter("dependency_desc"), found.Dependent, found.Required),
-			msgGetter("skip"),
-			fmt.Sprintf(msgGetter("open_required_page"), found.Required),
-			fmt.Sprintf(msgGetter("delete_dependent"), found.Dependent),
-		)
-		switch choice {
-		case 1:
-			openURL(found.RequiredURL)
-			return false
-		case 2:
-			RemoveMod(found.Dependent)
-			appendLog(fmt.Sprintf(msgGetter("deleted_mod"), found.Dependent))
-			if refreshModListFunc != nil {
-				refreshModListFunc()
+		if hasURL {
+			openList := downloadable
+			var label string
+			if len(openList) == 1 {
+				label = fmt.Sprintf(msgGetter("open_required_page"),
+					openList[0].requiredName)
+			} else {
+				label = msgGetter("dependency_btn_open_all")
 			}
-			time.Sleep(100 * time.Millisecond)
-		case 0:
-			return true
+			actions = append(actions, depAction{
+				label: label,
+				run: func() bool {
+					for _, m := range openList {
+						if m.dep.RequiredURL != "" {
+							openURL(m.dep.RequiredURL)
+						}
+					}
+					return false
+				},
+			})
 		}
 	}
+
+	// Граница между строками: всё, что добавлено до этого места —
+	// «безопасные» действия. То, что добавим ниже — разрушительные.
+	safeCount := len(actions)
+
+	// ─── Строка 2: разрушительные ────────────────────────────────
+
+	// Снимок display-имён зависимых модов (по имени папки) — общий
+	// для обеих «разрушительных» кнопок. У одного dependent имя
+	// одинаково во всех парах, поэтому берём первое встреченное.
+	dependentDisplay := make(map[string]string, len(missing))
+	for _, m := range missing {
+		if _, ok := dependentDisplay[m.dep.Dependent]; !ok {
+			dependentDisplay[m.dep.Dependent] = m.dependentName
+		}
+	}
+
+	// ─── Disable dependents (мягкий фикс) ────────────────────────
+	//
+	// Моды остаются на диске, но перестают грузиться. Полностью
+	// обратимо. Идём по uniqueDependents, а не по missing: один мод
+	// может отсутствовать сразу по нескольким зависимостям
+	// (CustomCharacterBots → SoloPlay + BetterBots), а toggle-нуть
+	// его надо один раз.
+	{
+		disableList := uniqueDependents
+		var label string
+		if len(disableList) == 1 {
+			label = fmt.Sprintf(msgGetter("dependency_btn_disable_one"),
+				dependentDisplay[disableList[0]])
+		} else {
+			label = fmt.Sprintf(msgGetter("dependency_btn_disable_all"),
+				len(disableList))
+		}
+		actions = append(actions, depAction{
+			label: label,
+			run: func() bool {
+				if setModActiveFunc == nil {
+					appendLogToFileSafe("dependency: setModActiveFunc is not set")
+					return true
+				}
+				for _, dependent := range disableList {
+					if setModActiveFunc(dependent, false) {
+						appendLog(fmt.Sprintf(msgGetter("dependency_disabled"),
+							dependentDisplay[dependent]))
+					} else {
+						appendLogToFileSafe(fmt.Sprintf(
+							"dependency: failed to disable %s", dependent))
+					}
+				}
+				return true
+			},
+		})
+	}
+
+	// ─── Delete dependents (жёсткий фикс) ────────────────────────
+	//
+	// Удаляет папки модов. Тоже по uniqueDependents и с display-именем
+	// в подписи кнопки.
+	{
+		deleteList := uniqueDependents
+		var label string
+		if len(deleteList) == 1 {
+			label = fmt.Sprintf(msgGetter("delete_dependent"),
+				dependentDisplay[deleteList[0]])
+		} else {
+			label = fmt.Sprintf(msgGetter("dependency_btn_delete_all"),
+				len(deleteList))
+		}
+		actions = append(actions, depAction{
+			label: label,
+			run: func() bool {
+				for _, dependent := range deleteList {
+					RemoveMod(dependent)
+					appendLog(fmt.Sprintf(msgGetter("deleted_mod"), dependent))
+				}
+				if refreshModListFunc != nil {
+					refreshModListFunc()
+				}
+				time.Sleep(100 * time.Millisecond)
+				return true
+			},
+		})
+	}
+
+	// ─── Показ диалога ───────────────────────────────────────────
+
+	options := make([]string, len(actions))
+	for i, a := range actions {
+		options[i] = a.label
+	}
+	row1 := options[:safeCount]
+	row2 := options[safeCount:]
+
+	var choice int
+	if showChoiceDialogRows != nil {
+		choice = showChoiceDialogRows(window, msgGetter("dependency_title"),
+			message, [][]string{row1, row2})
+	} else {
+		// Fallback: если App по какой-то причине не зарегистрировал
+		// многострочный диалог — показываем одной строкой, как раньше.
+		choice = showChoiceDialog(window, msgGetter("dependency_title"),
+			message, options...)
+	}
+	if choice < 0 || choice >= len(actions) {
+		// Диалог закрыт без выбора — считаем «пропустить».
+		return true
+	}
+	return actions[choice].run()
 }
 
 func PickLocalized(tr map[string]string, lang string) string {
