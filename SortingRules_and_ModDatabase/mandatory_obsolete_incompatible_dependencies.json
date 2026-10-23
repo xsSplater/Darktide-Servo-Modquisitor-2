@@ -18,7 +18,8 @@
 		"SimpleAssets",
 		"SimpleAudio",
 		"STC",
-		"visual_loadout_customization_community_patch"
+		"visual_loadout_customization_community_patch",
+		"extended_weapon_customization"
 	],
 
 	"load_order": [
@@ -35,6 +36,7 @@
 		{"before": "custom_hud",					"after": "DivisionHUD"},
 		{"before": "custom_hud",					"after": "SquadHud"},
 		{"before": "GlobalStore",					"after": "FilterTrash"},
+		{"before": "master_item_community_patch",	"after": "transonic_stance_colors"},
 		{"before": "MultiBind",						"after": "guarantee_ability_activation"},
 		{"before": "MultiBind",						"after": "guarantee_special_action"},
 		{"before": "MultiBind",						"after": "guarantee_weapon_swap"},
@@ -60,6 +62,7 @@
 		{"before": "extended_weapon_customization",	"after": "enhanced_character_selection"},
 		{"before": "extended_weapon_customization",	"after": "for_the_drip"},
 		{"before": "extended_weapon_customization",	"after": "GoToMastery"},
+		{"before": "extended_weapon_customization",	"after": "transonic_stance_colors"},
 		{"before": "extended_weapon_customization",	"after": "guarantee_special_action"},
 
 		{"before": "extended_weapon_customization_no_gun",
