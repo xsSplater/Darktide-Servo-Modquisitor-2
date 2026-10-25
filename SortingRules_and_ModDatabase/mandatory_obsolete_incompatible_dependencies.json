@@ -1,5 +1,5 @@
 {
-	"version": "3.0.1",
+	"version": "3.0.2",
 
 	"obsolete_mods": [
 		"ads_crosshair",
@@ -558,8 +558,6 @@
 		{ "mod1": "Grace",					"mod2": "Walk" },
 		{ "mod1": "GuaranteeQuell",			"mod2": "TapQuell" },
 		{ "mod1": "hideprompts",			"mod2": "HideYoKeybinds",			"type": "same" },
-		{ "mod1": "hub_shortcuts",			"mod2": "InstantCharacterChange",	"type": "same" },
-		{ "mod1": "hub_shortcuts",			"mod2": "quick_character_select",	"type": "same" },
 		{ "mod1": "hybrid_sprint",			"mod2": "StickySprint" },
 		{ "mod1": "i_purge_thy_name",		"mod2": "AnonPlayers",
 			"desc": {
