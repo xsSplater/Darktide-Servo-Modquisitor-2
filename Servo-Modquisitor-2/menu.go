@@ -7,6 +7,7 @@ import (
 	"Servo-Modquisitor/themes"
 	"fmt"
 	"net/url"
+	"path/filepath"
 
 	"fyne.io/fyne/v2"
 )
@@ -323,12 +324,24 @@ func (app *App) buildMainMenu() *fyne.MainMenu {
 			app.msg("menu_restore_settings"),
 			loadMenuIcon("import.png"),
 			func() { app.showRestoreSettingsDialog() }),
+		fyne.NewMenuItemSeparator(),
+		fyne.NewMenuItemWithIcon(
+			app.msg("menu_open_user_settings_folder"),
+			loadMenuIcon("folder_open.png"),
+			func() { app.openPathInFileManager(filepath.Dir(app.getUserSettingsPath())) },
+		),
 	)
 
 	// PROFILES MENU
 	profileMenu := fyne.NewMenuWithIcon(
 		app.msg("menu_profiles"),
 		loadMenuIcon("profiles.png"),
+		fyne.NewMenuItemWithIcon(
+			app.msg("menu_vortex_import"),
+			loadMenuIcon("vortex.png"),
+			func() { app.migrateFromVortex() },
+		),
+		fyne.NewMenuItemSeparator(),
 		fyne.NewMenuItemWithIcon(
 			app.msg("menu_profiles_create"),
 			loadMenuIcon("profile_add.png"),
@@ -360,6 +373,12 @@ func (app *App) buildMainMenu() *fyne.MainMenu {
 			app.msg("menu_profiles_reset"),
 			loadMenuIcon("reset_yellow.png"),
 			func() { app.ResetGameModsWithConfirm() }),
+		fyne.NewMenuItemSeparator(),
+		fyne.NewMenuItemWithIcon(
+			app.msg("menu_open_profiles_folder"),
+			loadMenuIcon("folder_open.png"),
+			func() { app.openPathInFileManager(app.profilesDir()) },
+		),
 	)
 
 	backupsMenu := fyne.NewMenuWithIcon(
@@ -393,24 +412,38 @@ func (app *App) buildMainMenu() *fyne.MainMenu {
 		fyne.NewMenuItemSeparator(),
 
 		fyne.NewMenuItemWithIcon(
+			app.msg("menu_guides_video_install_wiz"),
+			loadMenuIcon("video.png"),
+			func() {
+				u, _ := url.Parse(YouTubeGuideWizard) // Новый Визард
+				_ = app.myApp.OpenURL(u)
+			}),
+		fyne.NewMenuItemWithIcon(
+			app.msg("menu_guides_video_updates"),
+			loadMenuIcon("video.png"),
+			func() {
+				u, _ := url.Parse(YouTubeGuideUpdate) // Новый Обновы
+				_ = app.myApp.OpenURL(u)
+			}),
+		fyne.NewMenuItemWithIcon(
+			app.msg("menu_guides_video_collections"),
+			loadMenuIcon("video.png"),
+			func() {
+				u, _ := url.Parse(YouTubeGuideCollec) // Новый Коллекции
+				_ = app.myApp.OpenURL(u)
+			}),
+		fyne.NewMenuItemWithIcon(
 			app.msg("menu_guides_video_profiles"),
 			loadMenuIcon("video.png"),
 			func() {
-				u, _ := url.Parse(YouTubeGuideProfil)
+				u, _ := url.Parse(YouTubeGuideProfil) // Профили старый
 				_ = app.myApp.OpenURL(u)
 			}),
-		// fyne.NewMenuItemWithIcon(
-		// 	app.msg("menu_guides_video_profiles"),
-		// 	loadMenuIcon("video.png"),
-		// 	func() {
-		// 		u, _ := url.Parse(YouTubeGuideProfil)
-		// 		_ = app.myApp.OpenURL(u)
-		// 	}),
 		fyne.NewMenuItemWithIcon(
 			app.msg("menu_guides_video_hti"),
 			loadMenuIcon("video.png"),
 			func() {
-				u, _ := url.Parse(YouTubeGuideURLOld)
+				u, _ := url.Parse(YouTubeGuideURLOld) // Старый
 				_ = app.myApp.OpenURL(u)
 			}),
 	)
@@ -493,16 +526,9 @@ func (app *App) buildMainMenu() *fyne.MainMenu {
 	showSystemItem := fyne.NewMenuItem(app.msg("setting_show_system_mods"), func() {
 		app.cfgMutex.Lock()
 		app.cfg.ShowSystemMods = !app.cfg.ShowSystemMods
-		newShow := app.cfg.ShowSystemMods
 		app.cfgMutex.Unlock()
 		app.saveConfigSafe()
-		if app.systemModsTableContainer != nil {
-			if newShow {
-				app.systemModsTableContainer.Show()
-			} else {
-				app.systemModsTableContainer.Hide()
-			}
-		}
+		app.refreshModList()
 		app.mainWindow.SetMainMenu(app.buildMainMenu())
 	})
 	showSystemItem.Checked = showSystemMods

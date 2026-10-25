@@ -123,9 +123,9 @@ func (t ForcedDarkTheme) Color(name fyne.ThemeColorName, variant fyne.ThemeVaria
 	case ColorTableRowEven:
 		return color.NRGBA{R: 38, G: 38, B: 42, A: 155} // Цвет основной строки
 	case ColorTableRowOdd:
-		return color.NRGBA{R: 34, G: 34, B: 38, A: 5} // ?
+		return color.NRGBA{R: 34, G: 34, B: 38, A: 5} // Доп цвет таблицы
 	case ColorTableBorderDirty:
-		return color.NRGBA{R: 200, G: 100, B: 0, A: 255}
+		return color.NRGBA{R: 200, G: 100, B: 0, A: 255} // Цвет границы Dirty
 	case ColorTableHeaderBg:
 		return color.NRGBA{R: 20, G: 20, B: 20, A: 255} // Заголовок таблицы
 	case ColorSystemTableBg:
@@ -194,6 +194,13 @@ func (t ForcedDarkTheme) Color(name fyne.ThemeColorName, variant fyne.ThemeVaria
 		return color.NRGBA{R: 0xC0, G: 0xFF, B: 0x1A, A: 255}
 	case theme.ColorNameMenuItemHeaderBg:
 		return color.NRGBA{R: 0xC0, G: 0xFF, B: 0x1A, A: 0x14}
+
+	// ──────────────── AML-предупреждение ─────
+	case ColorAMLWarning:
+		// Насыщенный жёлтый, отличимый от оранжевого
+		// ColorTableBorderDirty (#FF9800) — чтобы пользователь
+		// мог различить «не сохранено» и «AML активен».
+		return color.NRGBA{R: 0x00, G: 0xFF, B: 0xFF, A: 0xFF}
 
 	// Если вдруг запрошен неизвестный цвет - отдаём белый (заглушка)
 	default:

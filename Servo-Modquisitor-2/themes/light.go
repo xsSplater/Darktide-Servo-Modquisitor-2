@@ -188,6 +188,12 @@ func (t ForcedLightTheme) Color(name fyne.ThemeColorName, variant fyne.ThemeVari
 	case theme.ColorNameMenuItemHeaderBg:
 		return color.NRGBA{R: 46, G: 125, B: 50, A: 0x14}
 
+	// ──────────────── AML-предупреждение ─────
+	case ColorAMLWarning:
+		// Тот же насыщенный жёлтый на светлой теме — на белом фоне
+		// читается как явное предупреждение.
+		return color.NRGBA{R: 0x00, G: 0xFF, B: 0xFF, A: 0xFF}
+
 	default:
 		return theme.DefaultTheme().Color(name, variant)
 	}

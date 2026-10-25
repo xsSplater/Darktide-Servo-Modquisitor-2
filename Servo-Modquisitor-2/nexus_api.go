@@ -4,6 +4,7 @@ package main
 import (
 	"Servo-Modquisitor/checks"
 	"Servo-Modquisitor/helpers"
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -12,8 +13,10 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"path/filepath"
 	"regexp"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 
@@ -118,6 +121,10 @@ func (app *App) DownloadFileWithProgress(ctx context.Context, url, destPath stri
 		return fmt.Errorf("HTTP error: %d", resp.StatusCode)
 	}
 
+	if bar == nil {
+		bar = &widget.ProgressBar{} // фиктивный бар, чтобы не было паники
+	}
+
 	totalSize := resp.ContentLength
 	app.appendLogToFile(fmt.Sprintf("DownloadFileWithProgress: content length %d", totalSize))
 
@@ -180,6 +187,8 @@ func (app *App) checkNexusUpdates() {
 		return
 	}
 
+	var updateItems []*BatchItem
+
 	app.appendLog(app.msg("log_checking_updates"))
 
 	// Показываем прогресс
@@ -191,7 +200,6 @@ func (app *App) checkNexusUpdates() {
 
 	totalMods := 0
 	processed := 0
-	updatesFound := 0
 
 	app.modsMutex.RLock()
 	allModsCopy := make([]checks.ModInfo, len(app.allMods))
@@ -243,9 +251,26 @@ func (app *App) checkNexusUpdates() {
 			continue
 		}
 
-		if fileInfo.UploadedTimestamp > saved.Timestamp {
-			app.appendLog(fmt.Sprintf(app.msg("update_available_x_a_b"), mod.Name, saved.Version, fileInfo.Version))
-			updatesFound++
+		// Сравниваем версии, а если дата есть, то и её
+		if compareVersions(fileInfo.Version, saved.Version) > 0 || (saved.Timestamp != 0 && fileInfo.UploadedTimestamp > saved.Timestamp) {
+			item := &BatchItem{
+				ID:          mod.Name,
+				Name:        mod.DisplayName,
+				Description: mod.Description,
+				Version:     fileInfo.Version,
+				NexusModID:  modID,
+				FileID:      fileInfo.ID,
+				Selected:    true,
+				Status:      BatchPending,
+				Author:      mod.Author,
+				Category:    mod.Category,
+				PictureURL:  mod.NexusPictureURL,
+			}
+			// Запрашиваем changelog
+			cl, _ := app.FetchChangelog(modID, fileInfo.ID)
+			item.Changelog = cl
+
+			updateItems = append(updateItems, item)
 		}
 
 		processed++
@@ -257,18 +282,15 @@ func (app *App) checkNexusUpdates() {
 		}
 	}
 
-	if updatesFound == 0 {
-		app.appendLog(app.msg("no_updates_found"))
+	if len(updateItems) > 0 {
+		// Для free-пользователя FileID пойдёт в manual-режим — батч сам
+		// разберётся. Не скрываем диалог.
+		fyne.Do(func() {
+			app.showBatchDialog(app.msg("batch_title_updates"), updateItems, BatchModeUpdate)
+		})
 	} else {
-		app.appendLog(fmt.Sprintf(app.msg("updates_found_count"), updatesFound))
+		app.appendLog(app.msg("no_updates_found"))
 	}
-
-	app.checkSpecialUpdates()
-	app.appendLog(app.msg("log_update_check_completed"))
-
-	fyne.Do(func() {
-		app.refreshModList()
-	})
 }
 
 // extractFileNameFromURL извлекает имя файла из последнего сегмента пути URL.
@@ -506,7 +528,8 @@ func (app *App) autoAddModToDatabase(modID int, folderName string, fileName ...s
 	if existing != nil && existing.URL != "" {
 		existingModID := helpers.ExtractModIDFromURL(existing.URL)
 		if existingModID != 0 && existingModID != modID {
-			// Если запись неполная (поля пустые) — разрешаем перезапись, удалив старую запись из кэша
+			// Если запись неполная (поля пустые) — разрешаем перезапись,
+			// удалив старую запись из кэша.
 			if existing.Name == nil || checks.PickLocalized(existing.Name, "en") == "" ||
 				existing.Description == nil || checks.PickLocalized(existing.Description, "en") == "" ||
 				existing.Author == "" {
@@ -518,7 +541,21 @@ func (app *App) autoAddModToDatabase(modID int, folderName string, fileName ...s
 				// Далее создадим новую запись с нуля
 				existing = nil // чтобы не копировать старую
 			} else {
-				app.appendLog(fmt.Sprintf(app.msg("mod_already_has_id"), folderName, existingModID, modID))
+				// Запись полная, но URL указывает на другой ID. Это
+				// ошибка прошлых версий парсера имён файлов: ID был
+				// извлечён неправильно, и в базу попал чужой URL.
+				// Молча оставлять его нельзя — пользователь видит
+				// битую ссылку и не может открыть страницу мода.
+				// Исправляем на реальный modID.
+				app.appendLogToFile(fmt.Sprintf(
+					"autoAddModToDatabase: fixing URL for %s: mods/%d → mods/%d",
+					folderName, existingModID, modID))
+				updated := *existing
+				updated.URL = fmt.Sprintf(NexusModIDLink, modID)
+				checks.UpdateModDBEntry(updated)
+				if err := checks.SaveModDatabase(); err != nil {
+					app.appendLogToFile(fmt.Sprintf(app.msg("log_failed_to_save_mod_db"), err))
+				}
 				return
 			}
 		}
@@ -600,6 +637,11 @@ func (app *App) autoAddModToDatabase(modID int, folderName string, fileName ...s
 	if entry.Author == "" {
 		entry.Author = info.Author
 	}
+	// Nexus отдаёт picture_url как прямую ссылку на CDN. Кэшируем
+	// её в базе, чтобы в UI не дёргать API каждый раз при выделении.
+	if entry.NexusPictureURL == "" {
+		entry.NexusPictureURL = info.PictureURL
+	}
 
 	// Гарантируем наличие всех языковых ключей (пустых)
 	ensureAllLanguageKeys(&entry)
@@ -616,14 +658,31 @@ func (app *App) autoAddModToDatabase(modID int, folderName string, fileName ...s
 		app.modsMutex.Unlock()
 		checks.SetModDatabase(newDB)
 
-		// refreshModList НЕ вызываем: мод уже в списке после
-		// finalizeModInstallUI, а мы лишь дополняем запись в базе
-		// (author/description/pattern). Полный refreshModList по 267
-		// модам ради одного поля — заметный фриз UI.
+		// refreshModList обязателен.
+		//
+		// Раньше здесь стоял только updateDescriptionForMod —
+		// предполагалось, что finalizeModInstallUI уже вызвал
+		// refreshModList, и текущий список модов уже знает о новом
+		// моде. Но finalizeModInstallUI работает в другой горутине
+		// и успевает вызвать refreshModList РАНЬШЕ, чем мы допишем
+		// URL в mod_database.json. В момент его прохода URL ещё
+		// пустой → cacheKey не строится → Source = "manual".
+		//
+		// Именно из-за этого только что установленный мод качается
+		// с Nexus, но в таблице отображается как «manual». При
+		// повторной установке URL уже в базе с прошлого раза, и
+		// проблема не видна.
+		//
+		// Теперь, когда newDB с URL попал в checks через
+		// SetModDatabase, refreshModList сможет построить cacheKey
+		// вида "1423:own_ammo_colors", найти запись в versionCache
+		// (она туда попала из startDownload через cacheModVersion
+		// с source="nexus") и выставить Source правильно.
+		//
+		// Один лишний refresh на установку — приемлемо: без него
+		// пользователь видит «manual» до перезапуска.
 		fyne.Do(func() {
-			if app.selectedModName == folderName {
-				app.updateDescriptionForMod(folderName)
-			}
+			app.refreshModList()
 		})
 	}
 }
@@ -658,6 +717,15 @@ func (app *App) getPremiumDownloadURL(modID, fileID string) (string, string, err
 	snippet := string(respBody)
 	if len(snippet) > 500 {
 		snippet = snippet[:500] + "..."
+	}
+	if resp.StatusCode == http.StatusUnauthorized {
+		// Premium-ручка тоже отдаёт 401 при невалидном токене.
+		// Раньше это попадало в общий «API error 401: {...}» без
+		// пояснений и без переключения меню.
+		app.handleAuthExpired()
+		return "", "", fmt.Errorf(
+			"not authenticated with Nexus Mods (HTTP 401). " +
+				"Please log in via the Nexus menu in Servo-Modquisitor.")
 	}
 	if resp.StatusCode != http.StatusOK {
 		return "", "", fmt.Errorf("API error %d: %s", resp.StatusCode, snippet)
@@ -722,10 +790,23 @@ func (app *App) getFreeDownloadURL(modID, fileID, key, expires string) (string, 
 	switch resp.StatusCode {
 	case http.StatusOK:
 		// продолжаем ниже
-	case http.StatusUnauthorized, http.StatusForbidden:
+	case http.StatusUnauthorized:
+		// 401 = OAuth-токен отсутствует или невалиден. Показываем
+		// пользователю окно «сессия истекла», переключаем меню
+		// на красный значок. handleAuthExpired самозащищён от
+		// параллельных вызовов, так что здесь можно звать его
+		// без дополнительных проверок.
+		app.handleAuthExpired()
 		return "", "", fmt.Errorf(
-			"download link expired or invalid (HTTP %d). Please generate a new link on Nexus.",
-			resp.StatusCode)
+			"not authenticated with Nexus Mods (HTTP 401). " +
+				"Please log in via the Nexus menu in Servo-Modquisitor.")
+	case http.StatusForbidden:
+		// 403 — токен валиден, но доступ запрещён: скорее всего,
+		// действительно истёк key/expires в ссылке или у аккаунта
+		// нет прав на файл. Здесь окно о сессии не показываем.
+		return "", "", fmt.Errorf(
+			"access denied (HTTP 403). The download link may have expired, " +
+				"or your Nexus account lacks permission for this file.")
 	default:
 		return "", "", fmt.Errorf("API error %d: %s", resp.StatusCode, snippet)
 	}
@@ -867,4 +948,256 @@ func (app *App) getOldestFileInfo(modID int) (*FileInfo, error) {
 		UploadedTimestamp: oldest.UploadedTimestamp,
 		FileName:          oldest.FileName,
 	}, nil
+}
+
+// fetchNexusThumbnail скачивает thumbnail мода с CDN Nexus и
+// возвращает его как fyne.Resource.
+//
+// Nexus CDN (staticdelivery.nexusmods.com) отдаёт 403 на «горячие»
+// запросы без Referer'а — это их hotlink-защита. Поэтому обязательно
+// ставим Referer на www.nexusmods.com и User-Agent нашего приложения
+// (те же значения, что используются во всех API-запросах).
+//
+// Формат картинок у Nexus — обычно PNG или JPEG, но иногда WebP.
+// Fyne-встроенный декодер (canvas/image.go) знает только jpeg/png, а
+// WebP требует отдельного импорта _ "golang.org/x/image/webp" в пакете
+// canvas. Пока этого импорта нет, WebP-картинка декодируется с ошибкой
+// (видно в логе как «Failed to render image»), но программа не падает —
+// просто не покажет картинку.
+func fetchNexusThumbnail(rawURL string) (fyne.Resource, error) {
+	req, err := http.NewRequest("GET", rawURL, nil)
+	if err != nil {
+		return nil, fmt.Errorf("build request: %w", err)
+	}
+	req.Header.Set("User-Agent", ConfigFolderSMQ)
+	req.Header.Set("Referer", NexusMainURL)
+
+	client := &http.Client{Timeout: 15 * time.Second}
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("HTTP %d", resp.StatusCode)
+	}
+
+	data, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("read body: %w", err)
+	}
+	if len(data) < 100 {
+		return nil, fmt.Errorf("response too small (%d bytes)", len(data))
+	}
+
+	// Имя ресурса — basename URL без query/fragment. Fyne при
+	// декодировании PNG/JPEG ориентируется на содержимое, а не на
+	// имя, но имя нужно для кэша внутри fyne (cache.GetSvg и т.п.).
+	name := filepath.Base(rawURL)
+	if idx := strings.IndexAny(name, "?#"); idx != -1 {
+		name = name[:idx]
+	}
+	if name == "" || name == "." || name == "/" {
+		name = "thumbnail.png"
+	}
+
+	return fyne.NewStaticResource(name, data), nil
+}
+
+// ─── Nexus Collections (GraphQL) ───────────────────────────────────
+type NexusCollection struct {
+	Name     string
+	Slug     string
+	Author   string
+	Revision int
+	Mods     []CollectionMod
+}
+
+type CollectionMod struct {
+	ModID    int
+	FileID   int
+	Name     string
+	Version  string
+	Optional bool
+}
+
+type collectionLink struct {
+	Game string
+	Slug string
+	Rev  int
+}
+
+// parseCollectionLink разбирает ссылки вида:
+// - nxm://warhammer40kdarktide/collections/slug/revisions/1
+// - https://www.nexusmods.com/games/warhammer40kdarktide/collections/slug
+func parseCollectionLink(rawURL string) (collectionLink, bool) {
+	u, err := url.Parse(strings.TrimSpace(rawURL))
+	if err != nil {
+		return collectionLink{}, false
+	}
+
+	var link collectionLink
+	if u.Scheme == "nxm" {
+		link.Game = u.Host
+		parts := strings.Split(strings.Trim(u.Path, "/"), "/")
+		if len(parts) >= 3 && parts[0] == "collections" {
+			link.Slug = parts[1]
+			if len(parts) >= 5 && parts[2] == "revisions" {
+				link.Rev, _ = strconv.Atoi(parts[3])
+			}
+		}
+	} else {
+		parts := strings.Split(strings.Trim(u.Path, "/"), "/")
+		for i, p := range parts {
+			if p == "collections" && i+1 < len(parts) {
+				link.Slug = parts[i+1]
+				if i > 0 && parts[i-1] != "games" {
+					link.Game = parts[i-1]
+				}
+			}
+			// Обработка .../collections/slug/revisions/5
+			if p == "revisions" && i+1 < len(parts) {
+				link.Rev, _ = strconv.Atoi(parts[i+1])
+			}
+		}
+	}
+	return link, link.Slug != ""
+}
+
+// fetchNexusCollection запрашивает коллекцию через GraphQL API v2.
+func (app *App) fetchNexusCollection(slug string, rev int) (*NexusCollection, error) {
+	urlStr := "https://api.nexusmods.com/v2/graphql"
+
+	query := `query($slug: String!, $domain: String, $revision: Int) {
+		collectionRevision(slug: $slug, domainName: $domain, revision: $revision, viewAdultContent: true) {
+			revisionNumber
+			collection { name slug user { name } }
+			modFiles { 
+				fileId 
+				optional 
+				version 
+				file { 
+					modId 
+					name 
+					version 
+					mod { version } 
+				} 
+			}
+		}
+	}`
+
+	vars := map[string]interface{}{"slug": slug, "domain": "warhammer40kdarktide"}
+	if rev > 0 {
+		vars["revision"] = rev
+	}
+
+	reqBody, _ := json.Marshal(map[string]interface{}{
+		"query":     query,
+		"variables": vars,
+	})
+
+	req, err := http.NewRequest("POST", urlStr, bytes.NewBuffer(reqBody))
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Application-Name", appName)
+	req.Header.Set("Application-Version", appVersion)
+
+	token := app.getAuthToken()
+	if token != "" {
+		req.Header.Set("Authorization", "Bearer "+token)
+	}
+
+	client := &http.Client{Timeout: Timeout10Seconds}
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	switch resp.StatusCode {
+	case http.StatusOK:
+		// Продолжаем парсинг
+	case http.StatusUnauthorized:
+		app.handleAuthExpired()
+		return nil, fmt.Errorf("GraphQL 401: not authenticated")
+	case http.StatusTooManyRequests:
+		return nil, fmt.Errorf("GraphQL 429: rate limited")
+	case http.StatusNotFound:
+		return nil, fmt.Errorf("GraphQL 404: collection not found")
+	default:
+		return nil, fmt.Errorf("GraphQL HTTP %d", resp.StatusCode)
+	}
+
+	var result struct {
+		Data struct {
+			Revision struct {
+				Number     int `json:"revisionNumber"`
+				Collection struct {
+					Name string `json:"name"`
+					Slug string `json:"slug"`
+					User struct {
+						Name string `json:"name"`
+					} `json:"user"`
+				} `json:"collection"`
+				Files []struct {
+					FileID   int    `json:"fileId"`
+					Optional bool   `json:"optional"`
+					Version  string `json:"version"`
+					File     *struct {
+						ModID   int    `json:"modId"`
+						Name    string `json:"name"`
+						Version string `json:"version"`
+						Mod     struct {
+							Version string `json:"version"`
+						} `json:"mod"`
+					} `json:"file"`
+				} `json:"modFiles"`
+			} `json:"collectionRevision"`
+		} `json:"data"`
+		Errors []interface{} `json:"errors"`
+	}
+
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return nil, err
+	}
+	if len(result.Errors) > 0 {
+		return nil, fmt.Errorf("GraphQL error: %v", result.Errors[0])
+	}
+
+	col := &NexusCollection{
+		Name:     result.Data.Revision.Collection.Name,
+		Slug:     result.Data.Revision.Collection.Slug,
+		Author:   result.Data.Revision.Collection.User.Name,
+		Revision: result.Data.Revision.Number,
+	}
+
+	for _, f := range result.Data.Revision.Files {
+		if f.File == nil {
+			continue
+		}
+		// Версия есть на трёх уровнях; берём первую непустую:
+		//   file.mod.version  — версия мода (то, что видно на странице)
+		//   file.version      — версия файла
+		//   modFiles.version  — версия файла (то же самое, но короче)
+		version := ""
+		if f.File.Mod.Version != "" {
+			version = f.File.Mod.Version
+		} else if f.File.Version != "" {
+			version = f.File.Version
+		} else {
+			version = f.Version
+		}
+
+		col.Mods = append(col.Mods, CollectionMod{
+			ModID:    f.File.ModID,
+			FileID:   f.FileID,
+			Name:     f.File.Name,
+			Version:  version,
+			Optional: f.Optional,
+		})
+	}
+	return col, nil
 }

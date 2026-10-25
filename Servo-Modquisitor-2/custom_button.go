@@ -118,7 +118,17 @@ func (r *_CustomButtonRenderer) updateColors() {
 		r.shadow.FillColor = th.Color(themes.ColorButtonShadow, variant)
 	}
 
-	r.bg.StrokeColor = th.Color(themes.ColorButtonStroke, variant)
+	// Рамка: если warningFrame — жёлтая, толще; иначе обычная.
+	// Значение применяется ко всем ветвям ниже, потому что жёлтая
+	// рамка должна быть видна всегда, независимо от hover/pressed/
+	// disabled-состояния и наличия bgImage.
+	if btn.warningFrame {
+		r.bg.StrokeColor = th.Color(themes.ColorAMLWarning, variant)
+		r.bg.StrokeWidth = 1
+	} else {
+		r.bg.StrokeColor = th.Color(themes.ColorButtonStroke, variant)
+		r.bg.StrokeWidth = 1
+	}
 
 	if btn.disabled {
 		r.bg.FillColor = th.Color(theme.ColorNameDisabledButton, variant)
@@ -128,7 +138,11 @@ func (r *_CustomButtonRenderer) updateColors() {
 
 	if r.bgImage != nil {
 		r.bg.FillColor = color.Transparent
-		r.bg.StrokeColor = th.Color(themes.ColorButtonStrokeImage, variant)
+		// Рамка уже назначена выше. Если warningFrame не установлен —
+		// используем обычный цвет для кнопки с фоном-картинкой.
+		if !btn.warningFrame {
+			r.bg.StrokeColor = th.Color(themes.ColorButtonStrokeImage, variant)
+		}
 		if btn.Importance == widget.WarningImportance {
 			r.text.Color = th.Color(theme.ColorNameForegroundOnWarning, variant)
 		} else {
@@ -167,6 +181,12 @@ type CustomButton struct {
 	focused  bool
 	disabled bool
 
+	// warningFrame — постоянная жёлтая обводка вокруг кнопки.
+	// Используется, например, для кнопок Save и Autosort, когда
+	// в системе обнаружен AML (Auto Mod Loader), и наши операции
+	// с load order'ом могут конфликтовать с ним.
+	warningFrame bool
+
 	OnMouseIn    func()
 	OnMouseOut   func()
 	OnMouseMoved func(*desktop.MouseEvent)
@@ -174,6 +194,17 @@ type CustomButton struct {
 	bgImage *canvas.Image
 
 	iconSize float32 // размер иконки
+}
+
+// SetWarningFrame включает/выключает постоянную жёлтую обводку.
+// Не путать с Importance=WarningImportance — та меняет фон, а
+// warningFrame только рамку. Обе могут сосуществовать.
+func (b *CustomButton) SetWarningFrame(on bool) {
+	if b.warningFrame == on {
+		return
+	}
+	b.warningFrame = on
+	b.Refresh()
 }
 
 func NewCustomButton(label string, tapped func()) *CustomButton {

@@ -5,7 +5,9 @@ import (
 	"Servo-Modquisitor/checks"
 	"Servo-Modquisitor/helpers"
 	"Servo-Modquisitor/themes"
+	"bytes"
 	"fmt"
+	"image"
 	"image/color"
 	"net/url"
 	"path/filepath"
@@ -91,7 +93,6 @@ func (app *App) buildUI() {
 	app.buildManagePanel()
 	topPanelWithBg := app.buildTopPanel(filterSelectWithSize, searchBar)
 	app.buildHeaderTable()
-	app.buildSystemModsTable()
 	app.buildModsTable()
 	bottomPanel := app.buildBottomPanel()
 	rightContent := app.buildDescriptionCard()
@@ -129,7 +130,7 @@ func (app *App) buildControlButtons() {
 	addRes := app.loadIconResource("add", "assets/buttons/add.png")
 	autosortRes := app.loadIconResource("autosort", "assets/buttons/sort.png")
 	checkUpdatesRes := app.loadIconResource("check_updates", "assets/buttons/check_updates_blue.png")
-	updateAllRes := app.loadIconResource("update_all", "assets/buttons/update_all_mods_blue_p.png")
+	// updateAllRes := app.loadIconResource("update_all", "assets/buttons/update_all_mods_blue_p.png")
 	updateSelRes := app.loadIconResource("update_sel", "assets/buttons/update_selected_blue_p.png")
 	playRes := app.loadIconResource("play", "assets/buttons/play.png")
 	playFastRes := app.loadIconResource("play_fast", "assets/buttons/play_fast.png")
@@ -277,10 +278,10 @@ func (app *App) buildControlButtons() {
 	})
 	app.btnCheckUpdates.SetToolTip(app.msg("btn_check_updates_tooltip"))
 
-	app.btnUpdateAll = NewIconButton(updateAllRes, func() {
-		go app.updateAllModsFromNexus()
-	})
-	app.btnUpdateAll.SetToolTip(app.msg("btn_update_all_premium_only"))
+	// app.btnUpdateAll = NewIconButton(updateAllRes, func() {
+	// 	go app.updateAllModsFromNexus()
+	// })
+	// app.btnUpdateAll.SetToolTip(app.msg("btn_update_all_premium_only"))
 
 	// Запуск игры ──────────────────────────────────────────────
 	gameRoot, _ := app.getGameState()
@@ -325,6 +326,35 @@ func (app *App) loadIconResource(name, path string) fyne.Resource {
 	return fyne.NewStaticResource(name, data)
 }
 
+// statusIconCache хранит уже загруженные иконки статусов. Заполняется
+// только из UI-потока (updateCell, updateDescriptionForMod), поэтому
+// без мьютекса.
+var statusIconCache = map[string]fyne.Resource{}
+
+// statusIcon возвращает canvas.Image с иконкой статуса. Иконка берётся
+// из assets/buttons/<filename>.png и кэшируется между вызовами, чтобы
+// не читать файл на каждую ячейку таблицы.
+func (app *App) statusIcon(filename string) *canvas.Image {
+	res, ok := statusIconCache[filename]
+	if !ok {
+		res = app.loadIconResource(filename, "assets/buttons/"+filename+".png")
+		statusIconCache[filename] = res
+	}
+	img := canvas.NewImageFromResource(res)
+	img.FillMode = canvas.ImageFillContain
+	img.SetMinSize(fyne.NewSize(20, 20))
+	return img
+}
+
+// statusRow — строка секции в правой панели: иконка слева, текст
+// справа с переносом. Используется и в секции «Статус», и в «Проблемы».
+func (app *App) statusRow(iconName, text string) fyne.CanvasObject {
+	icon := app.statusIcon(iconName)
+	label := widget.NewLabel(text)
+	label.Wrapping = fyne.TextWrapWord
+	return container.NewBorder(nil, nil, icon, nil, label)
+}
+
 // ─────────────────────────────────────────────────────────────────
 // Мелкие обработчики кнопок (вынесены из closures для читаемости)
 // ─────────────────────────────────────────────────────────────────
@@ -343,6 +373,12 @@ func (app *App) refreshWithDirtyCheck() {
 				switch choice {
 				case 0:
 					app.saveOrderFromUI(func() {
+						// saveOrderFromUI с onDone != nil НЕ вызывает
+						// refreshModList (он это делает только при
+						// onDone == nil). А нам здесь нужен именно
+						// пересбор списка — это же «сохранить и
+						// обновить».
+						app.refreshModList()
 						app.appendLog(app.msg("log_list_refreshed"))
 					})
 				case 1:
@@ -429,7 +465,14 @@ func (app *App) pickAndInstallArchive() {
 		}
 		defer reader.Close()
 		path := reader.URI().Path()
-		if !strings.HasSuffix(strings.ToLower(path), ".zip") {
+		// Фильтр диалога уже разрешает .zip/.rar/.7z, поэтому проверка
+		// должна совпадать с ним. Раньше здесь оставалось только
+		// strings.HasSuffix(".zip") — пользователь мог выбрать .rar,
+		// но получал «please select a ZIP archive» и вынужден был
+		// повторять выбор. handleDrop при этом .rar принимает — вот
+		// и расхождение в поведении.
+		ext := strings.ToLower(filepath.Ext(path))
+		if ext != ".zip" && ext != ".rar" && ext != ".7z" {
 			app.appendLogToFile(app.msg("log_zip_only"))
 			return
 		}
@@ -653,7 +696,9 @@ func (app *App) confirmRemoveSelectedDescription() {
 			app.appendLog(fmt.Sprintf(app.msg("log_deleted"), modName))
 
 			app.saveCurrentOrder()
-			app.syncProfileFromGame()
+			if err := app.syncActiveProfileFromGame(); err != nil {
+				app.appendLogToFile(fmt.Sprintf("confirmRemoveSelectedDescription: sync failed: %v", err))
+			}
 			app.orderDirty.Store(false)
 			app.updateTableBorder()
 
@@ -844,13 +889,20 @@ func (app *App) buildSearchAndFilter() (filterSelectWithSize fyne.CanvasObject, 
 			app.searchClearBtn.Hide()
 		}
 		app.filterModList()
+		// После смены поиска — скролл наверх: пользователь ожидает
+		// увидеть новую выборку с начала.
+		app.modTable.ScrollToTop()
 	}
 
 	searchBar = container.NewBorder(nil, nil, nil, app.searchClearBtn, searchEntryBox)
 
 	app.filterSelect = widget.NewSelect(app.filterOptions(), nil)
 	app.filterSelect.SetSelected(app.msg("filter_all"))
-	app.filterSelect.OnChanged = func(s string) { app.filterModList() }
+	app.filterSelect.OnChanged = func(s string) {
+		app.filterModList()
+		// После смены фильтра — скролл наверх по той же причине.
+		app.modTable.ScrollToTop()
+	}
 
 	filterSpacer := canvas.NewRectangle(color.Transparent)
 	filterSpacer.SetMinSize(fyne.NewSize(FilterMinWidth, 1))
@@ -938,7 +990,7 @@ func (app *App) buildTopPanel(filterSelectWithSize, searchBar fyne.CanvasObject)
 		searchBar,
 		widget.NewSeparator(),
 		app.btnCheckUpdates,
-		app.btnUpdateAll,
+		// app.btnUpdateAll,
 		widget.NewSeparator(),
 		app.btnToggle,
 		widget.NewSeparator(),
@@ -1000,128 +1052,6 @@ func (app *App) buildHeaderTable() {
 	app.headerTable.OnSelected = nil
 }
 
-// buildSystemModsTable создаёт таблицу системных модов (base/dmf/autopatch).
-// Устанавливает app.systemModsTable, app.systemModsTableContainer.
-func (app *App) buildSystemModsTable() {
-	updateCell := func(id widget.TableCellID, cell fyne.CanvasObject) {
-		if id.Row >= len(app.systemMods) {
-			return
-		}
-		th := fyne.CurrentApp().Settings().Theme()
-		variant := fyne.CurrentApp().Settings().ThemeVariant()
-		mod := &app.systemMods[id.Row]
-		cont := cell.(*fyne.Container)
-		cont.Objects = nil
-		cont.Add(canvas.NewRectangle(th.Color(themes.ColorSystemTableBg, variant)))
-
-		switch id.Col {
-		case 0, 1:
-			cont.Add(widget.NewLabel(""))
-		case 2:
-			t := widget.NewLabel("[ ]")
-			t.Alignment = fyne.TextAlignCenter
-			cont.Add(t)
-		case 3:
-			display := mod.DisplayName
-			if display == "" {
-				display = mod.Name
-			}
-			label := widget.NewLabel(display)
-			label.TextStyle = fyne.TextStyle{Bold: true}
-			cont.Add(label)
-		case 4:
-			t := canvas.NewText(app.formatDate(mod.ModTime, app.cfg.DateFormat),
-				th.Color(theme.ColorNameForeground, variant))
-			t.Alignment = fyne.TextAlignCenter
-			cont.Add(t)
-		case 5:
-			cont.Add(app.buildSystemStatusLabel(mod, th, variant))
-		case 6:
-			label := widget.NewLabel(mod.Note)
-			label.Wrapping = fyne.TextWrapWord
-			cont.Add(label)
-		}
-	}
-
-	app.systemModsTable = widget.NewTable(
-		func() (int, int) { return len(app.systemMods), TableColumnCount },
-		func() fyne.CanvasObject { return createTableRow(TableRowHeight) },
-		updateCell,
-	)
-	ApplyTableColumnWidths(app.systemModsTable)
-	app.systemModsTable.SetColumnWidth(0, 0)
-
-	app.systemModsTable.OnSelected = func(id widget.TableCellID) {
-		if id.Row < len(app.systemMods) {
-			mod := &app.systemMods[id.Row]
-			app.selectedModName = mod.Name
-			app.selectedModIndex.Store(-1)
-			app.updateDescriptionForMod(mod.Name)
-			app.scheduleEnrich(mod)
-			app.updateUpDownButtons()
-			app.systemModsTable.Refresh()
-			app.modTable.UnselectAll()
-		}
-	}
-
-	// Spacer определяет высоту контейнера; пересчитывается в
-	// updateSystemModsTable при изменении числа системных модов.
-	app.systemModsTableSpacer = canvas.NewRectangle(color.Transparent)
-	app.systemModsTableSpacer.SetMinSize(fyne.NewSize(
-		1, SystemTableRowHeight*float32(len(app.systemMods))))
-
-	sysContainer := container.NewStack(app.systemModsTableSpacer, app.systemModsTable)
-
-	app.cfgMutex.RLock()
-	showSys := app.cfg.ShowSystemMods
-	app.cfgMutex.RUnlock()
-	if !showSys {
-		sysContainer.Hide()
-	}
-	app.systemModsTableContainer = sysContainer
-}
-
-// buildSystemStatusLabel собирает двухстрочный статус для системной
-// таблицы (frameworks + подстатус).
-func (app *App) buildSystemStatusLabel(mod *checks.ModInfo, th fyne.Theme, variant fyne.ThemeVariant) fyne.CanvasObject {
-	mainLabel := canvas.NewText(app.msg("status_system"), th.Color(themes.ColorStatusSystem, variant))
-	mainLabel.TextSize = StatusFontSize + 2
-	mainLabel.Alignment = fyne.TextAlignCenter
-	mainLabel.TextStyle = fyne.TextStyle{Bold: true}
-
-	var subText string
-	var subColor color.Color
-	switch {
-	case mod.MissingFolder:
-		subText = app.msg("status_missing_folder")
-		subColor = th.Color(themes.ColorStatusMissing, variant)
-	case mod.VortexDeployed:
-		subText = app.msg("status_vortex")
-		subColor = th.Color(themes.ColorStatusVortex, variant)
-	case mod.IsSymlink:
-		subText = app.msg("status_symlink")
-		subColor = th.Color(themes.ColorStatusSymlink, variant)
-	case mod.Source == "manual":
-		subText = app.msg("status_manual")
-		subColor = th.Color(themes.ColorStatusManual, variant)
-	case mod.Source == "nexus":
-		subText = app.msg("status_nexus")
-		subColor = th.Color(themes.ColorStatusNexus, variant)
-	}
-
-	if subText == "" {
-		return mainLabel
-	}
-
-	subLabel := canvas.NewText(subText, subColor)
-	subLabel.TextSize = StatusFontSize
-	subLabel.Alignment = fyne.TextAlignCenter
-
-	box := container.NewWithoutLayout(mainLabel, subLabel)
-	box.Layout = &VBoxWithSpacing{Spacing: StatusRowSpacing}
-	return box
-}
-
 // buildModsTable создаёт основную таблицу модов. Устанавливает
 // app.modTable, app.tableBorder, app.tableBorderContainer.
 func (app *App) buildModsTable() {
@@ -1147,21 +1077,15 @@ func (app *App) buildModsTable() {
 				cont.Add(widget.NewLabel(""))
 			}
 		case 1:
-			if !mod.IsSystem {
-				cont.Add(app.buildActiveCheckboxColumn(id.Row, mod))
-			}
+			cont.Add(app.buildActiveCheckboxColumn(id.Row, mod))
 		case 2:
-			if mod.IsSystem {
-				cont.Add(widget.NewLabel(""))
-			} else {
-				cont.Add(app.buildNumberColumn(id.Row, th, variant))
-			}
+			cont.Add(app.buildNumberColumn(id.Row, th, variant))
 		case 3:
 			cont.Add(app.buildNameColumn(id.Row, mod))
 		case 4:
 			cont.Add(app.buildDateColumn(mod, th, variant))
 		case 5:
-			cont.Add(app.buildStatusColumn(mod, th, variant))
+			cont.Add(app.buildStatusIconsColumn(mod))
 		case 6:
 			cont.Add(app.buildNoteColumn(mod))
 		}
@@ -1195,11 +1119,24 @@ func (app *App) buildModsTable() {
 
 	th := fyne.CurrentApp().Settings().Theme()
 	variant := fyne.CurrentApp().Settings().ThemeVariant()
+
 	app.tableBorder = canvas.NewRectangle(color.Transparent)
 	app.tableBorder.StrokeWidth = 2
 	app.tableBorder.StrokeColor = th.Color(themes.ColorTableBorderDirty, variant)
 	app.tableBorder.FillColor = color.Transparent
 	app.tableBorder.Hide()
+
+	// AML-рамка: 3px, чтобы при одновременном показе с dirty-рамкой
+	// (2px, сверху) жёлтая торчала тонкой полоской снаружи. Порядок
+	// в стеке ниже: amlTableBorder снизу, tableBorder сверху.
+	// Так при AML+dirty видны обе — жёлтый контур снаружи, оранжевая
+	// обводка внутри. При только AML — жёлтая 3px. При только dirty —
+	// оранжевая 2px.
+	app.amlTableBorder = canvas.NewRectangle(color.Transparent)
+	app.amlTableBorder.StrokeWidth = 1
+	app.amlTableBorder.StrokeColor = th.Color(themes.ColorAMLWarning, variant)
+	app.amlTableBorder.FillColor = color.Transparent
+	app.amlTableBorder.Hide()
 
 	mechData, _ := embeddedFiles.ReadFile(TableBackgroundImage)
 	var mechBg *canvas.Image
@@ -1207,9 +1144,18 @@ func (app *App) buildModsTable() {
 		mechBg = canvas.NewImageFromResource(fyne.NewStaticResource(TableBackgroundImage, mechData))
 		mechBg.FillMode = canvas.ImageFillContain
 		mechBg.Translucency = TableBackgroundOpacity
-		app.tableBorderContainer = container.NewStack(mechBg, app.modTable, app.tableBorder)
+		app.tableBorderContainer = container.NewStack(
+			mechBg,
+			app.modTable,
+			app.amlTableBorder,
+			app.tableBorder,
+		)
 	} else {
-		app.tableBorderContainer = container.NewStack(app.modTable, app.tableBorder)
+		app.tableBorderContainer = container.NewStack(
+			app.modTable,
+			app.amlTableBorder,
+			app.tableBorder,
+		)
 	}
 }
 
@@ -1239,6 +1185,72 @@ func (app *App) modRowBackgroundColor(row int, mod *checks.ModInfo, th fyne.Them
 	}
 }
 
+// buildStatusIconsColumn — колонка 5 основной таблицы: горизонтальный
+// ряд иконок статуса.
+//
+// Порядок подобран так, чтобы два «всегда присутствующих» статуса
+// (состояние и источник) занимали фиксированные позиции слева — по ним
+// глаз сканирует вертикаль. Вариативная часть (особенности, проблемы,
+// обновление) идёт справа и уже не мешает сравнению строк между собой.
+//
+//  1. Состояние  — on / off_red  (всегда есть)
+//  2. Источник   — hand_vulcan / nexus_orange  (всегда есть)
+//  3. Особенности — pin, vortex, sys, symlink
+//  4. Проблемы    — folder_missing, folder_broken, conflict, skull
+//  5. Обновление  — update
+func (app *App) buildStatusIconsColumn(mod *checks.ModInfo) fyne.CanvasObject {
+	row := container.NewHBox()
+
+	// 1. Состояние (УДАЛЕНО! Теперь это в отдельной колонке с иконками)
+
+	// 2. Источник
+	switch mod.Source {
+	case "manual":
+		row.Add(app.statusIcon("hand_vulcan_yellow"))
+	case "nexus":
+		row.Add(app.statusIcon("nexus_orange"))
+	}
+
+	// 3. Особенности
+	if mod.Mandatory {
+		row.Add(app.statusIcon("pin_bir"))
+	}
+	if mod.VortexDeployed {
+		row.Add(app.statusIcon("vortex"))
+	}
+	if mod.IsSystem {
+		row.Add(app.statusIcon("sys"))
+	}
+	if mod.IsSymlink {
+		row.Add(app.statusIcon("symlink"))
+	}
+
+	// 4. Проблемы
+	if mod.MissingFolder {
+		row.Add(app.statusIcon("folder_missing"))
+	}
+	if mod.Broken {
+		row.Add(app.statusIcon("folder_broken"))
+	}
+	if mod.Incompatible {
+		row.Add(app.statusIcon("conflict"))
+	}
+	if mod.Obsolete {
+		row.Add(app.statusIcon("skull"))
+	}
+
+	// 5. Обновление
+	if mod.HasUpdate {
+		row.Add(app.statusIcon("update"))
+	}
+
+	// Спейсер слева — чтобы иконки не прилипали к границе ячейки.
+	pad := canvas.NewRectangle(color.Transparent)
+	pad.SetMinSize(fyne.NewSize(theme.Padding()/2, 1))
+
+	return container.NewHBox(pad, row)
+}
+
 // buildSelectCheckboxColumn - ячейка колонки 0: чекбокс выделения поверх
 // опционального фонового изображения.
 func (app *App) buildSelectCheckboxColumn(row int, mod *checks.ModInfo) fyne.CanvasObject {
@@ -1258,10 +1270,22 @@ func (app *App) buildSelectCheckboxColumn(row int, mod *checks.ModInfo) fyne.Can
 	name := mod.Name
 	check := widget.NewCheck("", nil)
 	check.SetChecked(mod.Selected)
+	// OnChanged ставим ПОСЛЕ SetChecked, чтобы избежать ложных срабатываний при перерисовке
 	check.OnChanged = func(b bool) {
 		app.updateModSelected(name, b)
 		if b {
-			app.modTable.Select(widget.TableCellID{Row: row, Col: 0}, 0)
+			// KeyModifierControl — обязательно. Без модификатора
+			// Select в Fyne ЗАМЕНЯЕТ выделение (снимает со всех
+			// строк и выделяет одну). Это ломало множественное
+			// выделение галочками: после клика на второй чекбокс
+			// syncSelectionToCheckboxes видел IsRowSelected(first)
+			// == false и сбрасывал Selected[first] в модели —
+			// и первая галочка визуально снималась.
+			//
+			// С Control выделение ДОБАВЛЯЕТСЯ к существующему,
+			// IsRowSelected для ранее выбранных строк остаётся
+			// true, sync ничего не сбрасывает.
+			app.modTable.Select(widget.TableCellID{Row: row, Col: 0}, fyne.KeyModifierControl)
 		} else if app.selectedModName == name {
 			app.reassignSelectionAfterUncheck(name)
 		}
@@ -1310,17 +1334,32 @@ func (app *App) reassignSelectionAfterUncheck(name string) {
 
 // buildActiveCheckboxColumn - колонка 1: чекбокс активности мода.
 func (app *App) buildActiveCheckboxColumn(row int, mod *checks.ModInfo) fyne.CanvasObject {
+	if mod.IsSystem {
+		// Системные моды всегда включены, просто показываем иконку "on"
+		img := app.statusIcon("on")
+		return container.NewCenter(img)
+	}
+
 	name := mod.Name
-	check := widget.NewCheck("", nil)
-	check.SetChecked(mod.Active)
-	if mod.MissingFolder {
-		check.Disable()
+	// Безопасно копируем текущее состояние в локальную переменную.
+	// Если этого не сделать, кнопка при клике может прочитать старое значение,
+	// если список уже успел перестроиться (filterModList).
+	isActive := mod.Active
+
+	var icon fyne.Resource
+	if isActive {
+		icon = app.toggleOnIcon
+	} else {
+		icon = app.toggleOffIcon
 	}
-	check.OnChanged = func(b bool) {
-		app.toggleModActive(name, b)
-		app.modTable.Select(widget.TableCellID{Row: row, Col: 0}, 0)
-	}
-	return check
+
+	// Создаем кнопку-иконку
+	btn := NewIconButton(icon, func() {
+		app.toggleModActive(name, !isActive)
+	})
+	btn.SetIconSize(24)
+	btn.Importance = widget.LowImportance
+	return container.NewCenter(btn)
 }
 
 // buildNumberColumn - колонка 2: порядковый номер строки.
@@ -1348,71 +1387,6 @@ func (app *App) buildDateColumn(mod *checks.ModInfo, th fyne.Theme, variant fyne
 	t := canvas.NewText(app.formatDate(mod.ModTime, app.cfg.DateFormat), th.Color(theme.ColorNameForeground, variant))
 	t.Alignment = fyne.TextAlignCenter
 	return t
-}
-
-// buildStatusColumn - колонка 5: основной и дополнительный статус.
-func (app *App) buildStatusColumn(mod *checks.ModInfo, th fyne.Theme, variant fyne.ThemeVariant) fyne.CanvasObject {
-	mainText, mainColor, subText, subColor := app.computeStatusTexts(mod, th, variant)
-
-	mainLabel := canvas.NewText(mainText, mainColor)
-	mainLabel.TextSize = StatusFontSize + 2
-	mainLabel.Alignment = fyne.TextAlignCenter
-	mainLabel.TextStyle = fyne.TextStyle{Bold: true}
-
-	if subText == "" {
-		return mainLabel
-	}
-
-	subLabel := canvas.NewText(subText, subColor)
-	subLabel.TextSize = StatusFontSize
-	subLabel.Alignment = fyne.TextAlignCenter
-
-	box := container.NewWithoutLayout(mainLabel, subLabel)
-	box.Layout = &VBoxWithSpacing{Spacing: StatusRowSpacing}
-	return box
-}
-
-// computeStatusTexts - определяет тексты и цвета для колонки статуса.
-func (app *App) computeStatusTexts(mod *checks.ModInfo, th fyne.Theme, variant fyne.ThemeVariant) (string, color.Color, string, color.Color) {
-	var mainText string
-	var mainColor color.Color
-	if mod.Active {
-		mainText = app.msg("status_active")
-		mainColor = th.Color(themes.ColorStatusActive, variant)
-	} else {
-		mainText = app.msg("status_inactive")
-		mainColor = th.Color(themes.ColorStatusInactive, variant)
-	}
-
-	if mod.HasUpdate {
-		return mainText, mainColor,
-			app.msg("status_update_available"), th.Color(theme.ColorNamePrimary, variant)
-	}
-
-	switch {
-	case mod.MissingFolder:
-		return mainText, mainColor, app.msg("status_missing_folder"), th.Color(themes.ColorStatusMissing, variant)
-	case mod.VortexDeployed:
-		return mainText, mainColor, app.msg("status_vortex"), th.Color(themes.ColorStatusVortex, variant)
-	case mod.IsSymlink:
-		return mainText, mainColor, app.msg("status_symlink"), th.Color(themes.ColorStatusSymlink, variant)
-	case mod.IsSystem:
-		return mainText, mainColor, app.msg("status_system"), th.Color(themes.ColorStatusSystem, variant)
-	case mod.Broken:
-		return mainText, mainColor, app.msg("desc_broken"), th.Color(themes.ColorStatusBroken, variant)
-	case mod.Incompatible:
-		return mainText, mainColor, app.msg("desc_conflict"), th.Color(themes.ColorStatusConflict, variant)
-	case mod.Obsolete:
-		return mainText, mainColor, app.msg("desc_obsolete"), th.Color(themes.ColorStatusObsolete, variant)
-	case mod.Mandatory && mod.Active:
-		return mainText, mainColor, app.msg("status_mandatory"), th.Color(themes.ColorStatusMandatory, variant)
-	case mod.Source == "manual":
-		return mainText, mainColor, app.msg("status_manual"), th.Color(themes.ColorStatusManual, variant)
-	case mod.Source == "nexus":
-		return mainText, mainColor, app.msg("status_nexus"), th.Color(themes.ColorStatusNexus, variant)
-	default:
-		return mainText, mainColor, "", color.Transparent
-	}
 }
 
 // buildNoteColumn - колонка 6: примечание в горизонтальном скролле.
@@ -1508,6 +1482,32 @@ func (app *App) buildBottomPanel() fyne.CanvasObject {
 // Карточка описания
 // ─────────────────────────────────────────────────────────────────
 
+// thumbnailOverlay - прозрачный слой, реагирующий на клики и меняющий курсор.
+type thumbnailOverlay struct {
+	widget.BaseWidget
+	onTapped func()
+}
+
+func newThumbnailOverlay(onTapped func()) *thumbnailOverlay {
+	t := &thumbnailOverlay{onTapped: onTapped}
+	t.ExtendBaseWidget(t)
+	return t
+}
+
+func (t *thumbnailOverlay) CreateRenderer() fyne.WidgetRenderer {
+	return widget.NewSimpleRenderer(canvas.NewRectangle(color.Transparent))
+}
+
+func (t *thumbnailOverlay) Tapped(_ *fyne.PointEvent) {
+	if t.onTapped != nil {
+		t.onTapped()
+	}
+}
+
+func (t *thumbnailOverlay) Cursor() desktop.Cursor {
+	return desktop.PointerCursor // Курсор-указатель (рука)
+}
+
 // buildDescriptionCard собирает правую верхнюю карточку с описанием мода.
 // Устанавливает поля descTitle, descAuthor, descBody, descURL, sourceCodeLink,
 // descConflict, descCardBgRect, descExtraContainer, descCardContent,
@@ -1526,25 +1526,148 @@ func (app *App) buildDescriptionCard() fyne.CanvasObject {
 	app.descInstalled = widget.NewLabel("")
 	app.descBody = widget.NewLabel(app.msg("desc_placeholder"))
 	app.descBody.Wrapping = fyne.TextWrapWord
+
 	app.descURL = widget.NewHyperlink("", nil)
+	app.descURL.OnTapped = func() {
+		if app.descURL.URL != nil {
+			if err := app.myApp.OpenURL(app.descURL.URL); err != nil {
+				app.appendLogToFile(fmt.Sprintf("descURL open failed: %v", err))
+			} else {
+				app.appendLogToFile(fmt.Sprintf("descURL opened: %s", app.descURL.URL))
+			}
+		} else {
+			app.appendLogToFile("descURL tapped, but URL is nil")
+		}
+	}
+
+	// Thumbnail в правом верхнем углу карточки. Контейнер фиксированного
+	// размера; внутри — фон-заглушка и картинка. Пока URL
+	// картинки нет или пока она грузится, видна только заглушка.
+	//
+	// SetMinSize на обоих элементах задаёт MinSize контейнера. Border
+	// в metaRow ниже даст этому боксу именно его min-size, а остальное
+	// уйдёт метаданным слева.
+	// Фон-подложка. Полупрозрачный чёрный, скруглённый — виден
+	// только когда картинка ещё грузится или не вписалась в бокс
+	// целиком (Contain оставляет поля по краям у неквадратных
+	// картинок).
+	app.descThumbnailBg = canvas.NewRectangle(color.NRGBA{R: 0, G: 0, B: 0, A: 15})
+	app.descThumbnailBg.CornerRadius = CornerRadius15
+	app.descThumbnailBg.SetMinSize(fyne.NewSize(sizeThumbnailX, sizeThumbnailY))
+
+	app.descThumbnail = canvas.NewImageFromResource(nil)
+	app.descThumbnail.FillMode = canvas.ImageFillContain
+	app.descThumbnail.SetMinSize(fyne.NewSize(sizeThumbnailX, sizeThumbnailY))
+	// CornerRadius совпадает с CornerRadius рамки и фона, чтобы
+	// скругления на всех трёх слоях смотрелись как одно целое.
+	app.descThumbnail.CornerRadius = CornerRadius15
+
+	// Рамка — прозрачная заливка + тонкая обводка. Цвет берём из
+	// ColorCRTScreenStroke: это тот же неоновый зелёный, что рисует
+	// CRT-экран, и он уже присутствует в остальной карточке.
+	// Если захочется нейтральную рамку — ColorDescCardStroke;
+	// если ярче — ColorInputBorder.
+	app.descThumbnailBorder = canvas.NewRectangle(color.Transparent)
+	app.descThumbnailBorder.CornerRadius = CornerRadius15
+	app.descThumbnailBorder.StrokeWidth = 1
+	// ColorTableBorderDirty - рыжий
+	app.descThumbnailBorder.StrokeColor = th.Color(theme.ColorNameSeparator, variant)
+	app.descThumbnailBorder.SetMinSize(fyne.NewSize(sizeThumbnailX, sizeThumbnailY))
+
+	// Создаем прозрачный слой для кликов
+	clickOverlay := newThumbnailOverlay(func() {
+		if app.descThumbnail.Resource != nil {
+			app.showEnlargedImage(app.descThumbnail.Resource)
+		}
+	})
+
+	// Создаем иконку лупы для визуальной подсказки.
+	// Правильное имя в стандартной теме Fyne - theme.ZoomInIcon()
+	zoomIcon := widget.NewIcon(theme.ZoomInIcon())
+	zoomIconBg := canvas.NewRectangle(color.NRGBA{R: 0, G: 0, B: 0, A: 40}) // Полупрозрачный чёрный фон
+	zoomIconBg.CornerRadius = 10
+
+	// Контейнер для иконки с фоном (фиксированный размер 32x32)
+	zoomBtn := container.NewStack(zoomIconBg, container.NewPadded(zoomIcon))
+	zoomBtn.Resize(fyne.NewSize(32, 32))
+	// Позиционируем в правом нижнем углу (отступ 8px)
+	zoomBtn.Move(fyne.NewPos(sizeThumbnailX-32-320, sizeThumbnailY-32+40))
+
+	// Оборачиваем в контейнер без лэйаута, чтобы внутренний Stack не перецентрировал иконку
+	zoomOverlay := container.NewWithoutLayout(zoomBtn)
+
+	app.descThumbnailBox = container.NewStack(
+		app.descThumbnailBg,
+		app.descThumbnail,
+		clickOverlay, // Прозрачный слой для кликов
+		app.descThumbnailBorder,
+		zoomOverlay, // Иконка лупы в правом нижнем углу
+	)
+
 	app.sourceCodeLink = widget.NewHyperlink("", nil)
 	app.sourceCodeLink.Alignment = fyne.TextAlignLeading
+	app.sourceCodeLink.OnTapped = func() {
+		if app.sourceCodeLink.URL != nil {
+			if err := app.myApp.OpenURL(app.sourceCodeLink.URL); err != nil {
+				app.appendLogToFile(fmt.Sprintf("sourceCodeLink open failed: %v", err))
+			} else {
+				app.appendLogToFile(fmt.Sprintf("sourceCodeLink opened: %s", app.sourceCodeLink.URL))
+			}
+		} else {
+			app.appendLogToFile("sourceCodeLink tapped, but URL is nil")
+		}
+	}
 
-	app.descLocalVersion = widget.NewLabel("")
+	// Блок версий и дат — таблицей. Формируется один раз, значения
+	// обновляются из updateDescriptionForMod через SetText у каждой
+	// ячейки. FormLayout даёт выравнивание подписей и значений в две
+	// колонки, как в классической «карточке товара».
+	//
+	// Подписи берём из messages.json; original_upload_label и
+	// last_updated_label уже есть и приходят без двоеточия — приклеим
+	// его здесь, чтобы не плодить по два ключа на каждую строку.
+	app.descVersionLblVersion = widget.NewLabel("")
+	app.descVersionValVersion = widget.NewLabel("")
+	app.descVersionLblLatest = widget.NewLabel("")
+	app.descVersionValLatest = widget.NewLabel("")
+	app.descVersionLblOrig = widget.NewLabel("")
+	app.descVersionValOrig = widget.NewLabel("")
+	app.descVersionLblUpd = widget.NewLabel("")
+	app.descVersionValUpd = widget.NewLabel("")
+	app.descCategoryLbl = widget.NewLabel("")
+	app.descCategoryVal = widget.NewLabel("")
+	// Локализованные подписи ставим через refresh — так же, как это
+	// будет делаться при смене языка.
+	app.refreshDescStaticLabels()
 
-	app.descLatestVersion = widget.NewLabel("")
+	// Каждая строка — Border с фиксированной колонкой подписей слева
+	// и значением справа. Фиксированная ширина через Spacer нужна,
+	// чтобы значения начинались в одной вертикали (как в FormLayout),
+	// но без его внутренних theme.Padding() — их мы не контролируем.
+	//
+	// Ширина 160 подобрана по самой длинной подписи ("Original upload:")
+	// в 12 локалях с запасом. Если менять — держать синхронно во всех
+	// строках, иначе колонка значений «съедет».
+	const versionLabelColWidth float32 = 160
 
-	app.descLastUpdated = widget.NewLabel("")
+	makeVersionRow := func(lbl, val *widget.Label) fyne.CanvasObject {
+		lblSpacer := canvas.NewRectangle(color.Transparent)
+		lblSpacer.SetMinSize(fyne.NewSize(versionLabelColWidth, 1))
+		lblCol := container.NewStack(lblSpacer, lbl)
+		return container.NewBorder(nil, nil, lblCol, nil, val)
+	}
 
-	app.descOriginalUpload = widget.NewLabel("")
-
-	app.descConflict = widget.NewLabel("")
-	app.descConflict.Wrapping = fyne.TextWrapWord
-	app.descConflict.Hide()
+	app.descVersionGrid = container.New(
+		&VBoxWithSpacing{Spacing: SpacingText15},
+		makeVersionRow(app.descVersionLblVersion, app.descVersionValVersion),
+		makeVersionRow(app.descVersionLblLatest, app.descVersionValLatest),
+		makeVersionRow(app.descVersionLblOrig, app.descVersionValOrig),
+		makeVersionRow(app.descVersionLblUpd, app.descVersionValUpd),
+		makeVersionRow(app.descCategoryLbl, app.descCategoryVal),
+	)
 
 	app.descUserNote = widget.NewLabel("")
 	app.descUserNote.Wrapping = fyne.TextWrapWord
-	app.descUserNote.Hide()
 
 	app.descCardBgRect = canvas.NewRectangle(th.Color(themes.ColorDescCardBg, variant))
 	app.descCardBgRect.CornerRadius = 12
@@ -1587,38 +1710,212 @@ func (app *App) buildDescriptionCard() fyne.CanvasObject {
 	titleSep := canvas.NewRectangle(th.Color(themes.ColorCRTScreenStroke, variant))
 	titleSep.SetMinSize(fyne.NewSize(0, 3))
 
+	// titleSep — зелёная линия под заголовком карточки. Прячем
+	// вместе с шапкой, когда мод не выбран, чтобы линия не висела
+	// в пустой карточке.
+	app.descTitleSep = container.NewVBox(titleSep)
+
+	// Левый столбец метаданных: автор + оригинальная дата загрузки,
+	// ссылки, версии. Три смысловые группы, разделённые линиями —
+	// чтобы глаз сразу находил нужное.
+	//
+	// Nexus и Source стоят друг под другом: так лучше сканируется
+	// (левый край обеих ссылок выровнен по одной вертикали), и
+	// длинный текст "Open mod page [Nexus]" не сталкивается с
+	// "Source Code" при узкой карточке.
+	linksColumn := container.New(
+		&VBoxWithSpacing{Spacing: SpacingLinks},
+		app.descURL,
+		app.sourceCodeLink,
+	)
+
+	metaLeft := container.NewVBox(
+		app.descAuthor,
+		widget.NewSeparator(),
+		linksColumn,
+		widget.NewSeparator(),
+		app.descVersionGrid,
+	)
+
+	// Строка «метаданные | thumbnail». Border отдаёт правому элементу
+	// его MinSize (230×150), остальное забирает metaLeft. Если картинки
+	// нет, descThumbnailBox скрыт — metaLeft растягивается на всю
+	// ширину карточки.
+	metaRow := container.NewBorder(nil, nil, nil, app.descThumbnailBox, metaLeft)
+
+	// Обёртки-секции. Каждая хранит свой separator ПЕРЕД контентом и
+	// прячется целиком, когда контента нет — так в пустой карточке
+	// (мод не выбран) не остаётся «висячих» линий.
+	//
+	// metaSection — без верхнего separator'а: его роль играет зелёный
+	// titleSep выше. У metaLeft свои внутренние разделители, они
+	// прячутся вместе с ним.
+	app.descMetaSection = container.NewVBox(metaRow)
+
+	app.descStatusTitle = widget.NewLabel("")
+	app.descStatusList = container.New(&VBoxWithSpacing{Spacing: SpacingText11})
+	// Заголовок + список — в одном VBoxWithSpacing с тем же отступом,
+	// что и внутри списка. Тогда «Status:» и первая строка статуса
+	// стоят так же плотно, как строки между собой. Внешний
+	// container.NewVBox оставляем: он отделяет секцию от соседей
+	// (от предыдущего блока и от следующей секции).
+	app.descStatusSection = container.NewVBox(
+		widget.NewSeparator(),
+		container.New(&VBoxWithSpacing{Spacing: SpacingText13},
+			app.descStatusTitle,
+			app.descStatusList,
+		),
+	)
+	app.descStatusSection.Hide()
+
+	app.descProblemsTitle = widget.NewLabel("")
+	app.descProblemsList = container.New(&VBoxWithSpacing{Spacing: SpacingText11})
+	app.descProblemsSection = container.NewVBox(
+		widget.NewSeparator(),
+		container.New(&VBoxWithSpacing{Spacing: SpacingText13},
+			app.descProblemsTitle,
+			app.descProblemsList,
+		),
+	)
+	app.descProblemsSection.Hide()
+
+	app.descUserNoteSection = container.NewVBox(
+		widget.NewSeparator(),
+		app.descUserNote,
+	)
+	app.descUserNoteSection.Hide()
+
 	descHeader := container.NewBorder(
 		nil, nil, nil, nil,
 		container.NewVBox(
 			headerRow,
-			titleSep,
-			app.descAuthor,
-			widget.NewSeparator(),
-			container.NewHBox(widget.NewLabel(""), app.descURL, widget.NewLabel("  "), app.sourceCodeLink),
-			widget.NewSeparator(),
-			container.NewHBox(widget.NewLabel(""), app.descLocalVersion),
-			widget.NewSeparator(),
-			app.descConflict,
-			app.descUserNote,
+			app.descTitleSep,
+			app.descMetaSection,
+			app.descStatusSection,
+			app.descProblemsSection,
+			app.descUserNoteSection,
 		),
 	)
 
 	spacer := canvas.NewRectangle(color.Transparent)
 	spacer.SetMinSize(fyne.NewSize(0, 20))
 
-	app.descCardContent = container.NewVBox(
-		descHeader,
+	// Серый separator между шапкой и описанием тоже прячем в пустом
+	// состоянии — обёртка descBodySep хранит сам разделитель и тело
+	// описания, чтобы не висел в воздухе без содержимого.
+	app.descBodySep = container.NewVBox(
 		widget.NewSeparator(),
 		app.descBody,
+	)
+
+	// Размеры placeholder'а. Лого и glow имеют фиксированные размеры —
+	// scale-анимация через canvas.Image.Resize в Fyne пересчитывает
+	// текстуру на каждом кадре и даёт видимые «ступеньки». Поэтому
+	// пульсирует только прозрачность glow: смена Translucency —
+	// это обновление одного uniform'а в шейдере, без пересборки
+	// геометрии и без re-upload текстуры.
+	const (
+		placeholderBoxSize  = 210.0
+		placeholderLogoSize = 200.0
+		placeholderGlowSize = 215.0
+	)
+
+	// Лого-заглушка вместо лупы: два PNG в стеке. Передний —
+	// mechanicus.png, задний — mechanicus_glow.png (размытая светящаяся
+	// версия, подготовленная в графическом редакторе). Такой подход
+	// даёт настоящее мягкое свечение, недостижимое двойной копией того
+	// же PNG в Fyne.
+	//
+	// Анимация идёт через прямые Resize/Move на картинках (см.
+	// startPlaceholderPulse). Поэтому обе картинки лежат в
+	// container.NewWithoutLayout — этот контейнер НЕ трогает
+	// layout-систему Fyne, что убирает рывки, которые были при
+	// SetMinSize (тот пересчитывал layout всего дерева до меток).
+	logoData, _ := embeddedFiles.ReadFile("assets/mechanicus.png")
+	glowData, _ := embeddedFiles.ReadFile("assets/mechanicus_glow.png")
+
+	logoRes := fyne.NewStaticResource("placeholder-logo.png", logoData)
+	glowRes := fyne.NewStaticResource("placeholder-glow.png", glowData)
+
+	// Задний слой — свечение.
+	app.descPlaceholderGlow = canvas.NewImageFromResource(glowRes)
+	app.descPlaceholderGlow.FillMode = canvas.ImageFillStretch
+	app.descPlaceholderGlow.Translucency = 0.25
+
+	app.descPlaceholderLogo = canvas.NewImageFromResource(logoRes)
+	app.descPlaceholderLogo.FillMode = canvas.ImageFillStretch
+
+	// Размеры фиксированы, позиции не меняются — обычный Stack.
+	// Лого и glow выровнены по центру через GridWrap.
+	app.descPlaceholderLogo.SetMinSize(fyne.NewSize(placeholderLogoSize, placeholderLogoSize))
+	app.descPlaceholderGlow.SetMinSize(fyne.NewSize(placeholderGlowSize, placeholderGlowSize))
+
+	logoStack := container.NewStack(
+		container.NewCenter(app.descPlaceholderGlow),
+		container.NewCenter(app.descPlaceholderLogo),
+	)
+	logoWithSize := container.NewGridWrap(
+		fyne.NewSize(placeholderBoxSize, placeholderBoxSize),
+		logoStack,
+	)
+
+	app.descPlaceholderTitle = canvas.NewText("", th.Color(theme.ColorNameForeground, variant))
+	app.descPlaceholderTitle.Alignment = fyne.TextAlignCenter
+	app.descPlaceholderTitle.TextSize = theme.TextSize() + 14
+	app.descPlaceholderTitle.TextStyle = fyne.TextStyle{Bold: true}
+
+	app.descPlaceholderHint = canvas.NewText("", th.Color(theme.ColorNamePlaceHolder, variant))
+	app.descPlaceholderHint.Alignment = fyne.TextAlignCenter
+	app.descPlaceholderHint.TextSize = theme.TextSize() + 8
+
+	placeholderTopSpacer := canvas.NewRectangle(color.Transparent)
+	placeholderTopSpacer.SetMinSize(fyne.NewSize(0, 40))
+
+	placeholderMidSpacer := canvas.NewRectangle(color.Transparent)
+	placeholderMidSpacer.SetMinSize(fyne.NewSize(0, 16))
+
+	placeholderBottomSpacer := canvas.NewRectangle(color.Transparent)
+	placeholderBottomSpacer.SetMinSize(fyne.NewSize(0, 16))
+
+	app.descPlaceholder = container.NewVBox(
+		placeholderTopSpacer,
+		container.NewCenter(logoWithSize),
+		placeholderMidSpacer,
+		container.NewCenter(app.descPlaceholderTitle),
+		placeholderBottomSpacer,
+		container.NewCenter(app.descPlaceholderHint),
+	)
+
+	// descModContent — вся карточка мода. Внутри те же элементы, что
+	// и раньше, но теперь они прячутся одним махом вместе с обёрткой.
+	app.descModContent = container.NewVBox(
+		descHeader,
+		app.descBodySep,
 		spacer,
 		app.descExtraContainer,
+	)
+	app.descModContent.Hide() // изначально мод не выбран
+
+	app.descCardContent = container.NewVBox(
+		app.descPlaceholder,
+		app.descModContent,
 	)
 
 	app.descCardScroll = container.NewScroll(app.descCardContent)
 	app.descCardScroll.SetMinSize(fyne.NewSize(DescScrollMinWidth, DescScrollMinHeight))
 
+	// Оверлей поверх фона, но ПОД содержимым. Полупрозрачный чёрный:
+	// затемняет карточку в пустом состоянии. Скрыт при выбранном моде.
+	//
+	// 30/255 альфы — лёгкое притемнение. Достаточно, чтобы «пустая»
+	// карточка отличалась от «рабочей», но не настолько, чтобы
+	// потерялись цвета фона или рамки.
+	app.descCardOverlay = canvas.NewRectangle(color.NRGBA{R: 0, G: 0, B: 0, A: 30})
+	app.descCardOverlay.Hide()
+
 	descCard := container.NewStack(
 		app.descCardBgRect,
+		app.descCardOverlay,
 		container.NewPadded(app.descCardScroll),
 	)
 
@@ -1641,11 +1938,7 @@ func (app *App) assembleMainLayout(topPanelWithBg, bottomPanel, rightContent fyn
 			app.headerTable,
 		),
 		nil, nil, nil,
-		container.NewBorder(
-			container.NewVBox(app.systemModsTableContainer),
-			nil, nil, nil,
-			app.tableBorderContainer,
-		),
+		app.tableBorderContainer,
 	)
 
 	leftPanel := container.NewBorder(
@@ -1690,14 +1983,17 @@ func (app *App) refreshThemeColors() {
 		app.managePanelBgRect.FillColor = th.Color(themes.ColorManagePanelBg, variant)
 		app.managePanelBgRect.Refresh()
 	}
-	if app.descCardBgRect != nil {
-		app.descCardBgRect.FillColor = th.Color(themes.ColorDescCardBg, variant)
-		app.descCardBgRect.StrokeColor = th.Color(themes.ColorDescCardStroke, variant)
-		app.descCardBgRect.Refresh()
+	if app.descThumbnailBorder != nil {
+		app.descThumbnailBorder.StrokeColor = th.Color(theme.ColorNameSeparator, variant)
+		app.descThumbnailBorder.Refresh()
 	}
 	if app.tableBorder != nil {
 		app.tableBorder.StrokeColor = th.Color(themes.ColorTableBorderDirty, variant)
 		app.tableBorder.Refresh()
+	}
+	if app.amlTableBorder != nil {
+		app.amlTableBorder.StrokeColor = th.Color(themes.ColorAMLWarning, variant)
+		app.amlTableBorder.Refresh()
 	}
 	if app.descTitle != nil {
 		app.descTitle.Color = th.Color(theme.ColorNameForeground, variant)
@@ -1719,17 +2015,23 @@ func (app *App) refreshThemeColors() {
 		app.descExtraContainer.Refresh()
 	}
 
+	if app.descPlaceholderTitle != nil {
+		app.descPlaceholderTitle.Color = th.Color(theme.ColorNameForeground, variant)
+		app.descPlaceholderTitle.Refresh()
+	}
+	if app.descPlaceholderHint != nil {
+		app.descPlaceholderHint.Color = th.Color(theme.ColorNameDisabled, variant)
+		app.descPlaceholderHint.Refresh()
+	}
+
 	if app.headerTable != nil {
 		app.headerTable.Refresh()
-	}
-	if app.systemModsTable != nil {
-		app.systemModsTable.Refresh()
 	}
 	if app.modTable != nil {
 		app.modTable.Refresh()
 	}
 
-	for _, tbl := range []*widget.Table{app.headerTable, app.systemModsTable, app.modTable} {
+	for _, tbl := range []*widget.Table{app.headerTable, app.modTable} {
 		if tbl == nil {
 			continue
 		}
@@ -1813,25 +2115,63 @@ func (app *App) appendCenteredLog(text string) {
 }
 
 func (app *App) updateDescriptionForMod(name string) {
+	app.refreshDescStaticLabels()
+
 	if name == "" {
 		app.descTitle.Text = app.msg("select_mod")
 		app.descTitle.Refresh()
-		app.descAuthor.SetText("-")
+
+		// Тексты placeholder'а пересобираются здесь же — так они
+		// автоматически подхватывают смену языка (changeLanguage
+		// вызывает updateDescriptionForMod("")).
+		if app.descPlaceholderTitle != nil {
+			app.descPlaceholderTitle.Text = app.msg("select_mod")
+			app.descPlaceholderTitle.Refresh()
+		}
+		if app.descPlaceholderHint != nil {
+			app.descPlaceholderHint.Text = app.msg("desc_placeholder")
+			app.descPlaceholderHint.Refresh()
+		}
+
+		// Показываем placeholder, всю остальную карточку прячем
+		// целиком — вместе с заголовком, кнопками, метаданными и
+		// сепараторами.
+		if app.descPlaceholder != nil {
+			app.descPlaceholder.Show()
+		}
+		if app.descModContent != nil {
+			app.descModContent.Hide()
+		}
+		if app.descCardOverlay != nil {
+			app.descCardOverlay.Show()
+			app.descCardOverlay.Refresh()
+		}
+
+		// Небольшая уборка, чтобы при следующем выборе мода описание
+		// не «мигнуло» старым содержимым.
 		app.descURL.SetURL(nil)
 		app.descURL.SetText("")
-		app.descBody.SetText(app.msg("desc_placeholder"))
+		app.descBody.SetText("")
+		if app.descThumbnailBox != nil {
+			app.descThumbnailBox.Hide()
+			app.descThumbnailURL = ""
+		}
+		if app.descStatusSection != nil {
+			app.descStatusSection.Hide()
+		}
+		if app.descProblemsSection != nil {
+			app.descProblemsSection.Hide()
+		}
 		if app.descExtraContainer != nil {
 			app.descExtraContainer.Objects = nil
 			app.descExtraContainer.Refresh()
 		}
+
 		if app.descCardContent != nil {
 			app.descCardContent.Refresh()
 		}
 		if app.descCardScroll != nil {
 			app.descCardScroll.Refresh()
-		}
-		if app.descUserNote != nil {
-			app.descUserNote.Hide()
 		}
 		return
 	}
@@ -1841,13 +2181,36 @@ func (app *App) updateDescriptionForMod(name string) {
 		return
 	}
 
+	// Скрываем placeholder, показываем всю карточку мода. Всё
+	// остальное (metaSection, conflictSection, userNoteSection,
+	// titleSep, bodySep) уже внутри descModContent — им не нужны
+	// отдельные Show()/Hide() в этой ветке.
+	if app.descPlaceholder != nil {
+		app.descPlaceholder.Hide()
+	}
+	if app.descModContent != nil {
+		app.descModContent.Show()
+	}
+	if app.descCardOverlay != nil {
+		app.descCardOverlay.Hide()
+		app.descCardOverlay.Refresh()
+	}
+
+	if app.descExtraContainer != nil {
+		app.descExtraContainer.Show()
+	}
+
 	if app.descUserNote != nil {
 		un := app.userNotes.Get(mod.Name)
 		if un != "" {
 			app.descUserNote.SetText("📝 " + un)
-			app.descUserNote.Show()
+			if app.descUserNoteSection != nil {
+				app.descUserNoteSection.Show()
+			}
 		} else {
-			app.descUserNote.Hide()
+			if app.descUserNoteSection != nil {
+				app.descUserNoteSection.Hide()
+			}
 		}
 	}
 
@@ -1874,102 +2237,90 @@ func (app *App) updateDescriptionForMod(name string) {
 	if author == "" {
 		author = app.msg("author_unknown")
 	}
-	authorText := fmt.Sprintf(app.msg("author_label"), author)
-	if !mod.OriginalUpload.IsZero() {
-		authorText += fmt.Sprintf("          %s: %s",
-			app.msg("original_upload_label"),
-			app.formatDate(mod.OriginalUpload, dateFormat))
-	}
-	app.descAuthor.SetText(authorText)
+	// Author — одной строкой. Original upload переехал ниже, в блок
+	// версий: там он стоит парой с Last updated, обе даты описывают
+	// «когда мод появился» и «когда обновлялся».
+	app.descAuthor.SetText(fmt.Sprintf(app.msg("author_label"), author))
 
 	app.descInstalled.SetText(fmt.Sprintf(app.msg("installed_label"),
 		app.formatDate(mod.ModTime, dateFormat)))
 
-	if app.descLocalVersion != nil {
-		var cacheKey string
-		switch mod.Name {
-		case "dmf":
-			cacheKey = "8:dmf"
-		case "base":
-			cacheKey = "19:base"
-		case "autopatch":
-			cacheKey = "709:autopatch"
-		default:
-			if mod.URL != "" {
-				modID := helpers.ExtractModIDFromURL(mod.URL)
-				if modID != 0 {
-					cacheKey = fmt.Sprintf("%d:%s", modID, mod.Name)
-				}
+	// Блок версий/дат. Каждое значение ставится отдельной SetText
+	// в свою ячейку FormLayout'а. Если данных нет — оставляем пустую
+	// строку: FormLayout всё равно рисует ячейку (она пустая), но
+	// подпись слева видна, и «дырка» в таблице читается как «данные
+	// ещё не подтянуты», а не как баг верстки.
+	//
+	// Пустая строка вместо «—» потому, что мод без nexus_versions
+	// и без даты — редкий случай, а прочерк на каждой второй строке
+	// выглядел бы шумно.
+
+	// Version / Latest — только если есть cacheKey и кэш.
+	// Обнуляем на каждом входе, чтобы не «протухли» с прошлого мода.
+	if app.descVersionValVersion != nil {
+		app.descVersionValVersion.SetText("")
+	}
+	if app.descVersionValLatest != nil {
+		app.descVersionValLatest.SetText("")
+	}
+
+	var cacheKey string
+	switch mod.Name {
+	case "dmf":
+		cacheKey = "8:dmf"
+	case "base":
+		cacheKey = "19:base"
+	case "autopatch":
+		cacheKey = "709:autopatch"
+	default:
+		if mod.URL != "" {
+			modID := helpers.ExtractModIDFromURL(mod.URL)
+			if modID != 0 {
+				cacheKey = fmt.Sprintf("%d:%s", modID, mod.Name)
 			}
-		}
-
-		if cacheKey != "" {
-			if info, ok := app.getCachedVersion(cacheKey); ok && info.Version != "" {
-				localText := fmt.Sprintf(app.msg("nexus_local_version_label"), info.Version)
-
-				if latest, ok := app.getLatestVersion(cacheKey); ok {
-					localText += "          " + fmt.Sprintf(app.msg("nexus_latest_version_label"), latest)
-				}
-
-				if !mod.LastUpdated.IsZero() {
-					localText += fmt.Sprintf("          %s: %s",
-						app.msg("last_updated_label"),
-						app.formatDate(mod.LastUpdated, dateFormat))
-				}
-
-				app.descLocalVersion.SetText(localText)
-			} else {
-				app.descLocalVersion.SetText(app.msg("nexus_local_version_unknown"))
-			}
-		} else {
-			app.descLocalVersion.SetText("")
 		}
 	}
 
-	if app.descLastUpdated != nil {
-		if !mod.LastUpdated.IsZero() {
-			app.descLastUpdated.SetText(fmt.Sprintf("Last updated: %s",
-				app.formatDate(mod.LastUpdated, dateFormat)))
-		} else {
-			app.descLastUpdated.SetText("")
+	if cacheKey != "" {
+		if info, ok := app.getCachedVersion(cacheKey); ok && info.Version != "" {
+			app.descVersionValVersion.SetText(info.Version)
+			if latest, ok := app.getLatestVersion(cacheKey); ok && latest != "" {
+				app.descVersionValLatest.SetText(latest)
+			}
 		}
 	}
 
-	if app.descOriginalUpload != nil {
+	// Original upload / Last updated — независимо от cacheKey.
+	// Даты приходят с Nexus в enrichModFromNexus и лежат прямо в ModInfo.
+	if app.descVersionValOrig != nil {
 		if !mod.OriginalUpload.IsZero() {
-			app.descOriginalUpload.SetText(fmt.Sprintf("Original upload: %s",
-				app.formatDate(mod.OriginalUpload, dateFormat)))
+			app.descVersionValOrig.SetText(app.formatDate(mod.OriginalUpload, dateFormat))
 		} else {
-			app.descOriginalUpload.SetText("")
+			app.descVersionValOrig.SetText("")
+		}
+	}
+	if app.descVersionValUpd != nil {
+		if !mod.LastUpdated.IsZero() {
+			app.descVersionValUpd.SetText(app.formatDate(mod.LastUpdated, dateFormat))
+		} else {
+			app.descVersionValUpd.SetText("")
 		}
 	}
 
-	if app.descLatestVersion != nil {
-		var cacheKey string
-		switch mod.Name {
-		case "dmf":
-			cacheKey = "8:dmf"
-		case "base":
-			cacheKey = "19:base"
-		case "autopatch":
-			cacheKey = "709:autopatch"
-		default:
-			if mod.URL != "" {
-				modID := helpers.ExtractModIDFromURL(mod.URL)
-				if modID != 0 {
-					cacheKey = fmt.Sprintf("%d:%s", modID, mod.Name)
-				}
-			}
-		}
-
-		if cacheKey != "" {
-			if latest, ok := app.getLatestVersion(cacheKey); ok {
-				app.descLatestVersion.SetText(fmt.Sprintf(app.msg("nexus_latest_version_label"), latest))
+	// Обновляем категорию с локализацией
+	if app.descCategoryVal != nil {
+		if mod.Category != "" {
+			// Ищем перевод по ключу "category_НазваниеКатегории"
+			locKey := "category_" + mod.Category
+			translated := app.msg(locKey)
+			if translated != "" {
+				app.descCategoryVal.SetText(translated)
 			} else {
-				app.descLatestVersion.SetText(app.msg("nexus_latest_version_unknown"))
+				// Если перевода нет, показываем оригинал
+				app.descCategoryVal.SetText(mod.Category)
 			}
 		} else {
-			app.descLatestVersion.SetText("")
+			app.descCategoryVal.SetText("-")
 		}
 	}
 
@@ -2010,15 +2361,95 @@ func (app *App) updateDescriptionForMod(name string) {
 		}
 	}
 
-	// Блок конфликта: сначала сбрасываем состояние, затем пытаемся найти
-	// актуальную пару. Если mod.Incompatible == true, но ни одной валидной
-	// пары не найдено (например, второй мод удалили) — оставляем скрытым
-	// с пустым текстом, а не тащим прошлое значение.
-	if app.descConflict != nil {
-		app.descConflict.SetText("")
-		app.descConflict.Hide()
+	// ─── Секция «Статус» ──────────────────────────────────────────
+	// Самое актуальное — сверху: обновление, потом источник, потом
+	// особенности. Вкл/Выкл и Mandatory здесь НЕ показываем — они
+	// дублируют чекбокс и позицию в списке.
+	if app.descStatusList != nil {
+		app.descStatusList.Objects = nil
 
+		// Обновление — самое актуальное событие.
+		if mod.HasUpdate {
+			text := app.msg("status_update_available")
+
+			var statusKey string
+			switch mod.Name {
+			case "dmf":
+				statusKey = "8:dmf"
+			case "base":
+				statusKey = "19:base"
+			case "autopatch":
+				statusKey = "709:autopatch"
+			default:
+				if mod.URL != "" {
+					if id := helpers.ExtractModIDFromURL(mod.URL); id != 0 {
+						statusKey = fmt.Sprintf("%d:%s", id, mod.Name)
+					}
+				}
+			}
+			cur, latest := "", ""
+			if statusKey != "" {
+				if info, ok := app.getCachedVersion(statusKey); ok {
+					cur = info.Version
+				}
+				if l, ok := app.getLatestVersion(statusKey); ok {
+					latest = l
+				}
+			}
+			if cur != "" && latest != "" {
+				text = fmt.Sprintf("%s: %s → %s", text, cur, latest)
+			} else if latest != "" {
+				text = fmt.Sprintf("%s: %s", text, latest)
+			}
+			app.descStatusList.Add(app.statusRow("update", text))
+		}
+
+		// Источник
+		switch mod.Source {
+		case "manual":
+			app.descStatusList.Add(app.statusRow("hand_vulcan", app.msg("status_manual")))
+		case "nexus":
+			app.descStatusList.Add(app.statusRow("nexus_orange", app.msg("status_nexus")))
+		}
+
+		// Особенности
+		if mod.VortexDeployed {
+			app.descStatusList.Add(app.statusRow("vortex", app.msg("status_vortex")))
+		}
+		if mod.IsSymlink {
+			app.descStatusList.Add(app.statusRow("symlink", app.msg("status_symlink")))
+		}
+		if mod.IsSystem {
+			app.descStatusList.Add(app.statusRow("sys", app.msg("status_system")))
+		}
+		if mod.Obsolete {
+			app.descStatusList.Add(app.statusRow("skull", app.msg("desc_obsolete")))
+		}
+
+		if len(app.descStatusList.Objects) > 0 {
+			app.descStatusSection.Show()
+		} else {
+			app.descStatusSection.Hide()
+		}
+		app.descStatusList.Refresh()
+	}
+
+	// ─── Секция «Проблемы» ────────────────────────────────────────
+	// Три источника: отсутствует папка, повреждён .mod, конфликтует
+	// с другим модом. Порядок — по убыванию критичности.
+	if app.descProblemsList != nil {
+		app.descProblemsList.Objects = nil
+
+		if mod.MissingFolder {
+			app.descProblemsList.Add(app.statusRow(
+				"folder_missing", app.msg("status_missing_folder")))
+		}
+		if mod.Broken {
+			app.descProblemsList.Add(app.statusRow(
+				"folder_broken", app.msg("desc_broken")))
+		}
 		if mod.Incompatible {
+			desc := ""
 			for _, pair := range checks.GetIncompatiblePairs() {
 				if pair.Mod1 != mod.Name && pair.Mod2 != mod.Name {
 					continue
@@ -2030,13 +2461,21 @@ func (app *App) updateDescriptionForMod(name string) {
 				if !checks.FolderExists(other) {
 					continue
 				}
-				if desc := checks.GetIncompatibleDesc(pair.Mod1, pair.Mod2); desc != "" {
-					app.descConflict.SetText(desc)
-					app.descConflict.Show()
-				}
+				desc = checks.GetIncompatibleDesc(pair.Mod1, pair.Mod2)
 				break
 			}
+			if desc == "" {
+				desc = app.msg("desc_conflict")
+			}
+			app.descProblemsList.Add(app.statusRow("conflict", desc))
 		}
+
+		if len(app.descProblemsList.Objects) > 0 {
+			app.descProblemsSection.Show()
+		} else {
+			app.descProblemsSection.Hide()
+		}
+		app.descProblemsList.Refresh()
 	}
 
 	if app.descExtraContainer != nil {
@@ -2115,6 +2554,10 @@ func (app *App) updateDescriptionForMod(name string) {
 		}
 	}
 
+	// Thumbnail обновляем последним — когда все метки уже расставлены.
+	// Это позволяет layout сразу знать финальный размер metaLeft.
+	app.updateDescriptionThumbnail(mod)
+
 	if app.descCardContent != nil {
 		app.descCardContent.Refresh()
 	}
@@ -2185,6 +2628,42 @@ func (app *App) enrichModFromNexus(mod *checks.ModInfo) {
 					checks.SaveModDatabase()
 					app.appendLog(fmt.Sprintf(app.msg("log_autosaved_stable_pattern"), modName, pattern))
 				}
+			}
+		}
+
+		// Ленивое дозаполнение NexusPictureURL для модов, установленных
+		// до появления этого поля (или для случаев, когда первичная
+		// установка шла не через autoAddModToDatabase).
+		//
+		// Дополнительный API-запрос делается ОДИН раз на мод — после
+		// сохранения URL в базу условие entry.NexusPictureURL == ""
+		// больше не выполняется.
+		if entry := checks.GetModDBEntry(modName); entry != nil && entry.NexusPictureURL == "" {
+			info, err := app.FetchNexusModInfo(modID, app.getAuthToken())
+			if err == nil && info != nil && info.PictureURL != "" {
+				updated := *entry
+				updated.NexusPictureURL = info.PictureURL
+				checks.UpdateModDBEntry(updated)
+				checks.SaveModDatabase()
+
+				fyne.Do(func() {
+					// Синхронизируем allMods, чтобы UI сразу увидел URL.
+					app.modsMutex.Lock()
+					for i := range app.allMods {
+						if app.allMods[i].Name == modName {
+							app.allMods[i].NexusPictureURL = info.PictureURL
+							break
+						}
+					}
+					app.modsMutex.Unlock()
+
+					// Если этот же мод всё ещё выбран — обновляем картинку.
+					if app.selectedModName == modName {
+						if m, ok := app.findModByName(modName); ok {
+							app.updateDescriptionThumbnail(m)
+						}
+					}
+				})
 			}
 		}
 
@@ -2390,14 +2869,32 @@ func (app *App) filterModList() {
 	totalCount := len(app.allMods)
 	app.modsMutex.Unlock()
 
+	// Пересчитываем selectedModIndex из selectedModName — после
+	// перестройки displayedMods индекс мог измениться (при смене
+	// фильтра/поиска/порядка). Иначе ScrollTo уедет на другой мод.
+	if app.selectedModName != "" {
+		newIdx := -1
+		for i := range app.displayedMods {
+			if app.displayedMods[i].Name == app.selectedModName {
+				newIdx = i
+				break
+			}
+		}
+		app.selectedModIndex.Store(int32(newIdx))
+	} else {
+		app.selectedModIndex.Store(-1)
+	}
+
 	app.modTable.Length = func() (int, int) { return len(app.displayedMods), TableColumnCount }
 	app.modTable.Refresh()
-	selIdx := app.selectedModIndex.Load()
-	if selIdx >= 0 {
+	if selIdx := app.selectedModIndex.Load(); selIdx >= 0 {
 		app.modTable.ScrollTo(widget.TableCellID{Row: int(selIdx), Col: 0})
-	} else {
-		app.modTable.ScrollToTop()
 	}
+	// ScrollToTop здесь намеренно НЕ вызывается: при операциях без
+	// явной смены фильтра (toggle, refresh, install) список не должен
+	// прыгать в начало. Явный скролл наверх делают обработчики
+	// filterSelect.OnChanged и searchEntry.OnChanged.
+
 	app.updateUpDownButtons()
 	activeCount := 0
 	for _, m := range app.displayedMods {
@@ -2442,7 +2939,49 @@ func (app *App) selectAllMods(selected bool) {
 	app.modsMutex.Unlock()
 
 	fyne.Do(func() {
-		app.filterModList()
+		// applySelectionFromMods — не только перерисовывает таблицу,
+		// но и переносит Selected из модели в визуальное выделение
+		// строк через modTable.Select(..., fyne.KeyModifierControl).
+		//
+		// Раньше здесь стоял filterModList: он обновлял Selected в
+		// модели и Refresh-ил таблицу, но НЕ вызывал Select для строк.
+		// Из-за этого Ctrl+A / кнопки «выделить всё» / «снять всё»
+		// давали невидимое состояние — Selected в модели true, а
+		// строки в таблице не подсвечены. Первый же клик без
+		// модификатора по любой строке снимал визуальное выделение
+		// со всех и через syncSelectionToCheckboxes сбрасывал
+		// Selected у невидимых в false, теряя только что сделанный
+		// выбор.
+		previous := app.selectedModName
+
+		app.applySelectionFromMods()
+
+		// applySelectionFromMods выставляет selectedModName на первый
+		// выделенный. Для Ctrl+A это логично: «текущий» становится
+		// первый. Но если пользователь до Ctrl+A смотрел на конкретный
+		// мод и тот всё ещё видим — оставляем фокус на нём, чтобы
+		// описание не перескочило на другой мод из-за массового
+		// выделения.
+		//
+		// Восстанавливаем только при selected == true. При снятии
+		// (selected == false) пустое состояние с пустым описанием —
+		// это корректно и ожидаемо.
+		if selected && previous != "" && app.selectedModName != previous {
+			app.modsMutex.RLock()
+			stillVisible := false
+			for i := range app.displayedMods {
+				if app.displayedMods[i].Name == previous {
+					stillVisible = true
+					break
+				}
+			}
+			app.modsMutex.RUnlock()
+			if stillVisible {
+				app.selectedModName = previous
+				app.updateDescriptionForMod(previous)
+				app.updateUpDownButtons()
+			}
+		}
 	})
 }
 
@@ -2489,7 +3028,7 @@ func (app *App) setSelectedActive(active bool) {
 		fyne.Do(func() {
 			app.updateTableBorder()
 			app.filterModList()
-			app.forceRefreshTable()
+			// app.forceRefreshTable()
 		})
 	}
 }
@@ -2652,10 +3191,20 @@ func (app *App) syncSelectionToCheckboxes() {
 	}
 	app.modsMutex.Unlock()
 
+	// Форсируем пересчёт размера скролла Fyne Table. Трюк:
+	// временно отдаём другое число, Refresh, потом возвращаем
+	// ЖИВУЮ функцию, читающую len(app.displayedMods) — не
+	// зафиксированное значение. Иначе Length навсегда останется
+	// числом на момент вызова, и таблица будет рисовать неверное
+	// количество строк после того, как displayedMods изменится
+	// (вплоть до того, что часть модов просто пропадёт из вида).
 	rows, cols := app.modTable.Length()
 	app.modTable.Length = func() (int, int) { return rows + 1, cols }
 	app.modTable.Refresh()
-	app.modTable.Length = func() (int, int) { return rows, cols }
+
+	app.modTable.Length = func() (int, int) {
+		return len(app.displayedMods), TableColumnCount
+	}
 	app.modTable.Refresh()
 }
 
@@ -2721,7 +3270,7 @@ func (app *App) setupShortcuts() {
 		Modifier: fyne.KeyModifierControl,
 	}, func(shortcut fyne.Shortcut) {
 		app.saveOrderFromUI(nil)
-		app.appendLog("CTRL+S")
+		// app.appendLog("CTRL+S")
 	})
 
 	// Поиск - Ctrl+F
@@ -2731,7 +3280,7 @@ func (app *App) setupShortcuts() {
 	}, func(shortcut fyne.Shortcut) {
 		if app.searchEntry != nil {
 			canvas.Focus(app.searchEntry)
-			app.appendLog("Ctrl+F")
+			// app.appendLog("Ctrl+F")
 		}
 	})
 
@@ -2744,7 +3293,7 @@ func (app *App) setupShortcuts() {
 			return
 		}
 		app.selectAllModsToggle()
-		app.appendLog("Ctrl+A")
+		// app.appendLog("Ctrl+A")
 	})
 
 	// Автосортировка - Ctrl+T
@@ -2753,7 +3302,7 @@ func (app *App) setupShortcuts() {
 		Modifier: fyne.KeyModifierControl,
 	}, func(shortcut fyne.Shortcut) {
 		go app.runAllChecks()
-		app.appendLog("Ctrl+T")
+		// app.appendLog("Ctrl+T")
 	})
 
 	// Обновить список - Ctrl+R
@@ -2763,7 +3312,7 @@ func (app *App) setupShortcuts() {
 		Modifier: fyne.KeyModifierControl,
 	}, func(shortcut fyne.Shortcut) {
 		go app.refreshWithDirtyCheck()
-		app.appendLog("Ctrl+R")
+		// app.appendLog("Ctrl+R")
 	})
 
 	// Проверить обновления - Ctrl+U
@@ -2772,7 +3321,7 @@ func (app *App) setupShortcuts() {
 		Modifier: fyne.KeyModifierControl,
 	}, func(shortcut fyne.Shortcut) {
 		go app.checkNexusUpdates()
-		app.appendLog("Ctrl+U")
+		// app.appendLog("Ctrl+U")
 	})
 
 	// Вкл/выкл модов глобально - Ctrl+O
@@ -2782,7 +3331,7 @@ func (app *App) setupShortcuts() {
 		Modifier: fyne.KeyModifierControl,
 	}, func(shortcut fyne.Shortcut) {
 		app.toggleGlobalMods()
-		app.appendLog("Ctrl+O")
+		// app.appendLog("Ctrl+O")
 	})
 
 	// Панель управления модами - Ctrl+M
@@ -2791,33 +3340,38 @@ func (app *App) setupShortcuts() {
 		Modifier: fyne.KeyModifierControl,
 	}, func(shortcut fyne.Shortcut) {
 		app.toggleManagePanel()
-		app.appendLog("Ctrl+M")
+		// app.appendLog("Ctrl+M")
 	})
 
-	// Удалить выделенные моды - Ctrl+Delete (с модификатором работает).
+	// Редактирование заметки к моду - Ctrl+N
 	canvas.AddShortcut(&desktop.CustomShortcut{
-		KeyName:  fyne.KeyDelete,
+		KeyName:  fyne.KeyN,
 		Modifier: fyne.KeyModifierControl,
 	}, func(shortcut fyne.Shortcut) {
-		app.deleteSelectedModsWithConfirm()
-		app.appendLog("Ctrl+Delete")
-	})
+		// Не перехватываем клавишу, если пользователь вводит текст в поле
+		if f := canvas.Focused(); f != nil {
+			if _, ok := f.(*widget.Entry); ok {
+				return
+			}
+		}
 
-	// Запуск игры - Ctrl+F5 / Ctrl+F6 (альтернатива для тех, кому
-	// нравится с модификатором).
-	canvas.AddShortcut(&desktop.CustomShortcut{
-		KeyName:  fyne.KeyF5,
-		Modifier: fyne.KeyModifierControl,
-	}, func(shortcut fyne.Shortcut) {
-		app.launchGameFromUI(true)
-		app.appendLog("Ctrl+F5")
-	})
-	canvas.AddShortcut(&desktop.CustomShortcut{
-		KeyName:  fyne.KeyF6,
-		Modifier: fyne.KeyModifierControl,
-	}, func(shortcut fyne.Shortcut) {
-		app.launchGameFromUI(false)
-		app.appendLog("Ctrl+F6")
+		// Если мод не выбран - ничего не делаем
+		if app.selectedModName == "" {
+			return
+		}
+
+		mod, ok := app.findModByName(app.selectedModName)
+		if !ok {
+			return
+		}
+
+		display := mod.DisplayName
+		if display == "" {
+			display = mod.Name
+		}
+
+		// Открываем диалог заметки
+		app.showEditUserNoteDialog(mod.Name, display)
 	})
 
 	// Запуск игры без модификатора - F5 (быстрый), F6 (обычный).
@@ -2825,11 +3379,11 @@ func (app *App) setupShortcuts() {
 	// генерирует для чистых функциональных клавиш.
 	canvas.AddShortcut(&desktop.CustomShortcut{KeyName: fyne.KeyF5, Modifier: 0}, func(_ fyne.Shortcut) {
 		app.launchGameFromUI(true)
-		app.appendLog("F5")
+		// app.appendLog("F5")
 	})
 	canvas.AddShortcut(&desktop.CustomShortcut{KeyName: fyne.KeyF6, Modifier: 0}, func(_ fyne.Shortcut) {
 		app.launchGameFromUI(false)
-		app.appendLog("F6")
+		// app.appendLog("F6")
 	})
 
 	// Удаление выделенных модов без модификатора - Delete.
@@ -2845,7 +3399,7 @@ func (app *App) setupShortcuts() {
 			}
 		}
 		app.deleteSelectedModsWithConfirm()
-		app.appendLog("Delete")
+		// app.appendLog("Delete")
 	})
 }
 
@@ -2916,4 +3470,133 @@ func (app *App) deleteSelectedModsWithConfirm() {
 		fmt.Sprintf(app.msg("confirm_remove_selected_text"), len(sel)),
 		func() { app.removeSelectedMods() },
 	)
+}
+
+// updateDescriptionThumbnail обновляет картинку в правой карточке.
+//
+// Вызывается из UI-потока (updateDescriptionForMod). Загрузка идёт
+// асинхронно; пока она идёт, видна только заглушка — layout не «прыгает»
+// при появлении картинки, потому что descThumbnailBox имеет
+// фиксированный MinSize.
+//
+// Если у мода нет NexusPictureURL — прячем весь box; метаданные слева
+// растягиваются на всю ширину карточки.
+func (app *App) updateDescriptionThumbnail(mod checks.ModInfo) {
+	if app.descThumbnailBox == nil || app.descThumbnail == nil {
+		return
+	}
+
+	url := mod.NexusPictureURL
+	app.descThumbnailURL = url
+
+	if url == "" {
+		app.descThumbnailBox.Hide()
+		app.descThumbnail.Resource = nil
+		app.descThumbnail.Image = nil // ← важно: без этого остаётся старая текстура
+		app.descThumbnail.Refresh()
+		return
+	}
+
+	app.descThumbnailBox.Show()
+	// Сбрасываем ОБА поля. Resource — это источник данных, Image —
+	// уже декодированная картинка. Fyne в Refresh'е смотрит и на то, и на
+	// другое: если оставить Image, рендер останется прежним, даже если
+	// Resource = nil.
+	app.descThumbnail.Resource = nil
+	app.descThumbnail.Image = nil
+	app.descThumbnail.Refresh()
+
+	app.thumbnailCacheMu.Lock()
+	if res, ok := app.thumbnailCache[url]; ok {
+		app.thumbnailCacheMu.Unlock()
+		app.descThumbnail.Resource = res
+		app.descThumbnail.Refresh()
+		return
+	}
+	app.thumbnailCacheMu.Unlock()
+
+	go func(expectedURL string) {
+		defer func() { recover() }()
+
+		res, err := fetchNexusThumbnail(expectedURL)
+		if err != nil {
+			app.appendLogToFile(fmt.Sprintf(
+				"thumbnail fetch failed for %q: %v", expectedURL, err))
+			fyne.Do(func() {
+				if app.descThumbnailURL == expectedURL {
+					app.descThumbnailBox.Hide()
+					app.descThumbnail.Resource = nil
+					app.descThumbnail.Image = nil
+					app.descThumbnail.Refresh()
+				}
+			})
+			return
+		}
+
+		// Проверяем только заголовок — DecodeConfig дешёвый и не
+		// разворачивает кадры. Для анимированного WebP (VP8X+ANIM)
+		// он может вернуть ошибку, если версия x/image/webp старая.
+		// В этом случае НЕ прячем бокс: пусть Fyne декодирует картинку
+		// своим путём (в форке добавлен deanimator).
+		if cfg, _, cfgErr := image.DecodeConfig(bytes.NewReader(res.Content())); cfgErr == nil {
+			if cfg.Width < 10 || cfg.Height < 10 {
+				app.appendLogToFile(fmt.Sprintf(
+					"thumbnail too small for %q: %dx%d, skipping",
+					expectedURL, cfg.Width, cfg.Height))
+				fyne.Do(func() {
+					if app.descThumbnailURL == expectedURL {
+						app.descThumbnailBox.Hide()
+						app.descThumbnail.Resource = nil
+						app.descThumbnail.Image = nil
+						app.descThumbnail.Refresh()
+					}
+				})
+				return
+			}
+		}
+
+		app.thumbnailCacheMu.Lock()
+		app.thumbnailCache[expectedURL] = res
+		app.thumbnailCacheMu.Unlock()
+
+		fyne.Do(func() {
+			if app.descThumbnailURL != expectedURL {
+				return
+			}
+			app.descThumbnail.Resource = res
+			app.descThumbnail.Refresh()
+		})
+	}(url)
+}
+
+// refreshDescStaticLabels обновляет локализованные подписи карточки
+// описания: версии/даты и заголовки секций «Статус», «Проблемы».
+//
+// Раньше эти подписи создавались один раз в buildDescriptionCard и не
+// переиспользовались при changeLanguage — из-за этого после смены
+// языка они оставались на старом. Теперь вызывается и при первом
+// построении карточки, и на каждом updateDescriptionForMod, который
+// changeLanguage тоже дёргает.
+func (app *App) refreshDescStaticLabels() {
+	if app.descVersionLblVersion != nil {
+		app.descVersionLblVersion.SetText(app.msg("table_lbl_version"))
+	}
+	if app.descVersionLblLatest != nil {
+		app.descVersionLblLatest.SetText(app.msg("table_lbl_latest"))
+	}
+	if app.descVersionLblOrig != nil {
+		app.descVersionLblOrig.SetText(app.msg("original_upload_label") + ":")
+	}
+	if app.descVersionLblUpd != nil {
+		app.descVersionLblUpd.SetText(app.msg("last_updated_label") + ":")
+	}
+	if app.descStatusTitle != nil {
+		app.descStatusTitle.SetText(app.msg("desc_section_status") + ":")
+	}
+	if app.descProblemsTitle != nil {
+		app.descProblemsTitle.SetText(app.msg("desc_section_problems") + ":")
+	}
+	if app.descCategoryLbl != nil {
+		app.descCategoryLbl.SetText(app.msg("category_label") + ":")
+	}
 }

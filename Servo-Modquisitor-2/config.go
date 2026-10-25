@@ -11,7 +11,7 @@ import (
 // ───────────── Программа ─────────────────────────────────────────
 const (
 	AppName         = "Servo-Modquisitor-2"
-	AppVersion      = "4.8.5"
+	AppVersion      = "5.0.0"
 	AppID           = "com.xssplater.servo-modquisitor"
 	AppIcon         = "assets/icon.png"
 	ConfigFolderSMQ = "Servo-Modquisitor"
@@ -82,8 +82,11 @@ const (
 	DiscordDTModders = "https://discord.com/channels/1048312349867646996/1506507675976859679"
 	DiscordDTMy      = "https://discord.gg/BGZagw3xnz"
 
-	YouTubeGuideURLOld = "https://www.youtube.com/watch?v=k0Mvd-M-c5s"
-	YouTubeGuideProfil = "https://www.youtube.com/watch?v=RDgXpLSmUXE"
+	YouTubeGuideURLOld = "https://www.youtube.com/watch?v=k0Mvd-M-c5s" // Старый
+	YouTubeGuideProfil = "https://www.youtube.com/watch?v=RDgXpLSmUXE" // Профили старый
+	YouTubeGuideWizard = "https://www.youtube.com/watch?v=ea020q4mGcM" // Новый Визард
+	YouTubeGuideUpdate = "https://www.youtube.com/watch?v=H6Huh8MmVbc" // Новый Обновы
+	YouTubeGuideCollec = "https://www.youtube.com/watch?v=u4l3Erk_zvI" // Новый Коллекции
 )
 
 // ───────────── Донаты ────────────────────────────────────────────
@@ -110,10 +113,21 @@ const (
 
 // ───────────── Форматы времени ───────────────────────────────────
 const (
-	LogTimeFormat       = "02-01-2006 15:04:05"
-	YYYYMMDD_TimeFormat = "2006-01-02"
-	MMDDYYYY_TimeFormat = "01-02-2006"
-	DDMMYYYY_TimeFormat = "02-01-2006"
+	// LogTimeFormat — формат строки лога. Оставляем с дефисами:
+	// это единственный формат, где дата стоит перед временем, и
+	// дефисы явно отделяют её от mm:hh:ss, делая строку более
+	// читаемой в логе.
+	LogTimeFormat = "02-01-2006 15:04:05"
+
+	// Форматы дат, показываемых в UI. Точка вместо дефиса: дефисы
+	// в голове пользователя ассоциируются с ISO (yyyy-mm-dd), и
+	// дата вида 02-01-2006 вызывает лёгкое замешательство — то ли
+	// это 2 января, то ли 1 февраля. Точки в русской и большинстве
+	// европейских локалей однозначно читаются как разделитель
+	// компонентов даты в порядке дд.мм.гггг.
+	YYYYMMDD_TimeFormat = "2006.01.02"
+	MMDDYYYY_TimeFormat = "01.02.2006"
+	DDMMYYYY_TimeFormat = "02.01.2006"
 )
 
 // ───────────── Окна программы ────────────────────────────────────
@@ -130,6 +144,10 @@ const (
 	LeftPanelMinWidth  float32 = 400
 	RightPanelMinWidth float32 = 300
 	SplitOffset        float64 = 0.625
+	SpacingText15              = -15
+	SpacingText13              = -13
+	SpacingText11              = -11
+	SpacingLinks               = -12
 )
 
 // ───────────── Консоль ───────────────────────────────────────────
@@ -145,13 +163,14 @@ const (
 const (
 	TableColumnCount = 7
 
+	// 30+30+40+360+90+130+500 = 1180
 	ColCheckboxWidth float32 = 30
 	ColSelectWidth   float32 = 30
 	ColNumberWidth   float32 = 40
-	ColNameWidth     float32 = 350
-	ColDateWidth     float32 = 100
-	ColStatusWidth   float32 = 120
-	ColNoteWidth     float32 = 510
+	ColNameWidth     float32 = 360
+	ColDateWidth     float32 = 90
+	ColStatusWidth   float32 = 130
+	ColNoteWidth     float32 = 500
 
 	ModNameWidth float32 = 450
 	LABRWidth    float32 = 130
@@ -166,6 +185,12 @@ const (
 
 	StatusRowSpacing = -2 // отступ между строками в пикселях (0 — без отступа)
 	StatusFontSize   = 11 // размер шрифта для дополнительного статуса (основной будет на 2 больше)
+)
+
+const (
+	sizeThumbnailX = 360
+	sizeThumbnailY = 180
+	CornerRadius15 = 15
 )
 
 const (

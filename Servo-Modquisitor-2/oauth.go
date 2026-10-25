@@ -339,29 +339,55 @@ func (app *App) refreshAccessToken() error {
 
 func (app *App) getAuthToken() string {
 	accessToken, err := getStoredToken(keyAccessToken)
-	if err != nil {
+	if err != nil || accessToken == "" {
+		// Токена нет вообще: пользователь либо никогда не логинился,
+		// либо предыдущий refresh уже всё стёр. В любом случае —
+		// сообщаем об этом через handleAuthExpired: он покажет окно
+		// и переключит меню на красный значок.
+		app.appendLogToFile("OAuth: no access token stored")
+		app.handleAuthExpired()
 		return ""
 	}
+
 	expiryStr, err := getStoredToken(keyExpiry)
 	if err != nil {
+		app.appendLogToFile(fmt.Sprintf(
+			"OAuth: access token present, but expiry is missing: %v", err))
+		app.handleAuthExpired()
 		return ""
 	}
+
 	expiry, err := time.Parse(time.RFC3339, expiryStr)
 	if err != nil {
+		app.appendLogToFile(fmt.Sprintf(
+			"OAuth: cannot parse stored expiry %q: %v", expiryStr, err))
+		app.handleAuthExpired()
 		return ""
 	}
+
 	if time.Now().Before(expiry) {
 		return accessToken
 	}
+
+	// Токен истёк — пробуем refresh.
+	app.appendLogToFile(fmt.Sprintf(
+		"OAuth: access token expired at %s, attempting refresh",
+		expiry.Format(time.RFC3339)))
+
 	if err := app.refreshAccessToken(); err == nil {
 		newToken, _ := getStoredToken(keyAccessToken)
+		app.appendLogToFile("OAuth: token refreshed successfully")
+		// Успешный refresh снимает флаг — следующий 401 (если будет)
+		// снова покажет окно.
+		app.authExpiredHandled.Store(false)
 		return newToken
+	} else {
+		app.appendLogToFile(fmt.Sprintf("OAuth: refresh failed: %v", err))
 	}
+
 	deleteAllStoredTokens()
-	app.loggedIn.Store(false)
-	if app.mainWindow != nil {
-		fyne.Do(func() { app.mainWindow.SetMainMenu(app.buildMainMenu()) })
-	}
+	app.appendLogToFile("OAuth: tokens deleted, prompting re-login")
+	app.handleAuthExpired()
 	return ""
 }
 
@@ -383,5 +409,72 @@ func (app *App) saveOAuthTokens(access, refresh string, expiry time.Time) error 
 		return err
 	}
 	app.loggedIn.Store(true)
+	// Успешный логин закрывает «проблему сессии». Если пользователь
+	// в будущем снова получит 401 (например, через час, когда
+	// access-токен истечёт и refresh не пройдёт), окно «сессия
+	// истекла» покажется снова — потому что флаг сброшен.
+	app.authExpiredHandled.Store(false)
 	return nil
+}
+
+// handleAuthExpired вызывается всякий раз, когда Nexus вернул 401
+// или когда refresh access-токена провалился. Делает три вещи:
+//
+//  1. Переключает loggedIn в false — меню при перерисовке сразу
+//     покажет красный значок (disconnect_red_int.png) и пункт
+//     «Login with Nexus (OAuth)» вместо «Logout».
+//  2. Показывает пользователю окно с явным предложением залогиниться.
+//     Без этого он видел только «download link expired» в логе и
+//     шёл генерировать ссылку заново — что бесполезно.
+//  3. Ставит флаг authExpiredHandled, чтобы пачка параллельных 401
+//     не открывала десяток окон. Флаг сбрасывается через 10 секунд
+//     или при успешном логине.
+func (app *App) handleAuthExpired() {
+	// CompareAndSwap атомарно проверяет «уже обрабатываем?».
+	// Если кто-то другой уже вызвал эту функцию и окно висит —
+	// молча выходим.
+	if !app.authExpiredHandled.CompareAndSwap(false, true) {
+		return
+	}
+
+	app.appendLogToFile("OAuth: session expired or access token missing, " +
+		"prompting user to re-login")
+
+	// Мгновенное переключение индикации. loggedIn проверяется в
+	// buildMainMenu, поэтому достаточно просто его сбросить и
+	// перестроить меню в UI-потоке — значок сам станет красным.
+	app.loggedIn.Store(false)
+
+	fyne.Do(func() {
+		if app.mainWindow == nil {
+			return
+		}
+		app.mainWindow.SetMainMenu(app.buildMainMenu())
+
+		app.showChoiceDialog(
+			app.mainWindow,
+			app.msg("oauth_expired_title"),
+			app.msg("oauth_expired_message"),
+			func(choice int) {
+				if choice == 0 {
+					// Пользователь нажал «Login with Nexus» —
+					// запускаем OAuth-флоу. Он откроет браузер,
+					// после успеха вернётся на /callback и
+					// saveOAuthTokens переключит индикатор обратно
+					// на зелёный.
+					go app.startOAuthFlow()
+				}
+			},
+			app.msg("menu_nexus_login"), // «Login with Nexus (OAuth)»
+			app.msg("btn_cancel"),
+		)
+	})
+
+	// Сбрасываем флаг через 10 секунд. Если пользователь за это время
+	// не залогинился, следующий 401 снова покажет окно. Если залогинился
+	// — saveOAuthTokens сбросит флаг раньше и это срабатывание просто
+	// не найдёт уже установленный true.
+	time.AfterFunc(10*time.Second, func() {
+		app.authExpiredHandled.Store(false)
+	})
 }

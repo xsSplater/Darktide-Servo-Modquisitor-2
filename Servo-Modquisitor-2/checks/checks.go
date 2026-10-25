@@ -262,17 +262,21 @@ func ListModFolders() []string {
 }
 
 type ModInfo struct {
-	Active            bool
-	Broken            bool
-	Incompatible      bool
-	Mandatory         bool
-	Obsolete          bool
-	Selected          bool
-	IsSystem          bool
-	VortexDeployed    bool
-	IsSymlink         bool
-	MissingFolder     bool
-	HasUpdate         bool `json:"-"`
+	Active         bool
+	Broken         bool
+	Incompatible   bool
+	Mandatory      bool
+	Obsolete       bool
+	Selected       bool
+	IsSystem       bool
+	VortexDeployed bool
+	IsSymlink      bool
+	MissingFolder  bool
+	HasUpdate      bool `json:"-"`
+	// ConflictWith хранит display-имя второго мода в паре конфликта.
+	// Заполняется в refreshModList при обнаружении несовместимости.
+	// Пустая строка — конфликта нет или второй мод не установлен.
+	ConflictWith      string
 	NexusDownloads    int
 	NexusEndorsements int
 	Author            string
@@ -302,6 +306,19 @@ type ModDBEntry struct {
 	URL              string            `json:"url"`
 	SourceCodeURL    string            `json:"source_code_url"`
 	Note             map[string]string `json:"note"`
+
+	// NexusPictureURL — прямая ссылка на thumbnail мода на CDN Nexus
+	// (staticdelivery.nexusmods.com/...). Храним в базе, чтобы не
+	// дёргать Nexus API каждый раз при выделении мода в таблице.
+	//
+	// Заполняется:
+	//   - при первичной установке/обновлении мода (autoAddModToDatabase);
+	//   - ленивым дозаполнением, когда пользователь выделяет мод в таблице
+	//     и у записи ещё нет URL (enrichModFromNexus → FetchNexusModInfo).
+	//
+	// omitempty, чтобы не засорять mod_database.json пустыми полями для
+	// тех модов, у которых Nexus картинку не отдал.
+	NexusPictureURL string `json:"nexus_picture_url,omitempty"`
 }
 
 // JoinNotes склеивает непустые заметки через разделитель " · ".
@@ -450,8 +467,10 @@ func GetModsInfo(lang string, forceEnglish bool) []ModInfo {
 		// Заполняем поля из базы данных
 		if db, ok := modDBMap[strings.ToLower(name)]; ok && db.Folder != "" {
 			mod.Author = db.Author
+			mod.Category = db.Category
 			mod.URL = db.URL
 			mod.SourceCodeURL = db.SourceCodeURL
+			mod.NexusPictureURL = db.NexusPictureURL
 			mod.Description = PickLocalized(db.Description, lang)
 			// Не перезаписываем Note: если выше уже проставлена
 			// структурная причина (disabled-префикс, копия), она
@@ -494,6 +513,7 @@ func GetModsInfo(lang string, forceEnglish bool) []ModInfo {
 				mod.Author = db.Author
 				mod.URL = db.URL
 				mod.SourceCodeURL = db.SourceCodeURL
+				mod.NexusPictureURL = db.NexusPictureURL
 				mod.Category = db.Category
 				mod.Description = PickLocalized(db.Description, lang)
 				mod.Note = PickLocalized(db.Note, lang)
@@ -1629,7 +1649,21 @@ func SaveModDatabase() error {
 		return err
 	}
 	path := filepath.Join(dir, "mod_database.json")
-	return os.WriteFile(path, buf.Bytes(), 0644)
+
+	// Атомарная запись: temp + rename. Та же защита от обрыва —
+	// если процесс убит посреди записи, оригинальный
+	// mod_database.json останется целым. Без этого Alt+F4 во
+	// время сохранения базы оставил бы пустой файл, и при
+	// следующем запуске SMQ показал бы «база пуста».
+	tmpPath := path + ".tmp"
+	if err := os.WriteFile(tmpPath, buf.Bytes(), 0644); err != nil {
+		return err
+	}
+	if err := os.Rename(tmpPath, path); err != nil {
+		_ = os.Remove(tmpPath)
+		return err
+	}
+	return nil
 }
 
 func GetModDBEntry(folder string) *ModDBEntry {

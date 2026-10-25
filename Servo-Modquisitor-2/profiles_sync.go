@@ -247,6 +247,7 @@ func (app *App) SyncProfileManually() {
 		_, closeDialog := app.showInfiniteProgressDialog(
 			app.msg("profile_sync_title"),
 			app.msg("profile_sync_message"),
+			false,
 		)
 		defer closeDialog()
 
@@ -273,6 +274,7 @@ func (app *App) ResetGameModsWithConfirm() {
 				_, closeDialog := app.showInfiniteProgressDialog(
 					app.msg("profile_sync_title"),
 					app.msg("profile_sync_message"),
+					false,
 				)
 				defer closeDialog()
 

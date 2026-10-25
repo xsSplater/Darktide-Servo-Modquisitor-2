@@ -180,6 +180,10 @@ func (t HighContrastTheme) Color(name fyne.ThemeColorName, variant fyne.ThemeVar
 	case theme.ColorNameMenuItemHeaderBg:
 		return color.NRGBA{R: 200, G: 200, B: 200, A: 0xFF}
 
+	// ──────────────── AML-предупреждение ─────
+	case ColorAMLWarning:
+		return color.NRGBA{R: 0x00, G: 0xFF, B: 0xFF, A: 0xFF}
+
 	default:
 		return theme.DefaultTheme().Color(name, variant)
 	}

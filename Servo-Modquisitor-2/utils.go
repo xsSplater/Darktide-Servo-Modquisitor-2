@@ -195,7 +195,7 @@ func (app *App) runAllChecksInternal(openFileAtEnd bool) bool {
 	//
 	// Внимание: refreshModList не вызывает fyne.Do/DoAndWait
 	// внутри (проверено по всему call-tree: filterModList,
-	// forceRefreshTable, updateSystemModsTable, pruneVersionCache,
+	// forceRefreshTable, pruneVersionCache,
 	// updateTableBorder — прямые UI-вызовы, без обёрток).
 	// Значит, вложенного DoAndWait не будет и deadlock-а тоже.
 	if !app.orderDirty.Load() {
@@ -356,7 +356,33 @@ func (app *App) forceRefreshTable() {
 		app.appendLogToFile("forceRefreshTable: mainWindow or Canvas is nil, skipping")
 		return
 	}
+
+	// Шаг 1. Гарантируем, что Length — живой closure.
+	app.modTable.Length = func() (int, int) {
+		return len(app.displayedMods), TableColumnCount
+	}
+
+	// Шаг 2. Трюк «bump Length». Fyne Table кэширует состояние
+	// прокрутки/видимых строк и на обычном Refresh() не всегда
+	// перечитывает Length, если внутренний кэш считает, что «число
+	// строк не изменилось». В итоге displayedMods уже 114, счётчик
+	// показывает 114, а рендер всё ещё рисует 0 строк — что и
+	// проявляется как «таблица схлопнулась после автосортировки».
+	//
+	// Подменяем Length на значение +1, Refresh (Fyne видит «стало
+	// больше строк» и делает полный re-layout), затем возвращаем
+	// живой closure и Refresh ещё раз — окончательная раскладка
+	// происходит уже по правильному числу строк.
+	rows, _ := app.modTable.Length()
+	app.modTable.Length = func() (int, int) { return rows + 1, TableColumnCount }
 	app.modTable.Refresh()
+
+	app.modTable.Length = func() (int, int) {
+		return len(app.displayedMods), TableColumnCount
+	}
+	app.modTable.Refresh()
+
+	// Шаг 3. Обновляем соседние виджеты.
 	if app.tableBorderContainer != nil {
 		app.tableBorderContainer.Refresh()
 	}
@@ -544,6 +570,9 @@ func isModsEnabledAutoPatch(gameRoot string) bool {
 // гарантирует корректное освобождение порта NXM.
 func (app *App) closeApp() {
 	app.nxm.Stop()
+	// Не теряем отложенную запись кэша версий: debounce мог не
+	// сработать, а мы сейчас завершим процесс через os.Exit.
+	app.flushNexusVersionCache()
 	if app.mainWindow != nil {
 		fyne.Do(func() {
 			app.mainWindow.Close()
@@ -747,16 +776,32 @@ func (app *App) removeModFromCache(modName string) {
 // pruneVersionCache удаляет мёртвые и дублирующиеся записи из кэша
 // версий. Логика вынесена в VersionCache.Prune.
 func (app *App) pruneVersionCache() {
-	// 1. Собираем существующие папки.
 	app.modsMutex.RLock()
 	existing := make(map[string]bool)
 	for _, mod := range app.allMods {
 		existing[mod.Name] = true
 	}
-	for _, mod := range app.systemMods {
-		existing[mod.Name] = true
-	}
+	// Защищаем системные моды, даже если они скрыты
+	existing["base"] = true
+	existing["dmf"] = true
+	existing["autopatch"] = true
 	app.modsMutex.RUnlock()
+
+	// 1a. Guard от «пустого мира». Если existing пуст — это почти
+	// наверняка временная аномалия: папка mods не прочиталась,
+	// checks.GetModsInfo вернул пусто, гонка на старте. Раньше
+	// Prune в этом случае сносил ВСЕ записи (нечего сохранять —
+	// значит, всё stale), и файл на диске перезаписывался пустым.
+	// Именно так был потерян кэш на 540 модов.
+	//
+	// Правильное поведение: пропустить prune и написать в лог.
+	// Если пользователь действительно удалил все моды, он сделает
+	// это явно, и в следующий раз allMods будет непуст (моды
+	// из load order станут MissingFolder, но в allMods попадут).
+	if len(existing) == 0 {
+		app.appendLogToFile("pruneVersionCache: skip, mod list is empty")
+		return
+	}
 
 	// 2. Prune.
 	removed := app.versionCache.Prune(existing)
@@ -1176,5 +1221,67 @@ func (app *App) openPathInFileManager(path string) {
 		if err := exec.Command("open", path).Start(); err != nil {
 			app.appendLogToFile(fmt.Sprintf("open failed for %q: %v", path, err))
 		}
+	}
+}
+
+// applyAMLWarningState синхронизирует визуальное состояние UI
+// с флагом amlDetected:
+//
+//   - текст и тултипы кнопок Save / Autosort;
+//   - постоянную жёлтую рамку вокруг таблицы;
+//   - постоянную жёлтую рамку вокруг Save и Autosort.
+//
+// Вызывается безусловно из refreshModList, а не только при смене
+// флага: при первом запуске, если AML уже был, wasAML был false,
+// и старый код не применял ни текст, ни рамки до перезапуска.
+func (app *App) applyAMLWarningState() {
+	aml := app.amlDetected.Load()
+
+	// Логируем переход состояния, а не каждый вызов.
+	// Swap возвращает предыдущее значение, поэтому:
+	//   prev=false, aml=true   → переход «AML появился» → лог
+	//   prev=true,  aml=true   → уже логировали → тишина
+	//   prev=true,  aml=false  → переход «AML исчез» → лог
+	//   prev=false, aml=false  → тишина
+	//
+	// Раньше (в первом варианте правки) здесь стоял безусловный
+	// вызов appendLog: refreshModList вызывается десятки раз за
+	// сессию, и консоль заполнялась бы одинаковыми сообщениями.
+	prev := app.amlWarnedLastState.Swap(aml)
+	if aml && !prev {
+		app.appendLog(app.msg("log_aml_detected_warning"))
+	} else if !aml && prev {
+		app.appendLog(app.msg("log_aml_removed_info"))
+	}
+
+	if aml {
+		app.btnSaveOrder.SetText(app.msg("btn_save_order_aml"))
+		app.btnSortChecks.SetText(app.msg("btn_sort_checks_aml"))
+		app.btnSaveOrder.SetToolTip(app.msg("aml_save_warning_tooltip"))
+		app.btnSortChecks.SetToolTip(app.msg("aml_sort_warning_tooltip"))
+	} else {
+		app.btnSaveOrder.SetText(app.msg("btn_save_order"))
+		app.btnSortChecks.SetText(app.msg("btn_sort_checks"))
+		app.btnSaveOrder.SetToolTip(app.msg("btn_save_order_tooltip"))
+		app.btnSortChecks.SetToolTip(app.msg("btn_sort_checks_tooltip"))
+	}
+
+	// Рамка вокруг таблицы. Показ/скрытие — идемпотентно.
+	if app.amlTableBorder != nil {
+		if aml {
+			app.amlTableBorder.Show()
+		} else {
+			app.amlTableBorder.Hide()
+		}
+		app.amlTableBorder.Refresh()
+	}
+
+	// Рамка вокруг кнопок. SetWarningFrame сам вызывает Refresh,
+	// если значение изменилось — лишних перерисовок не будет.
+	if app.btnSaveOrder != nil {
+		app.btnSaveOrder.SetWarningFrame(aml)
+	}
+	if app.btnSortChecks != nil {
+		app.btnSortChecks.SetWarningFrame(aml)
 	}
 }

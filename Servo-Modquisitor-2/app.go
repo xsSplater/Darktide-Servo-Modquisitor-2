@@ -147,22 +147,38 @@ type App struct {
 	versionCache *VersionCache
 	changelog    *ChangelogCache
 
+	// versionCacheSaveTimer + versionCacheSaveMu реализуют debounce
+	// записи nexus_versions.json. При установке пачки модов
+	// saveNexusVersionCache вызывается десятки раз подряд; без
+	// debounce каждый вызов делает полную перезапись файла
+	// (сотни КБ JSON), и это окно — самая частая точка отказа.
+	//
+	// Логика: таймер взводится на 2 сек. Каждый новый вызов
+	// saveNexusVersionCache останавливает старый таймер и взводит
+	// новый. Через 2 секунды тишины — одна реальная запись.
+	// При выходе приложения flushNexusVersionCache() пишет
+	// немедленно, не дожидаясь таймера.
+	versionCacheSaveTimer *time.Timer
+	versionCacheSaveMu    sync.Mutex
+
 	userNotes *userNotesStore
 
 	// ─── UI-виджеты ────────────────────────────────────────────────
 	// Всё ниже — только для главного потока Fyne.
-	modTable                 *widget.Table
-	headerTable              *widget.Table
-	systemModsTable          *widget.Table
-	systemModsTableContainer *fyne.Container
-	systemModsTableSpacer    *canvas.Rectangle // задаёт высоту контейнера
-	tableBorderContainer     *fyne.Container
-	tableBorder              *canvas.Rectangle
-	managePanel              *fyne.Container
-	descCardContent          *fyne.Container
-	descCardScroll           *container.Scroll
-	consoleScroll            *container.Scroll
-	descExtraContainer       *fyne.Container
+	modTable             *widget.Table
+	headerTable          *widget.Table
+	tableBorderContainer *fyne.Container
+	tableBorder          *canvas.Rectangle // оранжевая, «грязное» состояние
+	// amlTableBorder — постоянная жёлтая рамка вокруг таблицы, пока
+	// обнаружен AML. Живёт параллельно с tableBorder: при AML+dirty
+	// обе показываются одновременно, dirty сверху (важнее «сохрани»),
+	// AML чуть толще — торчит тонкой жёлтой полоской снаружи.
+	amlTableBorder     *canvas.Rectangle
+	managePanel        *fyne.Container
+	descCardContent    *fyne.Container
+	descCardScroll     *container.Scroll
+	consoleScroll      *container.Scroll
+	descExtraContainer *fyne.Container
 
 	screenBgRect      *canvas.Rectangle
 	headerBoxBgRect   *canvas.Rectangle
@@ -209,20 +225,99 @@ type App struct {
 	toggleOffIcon     fyne.Resource
 	toggleOnIcon      fyne.Resource
 
-	statusLabel        *widget.Label
-	moveLabel          *widget.Label
-	descAuthor         *widget.Label
-	descInstalled      *widget.Label
-	descBody           *widget.Label
-	filterLabel        *widget.Label
-	counterLabel       *widget.Label
-	descLocalVersion   *widget.Label
-	descLatestVersion  *widget.Label
-	descLastUpdated    *widget.Label
-	descOriginalUpload *widget.Label
-	descConflict       *widget.Label
-	descUserNote       *widget.Label
-	profileLabel       *widget.Label
+	statusLabel   *widget.Label
+	moveLabel     *widget.Label
+	descAuthor    *widget.Label
+	descInstalled *widget.Label
+	descBody      *widget.Label
+	filterLabel   *widget.Label
+	counterLabel  *widget.Label
+
+	descUserNote *widget.Label
+	profileLabel *widget.Label
+
+	descMetaSection     *fyne.Container
+	descUserNoteSection *fyne.Container
+	descTitleSep        *fyne.Container
+	descBodySep         *fyne.Container
+
+	// Секция «Статус» — вертикальный список: иконка + расшифровка
+	// для тех состояний, что не показываются в таблице (или показаны
+	// в виде иконки без текста). Вкл/Выкл и Mandatory сюда НЕ попадают:
+	// они не требуют расшифровки в карточке.
+	descStatusTitle   *widget.Label
+	descStatusList    *fyne.Container
+	descStatusSection *fyne.Container
+
+	// Секция «Проблемы» — что мешает моду работать или конфликтует
+	// с другими модами. Три возможных источника: MissingFolder,
+	// Broken, Incompatible. Скрыта, если ничего нет.
+	descProblemsTitle   *widget.Label
+	descProblemsList    *fyne.Container
+	descProblemsSection *fyne.Container
+
+	// descVersionGrid — правая колонка метаданных, блок «версия + даты»
+	// в виде таблицы: подписи слева, значения справа. layout.FormLayout
+	// сам выравнивает колонку подписей по ширине самой длинной из них,
+	// поэтому значения начинаются в одной вертикали.
+	descVersionGrid       *fyne.Container
+	descVersionLblVersion *widget.Label
+	descVersionValVersion *widget.Label
+	descVersionLblLatest  *widget.Label
+	descVersionValLatest  *widget.Label
+	descVersionLblOrig    *widget.Label
+	descVersionValOrig    *widget.Label
+	descVersionLblUpd     *widget.Label
+	descVersionValUpd     *widget.Label
+	descCategoryVal       *widget.Label
+	descCategoryLbl       *widget.Label
+
+	// ─── Thumbnail в правой карточке описания ─────────────────────
+	// descThumbnailBox — фиксированного размера контейнер с фоном-
+	// заглушкой; внутри — descThumbnail. Пока идёт загрузка или у
+	// мода нет картинки, видна только заглушка (или весь box скрыт).
+	descThumbnail    *canvas.Image
+	descThumbnailBox *fyne.Container
+	descThumbnailBg  *canvas.Rectangle
+	// descThumbnailBorder — тонкая рамка-обводка поверх картинки.
+	// Отдельный слой нужен потому, что фон (descThumbnailBg) лежит
+	// ПОД картинкой и при FillMode=Stretch обводка на нём была бы
+	// перекрыта содержимым. Рамка сверху видна всегда.
+	descThumbnailBorder *canvas.Rectangle
+	// descThumbnailURL — URL, для которого сейчас ожидается/показана
+	// картинка. Нужен, чтобы отбрасывать ответы «прошлых» модов, если
+	// пользователь быстро переключается между строками таблицы.
+	descThumbnailURL string
+	// thumbnailCache — кэш в памяти по URL. Живёт до закрытия программы.
+	// При 294 модах и ~30 КБ на картинку это ~1-2 МБ, не проблема.
+	thumbnailCache   map[string]fyne.Resource
+	thumbnailCacheMu sync.Mutex
+
+	// Placeholder для пустого состояния: пульсирующее лого + крупный
+	// заголовок + серая подсказка. Показывается вместо содержимого
+	// карточки мода, когда ни один мод не выбран.
+	//
+	// Лого состоит из двух слоёв (glow и сам логотип), которые
+	// анимируются в противофазе — эффект «дыхания» как в CSS
+	// gentlePulse на OAuth-странице.
+	descPlaceholder      *fyne.Container
+	descPlaceholderLogo  *canvas.Image
+	descPlaceholderGlow  *canvas.Image
+	descPlaceholderTitle *canvas.Text
+	descPlaceholderHint  *canvas.Text
+
+	// descModContent — вся карточка конкретного мода (header с кнопками,
+	// метаданные, ссылки, версии, описание, changelog). Скрывается целиком
+	// в пустом состоянии. Благодаря этому все сепараторы и кнопки исчезают
+	// автоматически — не нужно точечно гасить каждый из них.
+	descModContent *fyne.Container
+
+	// descCardOverlay — полупрозрачный чёрный прямоугольник поверх
+	// фона карточки. Показывается вместе с placeholder'ом, пока мод
+	// не выбран: придаёт лёгкое «выключенное» состояние пустой
+	// карточке и визуально отделяет её от заполненной. Скрыт, когда
+	// мод выбран.
+	descCardOverlay *canvas.Rectangle
 
 	moveToEntry    *widget.Entry
 	searchEntry    *widget.Entry
@@ -240,6 +335,20 @@ type App struct {
 	// в UI-потоке. Кэш обновляется только при старте, логине, логауте
 	// и провале refresh-токена.
 	loggedIn atomic.Bool
+	// amlWarnedLastState — хранит предыдущее значение amlDetected,
+	// для которого мы уже вывели предупреждение в консоль.
+	// refreshModList вызывается много раз за сессию (при любой
+	// операции с модами), и без этого флага appendLog заспамил
+	// бы консоль десятками одинаковых сообщений. Логируем только
+	// при смене состояния: false → true и true → false.
+	amlWarnedLastState atomic.Bool
+	// authExpiredHandled — защита от спама диалогом «сессия истекла».
+	// Параллельные запросы к Nexus могут вернуть 401 одновременно;
+	// без этого флага каждый открывал бы своё окно. Устанавливается
+	// в true при первой обработке, сбрасывается через 10 секунд
+	// (чтобы пользователь мог снова увидеть окно, если не залогинился)
+	// или при успешном логине (saveOAuthTokens).
+	authExpiredHandled atomic.Bool
 
 	// ─── Лог ───────────────────────────────────────────────────────
 	logFile   *os.File
@@ -247,6 +356,9 @@ type App struct {
 
 	// ─── Сеть ──────────────────────────────────────────────────────
 	nxm *NXMListener
+	// batchInstallChan используется для сигнала от процесса установки
+	// (NXM или внутренний), что мод установлен и готов к следующему шагу.
+	batchInstallChan chan BatchSignal
 
 	// pendingNXMURL — URL, пришедший при старте, когда программа
 	// ещё не была запущена. Обрабатывается после старта NXMListener,
@@ -306,6 +418,9 @@ func NewApp(cfg *Config, myApp fyne.App) *App {
 	app.changelog = NewChangelogCache()
 	app.nxm = NewNXMListener(app.handleNXMLink)
 	app.oauth = NewOAuthState()
+
+	app.batchInstallChan = make(chan BatchSignal, 4) // 4 — чтобы случайные stale-сигналы не блокировали
+
 	app.selectedModIndex.Store(-1)
 	// Однократное обращение к keyring на старте — до того, как
 	// buildMainMenu начнёт активно дёргать isLoggedIn().
@@ -353,6 +468,7 @@ func NewApp(cfg *Config, myApp fyne.App) *App {
 	app.setGameState(root, detectPatcherTypeWithRoot(root))
 
 	app.userNotes = newUserNotesStore()
+	app.thumbnailCache = make(map[string]fyne.Resource)
 
 	return app
 }
@@ -393,13 +509,35 @@ func (app *App) loadNexusVersionCache() {
 	}
 }
 
-// saveNexusVersionCache записывает кэш версий активного профиля.
-// Тонкая обёртка над versionCache.SaveToProfile.
+// saveNexusVersionCache откладывает запись кэша на 2 секунды.
+// Многократные вызовы подряд (установка пачки модов, batch update)
+// схлопываются в одну реальную запись. См. flushNexusVersionCache
+// для немедленной записи.
 func (app *App) saveNexusVersionCache() {
+	app.versionCacheSaveMu.Lock()
+	defer app.versionCacheSaveMu.Unlock()
+	if app.versionCacheSaveTimer != nil {
+		app.versionCacheSaveTimer.Stop()
+	}
+	app.versionCacheSaveTimer = time.AfterFunc(2*time.Second, func() {
+		app.flushNexusVersionCache()
+	})
+}
+
+// flushNexusVersionCache немедленно пишет кэш на диск. Останавливает
+// отложенный таймер (если он был) и вызывает реальное сохранение.
+// Безопасна для параллельного вызова — мутекс сериализует.
+func (app *App) flushNexusVersionCache() {
+	app.versionCacheSaveMu.Lock()
+	if app.versionCacheSaveTimer != nil {
+		app.versionCacheSaveTimer.Stop()
+		app.versionCacheSaveTimer = nil
+	}
+	app.versionCacheSaveMu.Unlock()
+
 	app.cfgMutex.RLock()
 	activeProfile := app.cfg.ActiveProfile
 	app.cfgMutex.RUnlock()
-
 	if activeProfile == "" {
 		return
 	}
@@ -1136,9 +1274,8 @@ func (app *App) loadDataAfterInit() {
 		go app.checkSpecialUpdates()
 	}
 
-	if exePath, err := os.Executable(); err == nil {
-		registerNXMProtocol(exePath)
-	}
+	// registerNXMProtocol уже вызывается из main.go в шаге 6 фоновой
+	// инициализации — здесь второй раз не нужно.
 
 	app.nxm.Start() // ошибку логируем, если нужно
 }
@@ -1492,18 +1629,25 @@ func (app *App) refreshProfileList() {
 			names = append(names, e.Name())
 		}
 	}
-	if app.profileSelect != nil {
-		app.profileSelect.Options = names
-		app.cfgMutex.RLock()
-		active := app.cfg.ActiveProfile
-		app.cfgMutex.RUnlock()
-		if active != "" {
-			app.profileSelect.SetSelected(active)
-		} else if len(names) > 0 {
-			app.profileSelect.SetSelected(names[0])
+
+	// UI-часть — только в главном потоке. Функция вызывается
+	// из горутин (createProfile), из UI (switchProfileAsync) и из
+	// initProfiles (внутри fyne.Do). Вложенный fyne.Do безопасен —
+	// Fyne в v2.6+ обнаруживает UI-поток и исполняет синхронно.
+	fyne.Do(func() {
+		if app.profileSelect != nil {
+			app.profileSelect.Options = names
+			app.cfgMutex.RLock()
+			active := app.cfg.ActiveProfile
+			app.cfgMutex.RUnlock()
+			if active != "" {
+				app.profileSelect.SetSelected(active)
+			} else if len(names) > 0 {
+				app.profileSelect.SetSelected(names[0])
+			}
+			app.profileSelect.Refresh()
 		}
-		app.profileSelect.Refresh()
-	}
+	})
 }
 
 // switchProfile — обёртка без колбэка: используется там, где вызывающему
@@ -1547,6 +1691,18 @@ func (app *App) switchProfileAsync(name string, onDone func()) {
 			defer fyne.Do(onDone)
 		}
 
+		// Показываем инфинитный прогресс, чтобы пользователь видел,
+		// что программа не зависла, а активно работает с файлами.
+		// Кнопку отмены НЕ даём: смена профиля — атомарная операция
+		// (staging → rename), прерывание в середине оставит игру
+		// в нерабочем состоянии.
+		_, closeDialog := app.showInfiniteProgressDialog(
+			app.msg("profile_switch_title"),
+			app.msg("profile_switch_message"),
+			false,
+		)
+		defer closeDialog()
+
 		// 1. Синхронизируем активный профиль из game/mods (атомарно).
 		if err := app.syncActiveProfileFromGame(); err != nil {
 			app.appendLogToFile(fmt.Sprintf("switchProfile: sync failed: %v", err))
@@ -1583,6 +1739,13 @@ func (app *App) switchProfileAsync(name string, onDone func()) {
 			return
 		}
 
+		// 4a. Принудительно сбрасываем debounce ДО смены профиля.
+		// Иначе отложенный таймер запишет данные в файл УЖЕ НОВОГО
+		// профиля, а данные в памяти относятся к старому.
+		// flush вызываем здесь, пока cfg.ActiveProfile ещё указывает
+		// на старый профиль.
+		app.flushNexusVersionCache()
+
 		// 5. Кэш версий нового профиля.
 		tempCache := NewVersionCache(nil)
 		tempCache.LoadFromProfile(app.profilePath(name))
@@ -1592,6 +1755,17 @@ func (app *App) switchProfileAsync(name string, onDone func()) {
 		app.cfg.ActiveProfile = name
 		app.versionCache.ReplaceAll(newCache)
 		app.cfgMutex.Unlock()
+
+		// Сразу после смены профиля взводим debounce-запись.
+		// Это закроет окно, в котором параллельный вызов
+		// saveNexusVersionCache (например, из enrichModFromNexus
+		// после завершения timer'а 1.5s) мог бы записать данные
+		// нового профиля в файл СТАРОГО.
+		//
+		// Дополнительно: если до этого уже был взведён таймер
+		// под старым профилем — мы его гасим через flush (см. шаг
+		// 4a выше), а теперь взводим новый под новым профилем.
+		app.saveNexusVersionCache()
 
 		app.saveConfigSafe()
 		checks.SetProfileDataDir(app.activeProfilePath())
@@ -1719,41 +1893,6 @@ func (app *App) renameProfile(oldName, newName string) error {
 func fileExists(path string) bool {
 	_, err := os.Stat(path)
 	return err == nil
-}
-
-func (app *App) syncProfileFromGame() {
-	profilePath := app.activeProfilePath()
-	if profilePath == "" {
-		app.appendLogToFile("No active profile to sync")
-		return
-	}
-
-	dstMods := filepath.Join(profilePath, "mods")
-	app.cfgMutex.RLock()
-	src := app.cfg.ModsPath
-	app.cfgMutex.RUnlock()
-
-	if _, err := os.Stat(dstMods); err == nil {
-		entries, err := os.ReadDir(dstMods)
-		if err == nil {
-			for _, e := range entries {
-				if e.IsDir() {
-					name := e.Name()
-					if name == "base" || name == "dmf" || name == "autopatch" {
-						continue
-					}
-					os.RemoveAll(filepath.Join(dstMods, name))
-				}
-			}
-		}
-	}
-
-	if err := copyPath(src, dstMods); err != nil {
-		app.appendLogToFile(fmt.Sprintf("Failed to sync mods to profile: %v", err))
-		return
-	}
-	cleanupModsFolder(dstMods)
-	app.appendLogToFile("Profile synced from game folder.")
 }
 
 // syncModToProfile копирует одну папку мода из игровой папки в активный

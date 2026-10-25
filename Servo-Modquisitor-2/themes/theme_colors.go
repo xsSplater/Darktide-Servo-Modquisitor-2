@@ -50,4 +50,11 @@ const (
 	ColorButtonShadowDisabled = "color-button-shadow-disabled"
 	ColorButtonStroke         = "color-button-stroke"
 	ColorButtonStrokeImage    = "color-button-stroke-image"
+
+	// AML-предупреждение: жёлтый цвет рамок вокруг таблицы и вокруг
+	// кнопок Save/Autosort, когда обнаружен Auto Mod Loader (AML).
+	// AML перехватывает управление load order'ом, поэтому наши
+	// Save/Autosort могут конфликтовать с ним — предупреждаем
+	// визуально и постоянно, а не только всплывающим диалогом.
+	ColorAMLWarning = "color-aml-warning"
 )

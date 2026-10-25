@@ -125,14 +125,33 @@ func saveTokensToStore(access, refresh string, expiry time.Time) error {
 // getStoredToken возвращает одно из трёх значений. Сначала пробует
 // keyring (если он доступен), потом файл.
 func getStoredToken(key string) (string, error) {
+	// Пытаемся прочитать из keyring. ЛЮБАЯ ошибка — включая
+	// ErrNotFound — означает, что надо попробовать файл-fallback,
+	// потому что:
+	//
+	//   • на Steam Deck keyring доступен только в Desktop Mode.
+	//     Если пользователь логинился в Game Mode — токен ушёл
+	//     в файл. Позже он запустил SMQ в Desktop Mode, keyring
+	//     поднялся, keyring.Get вернул ErrNotFound — и раньше
+	//     функция возвращала «токена нет», хотя в файле он был.
+	//
+	//   • при недоступном keyring (минимальный WM, отвалившийся
+	//     Secret Service) Set мог упасть, а файл — записаться.
+	//
+	// Раньше при ErrNotFound мы не шли в файл, потому что
+	// считали «раз keyring работает, значит, ключ обязан быть
+	// здесь». Это ломало сценарий переключения между режимами
+	// и вообще любую ситуацию, когда keyring и файл разошлись.
 	if isKeyringAvailable() {
 		v, err := keyring.Get(keyringService, key)
 		if err == nil {
 			return v, nil
 		}
+		// ErrNotFound (или любая другая ошибка) — идём в файл.
+		// Если ошибка серьёзнее, чем «нет ключа», помечаем keyring
+		// сломанным до конца сессии, чтобы не ждать таймаута на
+		// каждом вызове.
 		if !errors.Is(err, keyring.ErrNotFound) {
-			// keyring вернул не «нет ключа», а что-то более серьёзное —
-			// переключаемся на файл до конца сессии.
 			markKeyringUnavailable()
 		}
 	}

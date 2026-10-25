@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync/atomic"
 	"time"
 
 	"fyne.io/fyne/v2"
@@ -145,6 +146,11 @@ func main() {
 	iconData, _ := embeddedFiles.ReadFile(AppIcon)
 	if iconData != nil {
 		icon := fyne.NewStaticResource("icon", iconData)
+		// SetIcon на app — для Windows и macOS (иконка в панели
+		// задач/Dock). На Linux это no-op, но ничего не ломает.
+		myApp.SetIcon(icon)
+		// SetIcon на window — для X11 Linux (_NET_WM_ICON).
+		// На Wayland — no-op, там работает .desktop (см. register).
 		application.mainWindow.SetIcon(icon)
 	}
 
@@ -153,31 +159,51 @@ func main() {
 	application.mainWindow.SetTitle(application.getTitle() + " v" + AppVersion)
 	application.mainWindow.SetMainMenu(application.buildMainMenu())
 
-	// Обработчик закрытия окна
-	application.mainWindow.SetOnClosed(func() {
-		// Закрываем слушатель nxm, чтобы освободить порт
-		application.nxm.Stop()
-
-		// Синхронизируем активный профиль из game/mods, чтобы правки,
-		// сделанные в течение сессии, не потерялись при следующем
-		// переключении профиля.
-		if !isDarktideRunning() {
-			if err := application.syncActiveProfileFromGame(); err != nil {
-				application.appendLogToFile(fmt.Sprintf("onClose sync: %v", err))
-			}
+	// Обработчик закрытия окна (перехватываем закрытие, чтобы показать прогресс)
+	var isClosing atomic.Bool
+	application.mainWindow.SetCloseIntercept(func() {
+		if isClosing.Swap(true) {
+			return // Защита от повторного клика
 		}
 
-		saveWindowState := func() {
-			if application.mainWindow == nil || application.mainWindow.Canvas() == nil {
-				return
-			}
-			size := application.mainWindow.Canvas().Size()
-			application.cfgMutex.Lock()
-			application.cfg.WindowWidth = int(size.Width)
-			application.cfg.WindowHeight = int(size.Height)
-			application.cfg.WindowMaximized = isWindowMaximized(application.mainWindow.Title())
-			application.cfgMutex.Unlock()
-			application.saveConfigSafe()
+		doClose := func() {
+			go func() {
+				// Показываем инфинитный прогресс при закрытии.
+				// Отмены нет: пользователь уже нажал «Закрыть» и
+				// подтвердил (если были несохранённые изменения).
+				// Кнопка «Отмена» здесь только затягивает процесс —
+				// половинчатое закрытие всё равно невозможно: часть
+				// ресурсов уже освобождена.
+				_, closeDialog := application.showInfiniteProgressDialog(
+					application.msg("app_closing_title"),
+					application.msg("app_closing_message"),
+					false,
+				)
+				defer closeDialog()
+
+				application.nxm.Stop()
+				application.flushNexusVersionCache()
+
+				if !isDarktideRunning() {
+					if err := application.syncActiveProfileFromGame(); err != nil {
+						application.appendLogToFile(fmt.Sprintf("onClose sync: %v", err))
+					}
+				}
+
+				// Сохраняем стейт окна (в UI-потоке) и выходим
+				fyne.Do(func() {
+					if application.mainWindow != nil && application.mainWindow.Canvas() != nil {
+						size := application.mainWindow.Canvas().Size()
+						application.cfgMutex.Lock()
+						application.cfg.WindowWidth = int(size.Width)
+						application.cfg.WindowHeight = int(size.Height)
+						application.cfg.WindowMaximized = isWindowMaximized(application.mainWindow.Title())
+						application.cfgMutex.Unlock()
+						application.saveConfigSafe()
+					}
+					application.closeApp()
+				})
+			}()
 		}
 
 		if application.orderDirty.Load() {
@@ -189,16 +215,14 @@ func main() {
 						application.saveCurrentOrder()
 						application.appendLogToFile(application.msg("order_saved_on_exit"))
 					}
-					saveWindowState()
-					application.closeApp()
+					doClose()
 				},
 				application.mainWindow,
 			)
 			return
 		}
 
-		saveWindowState()
-		application.closeApp()
+		doClose()
 	})
 
 	// Обработчик Drag&Drop

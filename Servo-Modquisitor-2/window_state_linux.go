@@ -1,8 +1,25 @@
-//go:build !windows
+//go:build linux
 
-// Servo-Modquisitor-2/window_state_other.go
+// Servo-Modquisitor-2/window_state_linux.go
 
 package main
 
-func maximizeWindowByTitle(title string)  {}
-func isWindowMaximized(title string) bool { return false }
+import (
+	"os/exec"
+)
+
+// maximizeWindowByTitle пытается развернуть окно на весь экран средствами ОС.
+func maximizeWindowByTitle(title string) {
+	// Пробуем wmctrl (наиболее надежный способ для большинства WM)
+	if err := exec.Command("wmctrl", "-r", title, "-b", "add,maximized_vert,maximized_horz").Run(); err == nil {
+		return
+	}
+	// Если wmctrl нет, пробуем xdotool (менее надежно, но часто работает)
+	_ = exec.Command("xdotool", "search", "--name", title, "windowsize", "100%", "100%").Run()
+}
+
+// isWindowMaximized на Linux без прямых X11-биндингов проверить сложно,
+// поэтому возвращаем false, чтобы не мешать сохранению текущих размеров.
+func isWindowMaximized(title string) bool {
+	return false
+}

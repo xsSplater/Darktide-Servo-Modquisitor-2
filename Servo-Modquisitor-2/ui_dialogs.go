@@ -6,6 +6,7 @@ import (
 	"Servo-Modquisitor/helpers"
 	"context"
 	"fmt"
+	"image/color"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -17,6 +18,7 @@ import (
 	"time"
 
 	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/storage"
@@ -39,8 +41,15 @@ func (app *App) showInfoDialog(title, message string) {
 	})
 }
 
-// showChoiceDialog показывает диалог выбора с произвольным количеством кнопок.
-// Результат возвращается через callback. Диалог автоматически закрывается при нажатии любой кнопки.
+// dialogMaxHeight — жёсткий потолок высоты модального диалога.
+// Ограничивает рост попапа, когда сообщение содержит длинный список
+// (например, десятки устаревших модов). Без него контент уходит
+// за нижний край экрана, а кнопки становятся недоступными. 700px —
+// разумный компромисс: типичный ноутбук 1366×768 даёт ~700px
+// рабочей высоты, диалог с 3 кнопками помещается целиком, а на
+// большом мониторе видно больше строк без скролла.
+const dialogMaxHeight float32 = 700
+
 func (app *App) showChoiceDialog(parent fyne.Window, title, message string, callback func(int), options ...string) {
 	// Все операции с UI - только в главном потоке
 	fyne.Do(func() {
@@ -48,49 +57,100 @@ func (app *App) showChoiceDialog(parent fyne.Window, title, message string, call
 		// Объявляем popUp ПЕРЕД созданием кнопок
 		var popUp *widget.PopUp
 
-		var btnObjects []fyne.CanvasObject
-		for i, opt := range options {
-			idx := i
-			btn := widget.NewButton(opt, func() {
-				if popUp != nil {
-					popUp.Hide()
+		// Фабрика кнопок. Вызывается дважды: для однорядной и
+		// двухрядной раскладки. Fyne не позволяет переиспользовать
+		// виджет в двух разных контейнерах одновременно, поэтому
+		// кнопки создаются заново — это диалог, лишняя работа
+		// незаметна.
+		// Добавляем переменную для хранения первой кнопки
+		var firstBtn *widget.Button
+
+		makeButtons := func() []fyne.CanvasObject {
+			btns := make([]fyne.CanvasObject, len(options))
+			for i, opt := range options {
+				idx := i
+				btn := widget.NewButton(opt, func() {
+					if popUp != nil {
+						popUp.Hide()
+					}
+					if callback != nil {
+						callback(idx)
+					}
+				})
+				if i == 0 {
+					firstBtn = btn // Запоминаем первую кнопку (обычно "Да/ОК")
 				}
-				if callback != nil {
-					callback(idx)
-				}
-			})
-			btnObjects = append(btnObjects, btn)
+				btns[i] = btn
+			}
+			return btns
 		}
 
 		titleLabel := widget.NewLabelWithStyle(title, fyne.TextAlignCenter, fyne.TextStyle{Bold: true})
 		msgLabel := widget.NewLabel(message)
 		msgLabel.Wrapping = fyne.TextWrapWord
 
-		// Центрируем кнопки
-		btnContainer := container.NewCenter(container.NewHBox(btnObjects...))
+		msgScroll := container.NewVScroll(msgLabel)
+		msgScroll.SetMinSize(fyne.NewSize(0, estimateMessageHeight(message)))
 
-		content := container.NewVBox(
-			titleLabel,
-			widget.NewSeparator(),
-			msgLabel,
-			widget.NewSeparator(),
-			btnContainer,
-		)
+		// Функция сборки контента с заданной раскладкой кнопок.
+		// Возвращает контейнер и ссылку на свою первую кнопку.
+		buildContent := func(oneRow bool) (*fyne.Container, *widget.Button) {
+			btns := makeButtons()
+			var firstBtn *widget.Button
+			if len(btns) > 0 {
+				if btn, ok := btns[0].(*widget.Button); ok {
+					firstBtn = btn
+				}
+			}
 
-		popUp = widget.NewModalPopUp(content, parent.Canvas())
+			var btnArea fyne.CanvasObject
+			if oneRow || len(btns) <= 2 {
+				btnArea = container.NewCenter(container.NewHBox(btns...))
+			} else {
+				mid := (len(btns) + 1) / 2
+				row1 := container.NewCenter(container.NewHBox(btns[:mid]...))
+				row2 := container.NewCenter(container.NewHBox(btns[mid:]...))
+				btnArea = container.NewVBox(row1, row2)
+			}
+			content := container.NewBorder(
+				container.NewVBox(titleLabel, widget.NewSeparator()),
+				container.NewVBox(widget.NewSeparator(), btnArea),
+				nil, nil,
+				msgScroll,
+			)
+			return content, firstBtn
+		}
 
-		// Размер по содержимому: длинные локализованные подписи и
-		// 5+ кнопок в фиксированные 500px не влезают — Fyne обрезает
-		// правую часть. Берём natural size плюс отступы, но не меньше
-		// прежнего минимума и не больше 90% родительского канваса.
-		sz := content.MinSize()
-		w := sz.Width + 60
-		h := sz.Height + 60
+		// Первая попытка — одна строка.
+		content, firstBtn := buildContent(true)
+		padded := container.NewPadded(content)
+
+		if parent != nil && parent.Canvas() != nil && len(options) > 2 {
+			ps := parent.Canvas().Size()
+			if padded.MinSize().Width > ps.Width*0.9 {
+				content2, firstBtn2 := buildContent(false)
+				padded2 := container.NewPadded(content2)
+				if padded2.MinSize().Width < padded.MinSize().Width {
+					padded = padded2
+					firstBtn = firstBtn2
+				}
+			}
+		}
+
+		// Размер = MinSize(padded) + небольшой запас на округления
+		// шрифта. Запас маленький: основную работу делает NewPadded.
+		sz := padded.MinSize()
+		w := sz.Width + 8
+		h := sz.Height + 8
+
 		if w < DialogMinWidth500 {
 			w = DialogMinWidth500
 		}
 		if h < DialogMinHeight200 {
 			h = DialogMinHeight200
+		}
+		if h > dialogMaxHeight {
+			h = dialogMaxHeight
 		}
 		if parent != nil && parent.Canvas() != nil {
 			ps := parent.Canvas().Size()
@@ -101,8 +161,15 @@ func (app *App) showChoiceDialog(parent fyne.Window, title, message string, call
 				h = maxH
 			}
 		}
+
+		popUp = widget.NewModalPopUp(padded, parent.Canvas())
 		popUp.Resize(fyne.NewSize(w, h))
 		popUp.Show()
+
+		// Устанавливаем фокус на актуальную первую кнопку
+		if firstBtn != nil && parent != nil && parent.Canvas() != nil {
+			parent.Canvas().Focus(firstBtn)
+		}
 	})
 }
 
@@ -187,37 +254,62 @@ func (app *App) showChoiceDialogRows(parent fyne.Window, title, message string, 
 		msgLabel := widget.NewLabel(message)
 		msgLabel.Wrapping = fyne.TextWrapWord
 
-		content := container.NewVBox(
-			titleLabel,
-			widget.NewSeparator(),
-			msgLabel,
-			widget.NewSeparator(),
-		)
+		// Скролл вокруг сообщения — та же причина, что и в
+		// showChoiceDialog: длинный список пар «X требует Y»
+		// иначе уводит кнопки за границу экрана.
+		msgScroll := container.NewVScroll(msgLabel)
+
+		// Высота сообщения — по числу визуальных строк, как
+		// в showChoiceDialog.
+		msgScroll.SetMinSize(fyne.NewSize(0, estimateMessageHeight(message)))
+
+		// Кнопки идут под сообщением, одним VBox'ом — потому что
+		// здесь их произвольное число строк.
+		buttonsColumn := container.NewVBox()
 		for _, rc := range rowContainers {
-			content.Add(rc)
+			buttonsColumn.Add(rc)
 		}
 
-		popUp = widget.NewModalPopUp(content, parent.Canvas())
+		content := container.NewBorder(
+			container.NewVBox(titleLabel, widget.NewSeparator()),
+			container.NewVBox(widget.NewSeparator(), buttonsColumn),
+			nil, nil,
+			msgScroll,
+		)
 
-		// Размер по содержимому + страховка от 500px-минимума и 90% канваса.
-		sz := content.MinSize()
-		w := sz.Width + 60
-		h := sz.Height + 60
+		// Обёртка в Padded — та же причина, что и в showChoiceDialog:
+		// widget.NewModalPopUp не даёт внутренних отступов, кнопки
+		// прилипают к краям.
+		padded := container.NewPadded(content)
+
+		sz := padded.MinSize()
+		w := sz.Width + 8
+		h := sz.Height + 8
 		if w < DialogMinWidth500 {
 			w = DialogMinWidth500
 		}
 		if h < DialogMinHeight200 {
 			h = DialogMinHeight200
 		}
+		if h > dialogMaxHeight {
+			h = dialogMaxHeight
+		}
 		if parent != nil && parent.Canvas() != nil {
 			ps := parent.Canvas().Size()
-			if maxW := ps.Width * 0.9; w > maxW {
-				w = maxW
+			// 100% вместо 90%: у этой функции кнопки уже разложены
+			// по строкам вызывающей стороной (CheckDependencies
+			// передаёт две строки). Возможность занять чуть больше
+			// места позволяет уместить строку целиком, вместо того
+			// чтобы обрезать её край.
+			if w > ps.Width {
+				w = ps.Width
 			}
 			if maxH := ps.Height * 0.9; h > maxH {
 				h = maxH
 			}
 		}
+
+		popUp = widget.NewModalPopUp(padded, parent.Canvas())
 		popUp.Resize(fyne.NewSize(w, h))
 		popUp.Show()
 	})
@@ -383,7 +475,7 @@ func (app *App) startDownload(downloadURL, filename, modName string, fileInfo *F
 
 		// knownVersion может быть "", тогда InstallModFromArchive попробует
 		// вытащить версию из имени файла или спросить у пользователя.
-		installedName, installedVersion, err := app.InstallModFromArchive(dest, false, knownVersion, modName)
+		installedName, installedVersion, err := app.InstallModFromArchive(dest, true, knownVersion, modName)
 		app.appendLogToFile(fmt.Sprintf("InstallModFromArchive: finished with err=%v, installedName=%s", err, installedName))
 		if err != nil {
 			app.appendLog(fmt.Sprintf(app.msg("log_install_failed"), err))
@@ -588,14 +680,26 @@ func (app *App) startSystemDownload(downloadURL, filename, displayName string, f
 				app.appendLog(fmt.Sprintf(app.msg("log_install_failed"), err))
 			} else {
 				if fileInfo != nil {
+					// Извлекаем реальное имя папки из ключа (например, "19:base" -> "base")
+					folderName := displayName
+					parts := strings.Split(cacheKey, ":")
+					if len(parts) == 2 {
+						folderName = parts[1]
+					}
+					modID, _ := strconv.Atoi(parts[0])
+
 					app.setCachedVersion(cacheKey, ModVersionInfo{
 						Timestamp:   fileInfo.UploadedTimestamp,
 						Version:     fileInfo.Version,
-						Folder:      displayName,
+						Folder:      folderName, // Теперь Prune не удалит запись
 						Source:      "nexus",
 						InstalledAt: time.Now().Unix(),
 					})
-					app.saveNexusVersionCache()
+
+					select {
+					case app.batchInstallChan <- BatchSignal{Folder: folderName, NexusModID: modID}:
+					default:
+					}
 				}
 				app.appendLog(logSuccess)
 			}
@@ -696,13 +800,18 @@ func (app *App) updateAutopatcher() {
 }
 
 // Processing nxm links
-
 func (app *App) handleNXMLink(nxmURL string) {
 	if app.nxm.IsDuplicate(nxmURL) {
 		app.appendLog(app.msg("nxm_already_processing"))
 		return
 	}
 	app.bringToFront()
+
+	// Проверяем, не является ли это коллекцией
+	if link, ok := parseCollectionLink(nxmURL); ok {
+		go app.installNexusCollection(link.Slug, link.Rev)
+		return
+	}
 
 	u, err := url.Parse(nxmURL)
 	if err != nil {
@@ -823,8 +932,6 @@ func (app *App) handleNXMLink(nxmURL string) {
 		app.showDownloadDialog(directURL, filename, modName, fileInfo, modID)
 	}()
 }
-
-// Остальные функции (showEditVersionDialog)
 
 func (app *App) showEditVersionDialog(mod *checks.ModInfo) {
 	var cacheKey string
@@ -1417,7 +1524,17 @@ func fileInfoSnapshot(fi *FileInfo) (version string, timestamp int64, fileName s
 }
 
 // showInfiniteProgressDialog — модальный диалог с инфинитным прогрессом.
-func (app *App) showInfiniteProgressDialog(title, message string) (<-chan struct{}, func()) {
+//
+// cancellable == true  — показывает кнопку «Отмена», закрытие крестиком
+//
+//	и Escape закрывают окно и сигналят в cancelChan.
+//
+// cancellable == false — кнопки нет, окно не закрывается ничем, кроме
+//
+//	вызова closeDialog. Применяется для операций,
+//	которые опасно прерывать (смена профиля,
+//	закрытие программы).
+func (app *App) showInfiniteProgressDialog(title, message string, cancellable bool) (<-chan struct{}, func()) {
 	bar := widget.NewProgressBarInfinite()
 	bar.Start()
 
@@ -1433,11 +1550,19 @@ func (app *App) showInfiniteProgressDialog(title, message string) (<-chan struct
 
 	fyne.Do(func() {
 		app.bringToFront()
-		dlg = dialog.NewCustom(title, app.msg("btn_cancel"), content, app.mainWindow)
+
+		if cancellable {
+			// С кнопкой отмены
+			dlg = dialog.NewCustom(title, app.msg("btn_cancel"), content, app.mainWindow)
+			dlg.SetOnClosed(func() {
+				once.Do(func() { close(cancelChan) })
+			})
+		} else {
+			// Совсем без кнопок (чистый прогресс-бар)
+			dlg = dialog.NewCustomWithoutButtons(title, content, app.mainWindow)
+		}
+
 		dlg.Resize(fyne.NewSize(400, 120))
-		dlg.SetOnClosed(func() {
-			once.Do(func() { close(cancelChan) })
-		})
 		dlg.Show()
 		close(ready)
 	})
@@ -1445,7 +1570,9 @@ func (app *App) showInfiniteProgressDialog(title, message string) (<-chan struct
 
 	return cancelChan, func() {
 		if dlg != nil {
-			fyne.Do(func() { dlg.Hide() })
+			fyne.Do(func() {
+				dlg.Hide()
+			})
 		}
 	}
 }
@@ -1461,6 +1588,7 @@ func (app *App) createActiveProfileBackupFromUI() {
 		_, closeDialog := app.showInfiniteProgressDialog(
 			app.msg("backup_creating_title"),
 			app.msg("backup_creating_message"),
+			false,
 		)
 		defer closeDialog()
 
@@ -1505,6 +1633,7 @@ func (app *App) showRestoreBackupDialog() {
 			_, closeDialog := app.showInfiniteProgressDialog(
 				app.msg("backup_restoring_title"),
 				app.msg("backup_restoring_message"),
+				false,
 			)
 			defer closeDialog()
 
@@ -1582,4 +1711,320 @@ func (app *App) showEditUserNoteDialog(modName, displayName string) {
 	popUp.Resize(fyne.NewSize(600, 400))
 	popUp.Show()
 	app.mainWindow.Canvas().Focus(entry)
+}
+
+// estimateMessageHeight возвращает высоту в пикселях для сообщения
+// диалога, оценённую по числу визуальных строк.
+//
+// Точную высоту посчитать нельзя без вызова layout'а с финальной
+// шириной (TextWrapWord переносит по фактическому размеру). Но
+// грубой оценки достаточно: диалог всё равно имеет жёсткий
+// потолок по высоте и скролл, если текста больше.
+//
+// Алгоритм:
+//  1. Разбиваем по "\n" — это явные строки.
+//  2. Каждую длинную строку делим на «псевдостроки» по ~50
+//     символов. Это типичное число символов, влезающих в
+//     диалог шириной 500px при TextSize=14. Для кириллицы
+//     ~45, для латиницы ~55 — берём среднее.
+//  3. Умножаем на ~22px (высота строки в Fyne при дефолтной
+//     теме) + padding скролла.
+//  4. Ограничиваем диапазоном [80, 400] пикселей.
+//
+// Примеры:
+//
+//	"Удалить мод X?"           → 80px  (одна строка, попадает в минимум)
+//	"Список (10 модов)"        → ~240px
+//	"Список (40 модов)"        → 400px (потолок, дальше скролл)
+func estimateMessageHeight(message string) float32 {
+	const (
+		charsPerLine = 50
+		lineHeightPx = 22
+		minHeightPx  = 80
+		maxHeightPx  = 400
+	)
+
+	visualLines := 0
+	for _, line := range strings.Split(message, "\n") {
+		if line == "" {
+			// Пустая строка — тоже занимает одну визуальную.
+			visualLines++
+			continue
+		}
+		// (len + charsPerLine - 1) / charsPerLine — целочисленное
+		// округление вверх без math.Ceil.
+		visualLines += (len(line) + charsPerLine - 1) / charsPerLine
+	}
+	if visualLines == 0 {
+		visualLines = 1
+	}
+
+	h := float32(visualLines * lineHeightPx)
+	if h < minHeightPx {
+		return minHeightPx
+	}
+	if h > maxHeightPx {
+		return maxHeightPx
+	}
+	return h
+}
+
+// showEnlargedImage показывает картинку в модальном окне на 80% экрана.
+func (app *App) showEnlargedImage(imgRes fyne.Resource) {
+	if imgRes == nil {
+		return
+	}
+
+	fyne.Do(func() {
+		app.bringToFront()
+
+		img := canvas.NewImageFromResource(imgRes)
+		img.FillMode = canvas.ImageFillContain
+
+		var popUp *widget.PopUp
+
+		// Кнопка закрытия
+		closeBtn := widget.NewButton(app.msg("theme_editor_btn_close"), func() {
+			popUp.Hide()
+		})
+		closeBtn.Importance = widget.HighImportance
+
+		const padding float32 = 5
+
+		topSpacer := canvas.NewRectangle(color.Transparent)
+		topSpacer.SetMinSize(fyne.NewSize(0, padding))
+
+		bottomSpacer := canvas.NewRectangle(color.Transparent)
+		bottomSpacer.SetMinSize(fyne.NewSize(0, padding))
+
+		leftSpacer := canvas.NewRectangle(color.Transparent)
+		leftSpacer.SetMinSize(fyne.NewSize(padding, 0))
+
+		rightSpacer := canvas.NewRectangle(color.Transparent)
+		rightSpacer.SetMinSize(fyne.NewSize(padding, 0))
+
+		// Создаем копию заголовка для попапа
+		popupTitle := canvas.NewText(app.descTitle.Text, app.descTitle.Color)
+		popupTitle.TextSize = app.descTitle.TextSize
+		popupTitle.TextStyle = app.descTitle.TextStyle
+		popupTitle.Alignment = fyne.TextAlignCenter
+
+		// Верхняя часть
+		topArea := container.NewVBox(
+			topSpacer,
+			container.NewCenter(popupTitle),
+			widget.NewSeparator(),
+		)
+
+		// Нижняя часть
+		bottomArea := container.NewVBox(
+			widget.NewSeparator(),
+			container.NewCenter(closeBtn),
+			bottomSpacer,
+		)
+
+		// Собираем контент с отступами со всех сторон
+		content := container.NewBorder(
+			topArea,
+			bottomArea,
+			leftSpacer,
+			rightSpacer,
+			img,
+		)
+
+		popUp = widget.NewModalPopUp(content, app.mainWindow.Canvas())
+
+		winSize := app.mainWindow.Canvas().Size()
+		popUp.Resize(fyne.NewSize(winSize.Width*0.8, winSize.Height*0.8))
+		popUp.Show()
+	})
+}
+
+// === УСТАНОВКА КОЛЛЕКЦИИ С НЕКСУС ===
+func (app *App) installNexusCollection(slug string, rev int) {
+	col, err := app.fetchNexusCollection(slug, rev)
+	if err != nil {
+		app.appendLog(fmt.Sprintf("Failed to fetch collection: %v", err))
+		return
+	}
+
+	app.cfgMutex.RLock()
+	lang := app.cfg.Language
+	app.cfgMutex.RUnlock()
+
+	// Создаём карту NexusID -> ModDBEntry для быстрого поиска
+	dbMap := make(map[int]checks.ModDBEntry)
+	for _, entry := range checks.GetModDBList() {
+		if entry.URL != "" {
+			if id := helpers.ExtractModIDFromURL(entry.URL); id != 0 {
+				dbMap[id] = entry
+			}
+		}
+	}
+
+	var items []*BatchItem
+
+	// ─── ШАГ 1: ПРИНУДИТЕЛЬНО ДОБАВЛЯЕМ DML И DMF ───────────────────
+	// Создаем элементы для DML и DMF. Ставим Selected: true, чтобы они
+	// точно установились, даже если мы переключаемся на новый (пустой) профиль.
+	dmlItem := &BatchItem{
+		ID:          "base",
+		NexusModID:  19,
+		Name:        "Darktide Mod Loader",
+		Description: "Required for all mods. (Added automatically)",
+		Selected:    true,
+		Status:      BatchPending,
+	}
+	dmfItem := &BatchItem{
+		ID:          "dmf",
+		NexusModID:  8,
+		Name:        "Darktide Mod Framework",
+		Description: "Required for most mods. (Added automatically)",
+		Selected:    true,
+		Status:      BatchPending,
+	}
+
+	// Если пользователь Premium, подтягиваем актуальные FileID для них,
+	// чтобы скачивание прошло автоматически.
+	if app.getAuthToken() != "" {
+		if fi, err := app.getLatestFileInfo(19); err == nil {
+			dmlItem.FileID = fi.ID
+			dmlItem.Version = fi.Version
+		}
+		if fi, err := app.getLatestFileInfo(8); err == nil {
+			dmfItem.FileID = fi.ID
+			dmfItem.Version = fi.Version
+		}
+	}
+
+	// Строго заданный порядок: сначала DML, затем DMF.
+	items = append(items, dmlItem, dmfItem)
+
+	// ─── ШАГ 2: ДОБАВЛЯЕМ ОСТАЛЬНЫЕ МОДЫ ────────────────────────────
+	for _, m := range col.Mods {
+		// Пропускаем DML и DMF, если автор их добавил в коллекцию,
+		// так как мы уже поставили их в самое начало.
+		if m.ModID == 19 || m.ModID == 8 {
+			continue
+		}
+
+		author, category, desc, picURL := "Unknown", "Unknown", "", ""
+		modName := m.Name
+
+		if db, ok := dbMap[m.ModID]; ok {
+			author = db.Author
+			category = db.Category
+			if locName := checks.PickLocalized(db.Name, lang); locName != "" {
+				modName = locName
+			}
+			desc = checks.PickLocalized(db.Description, lang)
+			if desc == "" {
+				desc = checks.PickLocalized(db.Description, "en")
+			}
+			picURL = db.NexusPictureURL
+		}
+
+		items = append(items, &BatchItem{
+			ID:          fmt.Sprintf("mod_%d", m.ModID),
+			NexusModID:  m.ModID,
+			FileID:      m.FileID,
+			Name:        modName,
+			Version:     m.Version,
+			Selected:    !m.Optional,
+			Author:      author,
+			Category:    category,
+			Description: desc,
+			PictureURL:  picURL,
+		})
+	}
+
+	// ─── ШАГ 3: ПРОВЕРКА НА AML ─────────────────────────────────────
+	var amlItem *BatchItem
+	for _, item := range items {
+		if item.NexusModID == 246 || strings.Contains(strings.ToLower(item.Name), "auto mod loading") {
+			amlItem = item
+			break
+		}
+	}
+
+	if amlItem != nil {
+		choice := app.showChoiceDialogSync(
+			app.mainWindow,
+			app.msg("aml_detected_title"),
+			"Коллекция содержит мод 'Auto Mod Loading and Ordering' (AML). Servo-Modquisitor обеспечивает лучшую сортировку. Вы хотите отключить AML в этой коллекции?",
+			app.msg("btn_yes"), app.msg("btn_no"),
+		)
+		if choice == 0 {
+			amlItem.Selected = false
+		}
+	}
+
+	// ─── ШАГ 4: ДИАЛОГ ВЫБОРА ПРОФИЛЯ ───────────────────────────────
+	title := app.msg("install_collection")
+	msg := fmt.Sprintf(app.msg("install_collection_desc"), col.Name, col.Author, len(items))
+
+	fyne.Do(func() {
+		app.showChoiceDialog(
+			app.mainWindow,
+			title,
+			msg,
+			func(choice int) {
+				switch choice {
+				case 0:
+					go app.startCollectionInstall(col, items, true)
+				case 1:
+					go app.startCollectionInstall(col, items, false)
+				}
+			},
+			app.msg("install_collection_create_profile"),
+			app.msg("install_collection_current_profile"),
+			app.msg("btn_cancel"),
+		)
+	})
+}
+
+func (app *App) startCollectionInstall(col *NexusCollection, items []*BatchItem, createProfile bool) {
+	if createProfile {
+		name := sanitizeProfileName(col.Name)
+		if app.profileExists(name) {
+			name = fmt.Sprintf("%s_%d", name, time.Now().Unix())
+		}
+
+		app.appendLogToFile(fmt.Sprintf("Collection: creating profile %q", name))
+
+		if err := app.createProfile(name, ""); err != nil {
+			app.appendLogToFile(fmt.Sprintf("Collection: failed to create profile: %v", err))
+			fyne.Do(func() {
+				app.showInfoDialog("Error", fmt.Sprintf("Failed to create profile: %v", err))
+			})
+			return
+		}
+
+		done := make(chan struct{})
+		fyne.Do(func() {
+			app.switchProfileAsync(name, func() { close(done) })
+		})
+		<-done
+	}
+
+	fyne.Do(func() {
+		app.showBatchDialog(
+			fmt.Sprintf("Collection «%s» (rev %d)", col.Name, col.Revision),
+			items, BatchModeInstall,
+		)
+	})
+}
+
+func sanitizeProfileName(name string) string {
+	replacer := strings.NewReplacer(
+		"/", "_", "\\", "_", ":", "_", "*", "_", "?", "_",
+		"\"", "_", "<", "_", ">", "_", "|", "_",
+	)
+	name = replacer.Replace(name)
+	name = strings.TrimSpace(name)
+	name = strings.TrimLeft(name, ".")
+	if name == "" {
+		name = "Collection"
+	}
+	return name
 }

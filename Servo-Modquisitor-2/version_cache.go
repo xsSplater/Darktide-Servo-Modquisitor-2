@@ -217,20 +217,71 @@ func (c *VersionCache) LoadFromProfile(profilePath string) {
 	}
 
 	path := filepath.Join(profilePath, FileNameNexusVersions)
-	data, err := os.ReadFile(path)
-	if err != nil {
-		c.ReplaceAll(nil)
-		return
+	bakPath := path + ".bak"
+
+	// Пробуем основной файл.
+	items, ok := c.tryLoadFromFile(path)
+
+	// Основной файл не подошёл — пробуем .bak.
+	//
+	// Что считается «не подошёл»:
+	//   - файла нет;
+	//   - JSON не парсится;
+	//   - JSON валиден, но содержит 0 записей.
+	//
+	// Последний случай — самая частая причина «все моды manual»:
+	// при каком-то сбое основной файл оказался с одной записью
+	// (или вообще пустой map), и без fallback на .bak кэш
+	// терялся целиком.
+	if !ok {
+		if bakItems, bakOK := c.tryLoadFromFile(bakPath); bakOK {
+			c.log(fmt.Sprintf(
+				"LoadFromProfile: recovered %d entries from %s (main file was missing/empty/corrupt)",
+				len(bakItems), bakPath))
+			// Возвращаем .bak на место основного, чтобы следующий
+			// запуск сразу получил валидные данные и не проваливался
+			// в fallback снова.
+			_ = os.Rename(bakPath, path)
+			items = bakItems
+			ok = true
+		}
 	}
 
-	items, err := parseVersionCacheJSON(data)
-	if err != nil {
-		c.log(fmt.Sprintf("Failed to parse %s: %v", path, err))
+	if !ok {
+		c.log(fmt.Sprintf("LoadFromProfile: no usable cache at %s", path))
 		c.ReplaceAll(nil)
 		return
 	}
 
 	c.ReplaceAll(items)
+}
+
+// tryLoadFromFile читает и парсит файл кэша. Возвращает:
+//
+//	(items, true)  — файл есть, парсится, содержит ≥1 запись.
+//	(nil, false)   — файла нет, парсится с ошибкой, или 0 записей.
+//
+// Вынесено в отдельный метод, чтобы LoadFromProfile мог вызвать
+// одну и ту же логику и для основного файла, и для .bak.
+func (c *VersionCache) tryLoadFromFile(path string) (map[string]ModVersionInfo, bool) {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return nil, false
+	}
+	if len(data) == 0 {
+		return nil, false
+	}
+	items, err := parseVersionCacheJSON(data)
+	if err != nil {
+		c.log(fmt.Sprintf("Failed to parse %s: %v", path, err))
+		return nil, false
+	}
+	if len(items) == 0 {
+		// Валидный JSON, но пустой map — считаем файл непригодным.
+		// См. комментарий в LoadFromProfile.
+		return nil, false
+	}
+	return items, true
 }
 
 // SaveToProfile записывает текущее содержимое кэша в nexus_versions.json
@@ -274,7 +325,61 @@ func (c *VersionCache) SaveToProfile(profilePath string) error {
 	}
 	buf.WriteString("}")
 
-	return os.WriteFile(path, buf.Bytes(), 0644)
+	// ─── Атомарная запись + .bak ──────────────────────────────────
+	//
+	// Порядок шагов важен, каждый ловит свою категорию сбоя:
+	//
+	//   1. .bak ← текущий файл (rename, атомарно).
+	//   2. .tmp ← новые данные.
+	//   3. path ← .tmp (rename, атомарно).
+	//
+	// Если процесс упадёт на шаге 2 — на диске лежит актуальный
+	// .bak и частично записанный .tmp; LoadFromProfile увидит битый
+	// основной файл и восстановится из .bak.
+	//
+	// Если упадёт на шаге 3 — на диске .bak и полноценный .tmp;
+	// LoadFromProfile возьмёт либо старый (валидный) основной,
+	// либо .bak.
+	//
+	// До этого патча .bak не создавался вообще, и единственным
+	// восстановлением был сам основной файл — если он повреждён,
+	// кэш терялся целиком (540 модов → 1 запись).
+	tmpPath := path + ".tmp"
+	bakPath := path + ".bak"
+
+	// Шаг 1. Сохраняем предыдущую версию как .bak.
+	// Переименование, а не копирование: атомарно и O(1).
+	// Если основного файла нет (первый запуск) — шаг no-op.
+	if _, err := os.Stat(path); err == nil {
+		// .bak мог остаться с прошлого раза — перезаписываем.
+		_ = os.Remove(bakPath)
+		if err := os.Rename(path, bakPath); err != nil {
+			// Не критично: продолжаем, .bak — это best-effort
+			// страховка. Не валим запись из-за него.
+			c.log(fmt.Sprintf("SaveToProfile: rename to .bak failed: %v", err))
+		}
+	}
+
+	// Шаг 2. Пишем новые данные во временный файл.
+	if err := os.WriteFile(tmpPath, buf.Bytes(), 0644); err != nil {
+		// Восстанавливаем .bak на место основного, чтобы не
+		// оставить ситуацию «файла нет, только .bak и .tmp».
+		if _, statErr := os.Stat(bakPath); statErr == nil {
+			_ = os.Rename(bakPath, path)
+		}
+		return err
+	}
+
+	// Шаг 3. Атомарная замена.
+	if err := os.Rename(tmpPath, path); err != nil {
+		// Восстанавливаем .bak, чтобы не остаться без файла.
+		if _, statErr := os.Stat(bakPath); statErr == nil {
+			_ = os.Rename(bakPath, path)
+		}
+		_ = os.Remove(tmpPath)
+		return err
+	}
+	return nil
 }
 
 // parseVersionCacheJSON разбирает JSON из nexus_versions.json, поддерживая

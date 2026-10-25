@@ -33,18 +33,24 @@ var (
 )
 
 func safeJoin(destDir, name string) (string, error) {
-	// Приводим имя к Unix-стилю для проверок (заменяем \ на /)
+	// Приводим имя к Unix-стилю (заменяем \ на /)
 	cleanName := strings.ReplaceAll(name, "\\", "/")
+
 	// Запрещаем абсолютные пути (Unix-стиль)
 	if strings.HasPrefix(cleanName, "/") {
 		return "", fmt.Errorf("absolute path not allowed")
 	}
-	// Запрещаем Windows-абсолютные пути (содержат :/ или :\\)
-	if strings.Contains(cleanName, ":/") || strings.Contains(cleanName, ":\\") {
+	// Запрещаем Windows-абсолютные пути (содержат :/)
+	// Проверка :\\ уже не нужна, так как мы заменили \ на / выше.
+	if strings.Contains(cleanName, ":/") {
 		return "", fmt.Errorf("absolute path not allowed")
 	}
+
 	// Собираем путь с использованием системного разделителя
-	full := filepath.Join(destDir, name)
+	// ВАЖНО: используем cleanName, а не name, чтобы избежать создания
+	// файлов с обратными слешами в именах на Linux.
+	full := filepath.Join(destDir, filepath.FromSlash(cleanName))
+
 	// Проверяем, что результирующий путь действительно внутри destDir
 	rel, err := filepath.Rel(destDir, full)
 	if err != nil || strings.HasPrefix(rel, "..") || filepath.IsAbs(rel) {
@@ -54,10 +60,6 @@ func safeJoin(destDir, name string) (string, error) {
 }
 
 func (app *App) refreshModList() {
-	// Проверяем, что UI-виджеты созданы
-	if app.modTable == nil || app.headerTable == nil || app.systemModsTable == nil {
-		return
-	}
 	if app.mainWindow == nil || app.mainWindow.Canvas() == nil {
 		return
 	}
@@ -71,6 +73,7 @@ func (app *App) refreshModList() {
 	lang := app.cfg.Language
 	forceEnglish := app.cfg.ForceEnglishModNames
 	modsPath := app.cfg.ModsPath
+	showSystem := app.cfg.ShowSystemMods
 	app.cfgMutex.RUnlock()
 
 	mods := checks.GetModsInfo(lang, forceEnglish)
@@ -78,12 +81,31 @@ func (app *App) refreshModList() {
 	var sysMods, regMods []checks.ModInfo
 	for _, m := range mods {
 		if m.IsSystem {
-			m.Active = false
-			sysMods = append(sysMods, m)
+			if showSystem {
+				m.Active = true // Системные моды всегда активны
+				sysMods = append(sysMods, m)
+			}
 		} else {
 			regMods = append(regMods, m)
 		}
 	}
+
+	// Сортируем системные моды в нужном порядке
+	sort.Slice(sysMods, func(i, j int) bool {
+		order := map[string]int{"base": 0, "dmf": 1, "autopatch": 2}
+		oi, ok1 := order[sysMods[i].Name]
+		if !ok1 {
+			oi = 99
+		}
+		oj, ok2 := order[sysMods[j].Name]
+		if !ok2 {
+			oj = 99
+		}
+		if oi != oj {
+			return oi < oj
+		}
+		return sysMods[i].Name < sysMods[j].Name
+	})
 
 	entries := checks.ReadLoadOrder()
 	if entries == nil {
@@ -152,6 +174,7 @@ func (app *App) refreshModList() {
 						}
 						conflictText := app.msg("conflict_with") + displayName
 						regMods[i].Note = checks.JoinNotes(regMods[i].Note, conflictText)
+						regMods[i].ConflictWith = displayName
 						break
 					}
 				}
@@ -232,7 +255,7 @@ func (app *App) refreshModList() {
 		}
 	}
 
-	// Цикл для MissingFolder
+	// Цикл для MissingFolder (только для regMods)
 	for i := range regMods {
 		if regMods[i].MissingFolder {
 			regMods[i].Active = false
@@ -254,25 +277,20 @@ func (app *App) refreshModList() {
 	}
 
 	// AML
-	wasAML := app.amlDetected.Load()
 	app.amlDetected.Store(checks.IsAMLInstalled(modsPath))
-	if wasAML != app.amlDetected.Load() {
-		if app.amlDetected.Load() {
-			app.btnSaveOrder.SetText(app.msg("btn_save_order_aml"))
-			app.btnSortChecks.SetText(app.msg("btn_sort_checks_aml"))
-			app.btnSaveOrder.SetToolTip(app.msg("aml_save_warning_tooltip"))
-			app.btnSortChecks.SetToolTip(app.msg("aml_sort_warning_tooltip"))
-		} else {
-			app.btnSaveOrder.SetText(app.msg("btn_save_order"))
-			app.btnSortChecks.SetText(app.msg("btn_sort_checks"))
-			app.btnSaveOrder.SetToolTip(app.msg("btn_save_order_tooltip"))
-			app.btnSortChecks.SetToolTip(app.msg("btn_sort_checks_tooltip"))
-		}
-	}
+	app.applyAMLWarningState()
 
-	// Установка флага HasUpdate
-	for i := range regMods {
-		mod := &regMods[i]
+	// Собираем все моды вместе
+	app.modsMutex.Lock()
+	app.allMods = append(sysMods, regMods...)
+	app.systemMods = sysMods
+	app.orderDirty.Store(false)
+	app.modsMutex.Unlock()
+
+	// Установка флага HasUpdate (теперь для всех модов)
+	app.modsMutex.Lock()
+	for i := range app.allMods {
+		mod := &app.allMods[i]
 		var cacheKey string
 		switch mod.Name {
 		case "dmf":
@@ -303,45 +321,12 @@ func (app *App) refreshModList() {
 			mod.HasUpdate = false
 		}
 	}
-
-	app.modsMutex.Lock()
-	app.allMods = regMods
-	app.systemMods = sysMods
-	app.orderDirty.Store(false)
 	app.modsMutex.Unlock()
 
-	// Очистка кэша от записей, не соответствующих существующим модам
 	app.pruneVersionCache()
-
 	app.filterModList()
-
-	app.updateSystemModsTable()
-
 	app.forceRefreshTable()
-
 	app.updateTableBorder()
-}
-
-func (app *App) updateSystemModsTable() {
-	if app.systemModsTable == nil {
-		app.appendLogToFile("updateSystemModsTable: systemModsTable is nil, skipping")
-		return
-	}
-	app.modsMutex.RLock()
-	n := len(app.systemMods)
-	app.modsMutex.RUnlock()
-
-	// Обновляем высоту контейнера под фактическое число строк.
-	// Раньше высота была фиксированной (75 = 2 строки), и третий
-	// системный мод (autopatch) не помещался в контейнер.
-	if app.systemModsTableSpacer != nil {
-		app.systemModsTableSpacer.SetMinSize(fyne.NewSize(
-			1, SystemTableRowHeight*float32(n)))
-		app.systemModsTableSpacer.Refresh()
-	}
-
-	app.systemModsTable.Length = func() (int, int) { return n, TableColumnCount }
-	app.systemModsTable.Refresh()
 }
 
 func (app *App) saveCurrentOrder() {
@@ -357,9 +342,12 @@ func (app *App) saveCurrentOrder() {
 func (app *App) buildLoadOrderEntries() []checks.LoadOrderEntry {
 	app.modsMutex.RLock()
 	defer app.modsMutex.RUnlock()
-	entries := make([]checks.LoadOrderEntry, len(app.allMods))
-	for i, m := range app.allMods {
-		entries[i] = checks.LoadOrderEntry{Name: m.Name, Active: m.Active}
+	var entries []checks.LoadOrderEntry
+	for _, m := range app.allMods {
+		if m.IsSystem {
+			continue
+		}
+		entries = append(entries, checks.LoadOrderEntry{Name: m.Name, Active: m.Active})
 	}
 	return entries
 }
@@ -376,7 +364,7 @@ func (app *App) toggleModActive(name string, active bool) {
 	app.modsMutex.Unlock()
 	app.updateTableBorder()
 	app.filterModList()
-	app.forceRefreshTable()
+	// app.forceRefreshTable()
 }
 
 // findModByName возвращает КОПИЮ ModInfo. Указатель наружу отдавать
@@ -522,9 +510,29 @@ func (app *App) handleDrop(uris []fyne.URI) {
 				app.refreshModList()
 				if installedName != "" {
 					app.selectAndScrollToMod(installedName)
-					modID, _, _ := extractVersionAndModIDFromFilename(p)
-					if modID != 0 {
-						go app.autoAddModToDatabase(modID, installedName, filepath.Base(p))
+
+					// ModID определяем по записи в БД (по имени папки),
+					// а не по имени файла. Причина: Nexus переписывает
+					// схемы имён по несколько раз в год, и парсер имени
+					// всегда отстаёт. Для LoadoutSelectionFix-
+					// 811-1-2-1775345918 дефисный парсер извлекал «2»
+					// (последнее короткое число) вместо 811, после чего
+					// autoAddModToDatabase конфликтовал с уже корректной
+					// записью в базе и писал в лог «already exists with
+					// ID 2».
+					//
+					// Имя папки — стабильный якорь: оно же лежит в
+					// load order, в mod_database.json (поле folder) и
+					// в nexus_versions.json.
+					//
+					// Разбор имени файла оставляем только как fallback
+					// для мода, которого ещё нет в базе (первая установка
+					// чего-то нового).
+					entry := checks.GetModDBEntry(installedName)
+					if entry == nil || entry.URL == "" {
+						if modID, _, _ := extractVersionAndModIDFromFilename(p); modID != 0 {
+							go app.autoAddModToDatabase(modID, installedName, filepath.Base(p))
+						}
 					}
 					app.orderDirty.Store(true)
 					app.updateTableBorder()
@@ -927,23 +935,33 @@ func (app *App) moveSelected(delta int) {
 
 	app.modsMutex.Lock()
 
+	var sysMods, regMods []checks.ModInfo
+	for _, m := range app.allMods {
+		if m.IsSystem {
+			sysMods = append(sysMods, m)
+		} else {
+			regMods = append(regMods, m)
+		}
+	}
+
 	if len(selNames) == 1 {
-		idx := app.findModIndexByNameLocked(selNames[0])
-		if idx == -1 {
-			app.modsMutex.Unlock()
-			return
+		idx := -1
+		for i, m := range regMods {
+			if m.Name == selNames[0] {
+				idx = i
+				break
+			}
 		}
-		newIdx := idx + delta
-		if newIdx < 0 || newIdx >= len(app.allMods) {
-			app.modsMutex.Unlock()
-			return
+		if idx != -1 {
+			newIdx := idx + delta
+			if newIdx >= 0 && newIdx < len(regMods) {
+				regMods[idx], regMods[newIdx] = regMods[newIdx], regMods[idx]
+				app.orderDirty.Store(true)
+			}
 		}
-		app.allMods[idx], app.allMods[newIdx] = app.allMods[newIdx], app.allMods[idx]
-		app.orderDirty.Store(true)
 	} else {
-		var selected []checks.ModInfo
-		var others []checks.ModInfo
-		for _, m := range app.allMods {
+		var selected, others []checks.ModInfo
+		for _, m := range regMods {
 			if m.Selected {
 				selected = append(selected, m)
 			} else {
@@ -951,30 +969,30 @@ func (app *App) moveSelected(delta int) {
 			}
 		}
 		originalFirstIdx := -1
-		for i, m := range app.allMods {
+		for i, m := range regMods {
 			if m.Selected {
 				originalFirstIdx = i
 				break
 			}
 		}
-		if originalFirstIdx == -1 {
-			app.modsMutex.Unlock()
-			return
+		if originalFirstIdx != -1 {
+			insertIdx := originalFirstIdx + delta
+			if insertIdx < 0 {
+				insertIdx = 0
+			}
+			if insertIdx > len(others) {
+				insertIdx = len(others)
+			}
+			var result []checks.ModInfo
+			result = append(result, others[:insertIdx]...)
+			result = append(result, selected...)
+			result = append(result, others[insertIdx:]...)
+			regMods = result
+			app.orderDirty.Store(true)
 		}
-		insertIdx := originalFirstIdx + delta
-		if insertIdx < 0 {
-			insertIdx = 0
-		} else if insertIdx > len(others) {
-			insertIdx = len(others)
-		}
-		var result []checks.ModInfo
-		result = append(result, others[:insertIdx]...)
-		result = append(result, selected...)
-		result = append(result, others[insertIdx:]...)
-		app.allMods = result
-		app.orderDirty.Store(true)
 	}
 
+	app.allMods = append(sysMods, regMods...)
 	app.modsMutex.Unlock()
 
 	app.updateTableBorder()
@@ -990,19 +1008,25 @@ func (app *App) moveSelectedToTop() {
 	}
 
 	app.modsMutex.Lock()
-
-	var selected []checks.ModInfo
-	var others []checks.ModInfo
+	var sysMods, regMods []checks.ModInfo
 	for _, m := range app.allMods {
+		if m.IsSystem {
+			sysMods = append(sysMods, m)
+		} else {
+			regMods = append(regMods, m)
+		}
+	}
+	var selected, others []checks.ModInfo
+	for _, m := range regMods {
 		if m.Selected {
 			selected = append(selected, m)
 		} else {
 			others = append(others, m)
 		}
 	}
-	app.allMods = append(selected, others...)
+	regMods = append(selected, others...)
+	app.allMods = append(sysMods, regMods...)
 	app.orderDirty.Store(true)
-
 	app.modsMutex.Unlock()
 
 	app.updateTableBorder()
@@ -1018,19 +1042,25 @@ func (app *App) moveSelectedToBottom() {
 	}
 
 	app.modsMutex.Lock()
-
-	var selected []checks.ModInfo
-	var others []checks.ModInfo
+	var sysMods, regMods []checks.ModInfo
 	for _, m := range app.allMods {
+		if m.IsSystem {
+			sysMods = append(sysMods, m)
+		} else {
+			regMods = append(regMods, m)
+		}
+	}
+	var selected, others []checks.ModInfo
+	for _, m := range regMods {
 		if m.Selected {
 			selected = append(selected, m)
 		} else {
 			others = append(others, m)
 		}
 	}
-	app.allMods = append(others, selected...)
+	regMods = append(others, selected...)
+	app.allMods = append(sysMods, regMods...)
 	app.orderDirty.Store(true)
-
 	app.modsMutex.Unlock()
 
 	app.updateTableBorder()
@@ -1052,17 +1082,27 @@ func (app *App) moveSelectedToPosition() {
 		return
 	}
 	visiblePos, err := strconv.Atoi(posStr)
-	if err != nil || visiblePos < 1 || visiblePos > len(app.allMods) {
-		app.appendLog(app.msg("log_invalid_position"))
+	if err != nil || visiblePos < 1 {
 		return
 	}
-	targetIdx := visiblePos - 1
 
 	app.modsMutex.Lock()
-
-	var selected []checks.ModInfo
-	var others []checks.ModInfo
+	var sysMods, regMods []checks.ModInfo
 	for _, m := range app.allMods {
+		if m.IsSystem {
+			sysMods = append(sysMods, m)
+		} else {
+			regMods = append(regMods, m)
+		}
+	}
+
+	targetIdx := visiblePos - 1 - len(sysMods)
+	if targetIdx < 0 {
+		targetIdx = 0
+	}
+
+	var selected, others []checks.ModInfo
+	for _, m := range regMods {
 		if m.Selected {
 			selected = append(selected, m)
 		} else {
@@ -1072,14 +1112,15 @@ func (app *App) moveSelectedToPosition() {
 	if targetIdx > len(others) {
 		targetIdx = len(others)
 	}
+
 	var result []checks.ModInfo
 	result = append(result, others[:targetIdx]...)
 	result = append(result, selected...)
 	result = append(result, others[targetIdx:]...)
+	regMods = result
 
-	app.allMods = result
+	app.allMods = append(sysMods, regMods...)
 	app.orderDirty.Store(true)
-
 	app.modsMutex.Unlock()
 
 	app.updateTableBorder()
@@ -1195,9 +1236,15 @@ func (app *App) InstallModFromArchive(archivePath string, activate bool, knownVe
 		// Первый мод — «главный» для UI и обратной совместимости.
 		installedName := names[0]
 
-		modID, version := app.resolveModIDAndVersion(archivePath, installedName, knownVersion)
-		app.finalizeModInstallUI(installedName, activate, archivePath)
-		app.cacheInstalledVersion(modID, installedName, version)
+		manual := modNameToUpdate == ""
+		modID, version := app.resolveModIDAndVersion(archivePath, installedName, knownVersion, manual)
+		app.finalizeModInstallUI(installedName, modID, activate, archivePath)
+
+		source := "nexus"
+		if manual {
+			source = "manual"
+		}
+		app.cacheInstalledVersion(modID, installedName, version, source)
 
 		return installedName, version, nil
 	}
@@ -1213,13 +1260,18 @@ func (app *App) InstallModFromArchive(archivePath string, activate bool, knownVe
 	installedName := installedNames[0] // для обратной совместимости возвращаем первый
 
 	// 4. Определяем modID и версию.
-	modID, version := app.resolveModIDAndVersion(archivePath, installedName, knownVersion)
+	manual := modNameToUpdate == ""
+	modID, version := app.resolveModIDAndVersion(archivePath, installedName, knownVersion, manual)
 
 	// 5. Обновляем UI и активируем мод, если нужно.
-	app.finalizeModInstallUI(installedName, activate, archivePath)
+	app.finalizeModInstallUI(installedName, modID, activate, archivePath)
 
 	// 6. Кешируем версию.
-	app.cacheInstalledVersion(modID, installedName, version)
+	source := "nexus"
+	if manual {
+		source = "manual"
+	}
+	app.cacheInstalledVersion(modID, installedName, version, source)
 
 	return installedName, version, nil
 }
@@ -1597,30 +1649,55 @@ func (app *App) installModsSubfolder(tmpDir, modsPath string) ([]string, error) 
 	return names, nil
 }
 
-// resolveModIDAndVersion извлекает ID мода и версию из имени архива, а
-// если не получилось — из базы или из диалога с пользователем.
-func (app *App) resolveModIDAndVersion(archivePath, installedName, knownVersion string) (int, string) {
+// resolveModIDAndVersion определяет modID и версию устанавливаемого мода.
+//
+// manual == true — установка инициирована пользователем (drag-and-drop
+// или диалог выбора файла). manual == false — установка/обновление
+// через NXM-ссылку или API Nexus.
+//
+// Для ручной установки известного мода (запись есть в mod_database.json)
+// имя файла НЕ разбирается вообще: пользователь мог переустановить
+// старый архив, и версия в имени файла не отражает реальность. А имя
+// папки — стабильно, оно же лежит в load order и в nexus_versions.json.
+//
+// Для первой установки неизвестного мода (записи в DB нет) разбор
+// имени файла — единственная зацепка, поэтому он остаётся как fallback.
+func (app *App) resolveModIDAndVersion(archivePath, installedName, knownVersion string, manual bool) (int, string) {
 	modID := 0
 	version := knownVersion
 
-	// Сначала — из имени файла (новый приоритет).
-	if idFromFile, v, ok := extractVersionAndModIDFromFilename(archivePath); ok && idFromFile != 0 {
-		modID = idFromFile
-		if v != "" && version == "" {
-			version = v
-		}
+	// 1. ModID — база по имени папки. Самый надёжный источник,
+	// потому что folder в DB и имя папки на диске совпадают по
+	// определению.
+	if entry := checks.GetModDBEntry(installedName); entry != nil && entry.URL != "" {
+		modID = helpers.ExtractModIDFromURL(entry.URL)
 	}
 
-	// Потом — из базы.
+	// 2. Имя файла — только если мода нет в базе (первая установка
+	// чего-то нового). Для NXM-flow сюда тоже заходим как fallback,
+	// если API не отдал версию.
 	if modID == 0 {
-		if entry := checks.GetModDBEntry(installedName); entry != nil && entry.URL != "" {
-			modID = helpers.ExtractModIDFromURL(entry.URL)
+		if idFromFile, v, ok := extractVersionAndModIDFromFilename(archivePath); ok && idFromFile != 0 {
+			modID = idFromFile
+			// Версию из имени файла доверяем только в NXM-flow.
+			// Для ручной установки неизвестного мода — тоже берём,
+			// спросить всё равно не у кого.
+			if v != "" && v != "unknown" && version == "" {
+				version = v
+			}
 		}
 	}
 
-	// Если версии всё ещё нет — спрашиваем пользователя.
+	// 3. Если версии всё ещё нет:
 	if version == "" {
-		version = app.promptUserForVersion(installedName)
+		if manual {
+			// Пользователь сам закинул архив — пусть введёт версию.
+			version = app.promptUserForVersion(installedName)
+		} else {
+			// Установка из Nexus. Не блокируем — ставим "unknown",
+			// пользователь поправит кнопкой «Edit version» при желании.
+			version = "unknown"
+		}
 	}
 	return modID, version
 }
@@ -1630,14 +1707,17 @@ func (app *App) resolveModIDAndVersion(archivePath, installedName, knownVersion 
 // прокручивает к установленному моду.
 //
 // Вся работа идёт в главном потоке Fyne.
-func (app *App) finalizeModInstallUI(installedName string, activate bool, archivePath string) {
-	fyne.Do(func() {
-		app.appendLogToFile("InstallModFromArchive: entering fyne.Do")
+// finalizeModInstallUI получает modID, чтобы корректно сигналить батч.
+func (app *App) finalizeModInstallUI(installedName string, modID int, activate bool, archivePath string) {
+	fyne.DoAndWait(func() {
+		app.appendLogToFile("InstallModFromArchive: entering fyne.DoAndWait")
+
+		// 1. СНАЧАЛА обновляем список, чтобы новый мод появился в app.allMods
 		app.refreshModList()
 		app.appendLogToFile("InstallModFromArchive: after refreshModList")
 
+		// 2. ТЕПЕРЬ включаем его, так как он уже есть в списке
 		if activate {
-			// #4: пишем Active под modsMutex.
 			app.modsMutex.Lock()
 			for i := range app.allMods {
 				if app.allMods[i].Name == installedName {
@@ -1649,17 +1729,11 @@ func (app *App) finalizeModInstallUI(installedName string, activate bool, archiv
 
 			app.orderDirty.Store(true)
 			app.updateTableBorder()
+
+			// 3. Сохраняем порядок уже с включенным модом
+			app.saveCurrentOrder()
 		}
 
-		// ВАЖНО: синхронизация в профиль вызывается ВСЕГДА, независимо
-		// от activate. Иначе свежеустановленный (но неактивный) мод
-		// останется только в игровой папке: при следующем переключении
-		// профиля switchProfile удалит его из <game>/mods/, не сохранив
-		// копию в профиль — и мод потеряется безвозвратно.
-		//
-		// Используем syncModToProfile (один мод) вместо syncProfileFromGame
-		// (все моды) — установка редкая, но копировать весь каталог на
-		// каждую установку всё равно избыточно.
 		app.syncModToProfile(installedName)
 
 		app.filterModList()
@@ -1673,15 +1747,24 @@ func (app *App) finalizeModInstallUI(installedName string, activate bool, archiv
 
 		app.selectAndScrollToMod(installedName)
 		app.appendLogToFile("InstallModFromArchive: after selectAndScrollToMod")
+
+		// Сигналим батчу, что мод установлен
+		select {
+		case app.batchInstallChan <- BatchSignal{Folder: installedName, NexusModID: modID}:
+		default:
+		}
 	})
 }
 
 // cacheInstalledVersion сохраняет версию мода в кеше и, для системных
 // модов (base/dmf), синхронизирует кеш с локальными файлами.
-func (app *App) cacheInstalledVersion(modID int, installedName, version string) {
+func (app *App) cacheInstalledVersion(modID int, installedName, version string, source string) {
 	if version != "" && modID != 0 {
 		cacheKey := fmt.Sprintf("%d:%s", modID, installedName)
-		app.cacheModVersion(cacheKey, installedName, version, 0, "manual", 0)
+		if source == "" {
+			source = "manual"
+		}
+		app.cacheModVersion(cacheKey, installedName, version, 0, source, 0)
 	}
 	if installedName == "base" || installedName == "dmf" {
 		app.syncVersionCache()
@@ -1766,12 +1849,7 @@ func (app *App) updateAllModsFromNexus() {
 	}
 
 	app.appendLog(app.msg("log_collecting_mods"))
-	type modUpdateItem struct {
-		ModName  string
-		ModID    int
-		FileInfo *FileInfo
-	}
-	var modsToUpdate []modUpdateItem
+	var updateItems []*BatchItem
 
 	bar, label, cancelChan, closeDialog := app.showProgressDialog(
 		app.msg("update_title"),
@@ -1779,38 +1857,34 @@ func (app *App) updateAllModsFromNexus() {
 	)
 	defer closeDialog()
 
-	totalMods := 0
-	processed := 0
 	app.modsMutex.RLock()
 	allModsCopy := make([]checks.ModInfo, len(app.allMods))
 	copy(allModsCopy, app.allMods)
 	app.modsMutex.RUnlock()
 
+	totalMods := 0
 	for _, mod := range allModsCopy {
 		if mod.URL != "" && !mod.IsSystem {
 			totalMods++
 		}
 	}
 
+	processed := 0
 	for i := range allModsCopy {
 		select {
 		case <-cancelChan:
-			app.appendLog(app.msg("collecting_mods_cancelled"))
 			return
 		default:
 		}
 
 		mod := &allModsCopy[i]
-		if mod.URL == "" || mod.IsSystem {
-			continue
-		}
-		modID := helpers.ExtractModIDFromURL(mod.URL)
-		if modID == 0 {
+		if mod.URL == "" || mod.IsSystem || app.isSymlinkFolder(mod.Name) {
 			processed++
 			continue
 		}
-		if app.isSymlinkFolder(mod.Name) {
-			app.appendLog(fmt.Sprintf(app.msg("log_skipping_symlink"), mod.Name))
+
+		modID := helpers.ExtractModIDFromURL(mod.URL)
+		if modID == 0 {
 			processed++
 			continue
 		}
@@ -1821,31 +1895,33 @@ func (app *App) updateAllModsFromNexus() {
 			processed++
 			continue
 		}
-		if fileInfo == nil {
-			processed++
-			continue
-		}
 
 		cacheKey := fmt.Sprintf("%d:%s", modID, mod.Name)
 		saved, exists := app.getCachedVersion(cacheKey)
-		if !exists || saved.Source == "" || saved.Source == "manual" {
-			processed++
-			continue
-		}
-		if saved.Timestamp == 0 || fileInfo.UploadedTimestamp > saved.Timestamp {
-			modsToUpdate = append(modsToUpdate, modUpdateItem{
-				ModName:  mod.Name,
-				ModID:    modID,
-				FileInfo: fileInfo,
-			})
-			if saved.Version != "" {
-				app.appendLog(fmt.Sprintf(app.msg("log_update_available"), mod.Name, saved.Version, fileInfo.Version))
-			} else {
-				app.appendLog(fmt.Sprintf(app.msg("log_update_available_x"), mod.Name, fileInfo.Version))
-			}
-		}
-		processed++
 
+		// СТАЛО: Сравниваем версии, а если дата есть, то и её
+		if exists && saved.Source != "manual" && saved.Version != "" &&
+			(compareVersions(fileInfo.Version, saved.Version) > 0 || (saved.Timestamp != 0 && fileInfo.UploadedTimestamp > saved.Timestamp)) {
+
+			item := &BatchItem{
+				ID:          mod.Name,
+				Name:        mod.DisplayName,
+				Description: mod.Description,
+				Version:     fileInfo.Version,
+				NexusModID:  modID,
+				FileID:      fileInfo.ID,
+				Selected:    true,
+				Status:      BatchPending,
+				Author:      mod.Author,
+				Category:    mod.Category,
+				PictureURL:  mod.NexusPictureURL,
+			}
+			cl, _ := app.FetchChangelog(modID, fileInfo.ID)
+			item.Changelog = cl
+			updateItems = append(updateItems, item)
+		}
+
+		processed++
 		if processed%5 == 0 || processed == totalMods {
 			fyne.Do(func() {
 				bar.SetValue(float64(processed) / float64(totalMods))
@@ -1854,132 +1930,15 @@ func (app *App) updateAllModsFromNexus() {
 		}
 	}
 
-	if len(modsToUpdate) == 0 {
-		app.appendLog(app.msg("no_updates_found"))
-		fyne.Do(func() {
-			label.SetText(app.msg("updates_found_no"))
-			bar.SetValue(1.0)
-		})
-		time.Sleep(1 * time.Second)
-		return
-	}
-
-	fyne.Do(func() {
-		label.SetText(app.msg("downloading_changelog"))
-		bar.SetValue(0)
-	})
-
-	var updateChoices []*ModUpdateChoice
-	for idx, item := range modsToUpdate {
-		select {
-		case <-cancelChan:
-			app.appendLog(app.msg("collecting_mods_cancelled"))
-			return
-		default:
-		}
-
-		changelog, err := app.FetchChangelog(item.ModID, item.FileInfo.ID)
-		if err != nil {
-			app.appendLog(fmt.Sprintf(app.msg("failed_fetch_changlog_for"), item.ModName, err))
-			changelog = ""
-		}
-		modInfo := &checks.ModInfo{
-			Name:        item.ModName,
-			DisplayName: item.ModName,
-			URL:         fmt.Sprintf(NexusModIDLink, item.ModID),
-		}
-		updateChoices = append(updateChoices, &ModUpdateChoice{
-			Mod:       modInfo,
-			FileInfo:  item.FileInfo,
-			Changelog: changelog,
-			Selected:  true,
-		})
-
-		fyne.Do(func() {
-			bar.SetValue(float64(idx+1) / float64(len(modsToUpdate)))
-			label.SetText(fmt.Sprintf(app.msg("downloading_changelog_x_y"), idx+1, len(modsToUpdate)))
-		})
-	}
-
 	closeDialog()
 
-	resultChan := make(chan struct {
-		indices []int
-		ok      bool
-	}, 1)
-
-	// ВАЖНО: не добавлять fyne.Do внутрь showUpdateChoiceDialog —
-	// это приведёт к deadlock из-за вложенности в DoAndWait.
-	// Если понадобится — сначала переписать на fyne.Do + select.
-	fyne.DoAndWait(func() {
-		app.showUpdateChoiceDialog(updateChoices, resultChan)
-	})
-
-	res := <-resultChan
-
-	if !res.ok || len(res.indices) == 0 {
-		return
-	}
-
-	app.modsMutex.RLock()
-	currentMods := make([]checks.ModInfo, len(app.allMods))
-	copy(currentMods, app.allMods)
-	app.modsMutex.RUnlock()
-
-	var selectedMods []*checks.ModInfo
-	for _, idx := range res.indices {
-		if idx < 0 || idx >= len(modsToUpdate) {
-			continue
-		}
-		item := modsToUpdate[idx]
-		for i := range currentMods {
-			if currentMods[i].Name == item.ModName {
-				selectedMods = append(selectedMods, &currentMods[i])
-				break
-			}
-		}
-	}
-
-	if len(selectedMods) == 0 {
-		app.appendLog(app.msg("log_no_mods_selected_update"))
-		return
-	}
-
-	bar2, label2, cancelChan2, closeDialog2 := app.showProgressDialog(
-		app.msg("update_title"),
-		fmt.Sprintf("0 / %d", len(selectedMods)),
-	)
-	defer closeDialog2()
-
-	updatedCount := 0
-	for _, mod := range selectedMods {
-		select {
-		case <-cancelChan2:
-			app.appendLogToFile("Update cancelled by user")
-			return
-		default:
-		}
-		app.appendLog(fmt.Sprintf(app.msg("updating_mod"), mod.Name))
-		app.appendLogToFile(fmt.Sprintf("Starting update for %s at %s", mod.Name, time.Now().Format("15:04:05")))
-		app.updateModFromNexus(mod, true)
-		app.appendLogToFile(fmt.Sprintf("Finished update for %s at %s", mod.Name, time.Now().Format("15:04:05")))
-		updatedCount++
-
+	if len(updateItems) > 0 {
 		fyne.Do(func() {
-			bar2.SetValue(float64(updatedCount) / float64(len(selectedMods)))
-			label2.SetText(fmt.Sprintf("%d / %d - %s", updatedCount, len(selectedMods), mod.Name))
+			app.showBatchDialog(app.msg("batch_title_updates"), updateItems, BatchModeUpdate)
 		})
-
-		time.Sleep(500 * time.Millisecond)
+	} else {
+		app.appendLog(app.msg("no_updates_found"))
 	}
-
-	fyne.Do(func() {
-		bar2.SetValue(1.0)
-		label2.SetText(fmt.Sprintf("%d / %d - ✅", updatedCount, len(selectedMods)))
-	})
-
-	app.appendLog(fmt.Sprintf(app.msg("update_all_finished"), updatedCount))
-	time.Sleep(1 * time.Second)
 }
 
 // Удалить выбранные моды
@@ -1991,10 +1950,15 @@ func (app *App) removeSelectedMods() {
 			selectedNames = append(selectedNames, m.Name)
 		}
 	}
-	firstSelectedName := ""
-	for _, m := range app.displayedMods {
+	// Запоминаем ПОЗИЦИЮ первого выделенного мода в displayedMods.
+	// После удаления на эту позицию придёт мод, который был следующим
+	// за удалённым (или предыдущий, если удаляли с конца списка).
+	// Имя удалённого мода использовать нельзя — его в новом списке нет,
+	// из-за чего поиск не находил его и сбрасывал фокус на строку 0.
+	firstSelectedRow := -1
+	for i, m := range app.displayedMods {
 		if m.Selected {
-			firstSelectedName = m.Name
+			firstSelectedRow = i
 			break
 		}
 	}
@@ -2012,7 +1976,10 @@ func (app *App) removeSelectedMods() {
 			app.removeModFromCache(name)
 		}
 		app.saveCurrentOrder()
-		app.syncProfileFromGame()
+		// Используем атомарную синхронизацию, которая также обновляет сигнатуру
+		if err := app.syncActiveProfileFromGame(); err != nil {
+			app.appendLogToFile(fmt.Sprintf("removeSelectedMods: sync failed: %v", err))
+		}
 
 		fyne.Do(func() {
 			app.orderDirty.Store(false)
@@ -2027,21 +1994,15 @@ func (app *App) removeSelectedMods() {
 			app.modsMutex.RUnlock()
 
 			if len(displayed) > 0 {
-				found := false
-				if firstSelectedName != "" {
-					for i, m := range displayed {
-						if m.Name == firstSelectedName {
-							app.modTable.Select(widget.TableCellID{Row: i, Col: 0}, 0)
-							app.modTable.ScrollTo(widget.TableCellID{Row: i, Col: 0})
-							found = true
-							break
-						}
-					}
+				targetRow := firstSelectedRow
+				if targetRow < 0 {
+					targetRow = 0
 				}
-				if !found {
-					app.modTable.Select(widget.TableCellID{Row: 0, Col: 0}, 0)
-					app.modTable.ScrollTo(widget.TableCellID{Row: 0, Col: 0})
+				if targetRow >= len(displayed) {
+					targetRow = len(displayed) - 1
 				}
+				app.modTable.Select(widget.TableCellID{Row: targetRow, Col: 0}, 0)
+				app.modTable.ScrollTo(widget.TableCellID{Row: targetRow, Col: 0})
 			} else {
 				app.selectedModName = ""
 				app.selectedModIndex.Store(-1)
@@ -2059,7 +2020,7 @@ func (app *App) removeSelectedMods() {
 // Удалить все моды
 func (app *App) removeAllMods() {
 	app.modsMutex.RLock()
-	mods := make([]string, 0, len(app.allMods))
+	var mods []string
 	for _, mod := range app.allMods {
 		if !mod.IsSystem {
 			mods = append(mods, mod.Name)
@@ -2068,8 +2029,14 @@ func (app *App) removeAllMods() {
 	app.modsMutex.RUnlock()
 
 	app.modsMutex.Lock()
-	app.allMods = []checks.ModInfo{}
-	app.displayedMods = []checks.ModInfo{}
+	var kept []checks.ModInfo
+	for _, m := range app.allMods {
+		if m.IsSystem {
+			kept = append(kept, m)
+		}
+	}
+	app.allMods = kept
+	app.displayedMods = kept
 	app.modsMutex.Unlock()
 
 	app.orderDirty.Store(false)
@@ -2096,7 +2063,10 @@ func (app *App) removeAllMods() {
 		}
 
 		app.saveCurrentOrder()
-		app.syncProfileFromGame()
+		// Используем атомарную синхронизацию
+		if err := app.syncActiveProfileFromGame(); err != nil {
+			app.appendLogToFile(fmt.Sprintf("removeAllMods: sync failed: %v", err))
+		}
 		app.appendLog(app.msg("log_all_mods_removed"))
 
 		fyne.Do(func() {
@@ -2131,6 +2101,12 @@ func (app *App) installDMLFromArchive(archivePath string) error {
 			app.appendLog(fmt.Sprintf(app.msg("log_failed_to_copy_dml"), entry.Name(), err))
 		}
 	}
+
+	// Сигнал батчу — система установила компонент.
+	// Не знаем, какой именно (base/dmf/autopatch), поэтому отправляем
+	// имя файла архива — runBatchRunner сверит через isSameMod.
+	app.refreshAfterSystemInstall()
+
 	return nil
 }
 
@@ -2551,16 +2527,36 @@ func (app *App) normalizeArchiveStructure(tmpDir string) error {
 		}
 	}
 
+	// --- Этап 6: убираем двойную вложенность ---
+	// Если в корне единственная папка (например, ThirdPerson) содержит
+	// внутри себя папку с тем же именем и .mod файл, поднимаем
+	// содержимое внутренней папки на уровень выше.
+	if len(entries) == 1 && entries[0].IsDir() {
+		outerDir := entries[0].Name()
+		outerPath := filepath.Join(tmpDir, outerDir)
+		innerEntries, err := os.ReadDir(outerPath)
+		if err == nil && len(innerEntries) == 1 && innerEntries[0].IsDir() && innerEntries[0].Name() == outerDir {
+			innerPath := filepath.Join(outerPath, outerDir)
+			modFile := filepath.Join(innerPath, outerDir+".mod")
+			// Проверяем, что внутри действительно лежит .mod файл
+			if _, err := os.Stat(modFile); err == nil {
+				tempPath := outerPath + ".tmp_flatten"
+				if err := os.Rename(innerPath, tempPath); err == nil {
+					os.RemoveAll(outerPath)
+					os.Rename(tempPath, outerPath)
+					entries, err = readEntries()
+					if err != nil {
+						return err
+					}
+				}
+			}
+		}
+	}
+
 	return nil
 }
 
 // updateSelectedMods принудительно обновляет выбранные моды до последней версии с Nexus.
-//
-// (#4) Раньше в блоке фильтрации был мусор: `mmod, ok := ...; if !ok || mod.IsSystem`.
-// Функция не компилировалась. Переписан чистый цикл:
-// findModByName возвращает (ModInfo, bool), из неё берём локальную
-// копию mod и берём её адрес — указатели в eligible живут столько,
-// сколько живёт функция.
 func (app *App) updateSelectedMods() {
 	selected := app.selectedMods()
 	if len(selected) == 0 {
@@ -2582,8 +2578,6 @@ func (app *App) updateSelectedMods() {
 			app.appendLog(fmt.Sprintf(app.msg("update_no_url_for"), name))
 			continue
 		}
-		// Копия в куче — чтобы указатель не ссылался на переменную цикла
-		// (безопасно и в Go 1.22+, но так надёжнее читается).
 		m := mod
 		eligible = append(eligible, &m)
 	}
@@ -2599,12 +2593,6 @@ func (app *App) updateSelectedMods() {
 	}
 
 	app.appendLog(app.msg("log_collecting_mods_for_force_update"))
-	type modUpdateItem struct {
-		Mod      *checks.ModInfo
-		ModID    int
-		FileInfo *FileInfo
-	}
-	var modsToUpdate []modUpdateItem
 
 	bar, label, cancelChan, closeDialog := app.showProgressDialog(
 		app.msg("update_title"),
@@ -2614,7 +2602,9 @@ func (app *App) updateSelectedMods() {
 
 	total := len(eligible)
 	processed := 0
+	var batchItems []*BatchItem
 
+	// Собираем информацию о модах для нового окна
 	for _, mod := range eligible {
 		select {
 		case <-cancelChan:
@@ -2640,13 +2630,27 @@ func (app *App) updateSelectedMods() {
 			continue
 		}
 
-		modsToUpdate = append(modsToUpdate, modUpdateItem{
-			Mod:      mod,
-			ModID:    modID,
-			FileInfo: fileInfo,
-		})
-		processed++
+		// Запрашиваем changelog для отображения в окне
+		changelog, _ := app.FetchChangelog(modID, fileInfo.ID)
 
+		// Создаем элемент для таблицы
+		item := &BatchItem{
+			ID:          mod.Name,
+			Name:        mod.DisplayName,
+			Description: mod.Description,
+			Version:     fileInfo.Version,
+			NexusModID:  modID,
+			FileID:      fileInfo.ID,
+			Selected:    true,
+			Status:      BatchPending,
+			Author:      mod.Author,
+			Category:    mod.Category,
+			PictureURL:  mod.NexusPictureURL,
+			Changelog:   changelog,
+		}
+		batchItems = append(batchItems, item)
+
+		processed++
 		if processed%5 == 0 || processed == total {
 			fyne.Do(func() {
 				bar.SetValue(float64(processed) / float64(total))
@@ -2655,7 +2659,9 @@ func (app *App) updateSelectedMods() {
 		}
 	}
 
-	if len(modsToUpdate) == 0 {
+	closeDialog()
+
+	if len(batchItems) == 0 {
 		app.appendLog(app.msg("no_mods_found_for_force_update"))
 		fyne.Do(func() {
 			label.SetText(app.msg("updates_found_no"))
@@ -2665,114 +2671,8 @@ func (app *App) updateSelectedMods() {
 		return
 	}
 
+	// Запускаем новое красивое окно пакетного обновления
 	fyne.Do(func() {
-		label.SetText(app.msg("downloading_changelog"))
-		bar.SetValue(0)
+		app.showBatchDialog(app.msg("batch_title_updates"), batchItems, BatchModeUpdate)
 	})
-
-	var updateChoices []*ModUpdateChoice
-	for idx, item := range modsToUpdate {
-		select {
-		case <-cancelChan:
-			app.appendLog(app.msg("collecting_mods_cancelled"))
-			return
-		default:
-		}
-
-		changelog, err := app.FetchChangelog(item.ModID, item.FileInfo.ID)
-		if err != nil {
-			app.appendLog(fmt.Sprintf(app.msg("failed_fetch_changlog_for"), item.Mod.Name, err))
-			changelog = ""
-		}
-		updateChoices = append(updateChoices, &ModUpdateChoice{
-			Mod:       item.Mod,
-			FileInfo:  item.FileInfo,
-			Changelog: changelog,
-			Selected:  true,
-		})
-
-		fyne.Do(func() {
-			bar.SetValue(float64(idx+1) / float64(len(modsToUpdate)))
-			label.SetText(fmt.Sprintf(app.msg("downloading_changelog_x_y"), idx+1, len(modsToUpdate)))
-		})
-	}
-
-	closeDialog()
-
-	resultChan := make(chan struct {
-		indices []int
-		ok      bool
-	}, 1)
-
-	// ВАЖНО: не добавлять fyne.Do внутрь showUpdateChoiceDialog —
-	// это приведёт к deadlock из-за вложенности в DoAndWait.
-	// Если понадобится — сначала переписать на fyne.Do + select.
-	fyne.DoAndWait(func() {
-		app.showUpdateChoiceDialog(updateChoices, resultChan)
-	})
-
-	res := <-resultChan
-	if !res.ok || len(res.indices) == 0 {
-		app.appendLog(app.msg("update_cancelled"))
-		return
-	}
-
-	app.modsMutex.RLock()
-	currentMods := make([]checks.ModInfo, len(app.allMods))
-	copy(currentMods, app.allMods)
-	app.modsMutex.RUnlock()
-
-	var selectedMods []*checks.ModInfo
-	for _, idx := range res.indices {
-		if idx < 0 || idx >= len(modsToUpdate) {
-			continue
-		}
-		item := modsToUpdate[idx]
-		for i := range currentMods {
-			if currentMods[i].Name == item.Mod.Name {
-				selectedMods = append(selectedMods, &currentMods[i])
-				break
-			}
-		}
-	}
-
-	if len(selectedMods) == 0 {
-		app.appendLog(app.msg("log_no_mods_selected_update"))
-		return
-	}
-
-	bar2, label2, cancelChan2, closeDialog2 := app.showProgressDialog(
-		app.msg("update_title"),
-		fmt.Sprintf("0 / %d", len(selectedMods)),
-	)
-	defer closeDialog2()
-
-	updatedCount := 0
-	for _, mod := range selectedMods {
-		select {
-		case <-cancelChan2:
-			app.appendLog(app.msg("log_update_cancelled"))
-			return
-		default:
-		}
-
-		app.appendLog(fmt.Sprintf(app.msg("updating_mod"), mod.Name))
-		app.updateModFromNexus(mod, true)
-		updatedCount++
-
-		fyne.Do(func() {
-			bar2.SetValue(float64(updatedCount) / float64(len(selectedMods)))
-			label2.SetText(fmt.Sprintf("%d / %d - %s", updatedCount, len(selectedMods), mod.Name))
-		})
-
-		time.Sleep(500 * time.Millisecond)
-	}
-
-	fyne.Do(func() {
-		bar2.SetValue(1.0)
-		label2.SetText(fmt.Sprintf("%d / %d - ✅", updatedCount, len(selectedMods)))
-	})
-
-	app.appendLog(fmt.Sprintf(app.msg("update_selected_forced_finished"), updatedCount))
-	time.Sleep(1 * time.Second)
 }

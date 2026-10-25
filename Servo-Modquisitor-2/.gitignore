@@ -20,7 +20,7 @@ dist/
 temp_extract/
 *.exe
 
-# Конфиг (у пользователя он в ~/.config, но на всякий случай)
+# Конфиг
 config.json
 oauth_tokens.json
 nexus_versions.json
