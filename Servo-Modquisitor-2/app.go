@@ -75,6 +75,11 @@ type Config struct {
 	// На ярлык «Quick Launch» (--play) не влияет: там тихий режим
 	// без проверок.
 	AutoSortBeforeLaunch bool `json:"auto_sort_before_launch,omitempty"`
+
+	// SuppressOAuthPrompt — не показывать окно «требуется вход в Nexus»
+	// при старте и при 401. Пользователь явно отказался от OAuth.
+	// Программа продолжает работать в ручном режиме.
+	SuppressOAuthPrompt bool `json:"suppress_oauth_prompt"`
 }
 
 type ModVersionInfo struct {
@@ -211,7 +216,6 @@ type App struct {
 	btnLaunchNormal     *CustomButton
 	btnLaunchNoLauncher *CustomButton
 	btnSortChecks       *CustomButton
-	btnUpdateAll        *CustomButton
 	btnUpdateMod        *CustomButton
 	btnUpdateSelected   *CustomButton
 	btnCheckUpdates     *CustomButton

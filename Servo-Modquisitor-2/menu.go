@@ -298,8 +298,26 @@ func (app *App) buildMainMenu() *fyne.MainMenu {
 			app.startOAuthFlow()
 		}
 	})
+
+	// В buildMainMenu, рядом с autoFocusItem
+	app.cfgMutex.RLock()
+	suppressOAuth := app.cfg.SuppressOAuthPrompt
+	app.cfgMutex.RUnlock()
+
+	suppressOAuthItem := fyne.NewMenuItem(app.msg("setting_suppress_oauth_prompt"), func() {
+		app.cfgMutex.Lock()
+		app.cfg.SuppressOAuthPrompt = !app.cfg.SuppressOAuthPrompt
+		app.cfgMutex.Unlock()
+		app.saveConfigSafe()
+		app.mainWindow.SetMainMenu(app.buildMainMenu())
+	})
+	suppressOAuthItem.Checked = suppressOAuth
+	suppressOAuthItem.CheckedIcon = checkedIcon
+	suppressOAuthItem.UncheckedIcon = uncheckedIcon
+
 	nexusMenu := fyne.NewMenuWithIcon(app.msg("menu_nexus"), nexusMenuIcon,
 		oauthActionItem,
+		suppressOAuthItem,
 	)
 
 	// SETTINGS MENU AML AND USER_SETTINGS.CONFIG
@@ -657,10 +675,7 @@ func (app *App) changeLanguage(lang string) {
 		app.searchEntry.SetPlaceHolder(app.msg("search_placeholder"))
 	}
 	if app.filterSelect != nil {
-		app.filterSelect.Options = []string{
-			app.msg("filter_all"), app.msg("filter_active"), app.msg("filter_inactive"),
-			app.msg("filter_obsolete"), app.msg("filter_conflict"),
-		}
+		app.filterSelect.Options = app.filterOptions()
 		app.filterSelect.SetSelected(app.msg("filter_all"))
 		app.filterSelect.Refresh()
 	}
@@ -700,9 +715,6 @@ func (app *App) changeLanguage(lang string) {
 	}
 	if app.btnUpdateSelected != nil {
 		app.btnUpdateSelected.SetToolTip(app.msg("btn_update_selected_tooltip"))
-	}
-	if app.btnUpdateAll != nil {
-		app.btnUpdateAll.SetToolTip(app.msg("btn_update_all_tooltip"))
 	}
 
 	if app.btnEditVersion != nil {
@@ -748,7 +760,6 @@ func (app *App) changeLanguage(lang string) {
 	app.btnAMLConfig.SetToolTip(app.msg("btn_aml_config_tooltip"))
 	app.btnUpdateSelected.SetToolTip(app.msg("btn_update_selected_tooltip"))
 	app.btnCheckUpdates.SetToolTip(app.msg("btn_check_updates_tooltip"))
-	app.btnUpdateAll.SetToolTip(app.msg("btn_update_all_tooltip"))
 	app.btnEditVersion.SetToolTip(app.msg("btn_edit_version_tooltip"))
 	app.openFolderBtn.SetToolTip(app.msg("open_mod_folder_tooltip"))
 }

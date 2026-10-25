@@ -278,11 +278,6 @@ func (app *App) buildControlButtons() {
 	})
 	app.btnCheckUpdates.SetToolTip(app.msg("btn_check_updates_tooltip"))
 
-	// app.btnUpdateAll = NewIconButton(updateAllRes, func() {
-	// 	go app.updateAllModsFromNexus()
-	// })
-	// app.btnUpdateAll.SetToolTip(app.msg("btn_update_all_premium_only"))
-
 	// Запуск игры ──────────────────────────────────────────────
 	gameRoot, _ := app.getGameState()
 	gameVer := detectGameVersion(gameRoot)
@@ -990,7 +985,6 @@ func (app *App) buildTopPanel(filterSelectWithSize, searchBar fyne.CanvasObject)
 		searchBar,
 		widget.NewSeparator(),
 		app.btnCheckUpdates,
-		// app.btnUpdateAll,
 		widget.NewSeparator(),
 		app.btnToggle,
 		widget.NewSeparator(),

@@ -1,5 +1,5 @@
 {
-	"version": "3.0.0",
+	"version": "3.0.1",
 
 	"obsolete_mods": [
 		"ads_crosshair",
@@ -55,7 +55,6 @@
 		"MutePerilSounds",
 		"Nakedtide",
 		"no_chitchat",
-		"no_sway",
 		"NoLetterbox",
 		"NoSkull",
 		"NPCLookLoadouts",
@@ -450,7 +449,6 @@
 		{ "mod1": "DarktideNetworkMonitor",	"mod2": "DisplayPing" },
 		{ "mod1": "DarktideNetworkMonitor",	"mod2": "PingMonitor" },
 		{ "mod1": "Decode_Helper",			"mod2": "DecodeMinigameSolver" },
-		{ "mod1": "Decode_Helper",			"mod2": "MatchingMinigameSolver" },
 		{ "mod1": "DecodeMinigameSolver",	"mod2": "MatchingMinigameSolver" },
 		{ "mod1": "default_to_strike_team",	"mod2": "PartyChatFix",				"type": "same" },
 		{ "mod1": "DialogueCodex",			"mod2": "Valkyrie",

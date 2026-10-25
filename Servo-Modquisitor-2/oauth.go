@@ -430,6 +430,16 @@ func (app *App) saveOAuthTokens(access, refresh string, expiry time.Time) error 
 //     не открывала десяток окон. Флаг сбрасывается через 10 секунд
 //     или при успешном логине.
 func (app *App) handleAuthExpired() {
+	// Если пользователь явно отказался от OAuth — молча выходим.
+	// Это позволяет использовать программу как локальный менеджер
+	// без каких-либо сетевых запросов к Nexus.
+	app.cfgMutex.RLock()
+	suppress := app.cfg.SuppressOAuthPrompt
+	app.cfgMutex.RUnlock()
+	if suppress {
+		app.loggedIn.Store(false)
+		return
+	}
 	// CompareAndSwap атомарно проверяет «уже обрабатываем?».
 	// Если кто-то другой уже вызвал эту функцию и окно висит —
 	// молча выходим.
@@ -456,17 +466,28 @@ func (app *App) handleAuthExpired() {
 			app.msg("oauth_expired_title"),
 			app.msg("oauth_expired_message"),
 			func(choice int) {
-				if choice == 0 {
+				switch choice {
+				case 0:
 					// Пользователь нажал «Login with Nexus» —
 					// запускаем OAuth-флоу. Он откроет браузер,
 					// после успеха вернётся на /callback и
 					// saveOAuthTokens переключит индикатор обратно
 					// на зелёный.
 					go app.startOAuthFlow()
+				case 2:
+					// Пользователь нажал «Skip (Don't ask again)»
+					app.cfgMutex.Lock()
+					app.cfg.SuppressOAuthPrompt = true
+					app.cfgMutex.Unlock()
+					app.saveConfigSafe()
+					app.appendLogToFile("OAuth prompt suppressed by user choice")
+					// Обновляем меню, чтобы галочка в пункте «Nexus» визуально включилась
+					app.mainWindow.SetMainMenu(app.buildMainMenu())
 				}
 			},
 			app.msg("menu_nexus_login"), // «Login with Nexus (OAuth)»
 			app.msg("btn_cancel"),
+			app.msg("download_skip_forever"),
 		)
 	})
 

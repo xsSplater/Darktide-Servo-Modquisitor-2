@@ -1399,20 +1399,6 @@
 		"es": "Mueve los mods seleccionados una línea hacia arriba.",
 	 "pt-BR": "Move os mods selecionados uma linha para cima."
 	},
-	"btn_update_all_premium_only": {
-		"de": "Aktualisiert alle Mods in der Liste. Nexus Premium ist erforderlich, um aus dem Programm heraus zu aktualisieren (Website-Einschränkung)!\n\nDu kannst aber dem Nexus-Link folgen und dort auf \"Mod manager download\" klicken, um den Mod schnell zu aktualisieren.",
-		"en": "Updates all mods in the list. Nexus Premium is required to update from within the program (site limitation)!\n\nBut you can follow the Nexus link and click \"Mod manager download\" there to quickly update the mod.",
-		"es": "Actualiza todos los mods de la lista. ¡Se requiere Nexus Premium para actualizar desde el programa (limitación del sitio)!\n\nPero puedes seguir el enlace de Nexus y hacer clic en \"Mod manager download\" allí para actualizar el mod rápidamente.",
-		"fr": "Met à jour tous les mods de la liste. Un compte Nexus Premium est requis pour mettre à jour depuis le programme (limitation du site) !\n\nMais vous pouvez suivre le lien Nexus et cliquer sur \"Mod manager download\" pour mettre à jour le mod rapidement.",
-		"it": "Aggiorna tutte le mod nella lista. È richiesto Nexus Premium per aggiornare dall'interno del programma (limitazione del sito)!\n\nMa puoi seguire il link di Nexus e cliccare su \"Mod manager download\" per aggiornare rapidamente il mod.",
-		"ja": "リスト内のすべてのMODを更新します。プログラムから更新するにはNexus Premiumが必要です（サイト側の制限）！\n\nただし、Nexusのリンクを開き、そこでMod manager downloadをクリックすれば、MODを素早く更新できます。",
-		"ko": "목록의 모든 모드를 업데이트합니다. 프로그램 내에서 업데이트하려면 Nexus 프리미엄이 필요합니다(사이트 제한)!\n\n하지만 Nexus 링크를 열고 거기서 Mod manager download를 클릭하면 모드를 빠르게 업데이트할 수 있습니다.",
-		"pl": "Aktualizuje wszystkie mody na liście. Do aktualizacji z poziomu programu wymagane jest Nexus Premium (ograniczenie strony)!\n\nMożesz jednak otworzyć link do Nexusa i kliknąć tam \"Mod manager download\", aby szybko zaktualizować mod.",
-	 "pt-BR": "Atualiza todos os mods na lista. É necessário Nexus Premium para atualizar de dentro do programa (limitação do site)!\n\nMas você pode seguir o link do Nexus e clicar em \"Mod manager download\" lá para atualizar o mod rapidamente.",
-		"ru": "Обновляет все моды в списке. Требуется премиум Нексус для обновления из программы (ограничение сайта)!\n\nНо вы можете перейти по ссылке на Нексус и нажать там \"Mod manager download\", чтобы быстро обновить мод.",
-   "zh-hans": "更新列表中的所有模组。需要 Nexus 高级会员才能从程序内更新（网站限制）！\n\n但你可以打开 Nexus 链接并在那里点击 Mod manager download，以快速更新模组。",
-   "zh-hant": "更新列表中的所有模組。需要 Nexus 高級會員才能從程式內更新（網站限制）！\n\n但你可以開啟 Nexus 連結並在那裡點擊 Mod manager download，以快速更新模組。"
-	},
 	"btn_update_mod_premium_only": {
 		"de": "Aktualisiert den Mod schnell. Nexus Premium ist erforderlich, um aus dem Programm heraus zu aktualisieren (Website-Einschränkung)!\n\nDu kannst aber dem Nexus-Link folgen und dort auf \"Mod manager download\" klicken, um den Mod schnell zu aktualisieren.",
 		"en": "Updates mod quickly. Nexus Premium is required to update from within the program (site limitation)!\n\nBut you can follow the Nexus link and click \"Mod manager download\" there to quickly update the mod.",
@@ -6383,18 +6369,18 @@
 	 "pt-BR": "Desconectado do Nexus Mods."
 	},
 	"oauth_success_title": {
-		"en": "✅ Login Successful",
-		"ru": "✅ Вход выполнен",
-   "zh-hans": "✅ 登录成功",
-   "zh-hant": "✅ 登入成功",
-		"de": "✅ Anmeldung erfolgreich",
-		"fr": "✅ Connexion réussie",
-		"ja": "✅ ログイン成功",
-		"ko": "✅ 로그인 성공",
-		"it": "✅ Accesso riuscito",
-		"pl": "✅ Pomyślnie zalogowano",
-		"es": "✅ Inicio de sesión exitoso",
-	 "pt-BR": "✅ Login bem-sucedido"
+		"en": "Login Successful",
+		"ru": "Вход выполнен",
+   "zh-hans": "登录成功",
+   "zh-hant": "登入成功",
+		"de": "Anmeldung erfolgreich",
+		"fr": "Connexion réussie",
+		"ja": "ログイン成功",
+		"ko": "로그인 성공",
+		"it": "Accesso riuscito",
+		"pl": "Pomyślnie zalogowano",
+		"es": "Inicio de sesión exitoso",
+	 "pt-BR": "Login bem-sucedido"
 	},
 	"oauth_success_message": {
 		"en": "You have successfully logged in to your Nexus Mods account.",
@@ -12016,5 +12002,20 @@
 		"ru": "Установка завершена. Хотите проверить обновления для всех установленных модов? Авторы коллекций иногда указывают не самые свежие версии.",
    "zh-hans": "安装完成。是否要为所有已安装的模组检查更新？合集作者有时会指定不是最新的版本。",
    "zh-hant": "安裝完成。是否要為所有已安裝的模組檢查更新？合集作者有時會指定不是最新的版本。"
+	},
+
+	"setting_suppress_oauth_prompt": {
+		"de": "Nicht zur Anmeldung auffordern",
+		"en": "Do not prompt for account login",
+		"es": "No sugerir inicio de sesión",
+		"fr": "Ne pas suggérer la connexion au compte",
+		"it": "Non suggerire l'accesso all'account",
+		"ja": "アカウントログインを促さない",
+		"ko": "계정 로그인 제안 안 함",
+		"pl": "Nie sugeruj logowania do konta",
+	 "pt-BR": "Não sugerir login na conta",
+		"ru": "Не предлагать вход в аккаунт",
+   "zh-hans": "不提示登录账号",
+   "zh-hant": "不提示登入帳號"
 	}
 }
