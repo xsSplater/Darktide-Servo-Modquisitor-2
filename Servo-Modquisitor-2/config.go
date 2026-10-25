@@ -11,17 +11,24 @@ import (
 // ───────────── Программа ─────────────────────────────────────────
 const (
 	AppName         = "Servo-Modquisitor-2"
-	AppVersion      = "5.0.2"
+	AppVersion      = "5.0.3"
 	AppID           = "com.xssplater.servo-modquisitor"
 	AppIcon         = "assets/icon.png"
 	ConfigFolderSMQ = "Servo-Modquisitor"
 	DarktideAppID   = "1361210"
 	MaxLogFileSize  = 512 * 1024 // 512 Кб, 1*1024*1024 = 1 Мб
 
-	// Limitations for unpacking archives
-	MaxArchiveSize   = 500 * 1024 * 1024      // 500 MB is the maximum downloadable archive size.
-	MaxExtractedSize = 1 * 1024 * 1024 * 1024 // 1 GB is the maximum total volume of unpacked data
-	MaxFileSize      = 500 * 1024 * 1024      // 500 MB is the maximum size of a single file within an archive.
+	// Максимальный размер скачиваемого архива.
+	MaxArchiveSize int64 = 2 * 1024 * 1024 * 1024 // 2 GB (сам архив)
+
+	// Максимальный размер одного файла внутри архива.
+	// Увеличен до 2 ГБ — модель NLLB-200 идёт одним файлом.
+	MaxFileSize int64 = 2 * 1024 * 1024 * 1024
+
+	// Максимальный суммарный размер распакованных данных.
+	// Увеличен до 4 ГБ, чтобы вмещать тяжёлые моды вроде
+	// Auto Translate с офлайн-моделью ~1.4 ГБ.
+	MaxExtractedSize int64 = 4 * 1024 * 1024 * 1024
 
 	NexusModIDForUpdates = 139 // Nexus ID SMQ для обновлений программы и файлов сортировки
 

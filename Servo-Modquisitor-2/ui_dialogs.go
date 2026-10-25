@@ -1515,7 +1515,18 @@ func (app *App) showRestoreBackupDialog() {
 			})
 		}()
 	}, app.mainWindow)
+
 	fd.SetFilter(storage.NewExtensionFileFilter([]string{".zip"}))
+
+	if dir := app.backupsDir(); dir != "" {
+		uri := storage.NewFileURI(dir)
+		if lister, err := storage.ListerForURI(uri); err == nil {
+			fd.SetLocation(lister)
+		} else {
+			app.appendLogToFile(fmt.Sprintf("showRestoreBackupDialog: can't list backups dir: %v", err))
+		}
+	}
+
 	fd.Show()
 	fd.Resize(fyne.NewSize(FileDialogWidth, FileDialogHeight))
 }
