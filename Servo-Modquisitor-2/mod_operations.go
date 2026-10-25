@@ -1847,6 +1847,7 @@ func (app *App) removeSelectedMods() {
 	}
 
 	go func() {
+		// Создаем прогресс-бар (выполняется в UI-потоке)
 		_, closeDialog := app.showInfiniteProgressDialog(
 			app.msg("removing_mods_title"),
 			app.msg("removing_mods_message"),
@@ -1856,6 +1857,7 @@ func (app *App) removeSelectedMods() {
 
 		// Batch-удаление.
 		checks.RemoveMods(selectedNames)
+
 		for _, name := range selectedNames {
 			app.removeModFromData(name)
 			app.removeModFromCache(name)
@@ -1932,9 +1934,6 @@ func (app *App) removeAllMods() {
 
 	app.updateTableBorder()
 	app.updateDescriptionForMod("")
-	app.refreshModList()
-	app.filterModList()
-	app.forceRefreshTable()
 
 	go func() {
 		defer func() {
