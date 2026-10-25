@@ -605,6 +605,22 @@ func (app *App) buildMainMenu() *fyne.MainMenu {
 	autoSortLaunchItem.CheckedIcon = checkedIcon
 	autoSortLaunchItem.UncheckedIcon = uncheckedIcon
 
+	// Auto activate mods after install/update.
+	app.cfgMutex.RLock()
+	autoActivate := app.cfg.AutoActivateModsEnabled()
+	app.cfgMutex.RUnlock()
+	autoActivateItem := fyne.NewMenuItem(app.msg("setting_auto_activate_mods"), func() {
+		app.cfgMutex.Lock()
+		v := !app.cfg.AutoActivateModsEnabled()
+		app.cfg.AutoActivateMods = &v
+		app.cfgMutex.Unlock()
+		app.saveConfigSafe()
+		app.mainWindow.SetMainMenu(app.buildMainMenu())
+	})
+	autoActivateItem.Checked = autoActivate
+	autoActivateItem.CheckedIcon = checkedIcon
+	autoActivateItem.UncheckedIcon = uncheckedIcon
+
 	// SETTINGS MENU
 	settingsMenu := fyne.NewMenuWithIcon(app.msg("menu_settings"), loadMenuIcon("cog.png"),
 		langMenu,
@@ -619,6 +635,7 @@ func (app *App) buildMainMenu() *fyne.MainMenu {
 		autoFocusItem,
 		autoConfirmItem,
 		autoSortLaunchItem,
+		autoActivateItem,
 		fyne.NewMenuItemSeparator(),
 		changePathItem,
 		createShortcutItem,

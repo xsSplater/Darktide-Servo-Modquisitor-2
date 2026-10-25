@@ -1664,6 +1664,12 @@ func (app *App) resolveModIDAndVersion(archivePath, installedName, knownVersion 
 // Вся работа идёт в главном потоке Fyne.
 // finalizeModInstallUI получает modID, чтобы корректно сигналить батч.
 func (app *App) finalizeModInstallUI(installedName string, modID int, activate bool, archivePath string) {
+	// Читаем настройку ДО fyne.DoAndWait — по правилу
+	// «захватил → скопировал → отпустил → UI».
+	app.cfgMutex.RLock()
+	autoActivate := app.cfg.AutoActivateModsEnabled()
+	app.cfgMutex.RUnlock()
+
 	fyne.DoAndWait(func() {
 		app.appendLogToFile("InstallModFromArchive: entering fyne.DoAndWait")
 
@@ -1671,8 +1677,9 @@ func (app *App) finalizeModInstallUI(installedName string, modID int, activate b
 		app.refreshModList()
 		app.appendLogToFile("InstallModFromArchive: after refreshModList")
 
-		// 2. ТЕПЕРЬ включаем его, так как он уже есть в списке
-		if activate {
+		// 2. ТЕПЕРЬ включаем его, так как он уже есть в списке.
+		// Уважаем настройку «Автовключение модов после установки».
+		if activate && autoActivate {
 			app.modsMutex.Lock()
 			for i := range app.allMods {
 				if app.allMods[i].Name == installedName {

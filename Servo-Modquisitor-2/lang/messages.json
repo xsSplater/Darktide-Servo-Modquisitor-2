@@ -12017,5 +12017,20 @@
 		"ru": "Не предлагать вход в аккаунт",
    "zh-hans": "不提示登录账号",
    "zh-hant": "不提示登入帳號"
+	},
+
+	"setting_auto_activate_mods": {
+		"de": "Mods nach Installation automatisch aktivieren",
+		"en": "Auto-enable mods after install",
+		"es": "Activar mods automáticamente tras la instalación",
+		"fr": "Activer automatiquement les mods après installation",
+		"it": "Attiva automaticamente i mod dopo l'installazione",
+		"ja": "インストール後にMODを自動で有効化",
+		"ko": "설치 후 모드 자동 활성화",
+		"pl": "Automatycznie włączaj mody po instalacji",
+	 "pt-BR": "Ativar mods automaticamente após instalação",
+		"ru": "Автовключение модов после установки",
+   "zh-hans": "安装后自动启用模组",
+   "zh-hant": "安裝後自動啟用模組"
 	}
 }

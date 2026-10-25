@@ -80,6 +80,11 @@ type Config struct {
 	// при старте и при 401. Пользователь явно отказался от OAuth.
 	// Программа продолжает работать в ручном режиме.
 	SuppressOAuthPrompt bool `json:"suppress_oauth_prompt"`
+
+	// AutoActivateMods — автоматически включать мод в load order сразу
+	// после скачивания/установки. Дефолт: включено (nil трактуется как
+	// «да»), чтобы старый config.json без этого ключа не менял поведение.
+	AutoActivateMods *bool `json:"auto_activate_mods,omitempty"`
 }
 
 type ModVersionInfo struct {
@@ -2219,6 +2224,12 @@ func (c Config) AutoFocusEnabled() bool {
 // согласиться.
 func (c Config) AutoConfirmDownloadEnabled() bool {
 	return c.AutoConfirmDownload != nil && *c.AutoConfirmDownload
+}
+
+// AutoActivateModsEnabled — включать ли мод в load order
+// автоматически после установки. Дефолт: включено.
+func (c Config) AutoActivateModsEnabled() bool {
+	return c.AutoActivateMods == nil || *c.AutoActivateMods
 }
 
 // RemoveDirWithTrashFallback перемещает директорию в системную корзину.

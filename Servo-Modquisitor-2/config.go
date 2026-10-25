@@ -11,7 +11,7 @@ import (
 // ───────────── Программа ─────────────────────────────────────────
 const (
 	AppName         = "Servo-Modquisitor-2"
-	AppVersion      = "5.0.3"
+	AppVersion      = "5.0.4"
 	AppID           = "com.xssplater.servo-modquisitor"
 	AppIcon         = "assets/icon.png"
 	ConfigFolderSMQ = "Servo-Modquisitor"

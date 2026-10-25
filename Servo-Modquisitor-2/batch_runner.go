@@ -28,16 +28,24 @@ func (app *App) runBatchRunner(d *BatchDialog, cancelChan <-chan struct{}) {
 	// Отложенная функция, которая сработает даже при отмене или ошибке
 	defer func() {
 		if d.mode == BatchModeInstall || d.mode == BatchModeUpdate {
-			// Принудительно включаем все не-системные моды
-			app.modsMutex.Lock()
-			for i := range app.allMods {
-				if !app.allMods[i].IsSystem {
-					app.allMods[i].Active = true
-				}
-			}
-			app.modsMutex.Unlock()
+			// Читаем настройку до UI-вызовов — по правилу
+			// «захватил → скопировал → отпустил → UI».
+			app.cfgMutex.RLock()
+			autoActivate := app.cfg.AutoActivateModsEnabled()
+			app.cfgMutex.RUnlock()
 
-			app.saveCurrentOrder()
+			if autoActivate {
+				// Принудительно включаем все не-системные моды
+				app.modsMutex.Lock()
+				for i := range app.allMods {
+					if !app.allMods[i].IsSystem {
+						app.allMods[i].Active = true
+					}
+				}
+				app.modsMutex.Unlock()
+
+				app.saveCurrentOrder()
+			}
 			if err := app.syncActiveProfileFromGame(); err != nil {
 				app.appendLogToFile(fmt.Sprintf("Batch: sync failed: %v", err))
 			}
