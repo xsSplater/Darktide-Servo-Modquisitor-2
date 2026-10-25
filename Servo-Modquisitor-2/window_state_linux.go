@@ -20,6 +20,9 @@ func maximizeWindowByTitle(title string) {
 
 // isWindowMaximized на Linux без прямых X11-биндингов проверить сложно,
 // поэтому возвращаем false, чтобы не мешать сохранению текущих размеров.
-func isWindowMaximized(title string) bool {
+func isWindowMaximized(_ string) bool {
+	// На Linux состояние «развёрнуто» через WM-независимый API
+	// не читается. Возвращаем false — при следующем старте
+	// окно откроется в сохранённом размере.
 	return false
 }

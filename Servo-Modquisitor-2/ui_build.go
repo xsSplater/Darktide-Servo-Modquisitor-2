@@ -1333,7 +1333,7 @@ func (app *App) reassignSelectionAfterUncheck(name string) {
 }
 
 // buildActiveCheckboxColumn - колонка 1: чекбокс активности мода.
-func (app *App) buildActiveCheckboxColumn(row int, mod *checks.ModInfo) fyne.CanvasObject {
+func (app *App) buildActiveCheckboxColumn(_ int, mod *checks.ModInfo) fyne.CanvasObject {
 	if mod.IsSystem {
 		// Системные моды всегда включены, просто показываем иконку "on"
 		img := app.statusIcon("on")

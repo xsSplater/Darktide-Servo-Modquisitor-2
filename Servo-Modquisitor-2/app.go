@@ -1990,15 +1990,6 @@ func (app *App) syncLoadOrderToGameLocked() {
 	}
 }
 
-// syncLoadOrderToGame — публичная обёртка: берёт loadOrderMutex и
-// делегирует в locked-версию. Используется там, где вызывающий не
-// держит мьютекс (например, из InstallModFromArchive).
-func (app *App) syncLoadOrderToGame() {
-	app.loadOrderMutex.Lock()
-	defer app.loadOrderMutex.Unlock()
-	app.syncLoadOrderToGameLocked()
-}
-
 // performFirstRunSetup помечает первичную настройку завершённой и
 // запускает мастер установки. Единственное место, откуда мастер
 // стартует автоматически — так первичный запуск остаётся линейным

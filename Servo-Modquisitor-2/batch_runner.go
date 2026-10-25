@@ -143,7 +143,7 @@ func (app *App) runBatchRunner(d *BatchDialog, cancelChan <-chan struct{}) {
 }
 
 // downloadAndInstallBatchItem — скачивает и устанавливает один мод.
-func (app *App) downloadAndInstallBatchItem(ctx context.Context, item *BatchItem, d *BatchDialog) error {
+func (app *App) downloadAndInstallBatchItem(ctx context.Context, item *BatchItem, _ *BatchDialog) error {
 	directURL, filename, err := app.getPremiumDownloadURL(
 		fmt.Sprintf("%d", item.NexusModID), fmt.Sprintf("%d", item.FileID))
 	if err != nil {

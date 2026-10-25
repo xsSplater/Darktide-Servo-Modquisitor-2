@@ -99,33 +99,6 @@ func (app *App) makeCRTGradient(w, h int) *image.NRGBA {
 	return img
 }
 
-func (app *App) makeRedCRTGradient(w, h int) *image.NRGBA {
-	img := image.NewNRGBA(image.Rect(0, 0, w, h))
-	centerX, centerY := float64(w)/2, float64(h)/2
-	maxDist := math.Sqrt(centerX*centerX + centerY*centerY)
-	for y := 0; y < h; y++ {
-		for x := 0; x < w; x++ {
-			dx, dy := float64(x)-centerX, float64(y)-centerY
-			dist := math.Sqrt(dx*dx+dy*dy) / maxDist
-			t := math.Pow(dist, 1.5)
-			r := uint8(220 - 180*t)
-			g := uint8(30 - 25*t)
-			b := uint8(20 - 15*t)
-			if r < 40 {
-				r = 40
-			}
-			if g < 5 {
-				g = 5
-			}
-			if b < 5 {
-				b = 5
-			}
-			img.Set(x, y, color.NRGBA{R: r, G: g, B: b, A: 180})
-		}
-	}
-	return img
-}
-
 // runAllChecks — обёртка для кнопки «Автосортировка» и Ctrl+T.
 // Открывает mod_load_order.txt (если включена настройка
 // ShowModListAfterSort) после завершения проверок.

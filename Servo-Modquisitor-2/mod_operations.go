@@ -545,13 +545,6 @@ func (app *App) handleDrop(uris []fyne.URI) {
 	}
 }
 
-func (app *App) extractArchive(archivePath string) error {
-	app.cfgMutex.RLock()
-	modsPath := app.cfg.ModsPath
-	app.cfgMutex.RUnlock()
-	return app.extractArchiveTo(archivePath, modsPath)
-}
-
 func (app *App) has7z() bool {
 	_, err := exec.LookPath("7z")
 	return err == nil
@@ -1127,44 +1120,6 @@ func (app *App) moveSelectedToPosition() {
 	app.filterModList()
 	app.applySelectionFromMods()
 	app.forceRefreshTable()
-}
-
-// findModIndexByName — публичная версия, берёт RLock.
-// Использовать только когда мьютекс НЕ удерживается вызывающим.
-func (app *App) findModIndexByName(name string) int {
-	app.modsMutex.RLock()
-	defer app.modsMutex.RUnlock()
-	return app.findModIndexByNameLocked(name)
-}
-
-// findModIndexByNameLocked — вызывающий ОБЯЗАН держать modsMutex
-// (RLock или Lock). Реентерабельности в RWMutex нет, поэтому
-// внутри уже взятых блокировок надо звать только эту версию.
-func (app *App) findModIndexByNameLocked(name string) int {
-	for i, m := range app.allMods {
-		if m.Name == name {
-			return i
-		}
-	}
-	return -1
-}
-
-func (app *App) selectModByName(name string) {
-	// (#4) Снимок displayedMods — под RLock, чтобы итерация не гонялась
-	// с параллельной перестройкой в filterModList.
-	app.modsMutex.RLock()
-	names := make([]string, len(app.displayedMods))
-	for i := range app.displayedMods {
-		names[i] = app.displayedMods[i].Name
-	}
-	app.modsMutex.RUnlock()
-
-	for i, n := range names {
-		if n == name {
-			app.modTable.Select(widget.TableCellID{Row: i, Col: 0}, 0)
-			break
-		}
-	}
 }
 
 // archiveKind — классификация содержимого распакованного архива.
@@ -1820,7 +1775,7 @@ func (app *App) updateModFromNexus(mod *checks.ModInfo, skipConfirm bool) {
 }
 
 // doUpdateModFromNexus - выполняет фактическое обновление (без лишних диалогов).
-func (app *App) doUpdateModFromNexus(mod *checks.ModInfo, modID int, modIDStr, cacheKey string, skipConfirm bool) {
+func (app *App) doUpdateModFromNexus(mod *checks.ModInfo, modID int, modIDStr, _ string, skipConfirm bool) {
 	fileInfo, err := app.getLatestFileInfoForMod(modID, mod.Name)
 	if err != nil {
 		app.logNexusError(err, mod.Name)
@@ -1837,107 +1792,6 @@ func (app *App) doUpdateModFromNexus(mod *checks.ModInfo, modID int, modIDStr, c
 		app.startDownload(directURL, filename, mod.Name, fileInfo, modIDStr)
 	} else {
 		app.showDownloadDialog(directURL, filename, mod.Name, fileInfo, modIDStr)
-	}
-}
-
-// Обновление всех модов (только те, у которых есть обновление). Только для Premium-пользователей!
-func (app *App) updateAllModsFromNexus() {
-	app.appendLog(app.msg("log_starting_batch_update"))
-	if app.getAuthToken() == "" {
-		app.appendLog(app.msg("nexus_api_key_missing"))
-		return
-	}
-
-	app.appendLog(app.msg("log_collecting_mods"))
-	var updateItems []*BatchItem
-
-	bar, label, cancelChan, closeDialog := app.showProgressDialog(
-		app.msg("update_title"),
-		app.msg("collecting_mods_for_update"),
-	)
-	defer closeDialog()
-
-	app.modsMutex.RLock()
-	allModsCopy := make([]checks.ModInfo, len(app.allMods))
-	copy(allModsCopy, app.allMods)
-	app.modsMutex.RUnlock()
-
-	totalMods := 0
-	for _, mod := range allModsCopy {
-		if mod.URL != "" && !mod.IsSystem {
-			totalMods++
-		}
-	}
-
-	processed := 0
-	for i := range allModsCopy {
-		select {
-		case <-cancelChan:
-			return
-		default:
-		}
-
-		mod := &allModsCopy[i]
-		if mod.URL == "" || mod.IsSystem || app.isSymlinkFolder(mod.Name) {
-			processed++
-			continue
-		}
-
-		modID := helpers.ExtractModIDFromURL(mod.URL)
-		if modID == 0 {
-			processed++
-			continue
-		}
-
-		fileInfo, err := app.getLatestFileInfoForMod(modID, mod.Name)
-		if err != nil {
-			app.logNexusError(err, mod.Name)
-			processed++
-			continue
-		}
-
-		cacheKey := fmt.Sprintf("%d:%s", modID, mod.Name)
-		saved, exists := app.getCachedVersion(cacheKey)
-
-		// СТАЛО: Сравниваем версии, а если дата есть, то и её
-		if exists && saved.Source != "manual" && saved.Version != "" &&
-			(compareVersions(fileInfo.Version, saved.Version) > 0 || (saved.Timestamp != 0 && fileInfo.UploadedTimestamp > saved.Timestamp)) {
-
-			item := &BatchItem{
-				ID:          mod.Name,
-				Name:        mod.DisplayName,
-				Description: mod.Description,
-				Version:     fileInfo.Version,
-				NexusModID:  modID,
-				FileID:      fileInfo.ID,
-				Selected:    true,
-				Status:      BatchPending,
-				Author:      mod.Author,
-				Category:    mod.Category,
-				PictureURL:  mod.NexusPictureURL,
-			}
-			cl, _ := app.FetchChangelog(modID, fileInfo.ID)
-			item.Changelog = cl
-			updateItems = append(updateItems, item)
-		}
-
-		processed++
-		if processed%5 == 0 || processed == totalMods {
-			fyne.Do(func() {
-				bar.SetValue(float64(processed) / float64(totalMods))
-				label.SetText(fmt.Sprintf(app.msg("collecting_mods_x_y"), processed, totalMods))
-			})
-		}
-	}
-
-	closeDialog()
-
-	if len(updateItems) > 0 {
-		fyne.Do(func() {
-			app.showBatchDialog(app.msg("batch_title_updates"), updateItems, BatchModeUpdate)
-		})
-	} else {
-		app.appendLog(app.msg("no_updates_found"))
 	}
 }
 

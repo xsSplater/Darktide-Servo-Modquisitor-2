@@ -86,18 +86,3 @@ func isSteamRunning() bool {
 	}
 	return false
 }
-
-// isSteamClientReady сообщает, что клиент Steam полностью поднялся.
-// На Linux steamwebhelper называется steamwebhelper (нативная версия)
-// или com.valvesoftware.Steam... (Flatpak). Плюс — признак готовности:
-// процесс висит больше секунды.
-func isSteamClientReady() bool {
-	if err := exec.Command("pgrep", "-x", "steamwebhelper").Run(); err == nil {
-		return true
-	}
-	// Flatpak: steamwebhelper внутри sandbox
-	if err := exec.Command("pgrep", "-f", "steamwebhelper").Run(); err == nil {
-		return true
-	}
-	return false
-}

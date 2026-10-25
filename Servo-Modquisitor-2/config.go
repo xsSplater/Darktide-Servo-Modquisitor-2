@@ -39,11 +39,11 @@ const (
 
 // ───────────── Нексус ────────────────────────────────────────────
 const (
-	clientID          = "servomodquisitor2"
-	NexusMainURL      = "https://www.nexusmods.com/"
-	nexusAPIBase      = "https://api.nexusmods.com/v1"
-	nexusV3APIBase    = "https://api.nexusmods.com/v3"
-	gameDomain        = "warhammer40kdarktide"
+	clientID     = "servomodquisitor2"
+	NexusMainURL = "https://www.nexusmods.com/"
+	nexusAPIBase = "https://api.nexusmods.com/v1"
+	// nexusV3APIBase    = "https://api.nexusmods.com/v3"
+	// gameDomain        = "warhammer40kdarktide"
 	oauthAuthorizeURL = "https://users.nexusmods.com/oauth/authorize"
 	oauthTokenURL     = "https://users.nexusmods.com/oauth/token"
 	redirectURI       = "http://localhost:31337/callback" // НЕ менять!

@@ -56,34 +56,6 @@ type amlEdit struct {
 	lists   [3][]string
 }
 
-// amlPresets - копия пресетов из aml.lua
-var amlAfterPresets = map[string][]string{
-	"LogMeIn":             {"dmf"},
-	"DarktideLocalServer": {"dmf", "LogMeIn"},
-	"psych_ward":          {"dmf", "LogMeIn"},
-	"Audio":               {"DarktideLocalServer"},
-	"Rock":                {"Audio"},
-	"UnlimitedPower":      {"Audio"},
-	"Clang":               {"Audio"},
-	"EnemyAudioReplacer":  {"Audio"},
-	"HeKnew":              {"Audio"},
-	"LeeroyJenkins":       {"Audio"},
-}
-
-// before_presets в AML пуст, поэтому оставляем пустым
-var amlBeforePresets = map[string][]string{}
-
-// require_presets для сортировки не нужны, но можно добавить для полноты
-var amlRequirePresets = map[string][]string{
-	"Audio":              {"DarktideLocalServer"},
-	"Rock":               {"Audio"},
-	"UnlimitedPower":     {"Audio"},
-	"Clang":              {"Audio"},
-	"EnemyAudioReplacer": {"Audio"},
-	"HeKnew":             {"Audio"},
-	"LeeroyJenkins":      {"Audio"},
-}
-
 // sectionHeaderKeys maps each editable list (in lists[] order) to its message key.
 var sectionHeaderKeys = [3]string{"aml_editor_load_after", "aml_editor_load_before", "aml_editor_require"}
 
@@ -987,14 +959,4 @@ func sortAlphabetically(configs []checks.AMLModConfig) []checks.AMLModConfig {
 		return strings.ToLower(result[i].Folder) < strings.ToLower(result[j].Folder)
 	})
 	return result
-}
-
-// contains - вспомогательная функция для проверки вхождения строки в срез
-func contains(slice []string, item string) bool {
-	for _, s := range slice {
-		if s == item {
-			return true
-		}
-	}
-	return false
 }
