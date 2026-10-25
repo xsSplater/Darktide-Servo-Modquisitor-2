@@ -1103,7 +1103,7 @@ func (app *App) loadDataAfterInit() {
 	suppressAML := app.cfg.SuppressAMLWarning
 	app.cfgMutex.RUnlock()
 
-	checks.SetTrashFunc(moveToTrash)
+	checks.SetTrashFunc(moveManyToTrash)
 
 	checks.SetLanguage(lang)
 

@@ -1847,12 +1847,22 @@ func (app *App) removeSelectedMods() {
 	}
 
 	go func() {
+		_, closeDialog := app.showInfiniteProgressDialog(
+			app.msg("removing_mods_title"),
+			app.msg("removing_mods_message"),
+			false,
+		)
+		defer closeDialog()
+
+		// Batch-удаление.
+		checks.RemoveMods(selectedNames)
 		for _, name := range selectedNames {
-			checks.RemoveMod(name)
 			app.removeModFromData(name)
 			app.removeModFromCache(name)
 		}
+
 		app.saveCurrentOrder()
+
 		// Используем атомарную синхронизацию, которая также обновляет сигнатуру
 		if err := app.syncActiveProfileFromGame(); err != nil {
 			app.appendLogToFile(fmt.Sprintf("removeSelectedMods: sync failed: %v", err))
@@ -1933,13 +1943,24 @@ func (app *App) removeAllMods() {
 			}
 		}()
 
+		// Показываем индикатор, чтобы пользователь видел, что процесс идёт.
+		// cancellable=false — отмена запрещена, удаление уже началось.
+		_, closeDialog := app.showInfiniteProgressDialog(
+			app.msg("removing_mods_title"),
+			app.msg("removing_mods_message"),
+			false,
+		)
+		defer closeDialog()
+
+		// Batch-удаление: одна IFileOperation на все моды.
+		checks.RemoveMods(mods)
 		for _, name := range mods {
-			checks.RemoveMod(name)
 			app.removeModFromCache(name)
 			app.appendLog(fmt.Sprintf(app.msg("log_deleted"), name))
 		}
 
 		app.saveCurrentOrder()
+
 		// Используем атомарную синхронизацию
 		if err := app.syncActiveProfileFromGame(); err != nil {
 			app.appendLogToFile(fmt.Sprintf("removeAllMods: sync failed: %v", err))

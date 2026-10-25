@@ -98,10 +98,49 @@ const userNotePrefix = "📝 "
 
 // trashFunc — устанавливается из main при старте. Если nil,
 // RemoveMod откатывается на os.RemoveAll.
-var trashFunc func(string) error
+var trashFunc func([]string) error
 
-// SetTrashFunc устанавливает функцию перемещения в системную корзину.
-func SetTrashFunc(fn func(string) error) { trashFunc = fn }
+func SetTrashFunc(fn func([]string) error) { trashFunc = fn }
+
+func RemoveMod(name string) {
+	RemoveMods([]string{name})
+}
+
+// RemoveMods — batch-удаление. На Windows все пути уходят
+// в одну операцию IFileOperation, что радикально быстрее цикла
+// из N отдельных вызовов.
+//
+// Симлинки удаляются сразу через os.Remove: перемещение
+// симлинка в Корзину на Windows не имеет смысла (в Корзину
+// уйдёт только ссылка, а не цель).
+func RemoveMods(names []string) {
+	paths := make([]string, 0, len(names))
+	for _, name := range names {
+		path := filepath.Join(getModsDir(), name)
+		info, err := os.Lstat(path)
+		if err != nil {
+			continue
+		}
+		if info.Mode()&os.ModeSymlink != 0 {
+			_ = os.Remove(path)
+			continue
+		}
+		paths = append(paths, path)
+	}
+	if len(paths) == 0 {
+		return
+	}
+	if trashFunc != nil {
+		if err := trashFunc(paths); err == nil {
+			return
+		}
+	}
+	// Fallback: насовсем. Пользователь увидит предупреждение
+	// (в bulk-операциях — через showInfiniteProgressDialog).
+	for _, p := range paths {
+		_ = os.RemoveAll(p)
+	}
+}
 
 // getModsDir возвращает путь к папке модов.
 func getModsDir() string {
@@ -215,25 +254,6 @@ func FolderExists(name string) bool {
 		return false
 	}
 	return info != nil && info.IsDir()
-}
-
-// Пробуем удалять в Корзину,а не навсегда.
-func RemoveMod(name string) {
-	path := filepath.Join(getModsDir(), name)
-	info, err := os.Lstat(path)
-	if err != nil {
-		return
-	}
-	if info.Mode()&os.ModeSymlink != 0 {
-		_ = os.Remove(path)
-		return
-	}
-	if trashFunc != nil {
-		if err := trashFunc(path); err == nil {
-			return
-		}
-	}
-	_ = os.RemoveAll(path)
 }
 
 func ListModFolders() []string {

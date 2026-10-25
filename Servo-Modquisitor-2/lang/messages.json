@@ -12032,5 +12032,34 @@
 		"ru": "Автовключение модов после установки",
    "zh-hans": "安装后自动启用模组",
    "zh-hant": "安裝後自動啟用模組"
+	},
+
+	"removing_mods_title": {
+		"de": "Mods werden entfernt",
+		"en": "Removing mods",
+		"es": "Eliminando mods",
+		"fr": "Suppression des mods",
+		"it": "Rimozione delle mod",
+		"ja": "MODを削除中",
+		"ko": "모드 제거 중",
+		"pl": "Usuwanie modów",
+	 "pt-BR": "Removendo mods",
+		"ru": "Удаление модов",
+   "zh-hans": "正在删除模组",
+   "zh-hant": "正在刪除模組"
+	},
+	"removing_mods_message": {
+		"de": "Bitte warten…",
+		"en": "Please wait…",
+		"es": "Por favor, espera…",
+		"fr": "Veuillez patienter…",
+		"it": "Attendere prego…",
+		"ja": "お待ちください…",
+		"ko": "잠시만 기다려 주세요…",
+		"pl": "Proszę czekać…",
+	 "pt-BR": "Por favor, aguarde…",
+		"ru": "Пожалуйста, подождите…",
+   "zh-hans": "请稍候…",
+   "zh-hant": "請稍候…"
 	}
 }

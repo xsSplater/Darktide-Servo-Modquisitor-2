@@ -182,9 +182,17 @@ func (app *App) runAllChecksInternal(openFileAtEnd bool) bool {
 	activeNames := []string{}
 	notActive := make(map[string]bool)
 	for _, mod := range app.allMods {
+		// Системные моды (base, dmf, autopatch) загружаются игрой
+		// автоматически и НЕ должны попадать в mod_load_order.txt —
+		// игра выдаст ошибку. Раньше фильтр стоял только в ветке
+		// notActive, а в activeNames системные просачивались
+		// (refreshModList ставит им Active=true).
+		if mod.IsSystem {
+			continue
+		}
 		if mod.Active && checks.FolderExists(mod.Name) {
 			activeNames = append(activeNames, mod.Name)
-		} else if checks.FolderExists(mod.Name) && !mod.IsSystem {
+		} else if checks.FolderExists(mod.Name) {
 			notActive[mod.Name] = true
 		}
 	}

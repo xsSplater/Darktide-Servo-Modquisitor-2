@@ -115,8 +115,15 @@ func CreateLoadOrderFromActive(activeMods []string, lang string) []DanglingDepen
 		logFunc(logCreateMLOT)
 	}
 
+	// Defensive: base, dmf, autopatch загружаются игрой всегда.
+	// Их присутствие в mod_load_order.txt вызывает ошибку в игре.
+	// Фильтр здесь — вторая линия защиты: даже если вызывающий
+	// забыл их отфильтровать, файл не будет испорчен.
 	activeSet := make(map[string]bool)
 	for _, m := range activeMods {
+		if m == "base" || m == "dmf" || m == "autopatch" {
+			continue
+		}
 		activeSet[m] = true
 	}
 
