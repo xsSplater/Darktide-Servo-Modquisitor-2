@@ -1210,6 +1210,16 @@ func (app *App) InstallModFromArchive(archivePath string, activate bool, knownVe
 		return "", "", err
 	}
 	if len(installedNames) == 0 {
+		// Особый случай: архив без папки мода (autopatch — только
+		// binaries/plugins/_dt_mod_autopatch.dll). Бинарники уже
+		// скопированы через installBinaries. Не считаем это ошибкой:
+		// установка фактически удалась.
+		if gameRoot != "" {
+			if info, statErr := os.Stat(filepath.Join(tmpDir, "binaries")); statErr == nil && info.IsDir() {
+				app.appendLogToFile("Binaries-only archive installed to game root (no mod folder)")
+				return "", "", nil
+			}
+		}
 		return "", "", errors.New(app.msg("log_no_mod_folder_found"))
 	}
 	installedName := installedNames[0] // для обратной совместимости возвращаем первый
@@ -1677,22 +1687,28 @@ func (app *App) finalizeModInstallUI(installedName string, modID int, activate b
 		app.refreshModList()
 		app.appendLogToFile("InstallModFromArchive: after refreshModList")
 
-		// 2. ТЕПЕРЬ включаем его, так как он уже есть в списке.
-		// Уважаем настройку «Автовключение модов после установки».
-		if activate && autoActivate {
-			app.modsMutex.Lock()
-			for i := range app.allMods {
-				if app.allMods[i].Name == installedName {
-					app.allMods[i].Active = true
-					break
+		// 2. Активация — только если автовключение включено.
+		// Сохранение load order — всегда: новый мод должен попасть
+		// в mod_load_order.txt (активным или с -- префиксом), иначе
+		// refreshModList/syncActiveProfileFromGame при следующем
+		// проходе рассинхронизируются с allMods и «потеряют»
+		// только что установленные моды.
+		if activate {
+			if autoActivate {
+				app.modsMutex.Lock()
+				for i := range app.allMods {
+					if app.allMods[i].Name == installedName {
+						app.allMods[i].Active = true
+						break
+					}
 				}
+				app.modsMutex.Unlock()
 			}
-			app.modsMutex.Unlock()
 
 			app.orderDirty.Store(true)
 			app.updateTableBorder()
 
-			// 3. Сохраняем порядок уже с включенным модом
+			// 3. Сохраняем порядок — всегда.
 			app.saveCurrentOrder()
 		}
 
@@ -2428,7 +2444,7 @@ func (app *App) updateSelectedMods() {
 	var eligible []*checks.ModInfo
 	for _, name := range selected {
 		mod, ok := app.findModByName(name)
-		if !ok || mod.IsSystem {
+		if !ok {
 			continue
 		}
 		if app.isSymlinkFolder(name) {
@@ -2480,7 +2496,16 @@ func (app *App) updateSelectedMods() {
 			continue
 		}
 
-		fileInfo, err := app.getLatestFileInfoForMod(modID, mod.Name)
+		// Для системных модов используем getLatestFileInfo — он
+		// берёт самый свежий файл, а не по pattern. Это совпадает
+		// с логикой существующих updateDML/updateDMF/updateAutopatcher.
+		var fileInfo *FileInfo
+		var err error
+		if mod.IsSystem {
+			fileInfo, err = app.getLatestFileInfo(modID)
+		} else {
+			fileInfo, err = app.getLatestFileInfoForMod(modID, mod.Name)
+		}
 		if err != nil {
 			app.logNexusError(err, mod.Name)
 			processed++

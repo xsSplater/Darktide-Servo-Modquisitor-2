@@ -34,8 +34,13 @@ func (app *App) runBatchRunner(d *BatchDialog, cancelChan <-chan struct{}) {
 			autoActivate := app.cfg.AutoActivateModsEnabled()
 			app.cfgMutex.RUnlock()
 
+			// Активируем все моды — только если автовключение включено.
+			// Save для случая «autoActivate off» уже сделан внутри
+			// finalizeModInstallUI при установке каждого мода (load order
+			// содержит новый мод как -- name). Поэтому повторный save
+			// здесь не нужен: syncActiveProfileFromGame получит
+			// консистентное состояние.
 			if autoActivate {
-				// Принудительно включаем все не-системные моды
 				app.modsMutex.Lock()
 				for i := range app.allMods {
 					if !app.allMods[i].IsSystem {

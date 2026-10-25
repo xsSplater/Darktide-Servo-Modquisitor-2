@@ -207,7 +207,7 @@ func (app *App) checkNexusUpdates() {
 	app.modsMutex.RUnlock()
 
 	for _, mod := range allModsCopy {
-		if mod.URL != "" && !mod.IsSystem {
+		if mod.URL != "" {
 			totalMods++
 		}
 	}
@@ -221,9 +221,6 @@ func (app *App) checkNexusUpdates() {
 		}
 
 		mod := &allModsCopy[i]
-		if mod.URL == "" || mod.IsSystem {
-			continue
-		}
 		modID := helpers.ExtractModIDFromURL(mod.URL)
 		if modID == 0 {
 			processed++
@@ -235,7 +232,13 @@ func (app *App) checkNexusUpdates() {
 			continue
 		}
 
-		fileInfo, err := app.getLatestFileInfoForMod(modID, mod.Name)
+		var fileInfo *FileInfo
+		var err error
+		if mod.IsSystem {
+			fileInfo, err = app.getLatestFileInfo(modID)
+		} else {
+			fileInfo, err = app.getLatestFileInfoForMod(modID, mod.Name)
+		}
 		if err != nil {
 			app.logNexusError(err, mod.Name)
 			processed++
