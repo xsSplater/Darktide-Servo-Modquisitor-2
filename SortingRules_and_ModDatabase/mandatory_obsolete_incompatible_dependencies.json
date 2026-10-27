@@ -1,5 +1,5 @@
 {
-	"version": "3.0.2",
+	"version": "3.0.3",
 
 	"obsolete_mods": [
 		"ads_crosshair",
@@ -126,6 +126,7 @@
 		"LogMeIn",
 		"Reconnect",
 		"psych_ward",
+		"strategium",
 		"CharacterGrid",
 		"Alfs_DMF_Extensions",
 		"animation_events",
@@ -779,6 +780,8 @@
 		{ "mod1": "state_your_name",		"mod2": "teammate_tracker" },
 		{ "mod1": "state_your_name",		"mod2": "true_level" },
 		{ "mod1": "state_your_name",		"mod2": "who_are_you" },
+		{ "mod1": "strategium",				"mod2": "CustomUIColors" },
+		{ "mod1": "strategium",				"mod2": "psych_ward" },
 		{ "mod1": "Targeter",				"mod2": "crosshair_remap" },
 		{ "mod1": "ToggleQuell",			"mod2": "TapQuell" },
 		{ "mod1": "teammate_tracker",		"mod2": "Do I Know You",			"type": "same" },
@@ -1032,6 +1035,9 @@
 				"url": "https://github.com/Adspartan/For_the_Drip/releases"},
 
 		{"required": "hud_studio",
+			"dependent": "CompactHexagonHud",
+				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1263"},
+		{"required": "hud_studio",
 			"dependent": "CrosshairHexagonHudByHudStudio",
 				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1263"},
 		{"required": "hud_studio",
@@ -1089,6 +1095,10 @@
 		{"required": "MiniAudioAddon",
 			"dependent": "ElevatorMusic",
 				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/665"},
+
+		{"required": "ops_scoreboard",
+			"dependent": "ops_scoreboard_live",
+				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1352"},
 
 		{"required": "PlayerOutlines",
 			"dependent": "outline_colours",
@@ -1222,6 +1232,9 @@
 				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1008"},
 		{"required": "SimpleAssets",
 			"dependent": "Blackjack",
+				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1008"},
+		{"required": "SimpleAssets",
+			"dependent": "CompactHexagonHud",
 				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1008"},
 		{"required": "SimpleAssets",
 			"dependent": "Crosshair Confirmation",
