@@ -675,59 +675,72 @@ func (app *App) confirmRemoveSelectedDescription() {
 		app.msg("confirm_delete_title"),
 		fmt.Sprintf(app.msg("confirm_delete_text"), mod.Name),
 		func() {
-			checks.RemoveMod(modName)
-			app.removeModFromCache(modName)
-			oldIndex, _ := app.removeModFromData(modName)
+			// 1. Фоновая горутина для тяжелой работы
+			go func() {
+				// А. Удаление файла и кэша (безопасно, там свои мьютексы)
+				checks.RemoveMod(modName)
+				app.removeModFromCache(modName)
 
-			app.updateModCounter()
-			app.modTable.Length = func() (int, int) {
-				app.modsMutex.RLock()
-				n := len(app.displayedMods)
-				app.modsMutex.RUnlock()
-				return n, TableColumnCount
-			}
-			app.modTable.Refresh()
-			app.updateTableBorder()
-			app.appendLog(fmt.Sprintf(app.msg("log_deleted"), modName))
+				// Б. Обновление структур данных в памяти
+				// removeModFromData сама захватит modsMutex.Lock(),
+				// изменит данные и отпустит его. UI не трогаем!
+				oldIndex, _ := app.removeModFromData(modName)
 
-			app.saveCurrentOrder()
-			if err := app.syncActiveProfileFromGame(); err != nil {
-				app.appendLogToFile(fmt.Sprintf("confirmRemoveSelectedDescription: sync failed: %v", err))
-			}
-			app.orderDirty.Store(false)
-			app.updateTableBorder()
+				// В. Сохранение и синхронизация профиля (тяжелый I/O)
+				app.saveCurrentOrder()
+				if err := app.syncActiveProfileFromGame(); err != nil {
+					app.appendLogToFile(fmt.Sprintf("confirmRemoveSelectedDescription: sync failed: %v", err))
+				}
 
-			// Обновляем снимок после удаления.
-			app.modsMutex.RLock()
-			displayedNames = displayedNames[:0]
-			for i := range app.displayedMods {
-				displayedNames = append(displayedNames, app.displayedMods[i].Name)
-			}
-			app.modsMutex.RUnlock()
+				// Г. Теперь, когда всё сделано, безопасно обновляем UI
+				fyne.Do(func() {
+					app.updateModCounter()
 
-			if nextModName != "" {
-				for i, n := range displayedNames {
-					if n == nextModName {
-						app.modTable.Select(widget.TableCellID{Row: i, Col: 0}, 0)
-						app.modTable.ScrollTo(widget.TableCellID{Row: i, Col: 0})
-						break
+					app.modTable.Length = func() (int, int) {
+						app.modsMutex.RLock()
+						n := len(app.displayedMods)
+						app.modsMutex.RUnlock()
+						return n, TableColumnCount
 					}
-				}
-			} else if len(displayedNames) > 0 {
-				newIndex := oldIndex
-				if newIndex >= len(displayedNames) {
-					newIndex = len(displayedNames) - 1
-				}
-				if newIndex >= 0 {
-					app.modTable.Select(widget.TableCellID{Row: newIndex, Col: 0}, 0)
-					app.modTable.ScrollTo(widget.TableCellID{Row: newIndex, Col: 0})
-				}
-			} else {
-				app.selectedModName = ""
-				app.selectedModIndex.Store(-1)
-				app.updateDescriptionForMod("")
-				app.updateUpDownButtons()
-			}
+					app.modTable.Refresh()
+
+					app.orderDirty.Store(false)
+					app.updateTableBorder()
+					app.appendLog(fmt.Sprintf(app.msg("log_deleted"), modName))
+
+					// Восстановление выделения
+					app.modsMutex.RLock()
+					displayedNames = displayedNames[:0]
+					for i := range app.displayedMods {
+						displayedNames = append(displayedNames, app.displayedMods[i].Name)
+					}
+					app.modsMutex.RUnlock()
+
+					if nextModName != "" {
+						for i, n := range displayedNames {
+							if n == nextModName {
+								app.modTable.Select(widget.TableCellID{Row: i, Col: 0}, 0)
+								app.modTable.ScrollTo(widget.TableCellID{Row: i, Col: 0})
+								break
+							}
+						}
+					} else if len(displayedNames) > 0 {
+						newIndex := oldIndex
+						if newIndex >= len(displayedNames) {
+							newIndex = len(displayedNames) - 1
+						}
+						if newIndex >= 0 {
+							app.modTable.Select(widget.TableCellID{Row: newIndex, Col: 0}, 0)
+							app.modTable.ScrollTo(widget.TableCellID{Row: newIndex, Col: 0})
+						}
+					} else {
+						app.selectedModName = ""
+						app.selectedModIndex.Store(-1)
+						app.updateDescriptionForMod("")
+						app.updateUpDownButtons()
+					}
+				})
+			}()
 		},
 	)
 }

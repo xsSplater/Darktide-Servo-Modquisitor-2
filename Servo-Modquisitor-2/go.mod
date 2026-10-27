@@ -4,12 +4,12 @@ go 1.27.1
 
 require (
 	fyne.io/fyne/v2 v2.8.2
-	github.com/Bios-Marcel/wastebasket/v2 v2.0.3
 	github.com/STARRY-S/zip v0.2.3
 	github.com/fyne-io/image v0.1.1
 	github.com/jeandeaual/go-locale v0.0.0-20250612000132-0ef82f21eade
 	github.com/lusingander/colorpicker v0.7.5
 	github.com/mholt/archives v0.1.5
+	github.com/xsSplater/xsstrashy v0.5.7
 	github.com/zalando/go-keyring v0.2.8
 	golang.org/x/sys v0.49.0
 )
@@ -33,7 +33,6 @@ require (
 	github.com/go-gl/glfw/v3.4/glfw v0.1.0-pre.2 // indirect
 	github.com/go-text/render v0.2.1 // indirect
 	github.com/go-text/typesetting v0.3.5 // indirect
-	github.com/gobwas/glob v1.0.0 // indirect
 	github.com/godbus/dbus/v5 v5.2.4 // indirect
 	github.com/hashicorp/golang-lru/v2 v2.0.7 // indirect
 	github.com/jsummers/gobmp v0.0.0-20230614200233-a9de23ed2e25 // indirect

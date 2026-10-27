@@ -3,8 +3,12 @@
 // Servo-Modquisitor-2/trash_linux.go
 package main
 
-import "github.com/Bios-Marcel/wastebasket/v2"
+import (
+	"context"
+
+	"github.com/xsSplater/xsstrashy"
+)
 
 func trashPaths(paths []string) error {
-	return wastebasket.Trash(paths...)
+	return xsstrashy.MoveContext(context.Background(), paths...)
 }
