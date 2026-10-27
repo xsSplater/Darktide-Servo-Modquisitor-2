@@ -9,7 +9,7 @@ require (
 	github.com/jeandeaual/go-locale v0.0.0-20250612000132-0ef82f21eade
 	github.com/lusingander/colorpicker v0.7.5
 	github.com/mholt/archives v0.1.5
-	github.com/xsSplater/xsstrashy v0.5.7
+	github.com/xsSplater/xsstrashy v0.5.8
 	github.com/zalando/go-keyring v0.2.8
 	golang.org/x/sys v0.49.0
 )
