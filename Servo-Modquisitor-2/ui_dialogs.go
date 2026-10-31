@@ -1063,6 +1063,20 @@ func (app *App) showCreateProfileDialog() {
 	copyCheck := widget.NewCheck(app.msg("profile_copy_from_current"), nil)
 	copyCheck.SetChecked(true)
 
+	// Предупреждение о создании чистого профиля
+	warningLabel := widget.NewLabel(app.msg("profile_clean_warning"))
+	warningLabel.Wrapping = fyne.TextWrapWord
+	warningLabel.Importance = widget.WarningImportance
+	warningLabel.Hide() // Скрыто по умолчанию
+
+	copyCheck.OnChanged = func(b bool) {
+		if !b {
+			warningLabel.Show()
+		} else {
+			warningLabel.Hide()
+		}
+	}
+
 	var popUp *widget.PopUp
 
 	// Кнопки с центрированием
@@ -1114,6 +1128,7 @@ func (app *App) showCreateProfileDialog() {
 		widget.NewLabel(app.msg("profile_create_message")),
 		entry,
 		copyCheck,
+		warningLabel,
 		widget.NewSeparator(),
 		btnContainer,
 	)
@@ -1500,7 +1515,7 @@ func (app *App) showRestoreBackupDialog() {
 			fyne.Do(func() {
 				app.refreshProfileList()
 				app.appendLog(fmt.Sprintf(app.msg("backup_restored"), profileName))
-				// НОВОЕ: сразу переключаемся на восстановленный профиль,
+				// Сразу переключаемся на восстановленный профиль,
 				// чтобы пользователь увидел сборку и системные файлы подхватились.
 				app.switchProfile(profileName)
 			})

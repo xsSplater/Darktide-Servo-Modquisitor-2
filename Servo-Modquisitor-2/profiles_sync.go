@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strings"
 
 	"fyne.io/fyne/v2"
 )
@@ -130,6 +131,10 @@ func (app *App) syncActiveProfileFromGame() error {
 
 	_ = os.RemoveAll(oldDir)
 	app.updateProfileSyncSignature()
+
+	// Стягиваем актуальные системные файлы из игры в профиль
+	app.copySystemFilesToProfile(app.profilePath(activeProfile))
+
 	return nil
 }
 
@@ -173,6 +178,10 @@ func (app *App) resetGameModsFromActiveProfile() error {
 	}
 
 	app.updateProfileSyncSignature()
+
+	// Раскладываем системные файлы из профиля в игру
+	app.restoreSystemFilesFromProfile(app.profilePath(activeProfile))
+
 	return nil
 }
 
@@ -291,4 +300,155 @@ func (app *App) ResetGameModsWithConfirm() {
 			}()
 		},
 	)
+}
+
+// copySystemFilesToProfile копирует загрузчики, патчи и скрипты из корня игры в папку профиля.
+func (app *App) copySystemFilesToProfile(profilePath string) {
+	gameRoot, _ := app.getGameState()
+	if gameRoot == "" {
+		return
+	}
+
+	// Если это чистый профиль — он не должен хранить системные файлы
+	if fileExists(filepath.Join(profilePath, CleanProfileMarker)) {
+		return
+	}
+
+	// 1. DML (mod_loader)
+	src := filepath.Join(gameRoot, "binaries", "mod_loader")
+	if fileExists(src) {
+		dstDir := filepath.Join(profilePath, "binaries")
+		_ = os.MkdirAll(dstDir, 0755)
+		_ = copyFile(src, filepath.Join(dstDir, "mod_loader"))
+	}
+
+	// 2. Плагины (DMA, Custom Assets и т.д.)
+	pluginsSrc := filepath.Join(gameRoot, "binaries", "plugins")
+	if info, err := os.Stat(pluginsSrc); err == nil && info.IsDir() {
+		entries, _ := os.ReadDir(pluginsSrc)
+		for _, e := range entries {
+			if e.IsDir() {
+				continue
+			}
+			nameLower := strings.ToLower(e.Name())
+			// Пропускаем стандартные DLL игры
+			if strings.Contains(nameLower, "crash_monitor") || strings.Contains(nameLower, "grpc") ||
+				strings.Contains(nameLower, "gwnav") || strings.Contains(nameLower, "lua_cjson") ||
+				strings.Contains(nameLower, "rule_database") || strings.Contains(nameLower, "texturereader") ||
+				strings.Contains(nameLower, "wwise") {
+				continue
+			}
+			// Создаём папку и копируем только если нашли модовый файл
+			dstDir := filepath.Join(profilePath, "binaries", "plugins")
+			_ = os.MkdirAll(dstDir, 0755)
+			_ = copyFile(filepath.Join(pluginsSrc, e.Name()), filepath.Join(dstDir, e.Name()))
+		}
+	}
+
+	// 3. Патч bundle
+	src = filepath.Join(gameRoot, "bundle", "9ba626afa44a3aa3.patch_999")
+	if fileExists(src) {
+		dstDir := filepath.Join(profilePath, "bundle")
+		_ = os.MkdirAll(dstDir, 0755)
+		_ = copyFile(src, filepath.Join(dstDir, "9ba626afa44a3aa3.patch_999"))
+	}
+
+	// 4. Tools
+	toolsSrc := filepath.Join(gameRoot, "tools")
+	if info, err := os.Stat(toolsSrc); err == nil && info.IsDir() {
+		toolsDst := filepath.Join(profilePath, "tools")
+		_ = os.RemoveAll(toolsDst) // Очищаем старую папку в профиле, чтобы не оставалось мусора
+		_ = copyPath(toolsSrc, toolsDst)
+	}
+
+	// 5. Скрипты в корне игры
+	for _, f := range []string{"toggle_darktide_mods.bat", "toggle_dt_mod_autopatch.cmd", "CUSTOM_ASSETS_PATCH.bat"} {
+		src := filepath.Join(gameRoot, f)
+		if fileExists(src) {
+			_ = copyFile(src, filepath.Join(profilePath, f))
+		}
+	}
+}
+
+// restoreSystemFilesFromProfile раскладывает загрузчики, патчи и скрипты из профиля обратно в игру.
+func (app *App) restoreSystemFilesFromProfile(profilePath string) {
+	gameRoot, _ := app.getGameState()
+	if gameRoot == "" {
+		return
+	}
+
+	isClean := fileExists(filepath.Join(profilePath, CleanProfileMarker))
+
+	// 1. DML
+	src := filepath.Join(profilePath, "binaries", "mod_loader")
+	dst := filepath.Join(gameRoot, "binaries", "mod_loader")
+	if fileExists(src) {
+		_ = os.MkdirAll(filepath.Dir(dst), 0755)
+		_ = copyFile(src, dst)
+	} else if isClean {
+		_ = os.Remove(dst) // Удаляем, только если это чистый профиль
+	}
+
+	// 2. Плагины
+	gamePluginsDir := filepath.Join(gameRoot, "binaries", "plugins")
+
+	// Вычищаем модовые DLL из игры, только если профиль чистый
+	if isClean {
+		if info, err := os.Stat(gamePluginsDir); err == nil && info.IsDir() {
+			entries, _ := os.ReadDir(gamePluginsDir)
+			for _, e := range entries {
+				nameLower := strings.ToLower(e.Name())
+				if strings.Contains(nameLower, "crash_monitor") || strings.Contains(nameLower, "grpc") ||
+					strings.Contains(nameLower, "gwnav") || strings.Contains(nameLower, "lua_cjson") ||
+					strings.Contains(nameLower, "rule_database") || strings.Contains(nameLower, "texturereader") ||
+					strings.Contains(nameLower, "wwise") {
+					continue
+				}
+				_ = os.Remove(filepath.Join(gamePluginsDir, e.Name()))
+			}
+		}
+	}
+
+	// Копируем плагины из профиля (если они там есть)
+	pluginsSrc := filepath.Join(profilePath, "binaries", "plugins")
+	if info, err := os.Stat(pluginsSrc); err == nil && info.IsDir() {
+		_ = os.MkdirAll(gamePluginsDir, 0755)
+		entries, _ := os.ReadDir(pluginsSrc)
+		for _, e := range entries {
+			if !e.IsDir() {
+				_ = copyFile(filepath.Join(pluginsSrc, e.Name()), filepath.Join(gamePluginsDir, e.Name()))
+			}
+		}
+	}
+
+	// 3. Патч bundle
+	src = filepath.Join(profilePath, "bundle", "9ba626afa44a3aa3.patch_999")
+	dst = filepath.Join(gameRoot, "bundle", "9ba626afa44a3aa3.patch_999")
+	if fileExists(src) {
+		_ = os.MkdirAll(filepath.Dir(dst), 0755)
+		_ = copyFile(src, dst)
+	} else if isClean {
+		_ = os.Remove(dst)
+	}
+
+	// 4. Tools
+	toolsSrc := filepath.Join(profilePath, "tools")
+	toolsDst := filepath.Join(gameRoot, "tools")
+	if info, err := os.Stat(toolsSrc); err == nil && info.IsDir() {
+		_ = os.RemoveAll(toolsDst)
+		_ = copyPath(toolsSrc, toolsDst)
+	} else if isClean {
+		_ = os.RemoveAll(toolsDst)
+	}
+
+	// 5. Скрипты в корне игры
+	for _, f := range []string{"toggle_darktide_mods.bat", "toggle_dt_mod_autopatch.cmd", "CUSTOM_ASSETS_PATCH.bat"} {
+		src := filepath.Join(profilePath, f)
+		dst := filepath.Join(gameRoot, f)
+		if fileExists(src) {
+			_ = copyFile(src, dst)
+		} else if isClean {
+			_ = os.Remove(dst)
+		}
+	}
 }

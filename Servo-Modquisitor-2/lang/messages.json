@@ -12061,5 +12061,20 @@
 		"ru": "Пожалуйста, подождите…",
    "zh-hans": "请稍候…",
    "zh-hant": "請稍候…"
+	},
+
+	"profile_clean_warning": {
+		"de": "HINWEIS!\nEs wird ein völlig leeres Profil erstellt (ohne DML und DMF).\nVergessen Sie nicht, den Darktide Mod Loader und das Darktide Mod Framework zu installieren, sonst lädt das Spiel Ihre Mods nicht.",
+		"en": "NOTICE!\nA completely clean profile will be created (without DML and DMF).\nDon't forget to install Darktide Mod Loader and Darktide Mod Framework, otherwise the game won't load your mods.",
+		"es": "¡AVISO!\nSe creará un perfil completamente limpio (sin DML y DMF).\nNo olvides instalar Darktide Mod Loader y Darktide Mod Framework, de lo contrario el juego no cargará tus mods.",
+		"fr": "AVIS !\nUn profil complètement propre va être créé (sans DML et DMF).\nN'oubliez pas d'installer Darktide Mod Loader et Darktide Mod Framework, sinon le jeu ne chargera pas vos mods.",
+		"it": "AVVISO!\nVerrà creato un profilo completamente pulito (senza DML e DMF).\nNon dimenticare di installare Darktide Mod Loader e Darktide Mod Framework, altrimenti il gioco non caricherà le tue mod.",
+		"ja": "お知らせ！\n完全にクリーンなプロファイルが作成されます（DMLとDMFなし）。\nDarktide Mod LoaderとDarktide Mod Frameworkをインストールするのを忘れないでください。そうしないと、ゲームがMODを読み込みません。",
+		"ko": "알림!\n완전히 깨끗한 프로필이 생성됩니다(DML 및 DMF 없음).\nDarktide Mod Loader와 Darktide Mod Framework 설치를 잊지 마세요. 그렇지 않으면 게임이 모드를 로드하지 않습니다.",
+		"pl": "UWAGA!\nZostanie utworzony całkowicie czysty profil (bez DML i DMF).\nNie zapomnij zainstalować Darktide Mod Loader i Darktide Mod Framework, w przeciwnym razie gra nie załaduje twoich modów.",
+		"pt-BR": "AVISO!\nUm perfil completamente limpo será criado (sem DML e DMF).\nNão se esqueça de instalar o Darktide Mod Loader e o Darktide Mod Framework, caso contrário o jogo não carregará seus mods.",
+		"ru": "ВНИМАНИЕ!\nБудет создан ПОЛНОСТЬЮ ЧИСТЫЙ ПРОФИЛЬ (без DML и DMF).\nНе забудьте установить Darktide Mod Loader и Darktide Mod Framework, иначе игра не загрузит ваши моды.",
+		"zh-hans": "提示！\n将创建一个完全干净的配置文件（不包含 DML 和 DMF）。\n请不要忘记安装 Darktide Mod Loader 和 Darktide Mod Framework，否则游戏将无法加载你的模组。",
+		"zh-hant": "提示！\n將建立一個完全乾淨的設定檔（不包含 DML 和 DMF）。\n請不要忘記安裝 Darktide Mod Loader 和 Darktide Mod Framework，否則遊戲將無法載入你的模組。"
 	}
 }

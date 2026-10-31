@@ -1558,6 +1558,10 @@ func (app *App) installBinaries(tmpDir, gameRoot string) error {
 		return err
 	}
 	app.appendLog(app.msg("log_binaries_installed_success"))
+
+	// Убираем маркер, так как мы установили DLL
+	app.removeCleanMarker()
+
 	return nil
 }
 
@@ -1997,6 +2001,9 @@ func (app *App) installDMLFromArchive(archivePath string) error {
 	// имя файла архива — runBatchRunner сверит через isSameMod.
 	app.refreshAfterSystemInstall()
 
+	// Убираем маркер чистоты, так как мы установили DML/DMF
+	app.removeCleanMarker()
+
 	return nil
 }
 
@@ -2069,7 +2076,11 @@ func copyPath(src, dst string) error {
 }
 
 func (app *App) installAutopatcherFromArchive(archivePath string) error {
-	return app.installDMLFromArchive(archivePath)
+	err := app.installDMLFromArchive(archivePath)
+	if err == nil {
+		app.removeCleanMarker()
+	}
+	return err
 }
 
 // isNumeric проверяет, состоит ли строка только из цифр
@@ -2574,4 +2585,17 @@ func (app *App) updateSelectedMods() {
 	fyne.Do(func() {
 		app.showBatchDialog(app.msg("batch_title_updates"), batchItems, BatchModeUpdate)
 	})
+}
+
+// removeCleanMarker удаляет маркер чистого профиля, превращая его в обычный, при установке модов.
+func (app *App) removeCleanMarker() {
+	profilePath := app.activeProfilePath()
+	if profilePath == "" {
+		return
+	}
+	markerPath := filepath.Join(profilePath, CleanProfileMarker)
+	if fileExists(markerPath) {
+		_ = os.Remove(markerPath)
+		app.appendLogToFile("Profile is no longer 'clean': removed .clean_profile marker")
+	}
 }

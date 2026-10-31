@@ -402,6 +402,8 @@ type App struct {
 	//   modsMutex    → app.modsMutex    (встроен через ModsState)
 }
 
+const CleanProfileMarker = ".clean_profile"
+
 // msg возвращает перевод по ключу. Безопасно вызывать из любой
 // горутины.
 func (app *App) msg(key string) string {
@@ -1396,6 +1398,9 @@ func (app *App) initProfiles() {
 	app.appendLogToFile(fmt.Sprintf("Active profile: %s", activeProfile))
 	app.updateSorterOutputPath()
 
+	// Вылечиваем старые профили (переносим в них системные файлы)
+	app.migrateOldProfiles()
+
 	fyne.Do(func() {
 		app.refreshProfileList()
 		app.refreshModList()
@@ -1748,6 +1753,9 @@ func (app *App) switchProfileAsync(name string, onDone func()) {
 			return
 		}
 
+		// 4.1. Раскладываем системные файлы (DLL, tools, bat) из профиля в игру
+		app.restoreSystemFilesFromProfile(app.profilePath(name))
+
 		// 4a. Принудительно сбрасываем debounce ДО смены профиля.
 		// Иначе отложенный таймер запишет данные в файл УЖЕ НОВОГО
 		// профиля, а данные в памяти относятся к старому.
@@ -1823,6 +1831,10 @@ func (app *App) createProfile(name string, copyFrom string) error {
 		if err := os.MkdirAll(modsPath, 0755); err != nil {
 			return err
 		}
+
+		// Создаём маркер для чистого профиля
+		markerPath := filepath.Join(app.profilePath(name), CleanProfileMarker)
+		_ = os.WriteFile(markerPath, []byte("This profile is intentionally clean.\n"), 0644)
 		emptyPath := filepath.Join(modsPath, FileNameLoadOrder)
 		if err := os.WriteFile(emptyPath, []byte(""), 0644); err != nil {
 			app.appendLogToFile(fmt.Sprintf("Failed to create empty load order: %v", err))
@@ -2264,5 +2276,58 @@ func (app *App) RemoveDirWithTrashFallback(path, what string) error {
 		}
 		app.appendLogToFile(fmt.Sprintf("Permanently deleted: %s", path))
 		return nil
+	}
+}
+
+// migrateOldProfiles проходит по старым профилям (без маркера CleanProfileMarker)
+// и, если в них нет системных файлов (DLL, tools), копирует их из игры.
+// Это защищает от ситуации, когда пользователь обновился с прошлой версии,
+// создал чистый профиль (который удалил файлы из игры), а затем вернулся в старый,
+// где этих файлов никогда не было.
+func (app *App) migrateOldProfiles() {
+	gameRoot, _ := app.getGameState()
+	if gameRoot == "" {
+		return
+	}
+
+	// Если в игре нет mod_loader или tools, значит, мигрировать нечего
+	hasGameFiles := fileExists(filepath.Join(gameRoot, "binaries", "mod_loader")) ||
+		fileExists(filepath.Join(gameRoot, "tools"))
+
+	if !hasGameFiles {
+		return
+	}
+
+	entries, err := os.ReadDir(app.profilesDir())
+	if err != nil {
+		return
+	}
+
+	migratedCount := 0
+	for _, e := range entries {
+		if !e.IsDir() {
+			continue
+		}
+		profileName := e.Name()
+		profilePath := app.profilePath(profileName)
+
+		// 1. Пропускаем чистые профили (у них есть маркер)
+		if fileExists(filepath.Join(profilePath, CleanProfileMarker)) {
+			continue
+		}
+
+		// 2. Пропускаем профили, у которых уже есть системные файлы
+		if fileExists(filepath.Join(profilePath, "binaries", "mod_loader")) {
+			continue
+		}
+
+		// 3. Это старый профиль — стягиваем в него файлы из игры
+		app.appendLogToFile(fmt.Sprintf("Migrating system files to old profile: %s", profileName))
+		app.copySystemFilesToProfile(profilePath)
+		migratedCount++
+	}
+
+	if migratedCount > 0 {
+		app.appendLogToFile(fmt.Sprintf("Successfully migrated system files to %d old profiles.", migratedCount))
 	}
 }
