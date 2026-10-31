@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"net/url"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -473,7 +474,7 @@ func (app *App) handleDrop(uris []fyne.URI) {
 			// а SetOnDropped вызывается в UI-потоке. Без этого UI
 			// подвисает до конца копирования.
 			go func(src, dst, name string) {
-				if err := app.copyFolder(src, dst); err != nil {
+				if err := copyPath(src, dst); err != nil {
 					app.appendLogToFile(fmt.Sprintf(
 						"handleDrop: failed to copy folder %q: %v", name, err))
 					fyne.Do(func() {
@@ -858,27 +859,6 @@ func (app *App) extractZipWithLimits(archivePath, destDir string, maxFile, maxTo
 	}
 
 	return nil
-}
-
-func (app *App) copyFolder(src, dst string) error {
-	return filepath.Walk(src, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		relPath, _ := filepath.Rel(src, path)
-		targetPath, err := safeJoin(dst, relPath)
-		if err != nil {
-			return err
-		}
-		if info.IsDir() {
-			return os.MkdirAll(targetPath, 0755)
-		}
-		data, err := os.ReadFile(path)
-		if err != nil {
-			return err
-		}
-		return os.WriteFile(targetPath, data, 0644)
-	})
 }
 
 // syncModsEnabledState вычитывает актуальное состояние патча из
@@ -1546,7 +1526,7 @@ func (app *App) installModFiles(tmpDir, modsPath, gameRoot string) ([]string, er
 
 		dest := filepath.Join(modsPath, modName)
 		app.appendLog(fmt.Sprintf(app.msg("log_moving_folder"), modName, dest))
-		if err := app.copyFolder(filepath.Join(tmpDir, modName), dest); err != nil {
+		if err := copyPath(filepath.Join(tmpDir, modName), dest); err != nil {
 			app.appendLog(fmt.Sprintf(app.msg("log_failed_copy"), err))
 			return nil, err
 		}
@@ -1807,6 +1787,15 @@ func (app *App) doUpdateModFromNexus(mod *checks.ModInfo, modID int, modIDStr, _
 
 	directURL, filename, err := app.getPremiumDownloadURL(modIDStr, strconv.Itoa(fileInfo.ID))
 	if err != nil {
+		// Если ошибка связана с отсутствием премиума (401/403),
+		// открываем страницу мода в браузере, как это делает батч-режим.
+		if isAuthError(err) {
+			app.appendLog(app.msg("premium_required_manual"))
+			if u, uerr := url.Parse(mod.URL); uerr == nil {
+				fyne.Do(func() { fyne.CurrentApp().OpenURL(u) })
+			}
+			return
+		}
 		app.appendLog(fmt.Sprintf(app.msg("failed_get_download_link"), err))
 		return
 	}
@@ -1890,8 +1879,12 @@ func (app *App) removeSelectedMods() {
 				if targetRow >= len(displayed) {
 					targetRow = len(displayed) - 1
 				}
-				app.modTable.Select(widget.TableCellID{Row: targetRow, Col: 0}, 0)
-				app.modTable.ScrollTo(widget.TableCellID{Row: targetRow, Col: 0})
+				time.AfterFunc(50*time.Millisecond, func() {
+					fyne.Do(func() {
+						app.modTable.Select(widget.TableCellID{Row: targetRow, Col: 0}, 0)
+						app.modTable.ScrollTo(widget.TableCellID{Row: targetRow, Col: 0})
+					})
+				})
 			} else {
 				app.selectedModName = ""
 				app.selectedModIndex.Store(-1)

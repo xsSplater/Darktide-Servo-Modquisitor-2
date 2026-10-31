@@ -60,7 +60,74 @@ func (app *App) CreateProfileBackup(profileName string) (string, error) {
 	ts := time.Now().Format("20060102_150405")
 	zipPath := filepath.Join(dir, fmt.Sprintf("%s_%s.zip", ts, profileName))
 
-	if err := app.createZipArchive(src, zipPath); err != nil {
+	// Создаём временную папку для сборки полного бэкапа
+	tmpDir, err := os.MkdirTemp("", "smq-backup-")
+	if err != nil {
+		return "", err
+	}
+	defer os.RemoveAll(tmpDir)
+
+	// 1. Копируем профиль (mods/ и nexus_versions.json)
+	dstProfile := filepath.Join(tmpDir, profileName)
+	if err := copyPath(src, dstProfile); err != nil {
+		return "", fmt.Errorf("copy profile: %w", err)
+	}
+
+	// 2. Докладываем системные компоненты из корня игры
+	gameRoot, _ := app.getGameState()
+	if gameRoot != "" {
+		// DML
+		modLoaderSrc := filepath.Join(gameRoot, "binaries", "mod_loader")
+		if fileExists(modLoaderSrc) {
+			_ = copyFile(modLoaderSrc, filepath.Join(dstProfile, "binaries", "mod_loader"))
+		}
+
+		// DLL из binaries/plugins (DMA, Custom Assets и т.д.)
+		pluginsSrc := filepath.Join(gameRoot, "binaries", "plugins")
+		if info, err := os.Stat(pluginsSrc); err == nil && info.IsDir() {
+			entries, _ := os.ReadDir(pluginsSrc)
+			for _, e := range entries {
+				if e.IsDir() {
+					continue
+				}
+				nameLower := strings.ToLower(e.Name())
+				// Пропускаем стандартные DLL игры, чтобы случайно не сломать её при восстановлении
+				if strings.Contains(nameLower, "crash_monitor") ||
+					strings.Contains(nameLower, "grpc") ||
+					strings.Contains(nameLower, "gwnav") ||
+					strings.Contains(nameLower, "lua_cjson") ||
+					strings.Contains(nameLower, "rule_database") ||
+					strings.Contains(nameLower, "texturereader") ||
+					strings.Contains(nameLower, "wwise") {
+					continue
+				}
+				_ = copyFile(filepath.Join(pluginsSrc, e.Name()), filepath.Join(dstProfile, "binaries", "plugins", e.Name()))
+			}
+		}
+
+		// Патч bundle (только patch_999)
+		patchSrc := filepath.Join(gameRoot, "bundle", "9ba626afa44a3aa3.patch_999")
+		if fileExists(patchSrc) {
+			_ = copyFile(patchSrc, filepath.Join(dstProfile, "bundle", "9ba626afa44a3aa3.patch_999"))
+		}
+
+		// Tools (dtkit-patch)
+		toolsSrc := filepath.Join(gameRoot, "tools")
+		if info, err := os.Stat(toolsSrc); err == nil && info.IsDir() {
+			_ = copyPath(toolsSrc, filepath.Join(dstProfile, "tools"))
+		}
+
+		// Toggle-скрипты
+		for _, f := range []string{"toggle_darktide_mods.bat", "toggle_dt_mod_autopatch.cmd"} {
+			fSrc := filepath.Join(gameRoot, f)
+			if fileExists(fSrc) {
+				_ = copyFile(fSrc, filepath.Join(dstProfile, f))
+			}
+		}
+	}
+
+	// 3. Архивируем временную папку
+	if err := app.createZipArchive(dstProfile, zipPath); err != nil {
 		return "", fmt.Errorf("create zip: %w", err)
 	}
 
@@ -144,8 +211,49 @@ func (app *App) restoreProfileFromBackup(zipPath, profileName string) error {
 		}
 	}
 
-	if err := copyPath(extracted, target); err != nil {
-		return fmt.Errorf("copy extracted: %w", err)
+	// 1. Копируем файлы профиля (mods/ и nexus_versions.json)
+	if fileExists(filepath.Join(extracted, "mods")) {
+		if err := copyPath(filepath.Join(extracted, "mods"), filepath.Join(target, "mods")); err != nil {
+			return fmt.Errorf("copy extracted mods: %w", err)
+		}
 	}
+	if fileExists(filepath.Join(extracted, "nexus_versions.json")) {
+		if err := copyFile(filepath.Join(extracted, "nexus_versions.json"), filepath.Join(target, "nexus_versions.json")); err != nil {
+			app.appendLogToFile(fmt.Sprintf("restoreProfileFromBackup: copy nexus_versions.json: %v", err))
+		}
+	}
+
+	// 2. Копируем системные компоненты в корень игры
+	gameRoot, _ := app.getGameState()
+	if gameRoot != "" {
+		if fileExists(filepath.Join(extracted, "binaries", "mod_loader")) {
+			_ = copyFile(filepath.Join(extracted, "binaries", "mod_loader"), filepath.Join(gameRoot, "binaries", "mod_loader"))
+		}
+
+		pluginsExtracted := filepath.Join(extracted, "binaries", "plugins")
+		if info, err := os.Stat(pluginsExtracted); err == nil && info.IsDir() {
+			entries, _ := os.ReadDir(pluginsExtracted)
+			for _, e := range entries {
+				if !e.IsDir() {
+					_ = copyFile(filepath.Join(pluginsExtracted, e.Name()), filepath.Join(gameRoot, "binaries", "plugins", e.Name()))
+				}
+			}
+		}
+
+		if fileExists(filepath.Join(extracted, "bundle", "9ba626afa44a3aa3.patch_999")) {
+			_ = copyFile(filepath.Join(extracted, "bundle", "9ba626afa44a3aa3.patch_999"), filepath.Join(gameRoot, "bundle", "9ba626afa44a3aa3.patch_999"))
+		}
+
+		if info, err := os.Stat(filepath.Join(extracted, "tools")); err == nil && info.IsDir() {
+			_ = copyPath(filepath.Join(extracted, "tools"), filepath.Join(gameRoot, "tools"))
+		}
+
+		for _, f := range []string{"toggle_darktide_mods.bat", "toggle_dt_mod_autopatch.cmd"} {
+			if fileExists(filepath.Join(extracted, f)) {
+				_ = copyFile(filepath.Join(extracted, f), filepath.Join(gameRoot, f))
+			}
+		}
+	}
+
 	return nil
 }

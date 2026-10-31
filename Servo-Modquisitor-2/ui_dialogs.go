@@ -1299,17 +1299,12 @@ func (app *App) showImportProfileDialog() {
 			baseName = baseName + "_imported"
 		}
 
-		if err := app.createProfile(baseName, ""); err != nil {
-			app.appendLogToFile(fmt.Sprintf("Failed to create profile: %v", err))
-			return
-		}
-
-		dstPath := app.profilePath(baseName)
-		if err := copyPath(profileFolder, dstPath); err != nil {
+		// Используем логику restore, она правильно разложит файлы
+		if err := app.restoreProfileFromBackup(srcPath, baseName); err != nil {
 			app.appendLogToFile(fmt.Sprintf("Failed to import profile: %v", err))
 			return
 		}
-		cleanupModsFolder(filepath.Join(dstPath, "mods"))
+
 		app.appendLog(fmt.Sprintf(app.msg("profile_imported"), baseName))
 		app.refreshProfileList()
 		app.switchProfile(baseName)
@@ -1345,27 +1340,20 @@ func (app *App) showExportProfileDialog() {
 
 			zipPath := filepath.Join(dstDir, profileName+".zip")
 
-			// Создаём временную папку для подготовки архива
-			tmpDir, err := os.MkdirTemp("", "profile-export-")
+			// Используем логику полноценного бэкапа (с системными файлами)
+			tempBackupPath, err := app.CreateProfileBackup(profileName)
 			if err != nil {
-				app.appendLogToFile(fmt.Sprintf("Failed to create temp directory: %v", err))
-				return
-			}
-			defer os.RemoveAll(tmpDir)
-
-			// Копируем содержимое профиля во временную папку
-			srcPath := app.activeProfilePath()
-			tmpProfileDir := filepath.Join(tmpDir, profileName)
-			if err := copyPath(srcPath, tmpProfileDir); err != nil {
-				app.appendLogToFile(fmt.Sprintf("Failed to copy profile to temp: %v", err))
+				app.appendLogToFile(fmt.Sprintf("Export profile: failed to create backup: %v", err))
 				return
 			}
 
-			// Архивируем временную папку
-			if err := app.createZipArchive(tmpProfileDir, zipPath); err != nil {
-				app.appendLog(fmt.Sprintf("Failed to create zip archive: %v", err))
+			// Копируем готовый zip в выбранную пользователем папку
+			if err := copyFile(tempBackupPath, zipPath); err != nil {
+				app.appendLogToFile(fmt.Sprintf("Export profile: failed to copy zip: %v", err))
 				return
 			}
+			// Временный архив (созданный в папке бэкапов) удаляем, чтобы не засорять
+			_ = os.Remove(tempBackupPath)
 
 			fyne.Do(func() {
 				app.appendLog(fmt.Sprintf(app.msg("profile_exported"), zipPath))
@@ -1512,6 +1500,9 @@ func (app *App) showRestoreBackupDialog() {
 			fyne.Do(func() {
 				app.refreshProfileList()
 				app.appendLog(fmt.Sprintf(app.msg("backup_restored"), profileName))
+				// НОВОЕ: сразу переключаемся на восстановленный профиль,
+				// чтобы пользователь увидел сборку и системные файлы подхватились.
+				app.switchProfile(profileName)
 			})
 		}()
 	}, app.mainWindow)

@@ -207,9 +207,14 @@ func (app *App) checkNexusUpdates() {
 	app.modsMutex.RUnlock()
 
 	for _, mod := range allModsCopy {
-		if mod.URL != "" {
+		if helpers.ExtractModIDFromURL(mod.URL) != 0 {
 			totalMods++
 		}
+	}
+
+	if totalMods == 0 {
+		app.appendLog(app.msg("no_updates_found"))
+		return
 	}
 
 	for i := range allModsCopy {
@@ -223,7 +228,8 @@ func (app *App) checkNexusUpdates() {
 		mod := &allModsCopy[i]
 		modID := helpers.ExtractModIDFromURL(mod.URL)
 		if modID == 0 {
-			processed++
+			// Мод без URL нельзя проверить — не увеличиваем processed,
+			// чтобы processed оставался ≤ totalMods.
 			continue
 		}
 		if app.isSymlinkFolder(mod.Name) {

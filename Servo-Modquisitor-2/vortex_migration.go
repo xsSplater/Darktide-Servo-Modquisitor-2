@@ -110,14 +110,14 @@ func (app *App) doVortexMigration(depPath, stagingPath string) {
 		}
 
 		// Копируем в game/mods
-		if err := app.copyFolder(srcDir, dstDir); err != nil {
+		if err := copyPath(srcDir, dstDir); err != nil {
 			app.appendLogToFile(fmt.Sprintf("Vortex migration: copy %s failed: %v", modName, err))
 			continue
 		}
 
 		// Копируем в profile/mods
 		dstProfileDir := filepath.Join(profileModsPath, modName)
-		_ = app.copyFolder(srcDir, dstProfileDir)
+		_ = copyPath(srcDir, dstProfileDir)
 
 		// Пытаемся распарсить имя папки Vortex (например, "Mod Name-123-1-0-1620000000")
 		// чтобы занести данные в кэш и не показывать мод как "manual"

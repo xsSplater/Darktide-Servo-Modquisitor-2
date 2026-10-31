@@ -806,44 +806,96 @@ func (app *App) createZipArchive(src, dst string) error {
 	defer zipWriter.Close()
 
 	baseDir := filepath.Base(src)
-	err = filepath.Walk(src, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		relPath, err := filepath.Rel(src, path)
-		if err != nil {
-			return err
-		}
-		if relPath == "." {
+
+	// Своя рекурсивная функция вместо filepath.Walk.
+	// Отличие: мы САМИ разрешаем симлинки и идём внутрь целевой папки.
+	// depth — защита от циклов (A → B → A).
+	var walk func(dir, relBase string, depth int) error
+	walk = func(dir, relBase string, depth int) error {
+		if depth > 64 {
+			app.appendLogToFile(fmt.Sprintf(
+				"zip: depth limit reached at %s, possible symlink loop", dir))
 			return nil
 		}
-		zipPath := filepath.Join(baseDir, relPath)
-		header, err := zip.FileInfoHeader(info)
+
+		entries, err := os.ReadDir(dir)
 		if err != nil {
-			return err
+			app.appendLogToFile(fmt.Sprintf("zip: readdir %s: %v", dir, err))
+			return nil
 		}
-		header.Name = filepath.ToSlash(zipPath)
-		if info.IsDir() {
-			header.Name += "/"
-		} else {
+
+		for _, e := range entries {
+			name := e.Name()
+			fullPath := filepath.Join(dir, name)
+			relPath := filepath.Join(relBase, name)
+			zipPath := filepath.ToSlash(filepath.Join(baseDir, relPath))
+
+			info, err := os.Lstat(fullPath)
+			if err != nil {
+				app.appendLogToFile(fmt.Sprintf("zip: lstat %s: %v", fullPath, err))
+				continue
+			}
+
+			// Симлинк → разрешаем и обрабатываем как обычный файл/папку.
+			if info.Mode()&os.ModeSymlink != 0 {
+				resolved, err := os.Stat(fullPath)
+				if err != nil {
+					app.appendLogToFile(fmt.Sprintf(
+						"zip: broken symlink %s -> %s: %v",
+						fullPath, readlinkSafe(fullPath), err))
+					continue
+				}
+				info = resolved
+			}
+
+			if info.IsDir() {
+				header := &zip.FileHeader{Name: zipPath + "/", Method: zip.Store}
+				header.SetMode(os.ModeDir | 0755)
+				if _, err := zipWriter.CreateHeader(header); err != nil {
+					return err
+				}
+				if err := walk(fullPath, relPath, depth+1); err != nil {
+					return err
+				}
+				continue
+			}
+
+			// Обычный файл.
+			header, err := zip.FileInfoHeader(info)
+			if err != nil {
+				return err
+			}
+			header.Name = zipPath
 			header.Method = zip.Deflate
+			w, err := zipWriter.CreateHeader(header)
+			if err != nil {
+				return err
+			}
+			file, err := os.Open(fullPath)
+			if err != nil {
+				app.appendLogToFile(fmt.Sprintf("zip: open %s: %v", fullPath, err))
+				continue
+			}
+			_, copyErr := io.Copy(w, file)
+			file.Close()
+			if copyErr != nil {
+				return copyErr
+			}
 		}
-		writer, err := zipWriter.CreateHeader(header)
-		if err != nil {
-			return err
-		}
-		if info.IsDir() {
-			return nil
-		}
-		file, err := os.Open(path)
-		if err != nil {
-			return err
-		}
-		defer file.Close()
-		_, err = io.Copy(writer, file)
-		return err
-	})
-	return err
+		return nil
+	}
+
+	return walk(src, "", 0)
+}
+
+// readlinkSafe — маленький хелпер для лога, чтобы не паниковать
+// на битых симлинках.
+func readlinkSafe(path string) string {
+	t, err := os.Readlink(path)
+	if err != nil {
+		return "?"
+	}
+	return t
 }
 
 // extractZipArchive распаковывает zip-архив в папку dst с защитой от path traversal.
