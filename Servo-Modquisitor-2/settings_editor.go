@@ -1166,7 +1166,7 @@ func (app *App) showGameSettingsEditor() {
 
 	// ─── Поиск ───────────────────────────────────────────────────
 	searchEntry := widget.NewEntry()
-	searchEntry.SetPlaceHolder(app.msg("usettings_search_placeholder"))
+	searchEntry.SetPlaceHolder(app.msg("search_placeholder"))
 	searchEntry.OnChanged = func(s string) {
 		searchText = s
 		rebuildRows()

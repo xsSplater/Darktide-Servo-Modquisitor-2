@@ -837,7 +837,7 @@ func (app *App) showAMLConfigWindow() {
 		widget.NewSeparator(),
 		editorTitle,
 		container.NewHBox(
-			widget.NewLabel(app.msg("aml_editor_version")),
+			widget.NewLabel(app.msg("table_lbl_version")),
 			versionEntryBox,
 			widget.NewLabel(app.msg("aml_editor_author")),
 			authorEntryBox,

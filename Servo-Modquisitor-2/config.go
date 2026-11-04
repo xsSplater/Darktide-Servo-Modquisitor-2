@@ -11,7 +11,7 @@ import (
 // ───────────── Программа ─────────────────────────────────────────
 const (
 	AppName         = "Servo-Modquisitor-2"
-	AppVersion      = "5.2.5"
+	AppVersion      = "5.5.5"
 	AppID           = "com.xssplater.servo-modquisitor"
 	AppIcon         = "assets/icon.png"
 	ConfigFolderSMQ = "Servo-Modquisitor"
@@ -174,9 +174,14 @@ const (
 	ColCheckboxWidth float32 = 30
 	ColSelectWidth   float32 = 30
 	ColNumberWidth   float32 = 40
-	ColNameWidth     float32 = 360
 	ColDateWidth     float32 = 90
+	ColVersionWidth  float32 = 90
+	ColDLsWidth      float32 = 100
+	ColStatusSmWidth float32 = 60
 	ColStatusWidth   float32 = 130
+	ColCategoryWidth float32 = 150
+	ColAuthorWidth   float32 = 200
+	ColNameWidth     float32 = 360
 	ColNoteWidth     float32 = 500
 
 	ModNameWidth float32 = 450
@@ -193,6 +198,11 @@ const (
 	StatusRowSpacing = -2 // отступ между строками в пикселях (0 — без отступа)
 	StatusFontSize   = 11 // размер шрифта для дополнительного статуса (основной будет на 2 больше)
 )
+
+// Ширина 160 подобрана по самой длинной подписи ("Original upload:")
+// в 12 локалях с запасом. Если менять — держать синхронно во всех
+// строках, иначе колонка значений «съедет».
+const versionLabelColWidth float32 = 160
 
 const (
 	sizeThumbnailX = 360

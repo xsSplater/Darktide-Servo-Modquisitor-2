@@ -214,6 +214,7 @@ type App struct {
 	btnToggle           *CustomButton
 	btnSaveOrder        *CustomButton
 	btnRefresh          *CustomButton
+	btnBrowser          *CustomButton
 	btnInstall          *CustomButton
 	btnRemove           *CustomButton
 	btnUp               *CustomButton

@@ -24,22 +24,24 @@ const (
 	BatchFailed
 )
 
+// Icon возвращает имя файла иконки (без .png) в assets/buttons/.
+// Используется в batch-диалоге для statusIcon().
 func (s BatchItemStatus) Icon() string {
 	switch s {
 	case BatchPending:
-		return "⚪"
+		return "clock_sand"
 	case BatchWaiting:
-		return "⏳"
+		return "timer"
 	case BatchDownloading:
-		return "🔄"
+		return "upd_download_blue"
 	case BatchInstalled:
-		return "✅"
+		return "checked_box"
 	case BatchSkipped:
-		return "⏭"
+		return "bottom"
 	case BatchFailed:
-		return "❌"
+		return "warn_red"
 	}
-	return "?"
+	return "clock_sand"
 }
 
 type BatchItem struct {

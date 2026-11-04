@@ -13,6 +13,7 @@ import (
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/layout"
+	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 )
 
@@ -34,17 +35,26 @@ type BatchDialog struct {
 	table       *widget.Table
 
 	// UI: Детали выбранного мода
-	detailsTitle     *widget.Label
-	detailsAuthor    *widget.Label
-	detailsDesc      *widget.Label
-	detailsChangelog *widget.Label
-	detailsLink      *widget.Hyperlink
-	detailsImage     *canvas.Image
-	detailsImageBox  *fyne.Container
-	detailsCard      *canvas.Rectangle
-	detailsScroll    *container.Scroll
-	currentDetailID  string
+	detailsTitle    *widget.Label
+	detailsTitleSep *canvas.Rectangle // зелёная полоска под заголовком
+	detailsAuthor   *widget.Label
+	detailsDesc     *widget.Label
+	detailsLink     *widget.Hyperlink
+	detailsImage    *canvas.Image
+	detailsImageBox *fyne.Container
+	detailsCard     *canvas.Rectangle
+	detailsScroll   *container.Scroll
+	currentDetailID string
 
+	// Required
+	descRequiredList    *fyne.Container
+	descRequiredSection fyne.CanvasObject
+
+	// Спойлер «Последние изменения»
+	changelogLabel     *widget.Label
+	changelogContainer *fyne.Container
+	btnChangelog       *widget.Button
+	changelogExpanded  bool
 	// UI: Прогресс и кнопки
 	statusLabel   *widget.Label
 	progressBar   *widget.ProgressBar
@@ -158,30 +168,31 @@ func (d *BatchDialog) buildTable() {
 			}
 		},
 	)
-	d.headerTable.SetColumnWidth(0, 30)
-	d.headerTable.SetColumnWidth(1, 50)
-	d.headerTable.SetColumnWidth(2, 360)
-	d.headerTable.SetColumnWidth(3, 90)
-	d.headerTable.SetColumnWidth(4, 200)
-	d.headerTable.SetColumnWidth(5, 150)
+	d.headerTable.SetColumnWidth(0, ColCheckboxWidth)
+	d.headerTable.SetColumnWidth(1, ColNumberWidth)
+	d.headerTable.SetColumnWidth(2, ColNameWidth)
+	d.headerTable.SetColumnWidth(3, ColVersionWidth)
+	d.headerTable.SetColumnWidth(4, ColAuthorWidth)
+	d.headerTable.SetColumnWidth(5, ColCategoryWidth)
 
 	d.table = widget.NewTable(
 		func() (int, int) { return len(d.items), 6 },
 		func() fyne.CanvasObject {
 			bg := canvas.NewRectangle(color.Transparent)
 			bg.SetMinSize(fyne.NewSize(1, 28))
-			return container.NewStack(bg, widget.NewLabel(""), widget.NewCheck("", nil))
+			statusBox := container.NewCenter() // <- ОБЯЗАТЕЛЬНО!
+			return container.NewStack(bg, widget.NewLabel(""), widget.NewCheck("", nil), statusBox)
 		},
 		func(id widget.TableCellID, cell fyne.CanvasObject) {
 			d.updateCell(id, cell)
 		},
 	)
-	d.table.SetColumnWidth(0, 30)
-	d.table.SetColumnWidth(1, 50)
-	d.table.SetColumnWidth(2, 360)
-	d.table.SetColumnWidth(3, 90)
-	d.table.SetColumnWidth(4, 200)
-	d.table.SetColumnWidth(5, 150)
+	d.table.SetColumnWidth(0, ColCheckboxWidth)
+	d.table.SetColumnWidth(1, ColNumberWidth)
+	d.table.SetColumnWidth(2, ColNameWidth)
+	d.table.SetColumnWidth(3, ColVersionWidth)
+	d.table.SetColumnWidth(4, ColAuthorWidth)
+	d.table.SetColumnWidth(5, ColCategoryWidth)
 
 	d.table.OnSelected = func(id widget.TableCellID) {
 		if id.Row >= 0 && id.Row < len(d.items) {
@@ -203,6 +214,7 @@ func (d *BatchDialog) updateCell(id widget.TableCellID, cell fyne.CanvasObject) 
 	bg := cont.Objects[0].(*canvas.Rectangle)
 	lbl := cont.Objects[1].(*widget.Label)
 	chk := cont.Objects[2].(*widget.Check)
+	statusBox := cont.Objects[3].(*fyne.Container)
 
 	if d.table.IsRowSelected(id.Row) {
 		bg.FillColor = th.Color(themes.ColorTableRowSelected, variant)
@@ -215,6 +227,9 @@ func (d *BatchDialog) updateCell(id widget.TableCellID, cell fyne.CanvasObject) 
 
 	lbl.Hide()
 	chk.Hide()
+	// Чистим контейнер под иконку, чтобы при переиспользовании ячейки
+	// не остался статус из предыдущей колонки.
+	statusBox.Objects = nil
 
 	switch id.Col {
 	case 0:
@@ -229,9 +244,8 @@ func (d *BatchDialog) updateCell(id widget.TableCellID, cell fyne.CanvasObject) 
 			chk.Enable()
 		}
 	case 1:
-		lbl.Show()
-		lbl.SetText(item.Status.Icon())
-		lbl.Alignment = fyne.TextAlignCenter
+		statusBox.Add(d.app.statusIcon(item.Status.Icon()))
+		statusBox.Refresh()
 	case 2:
 		lbl.Show()
 		lbl.SetText(item.Name)
@@ -260,16 +274,18 @@ func (d *BatchDialog) buildDetails() {
 	variant := d.app.myApp.Settings().ThemeVariant()
 
 	d.detailsTitle = widget.NewLabelWithStyle("", fyne.TextAlignLeading, fyne.TextStyle{Bold: true})
+
+	// Зелёная полоска под заголовком — как в главном окне.
+	d.detailsTitleSep = canvas.NewRectangle(th.Color(themes.ColorCRTScreenStroke, variant))
+	d.detailsTitleSep.SetMinSize(fyne.NewSize(0, 3))
+
 	d.detailsAuthor = widget.NewLabel("")
 	d.detailsDesc = widget.NewLabel("")
 	d.detailsDesc.Wrapping = fyne.TextWrapWord
 
-	d.detailsChangelog = widget.NewLabel("")
-	d.detailsChangelog.Wrapping = fyne.TextWrapWord
-
 	d.detailsLink = widget.NewHyperlink(d.app.msg("mod_url_label"), nil)
 
-	// Создаем картинку и рамку для нее (как в главном окне)
+	// Картинка с рамкой
 	imgBg := canvas.NewRectangle(color.NRGBA{R: 0, G: 0, B: 0, A: 15})
 	imgBg.CornerRadius = CornerRadius15
 	imgBg.SetMinSize(fyne.NewSize(sizeThumbnailX, sizeThumbnailY))
@@ -282,37 +298,69 @@ func (d *BatchDialog) buildDetails() {
 	imgBorder := canvas.NewRectangle(color.Transparent)
 	imgBorder.CornerRadius = CornerRadius15
 	imgBorder.StrokeWidth = 1
-	imgBorder.StrokeColor = th.Color(themes.ColorDescCardStroke, variant)
+	imgBorder.StrokeColor = th.Color(theme.ColorNameSeparator, variant)
 	imgBorder.SetMinSize(fyne.NewSize(sizeThumbnailX, sizeThumbnailY))
 
-	d.detailsImageBox = container.NewStack(
-		imgBg,
-		d.detailsImage,
-		imgBorder)
+	d.detailsImageBox = container.NewStack(imgBg, d.detailsImage, imgBorder)
 
+	// Секция Required — как в главном окне.
+	d.descRequiredList = container.New(&VBoxWithSpacing{Spacing: SpacingText11})
+	d.descRequiredSection = container.NewVBox(
+		widget.NewSeparator(),
+		container.New(&VBoxWithSpacing{Spacing: SpacingText13},
+			widget.NewLabelWithStyle(
+				d.app.msg("status_required_mods")+":",
+				fyne.TextAlignLeading, fyne.TextStyle{Bold: true},
+			),
+			d.descRequiredList,
+		),
+	)
+	d.descRequiredSection.Hide()
+
+	// Спойлер «Последние изменения» — с кнопкой скрытия/раскрытия.
+	d.changelogLabel = widget.NewLabel("")
+	d.changelogLabel.Wrapping = fyne.TextWrapWord
+	d.changelogContainer = container.NewVBox(d.changelogLabel)
+	d.changelogContainer.Hide()
+
+	d.btnChangelog = widget.NewButton(d.app.msg("btn_show_changelog"), func() {
+		d.changelogExpanded = !d.changelogExpanded
+		if d.changelogExpanded {
+			d.changelogContainer.Show()
+			d.btnChangelog.SetText(d.app.msg("btn_hide_changelog"))
+		} else {
+			d.changelogContainer.Hide()
+			d.btnChangelog.SetText(d.app.msg("btn_show_changelog"))
+		}
+	})
+	d.btnChangelog.Hide()
+
+	// Фон карточки
 	d.detailsCard = canvas.NewRectangle(th.Color(themes.ColorDescCardBg, variant))
 	d.detailsCard.CornerRadius = 12
 	d.detailsCard.StrokeWidth = 1
 	d.detailsCard.StrokeColor = th.Color(themes.ColorDescCardStroke, variant)
 
-	// Левая колонка с текстом
+	// Левая колонка метаданных
 	metaLeft := container.NewVBox(
-		d.detailsTitle,
-		widget.NewSeparator(),
 		d.detailsAuthor,
 		widget.NewSeparator(),
 		d.detailsLink,
+	)
+	metaRow := container.NewBorder(nil, nil, nil, d.detailsImageBox, metaLeft)
+
+	content := container.NewVBox(
+		d.detailsTitle,
+		d.detailsTitleSep,
+		metaRow,
+		d.descRequiredSection,
 		widget.NewSeparator(),
 		d.detailsDesc,
 		widget.NewSeparator(),
-		d.detailsChangelog,
+		d.btnChangelog,
+		d.changelogContainer,
+		layout.NewSpacer(),
 	)
-
-	// Оборачиваем картинку в VBox со Spacer, чтобы она не растягивалась по высоте
-	imageCol := container.NewVBox(d.detailsImageBox, layout.NewSpacer())
-
-	// Используем Border, чтобы колонка с картинкой ушла вправо
-	content := container.NewBorder(nil, nil, nil, imageCol, metaLeft)
 
 	d.detailsScroll = container.NewScroll(content)
 }
@@ -329,6 +377,18 @@ func (d *BatchDialog) selectDetail(id string) {
 		return
 	}
 	d.currentDetailID = id
+
+	// Сброс спойлера при смене мода.
+	d.changelogExpanded = false
+	d.changelogContainer.Hide()
+	d.btnChangelog.SetText(d.app.msg("btn_show_changelog"))
+	d.changelogLabel.SetText("")
+
+	// Сброс Required.
+	d.descRequiredList.Objects = nil
+	d.descRequiredSection.Hide()
+	d.descRequiredList.Refresh()
+
 	for _, item := range d.items {
 		if item.ID != id {
 			continue
@@ -347,12 +407,13 @@ func (d *BatchDialog) selectDetail(id string) {
 		}
 		d.detailsDesc.SetText(desc)
 
+		// Changelog — просто наполняем содержимое спойлера, но НЕ показываем.
 		cleanCL := stripHTML(item.Changelog)
 		if cleanCL != "" && cleanCL != d.app.msg("changelog_unavailable") {
-			d.detailsChangelog.SetText(d.app.msg("btn_show_changelog") + ":\n" + cleanCL)
-			d.detailsChangelog.Show()
+			d.changelogLabel.SetText(cleanCL)
+			d.btnChangelog.Show()
 		} else {
-			d.detailsChangelog.Hide()
+			d.btnChangelog.Hide()
 		}
 
 		if item.NexusModID != 0 {
@@ -364,6 +425,31 @@ func (d *BatchDialog) selectDetail(id string) {
 			d.detailsLink.Hide()
 		}
 
+		// Required. У обновлений item.ID — имя папки; у установки
+		// из коллекции item.ID — modID, а item.Name — ключ БД.
+		// Проверяем оба, берём тот, по которому нашлись зависимости.
+		lang := "en"
+		d.app.cfgMutex.RLock()
+		if d.app.cfg.Language != "" {
+			lang = d.app.cfg.Language
+		}
+		d.app.cfgMutex.RUnlock()
+
+		var reqRow fyne.CanvasObject
+		if row := d.app.createRequiredModsList(item.ID, lang); row != nil {
+			reqRow = row
+		} else if item.Name != item.ID {
+			if row := d.app.createRequiredModsList(item.Name, lang); row != nil {
+				reqRow = row
+			}
+		}
+		if reqRow != nil {
+			d.descRequiredList.Add(reqRow)
+			d.descRequiredSection.Show()
+		}
+		d.descRequiredList.Refresh()
+
+		// Картинка
 		d.detailsImage.Resource = nil
 		d.detailsImage.Refresh()
 		if item.PictureURL != "" {

@@ -750,7 +750,7 @@ func (app *App) showThemeEditor() {
 	liveApplyCheck.SetToolTip(app.msg("theme_editor_live_apply_tooltip"))
 
 	searchEntry := widget.NewEntry()
-	searchEntry.SetPlaceHolder(app.msg("theme_editor_search_placeholder"))
+	searchEntry.SetPlaceHolder(app.msg("search_placeholder"))
 	searchEntry.OnChanged = func(s string) {
 		searchText = s
 		applyFilter()

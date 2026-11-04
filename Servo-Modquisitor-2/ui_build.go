@@ -260,6 +260,11 @@ func (app *App) buildControlButtons() {
 	app.btnAMLConfig = NewCustomButton(app.msg("btn_aml_config"), func() { app.showAMLConfigWindow() })
 	app.btnAMLConfig.SetToolTip(app.msg("btn_aml_config_tooltip"))
 
+	// Кнопка открытия окна поиска модов (Find-O-Mod)
+	searchRes := app.loadIconResource("search", "assets/buttons/search.png")
+	app.btnBrowser = NewIconButton(searchRes, func() { app.showModBrowser() })
+	app.btnBrowser.SetToolTip(app.msg("browser_title"))
+
 	app.btnInstall = NewIconButton(addRes, func() { app.pickAndInstallArchive() })
 	app.btnInstall.SetToolTip(app.msg("btn_install_tooltip"))
 
@@ -338,6 +343,192 @@ func (app *App) statusIcon(filename string) *canvas.Image {
 	img.FillMode = canvas.ImageFillContain
 	img.SetMinSize(fyne.NewSize(20, 20))
 	return img
+}
+
+// requiredRowLayout позволяет точно позиционировать веточку, эмодзи и текст
+type requiredRowLayout struct {
+	gapXEmoji    float32 // Сдвиг эмодзи влево/вправо
+	gapXLink     float32 // Сдвиг ссылки влево/вправо
+	offsetYEmoji float32 // Сдвиг эмодзи вверх/вниз
+	offsetYLink  float32 // Сдвиг ссылки вверх/вниз
+}
+
+func (l requiredRowLayout) MinSize(objects []fyne.CanvasObject) fyne.Size {
+	if len(objects) < 3 {
+		return fyne.NewSize(0, 0)
+	}
+	pMin := objects[0].MinSize()
+	eMin := objects[1].MinSize()
+	cMin := objects[2].MinSize()
+
+	w := pMin.Width + l.gapXEmoji + eMin.Width + l.gapXLink + cMin.Width
+	if w < 0 {
+		w = 0
+	}
+
+	h := pMin.Height
+	if eMin.Height > h {
+		h = eMin.Height
+	}
+	if cMin.Height > h {
+		h = cMin.Height
+	}
+
+	// Учитываем сдвиги, чтобы ничего не обрезалось
+	extraTop := float32(0)
+	extraBottom := float32(0)
+
+	if l.offsetYEmoji < 0 && -l.offsetYEmoji > extraTop {
+		extraTop = -l.offsetYEmoji
+	}
+	if l.offsetYEmoji > 0 && l.offsetYEmoji > extraBottom {
+		extraBottom = l.offsetYEmoji
+	}
+	if l.offsetYLink < 0 && -l.offsetYLink > extraTop {
+		extraTop = -l.offsetYLink
+	}
+	if l.offsetYLink > 0 && l.offsetYLink > extraBottom {
+		extraBottom = l.offsetYLink
+	}
+
+	return fyne.NewSize(w, h+extraTop+extraBottom)
+}
+
+func (l requiredRowLayout) Layout(objects []fyne.CanvasObject, size fyne.Size) {
+	if len(objects) < 3 {
+		return
+	}
+	prefix := objects[0]
+	emoji := objects[1]
+	link := objects[2]
+
+	extraTop := float32(0)
+	if l.offsetYEmoji < 0 && -l.offsetYEmoji > extraTop {
+		extraTop = -l.offsetYEmoji
+	}
+	if l.offsetYLink < 0 && -l.offsetYLink > extraTop {
+		extraTop = -l.offsetYLink
+	}
+
+	pMin := prefix.MinSize()
+	prefix.Resize(pMin)
+	prefix.Move(fyne.NewPos(0, extraTop))
+
+	eMin := emoji.MinSize()
+	emoji.Resize(eMin)
+	emoji.Move(fyne.NewPos(pMin.Width+l.gapXEmoji, extraTop+l.offsetYEmoji))
+
+	cMin := link.MinSize()
+	link.Resize(cMin)
+	link.Move(fyne.NewPos(pMin.Width+l.gapXEmoji+eMin.Width+l.gapXLink, extraTop+l.offsetYLink))
+}
+
+// createRequiredModsList создает блок со списком требуемых модов,
+// но БЕЗ заголовка (заголовок добавляется внешней секцией).
+func (app *App) createRequiredModsList(modName, lang string) fyne.CanvasObject {
+	return app.createRequiredMods(modName, lang, false)
+}
+
+// createRequiredModsRow создает блок статуса с кликабельными ссылками
+// и индикацией установки для требуемых модов, ВКЛЮЧАЯ заголовок.
+func (app *App) createRequiredModsRow(modName, lang string) fyne.CanvasObject {
+	return app.createRequiredMods(modName, lang, true)
+}
+
+// createRequiredMods - общая логика.
+func (app *App) createRequiredMods(modName, lang string, showTitle bool) fyne.CanvasObject {
+	type reqModInfo struct {
+		Name      string
+		URL       string
+		Installed bool
+	}
+	var requiredMods []reqModInfo
+
+	for _, dep := range checks.GetDependencies() {
+		if dep.Dependent == modName {
+			reqName := dep.Required
+			if entry := checks.GetModDBEntry(dep.Required); entry != nil {
+				if n := checks.PickLocalized(entry.Name, lang); n != "" {
+					reqName = n
+				}
+			}
+			requiredMods = append(requiredMods, reqModInfo{
+				Name:      reqName,
+				URL:       dep.RequiredURL,
+				Installed: checks.FolderExists(dep.Required),
+			})
+		}
+	}
+
+	if len(requiredMods) == 0 {
+		return nil
+	}
+
+	content := container.New(&VBoxWithSpacing{Spacing: -17})
+
+	if showTitle {
+		titleBox := container.NewHBox(
+			app.statusIcon("warn_yellow_romb"),
+			widget.NewLabelWithStyle(
+				app.msg("status_required_mods"),
+				fyne.TextAlignLeading,
+				fyne.TextStyle{Bold: true},
+			),
+		)
+		content.Add(titleBox)
+	}
+
+	// ─── НАСТРОЙКИ ВНЕШНЕГО ВИДА ───────────────────────────────
+	gapXEmoji := float32(-3)
+	offsetYEmoji := float32(2)
+	gapXLink := float32(-13)
+	offsetYLink := float32(-1)
+	// ───────────────────────────────────────────────────────────
+
+	for i, rm := range requiredMods {
+		prefix := "├"
+		if i == len(requiredMods)-1 {
+			prefix = "└"
+		}
+
+		prefixText := canvas.NewText(prefix, theme.Color(theme.ColorNameForeground))
+		prefixText.TextSize = theme.TextSize() + 7
+
+		statusEmoji := "❌"
+		if rm.Installed {
+			statusEmoji = "✅"
+		}
+
+		emojiWidget := widget.NewLabel(statusEmoji)
+
+		var linkWidget fyne.CanvasObject
+		if rm.URL != "" {
+			if u, err := url.Parse(rm.URL); err == nil {
+				linkWidget = widget.NewRichTextFromMarkdown(fmt.Sprintf("[%s](%s)", rm.Name, u.String()))
+			} else {
+				linkWidget = widget.NewLabel(rm.Name)
+			}
+		} else {
+			linkWidget = widget.NewLabel(rm.Name)
+		}
+		if rText, ok := linkWidget.(*widget.RichText); ok {
+			rText.Wrapping = fyne.TextWrapOff
+		}
+
+		leftSpacer := canvas.NewRectangle(color.Transparent)
+		leftSpacer.SetMinSize(fyne.NewSize(28, 1))
+
+		innerRow := container.New(requiredRowLayout{
+			gapXEmoji:    gapXEmoji,
+			gapXLink:     gapXLink,
+			offsetYEmoji: offsetYEmoji,
+			offsetYLink:  offsetYLink,
+		}, prefixText, emojiWidget, linkWidget)
+
+		content.Add(container.NewHBox(leftSpacer, innerRow))
+	}
+
+	return content
 }
 
 // statusRow — строка секции в правой панели: иконка слева, текст
@@ -985,6 +1176,7 @@ func (app *App) buildTopPanel(filterSelectWithSize, searchBar fyne.CanvasObject)
 
 	app.topPanelBgRect = canvas.NewRectangle(th.Color(themes.ColorTopPanelBg, variant))
 	content := container.NewHBox(
+		app.btnBrowser,
 		app.btnInstall,
 		app.btnRefresh,
 		app.btnSaveOrder,
@@ -1199,17 +1391,14 @@ func (app *App) modRowBackgroundColor(row int, mod *checks.ModInfo, th fyne.Them
 // глаз сканирует вертикаль. Вариативная часть (особенности, проблемы,
 // обновление) идёт справа и уже не мешает сравнению строк между собой.
 //
-//  1. Состояние  — on / off_red  (всегда есть)
-//  2. Источник   — hand_vulcan / nexus_orange  (всегда есть)
-//  3. Особенности — pin, vortex, sys, symlink
-//  4. Проблемы    — folder_missing, folder_broken, conflict, skull
-//  5. Обновление  — update
+//  1. Источник   — hand_vulcan / nexus_orange  (всегда есть)
+//  2. Особенности — pin, vortex, sys, symlink
+//  3. Проблемы    — folder_missing, folder_broken, conflict, skull
+//  4. Обновление  — update
 func (app *App) buildStatusIconsColumn(mod *checks.ModInfo) fyne.CanvasObject {
 	row := container.NewHBox()
 
-	// 1. Состояние (УДАЛЕНО! Теперь это в отдельной колонке с иконками)
-
-	// 2. Источник
+	// 1. Источник
 	switch mod.Source {
 	case "manual":
 		row.Add(app.statusIcon("hand_vulcan_yellow"))
@@ -1217,7 +1406,7 @@ func (app *App) buildStatusIconsColumn(mod *checks.ModInfo) fyne.CanvasObject {
 		row.Add(app.statusIcon("nexus_orange"))
 	}
 
-	// 3. Особенности
+	// 2. Особенности
 	if mod.Mandatory {
 		row.Add(app.statusIcon("pin_bir"))
 	}
@@ -1231,7 +1420,7 @@ func (app *App) buildStatusIconsColumn(mod *checks.ModInfo) fyne.CanvasObject {
 		row.Add(app.statusIcon("symlink"))
 	}
 
-	// 4. Проблемы
+	// 3. Проблемы и Зависимости
 	if mod.MissingFolder {
 		row.Add(app.statusIcon("folder_missing"))
 	}
@@ -1245,7 +1434,20 @@ func (app *App) buildStatusIconsColumn(mod *checks.ModInfo) fyne.CanvasObject {
 		row.Add(app.statusIcon("skull"))
 	}
 
-	// 5. Обновление
+	// Проверка зависимостей
+	hasReqs := false
+	for _, dep := range checks.GetDependencies() {
+		if dep.Dependent == mod.Name {
+			hasReqs = true
+			break
+		}
+	}
+	if hasReqs {
+		// Используем иконку, которая уже есть (жёлтый ромб)
+		row.Add(app.statusIcon("warn_yellow_romb"))
+	}
+
+	// 4. Обновление
 	if mod.HasUpdate {
 		row.Add(app.statusIcon("update"))
 	}
@@ -1650,12 +1852,6 @@ func (app *App) buildDescriptionCard() fyne.CanvasObject {
 	// и значением справа. Фиксированная ширина через Spacer нужна,
 	// чтобы значения начинались в одной вертикали (как в FormLayout),
 	// но без его внутренних theme.Padding() — их мы не контролируем.
-	//
-	// Ширина 160 подобрана по самой длинной подписи ("Original upload:")
-	// в 12 локалях с запасом. Если менять — держать синхронно во всех
-	// строках, иначе колонка значений «съедет».
-	const versionLabelColWidth float32 = 160
-
 	makeVersionRow := func(lbl, val *widget.Label) fyne.CanvasObject {
 		lblSpacer := canvas.NewRectangle(color.Transparent)
 		lblSpacer.SetMinSize(fyne.NewSize(versionLabelColWidth, 1))
@@ -2049,7 +2245,7 @@ func (app *App) refreshThemeColors() {
 	app.updateTooltipStyle()
 
 	for _, btn := range []*CustomButton{
-		app.btnSaveOrder, app.btnRefresh, app.btnInstall, app.btnRemove,
+		app.btnBrowser, app.btnSaveOrder, app.btnRefresh, app.btnInstall, app.btnRemove,
 		app.btnUp, app.btnDown, app.btnSortChecks, app.btnToggle,
 		app.btnLaunchNormal, app.btnLaunchNoLauncher,
 		app.moveToTopBtn, app.moveToBottomBtn, app.btnAMLConfig,
@@ -2222,6 +2418,7 @@ func (app *App) updateDescriptionForMod(name string) {
 
 	app.cfgMutex.RLock()
 	dateFormat := app.cfg.DateFormat
+	lang := app.cfg.Language
 	app.cfgMutex.RUnlock()
 
 	if app.openFolderBtn != nil {
@@ -2416,6 +2613,11 @@ func (app *App) updateDescriptionForMod(name string) {
 			app.descStatusList.Add(app.statusRow("hand_vulcan", app.msg("status_manual")))
 		case "nexus":
 			app.descStatusList.Add(app.statusRow("nexus_orange", app.msg("status_nexus")))
+		}
+
+		// Требования (Dependencies)
+		if row := app.createRequiredModsRow(mod.Name, lang); row != nil {
+			app.descStatusList.Add(row)
 		}
 
 		// Особенности
