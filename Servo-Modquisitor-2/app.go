@@ -85,6 +85,10 @@ type Config struct {
 	// после скачивания/установки. Дефолт: включено (nil трактуется как
 	// «да»), чтобы старый config.json без этого ключа не менял поведение.
 	AutoActivateMods *bool `json:"auto_activate_mods,omitempty"`
+
+	// Пропущенные версии
+	SkippedProgramVersion string `json:"skipped_program_version,omitempty"`
+	SkippedSortingVersion string `json:"skipped_sorting_version,omitempty"`
 }
 
 type ModVersionInfo struct {
@@ -178,24 +182,24 @@ type App struct {
 	modTable             *widget.Table
 	headerTable          *widget.Table
 	tableBorderContainer *fyne.Container
-	tableBorder          *canvas.Rectangle // оранжевая, «грязное» состояние
+	tableBorder          *widget.ThemedRectangle // оранжевая, «грязное» состояние
 	// amlTableBorder — постоянная жёлтая рамка вокруг таблицы, пока
 	// обнаружен AML. Живёт параллельно с tableBorder: при AML+dirty
 	// обе показываются одновременно, dirty сверху (важнее «сохрани»),
 	// AML чуть толще — торчит тонкой жёлтой полоской снаружи.
-	amlTableBorder     *canvas.Rectangle
+	amlTableBorder     *widget.ThemedRectangle
 	managePanel        *fyne.Container
 	descCardContent    *fyne.Container
 	descCardScroll     *container.Scroll
 	consoleScroll      *container.Scroll
 	descExtraContainer *fyne.Container
 
-	screenBgRect      *canvas.Rectangle
-	headerBoxBgRect   *canvas.Rectangle
+	screenBgRect      *widget.ThemedRectangle
+	headerBoxBgRect   *widget.ThemedRectangle
 	tipBgRect         *canvas.Rectangle
-	topPanelBgRect    *canvas.Rectangle
-	managePanelBgRect *canvas.Rectangle
-	descCardBgRect    *canvas.Rectangle
+	topPanelBgRect    *widget.ThemedRectangle
+	managePanelBgRect *widget.ThemedRectangle
+	descCardBgRect    *widget.ThemedRectangle
 	descTitle         *canvas.Text
 	logHeaderText     *canvas.Text
 
@@ -288,12 +292,12 @@ type App struct {
 	// мода нет картинки, видна только заглушка (или весь box скрыт).
 	descThumbnail    *canvas.Image
 	descThumbnailBox *fyne.Container
-	descThumbnailBg  *canvas.Rectangle
+	descThumbnailBg  *widget.ThemedRectangle
 	// descThumbnailBorder — тонкая рамка-обводка поверх картинки.
 	// Отдельный слой нужен потому, что фон (descThumbnailBg) лежит
 	// ПОД картинкой и при FillMode=Stretch обводка на нём была бы
 	// перекрыта содержимым. Рамка сверху видна всегда.
-	descThumbnailBorder *canvas.Rectangle
+	descThumbnailBorder *widget.ThemedRectangle
 	// descThumbnailURL — URL, для которого сейчас ожидается/показана
 	// картинка. Нужен, чтобы отбрасывать ответы «прошлых» модов, если
 	// пользователь быстро переключается между строками таблицы.
@@ -327,7 +331,7 @@ type App struct {
 	// не выбран: придаёт лёгкое «выключенное» состояние пустой
 	// карточке и визуально отделяет её от заполненной. Скрыт, когда
 	// мод выбран.
-	descCardOverlay *canvas.Rectangle
+	descCardOverlay *widget.ThemedRectangle
 
 	moveToEntry    *widget.Entry
 	searchEntry    *widget.Entry
@@ -431,6 +435,8 @@ func NewApp(cfg *Config, myApp fyne.App) *App {
 	app.nxm = NewNXMListener(app.handleNXMLink)
 	app.oauth = NewOAuthState()
 
+	app.cleanupLegacyTokenFile()
+
 	app.batchInstallChan = make(chan BatchSignal, 4) // 4 — чтобы случайные stale-сигналы не блокировали
 
 	app.selectedModIndex.Store(-1)
@@ -438,7 +444,6 @@ func NewApp(cfg *Config, myApp fyne.App) *App {
 	// buildMainMenu начнёт активно дёргать isLoggedIn().
 	app.refreshLoginState()
 	app.loadLanguage(cfg.Language)
-	app.loadNexusVersionCache()
 
 	switch cfg.Theme {
 	case "light":
@@ -654,11 +659,11 @@ func (app *App) syncVersionCache() {
 
 	app.cfgMutex.RLock()
 	dbVersion := app.cfg.LastModDatabaseVersion
-	modsPath := app.cfg.ModsPath
 	app.cfgMutex.RUnlock()
 
 	if dbVersion != "" {
-		dbPath := filepath.Join(modsPath, FileNameModDatabase)
+		dbPath := filepath.Join(checks.GlobalDataDir(), FileNameModDatabase)
+
 		if info, err := os.Stat(dbPath); err == nil {
 			ts := info.ModTime().Unix()
 			if saved, ok := app.getCachedVersion(NexusCacheKeyRules); !ok || saved.Version != dbVersion {
@@ -1103,7 +1108,6 @@ func (app *App) loadDataAfterInit() {
 	modsPath := app.cfg.ModsPath
 	freq := app.cfg.UpdateCheckFrequency
 	initialSetupDone := app.cfg.InitialSetupDone
-	suppressAML := app.cfg.SuppressAMLWarning
 	app.cfgMutex.RUnlock()
 
 	checks.SetTrashFunc(moveManyToTrash)
@@ -1204,7 +1208,6 @@ func (app *App) loadDataAfterInit() {
 	app.modsMutex.RUnlock()
 	checks.SetModDatabase(dbSnapshot)
 
-	app.syncVersionCache()
 	if app.logFile != nil {
 		app.cfgMutex.RLock()
 		dbVer := app.cfg.LastModDatabaseVersion
@@ -1252,38 +1255,9 @@ func (app *App) loadDataAfterInit() {
 		if !initialSetupDone {
 			app.performFirstRunSetup()
 		}
-
-		if !app.pathsInitialized {
-			app.pathsInitialized = true
-			app.amlDetected.Store(checks.IsAMLInstalled(modsPath))
-			if app.amlDetected.Load() && !suppressAML {
-				app.showChoiceDialogAsync(
-					app.mainWindow,
-					app.msg("aml_detected_title"),
-					app.msg("aml_detected_warning"),
-					func(choice int) {
-						switch choice {
-						case 0:
-							if u, err := url.Parse(DarktideModDML); err == nil {
-								app.myApp.OpenURL(u)
-							}
-						case 2:
-							app.cfgMutex.Lock()
-							app.cfg.SuppressAMLWarning = true
-							app.cfgMutex.Unlock()
-							saveConfig(app.cfg)
-						}
-					},
-					app.msg("btn_open_dml_page"),
-					app.msg("btn_continue"),
-					app.msg("btn_dont_show_again"),
-				)
-			}
-		}
 	})
 
 	if freq != "never" && app.shouldCheckUpdates() {
-		go app.checkSpecialUpdates()
 	}
 
 	// registerNXMProtocol уже вызывается из main.go в шаге 6 фоновой
@@ -1401,6 +1375,19 @@ func (app *App) initProfiles() {
 
 	// Вылечиваем старые профили (переносим в них системные файлы)
 	app.migrateOldProfiles()
+
+	// Теперь, когда профиль точно создан и ActiveProfile установлен,
+	// загружаем кэш версий и синхронизируем текущую версию программы.
+	app.loadNexusVersionCache()
+	app.syncVersionCache()
+
+	// Запускаем проверку обновлений (теперь кэш уже содержит текущие версии)
+	app.cfgMutex.RLock()
+	freq := app.cfg.UpdateCheckFrequency
+	app.cfgMutex.RUnlock()
+	if freq != "never" && app.shouldCheckUpdates() {
+		go app.checkSpecialUpdates()
+	}
 
 	fyne.Do(func() {
 		app.refreshProfileList()
@@ -2160,16 +2147,25 @@ func (app *App) shouldCheckUpdates() bool {
 	freq := app.cfg.UpdateCheckFrequency
 	lastStr := app.cfg.LastUpdateCheck
 	app.cfgMutex.RUnlock()
+
 	if freq == "never" {
 		return false
 	}
+
+	// Если выбрано "при каждом запуске" - проверяем всегда
+	if freq == "every_start" {
+		return true
+	}
+
 	if lastStr == "" {
 		return true
 	}
+
 	last, err := time.Parse(time.RFC3339, lastStr)
 	if err != nil {
 		return true
 	}
+
 	now := time.Now()
 	switch freq {
 	case "weekly":
@@ -2179,7 +2175,7 @@ func (app *App) shouldCheckUpdates() bool {
 	case "yearly":
 		return now.After(last.AddDate(1, 0, 0))
 	}
-	return false
+	return true
 }
 
 // getGameState возвращает согласованный снимок gameRoot+patcherType.

@@ -11,7 +11,7 @@ import (
 // ───────────── Программа ─────────────────────────────────────────
 const (
 	AppName         = "Servo-Modquisitor-2"
-	AppVersion      = "5.6.6"
+	AppVersion      = "5.8.0"
 	AppID           = "com.xssplater.servo-modquisitor"
 	AppIcon         = "assets/icon.png"
 	ConfigFolderSMQ = "Servo-Modquisitor"
@@ -187,7 +187,7 @@ const (
 	ModNameWidth float32 = 450
 	LABRWidth    float32 = 130
 
-	TableRowHeight = 6
+	TableRowHeight = 32
 	// SystemTableRowHeight — высота одной строки системной таблицы.
 	// Исторически SystemTableHeight = 75 было рассчитано на 2 строки
 	// (DML + DMF). Теперь высота контейнера вычисляется как
@@ -262,7 +262,7 @@ const (
 
 // ───────────── Задержки ──────────────────────────────────────────
 const (
-	WindowMaximizeDelay = 200 * time.Millisecond
+	WindowMaximizeDelay = 50 * time.Millisecond
 	BlinkOnDuration     = 600 * time.Millisecond
 	BlinkOffDuration    = 1000 * time.Millisecond
 	BlinkCheckInterval  = 2 * time.Second

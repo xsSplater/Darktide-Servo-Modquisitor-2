@@ -132,11 +132,12 @@ func (app *App) showModBrowser() {
 		func() fyne.CanvasObject {
 			spacer := canvas.NewRectangle(color.Transparent)
 			spacer.SetMinSize(fyne.NewSize(1, 28))
-			return container.NewStack(spacer)
+			bg := canvas.NewRectangle(color.Transparent)
+			inner := container.NewStack()
+			return container.NewStack(spacer, bg, inner)
 		},
 		func(id widget.TableCellID, cell fyne.CanvasObject) {
 			cont := cell.(*fyne.Container)
-			cont.Objects = nil
 
 			if id.Row >= len(results) {
 				return
@@ -146,13 +147,17 @@ func (app *App) showModBrowser() {
 			th := app.myApp.Settings().Theme()
 			variant := app.myApp.Settings().ThemeVariant()
 
-			bgColor := th.Color(themes.ColorTableRowEven, variant)
+			bg := cont.Objects[1].(*canvas.Rectangle)
+			inner := cont.Objects[2].(*fyne.Container)
+			inner.Objects = nil
+
 			if table.IsRowSelected(id.Row) {
-				bgColor = th.Color(themes.ColorTableRowSelected, variant)
+				bg.FillColor = th.Color(themes.ColorTableRowSelected, variant)
 			} else if id.Row%2 == 1 {
-				bgColor = th.Color(themes.ColorTableRowOdd, variant)
+				bg.FillColor = th.Color(themes.ColorTableRowOdd, variant)
+			} else {
+				bg.FillColor = th.Color(themes.ColorTableRowEven, variant)
 			}
-			bg := canvas.NewRectangle(bgColor)
 
 			var content fyne.CanvasObject
 
@@ -206,13 +211,12 @@ func (app *App) showModBrowser() {
 				}
 			}
 
-			cont.Add(bg)
 			if content != nil {
-				cont.Add(content)
+				inner.Add(content)
 			} else {
 				spacer := canvas.NewRectangle(color.Transparent)
 				spacer.SetMinSize(fyne.NewSize(1, 28))
-				cont.Add(spacer)
+				inner.Add(spacer)
 			}
 		},
 	)

@@ -364,18 +364,18 @@
 	 "pt-BR": "A coleção contém o mod \"Auto Mod Loading and Ordering\" (AML).\nServo-Modquisitor oferece uma classificação melhor.\n\nDeseja desativar o AML nesta coleção?"
 	},
 	"aml_detected_warning": {
-		"en": "The file \"mod_manager.lua\" from Darktide Mod Loader has been modified.\nAll list management functions will be overwritten by AML's auto-sorting.\n\nYou can continue using the program or reinstall DML to remove AML and use this program's sorting features.\n\nYou can still run 'Check and Auto-Sort' to check the mods folder for problematic mods.\n\nWhat would you like to do?",
-		"ru": "Файл \"mod_manager.lua\" мода Darktide Mod Loader модифицирован.\nВсе функции управления списком будут перезаписаны автосортировкой AML.\n\nВы можете продолжить использование программы или переустановить DML, чтобы избавиться от AML и использовать сортировку этой программы.\n\nВы всё ещё можете выполнить \"Проверку и автосортировку\", чтобы проверить папку mods на проблемные моды.\n\nЧто будем делать?",
-   "zh-hans": "Darktide Mod Loader 的 'mod_manager.lua' 文件已被修改。\n所有列表管理功能将被 AML 的自动排序覆盖。\n\n您可以继续使用程序，或重新安装 DML 以移除 AML 并使用本程序的排序功能。\n\n您仍可运行「检查并自动排序」来检查模组文件夹中的问题模组。\n\n您想怎么做？",
-   "zh-hant": "Darktide Mod Loader 的 'mod_manager.lua' 檔案已被修改。\n所有列表管理功能將被 AML 的自動排序覆蓋。\n\n您可以繼續使用程式，或重新安裝 DML 以移除 AML 並使用本程式的排序功能。\n\n您仍可執行「檢查並自動排序」來檢查模組資料夾中的問題模組。\n\n您想做什麼？",
-		"de": "Die Datei 'mod_manager.lua' des Darktide Mod Loader wurde geändert.\nAlle Listenverwaltungsfunktionen werden durch die Auto-Sortierung von AML überschrieben.\n\nSie können das Programm weiter verwenden oder DML neu installieren, um AML zu entfernen und die Sortierfunktionen dieses Programms zu nutzen.\n\nSie können immer noch 'Prüfen und Auto-Sortieren' ausführen, um den Mods-Ordner auf problematische Mods zu prüfen.\n\nWas möchten Sie tun?",
-		"fr": "Le fichier 'mod_manager.lua' de Darktide Mod Loader a été modifié.\nToutes les fonctions de gestion de liste seront écrasées par le tri automatique d'AML.\n\nVous pouvez continuer à utiliser le programme ou réinstaller DML pour supprimer AML et utiliser les fonctions de tri de ce programme.\n\nVous pouvez toujours exécuter 'Vérifier et tri automatique' pour vérifier le dossier des mods.\n\nQue voulez-vous faire ?",
-		"ja": "Darktide Mod Loaderの「mod_manager.lua」ファイルが変更されました。\nすべてのリスト管理機能はAMLの自動ソートによって上書きされます。\n\nプログラムを続行するか、DMLを再インストールしてAMLを削除し、このプログラムのソート機能を使用できます。\n\n「チェックと自動ソート」を実行して、modフォルダ内の問題のあるMODをチェックすることもできます。\n\nどうしますか？",
-		"ko": "Darktide Mod Loader의 'mod_manager.lua' 파일이 수정되었습니다.\n모든 목록 관리 기능은 AML의 자동 정렬로 덮어쓰여집니다.\n\n프로그램을 계속 사용하거나 DML을 다시 설치하여 AML을 제거하고 이 프로그램의 정렬 기능을 사용할 수 있습니다.\n\n'검사 및 자동 정렬'을 실행하여 모드 폴더에서 문제가 있는 모드를 확인할 수 있습니다.\n\n어떻게 하시겠습니까?",
-		"it": "Il file 'mod_manager.lua' di Darktide Mod Loader è stato modificato.\nTutte le funzioni di gestione della lista saranno sovrascritte dall'auto-ordinamento di AML.\n\nPuoi continuare a usare il programma o reinstallare DML per rimuovere AML e usare le funzioni di ordinamento di questo programma.\n\nPuoi comunque eseguire 'Controlla e auto-ordina' per verificare la presenza di mod problematiche nella cartella mods.\n\nCosa vuoi fare?",
-		"pl": "Plik 'mod_manager.lua' z Darktide Mod Loader został zmodyfikowany.\nWszystkie funkcje zarządzania listą zostaną nadpisane przez automatyczne sortowanie AML.\n\nMożesz kontynuować używanie programu lub ponownie zainstalować DML, aby usunąć AML i używać funkcji sortowania tego programu.\n\nNadal możesz uruchomić 'Sprawdź i automatycznie sortuj', aby sprawdzić folder mods pod kątem problematycznych modów.\n\nCo chcesz zrobić?",
-		"es": "El archivo 'mod_manager.lua' de Darktide Mod Loader ha sido modificado.\nTodas las funciones de gestión de listas serán sobrescritas por el auto-ordenamiento de AML.\n\nPuedes seguir usando el programa o reinstalar DML para eliminar AML y usar las funciones de ordenamiento de este programa.\n\nAún puedes ejecutar 'Verificar y auto-ordenar' para revisar la carpeta de mods en busca de mods problemáticos.\n\n¿Qué deseas hacer?",
-	 "pt-BR": "O arquivo 'mod_manager.lua' do Darktide Mod Loader foi modificado.\nTodas as funções de gerenciamento de lista serão sobrescritas pela classificação automática do AML.\n\nVocê pode continuar usando o programa ou reinstalar o DML para remover o AML e usar os recursos de classificação deste programa.\n\nVocê ainda pode executar 'Verificar e Classificar Automaticamente' para verificar a pasta de mods em busca de mods problemáticos.\n\nO que você gostaria de fazer?"
+		"en": "Servo-Modquisitor has detected the 'Auto Mod Loading and Ordering' (AML) mod.\n\nBecause of AML, you cannot manage the mod order with Servo-Modquisitor, and the mod list will be highlighted in blue.\n\nIf you want to use Servo-Modquisitor's sorting, you need to remove AML by reinstalling the 'Darktide Mod Loader' (DML).",
+		"ru": "Servo-Modquisitor обнаружил мод 'Auto Mod Loading and Ordering' (AML).\n\nИз-за этого вы не можете управлять порядком модов через Servo-Modquisitor, а список будет подсвечен голубым.\n\nЕсли вы хотите использовать сортировку от Servo-Modquisitor, вам нужно избавиться от AML, переустановив 'Darktide Mod Loader' (DML).",
+   "zh-hans": "Servo-Modquisitor 检测到「Auto Mod Loading and Ordering」(AML) 模组。\n\n由于 AML 的存在，您无法使用 Servo-Modquisitor 管理模组顺序，且列表将显示为蓝色高亮。\n\n如果您想使用 Servo-Modquisitor 的排序功能，需通过重新安装「Darktide Mod Loader」(DML) 来移除 AML。",
+   "zh-hant": "Servo-Modquisitor 偵測到「Auto Mod Loading and Ordering」(AML) 模組。\n\n由於 AML 的存在，您無法使用 Servo-Modquisitor 管理模組順序，且列表將顯示為藍色高亮。\n\n如果您想使用 Servo-Modquisitor 的排序功能，需透過重新安裝「Darktide Mod Loader」(DML) 來移除 AML。",
+		"de": "Servo-Modquisitor hat den Mod 'Auto Mod Loading and Ordering' (AML) erkannt.\n\nAufgrund von AML können Sie die Mod-Reihenfolge nicht mit Servo-Modquisitor verwalten, und die Mod-Liste wird blau hervorgehoben.\n\nWenn Sie die Sortierung von Servo-Modquisitor nutzen möchten, müssen Sie AML entfernen, indem Sie den 'Darktide Mod Loader' (DML) neu installieren.",
+		"fr": "Servo-Modquisitor a détecté le mod « Auto Mod Loading and Ordering » (AML).\n\nEn raison d'AML, vous ne pouvez pas gérer l'ordre des mods avec Servo-Modquisitor, et la liste sera surlignée en bleu.\n\nSi vous souhaitez utiliser le tri de Servo-Modquisitor, vous devez supprimer AML en réinstallant le « Darktide Mod Loader » (DML).",
+		"ja": "Servo-Modquisitor は「Auto Mod Loading and Ordering」(AML) MODを検出しました。\n\nAMLのため、Servo-ModquisitorでMODの順序を管理できず、MODリストが青くハイライトされます。\n\nServo-Modquisitorの並べ替え機能を使用する場合は、「Darktide Mod Loader」(DML) を再インストールして AML を削除する必要があります。",
+		"ko": "Servo-Modquisitor가 'Auto Mod Loading and Ordering'(AML) 모드를 감지했습니다.\n\nAML 때문에 Servo-Modquisitor에서 모드 순서를 관리할 수 없으며, 모드 목록이 파란색으로 강조 표시됩니다.\n\nServo-Modquisitor의 정렬 기능을 사용하려면 'Darktide Mod Loader'(DML)를 다시 설치하여 AML을 제거해야 합니다.",
+		"it": "Servo-Modquisitor ha rilevato la mod 'Auto Mod Loading and Ordering' (AML).\n\nA causa di AML, non puoi gestire l'ordine delle mod con Servo-Modquisitor e l'elenco sarà evidenziato in blu.\n\nSe vuoi utilizzare l'ordinamento di Servo-Modquisitor, devi rimuovere AML reinstallando il 'Darktide Mod Loader' (DML).",
+		"pl": "Servo-Modquisitor wykrył mod 'Auto Mod Loading and Ordering' (AML).\n\nZ powodu AML nie możesz zarządzać kolejnością modów za pomocą Servo-Modquisitor, a lista będzie podświetlona na niebiesko.\n\nJeśli chcesz korzystać z sortowania Servo-Modquisitor, musisz usunąć AML, ponownie instalując 'Darktide Mod Loader' (DML).",
+		"es": "Servo-Modquisitor ha detectado el mod 'Auto Mod Loading and Ordering' (AML).\n\nDebido a AML, no puedes gestionar el orden de los mods con Servo-Modquisitor, y la lista se resaltará en azul.\n\nSi quieres usar la clasificación de Servo-Modquisitor, debes eliminar AML reinstalando el 'Darktide Mod Loader' (DML).",
+	 "pt-BR": "O Servo-Modquisitor detectou o mod 'Auto Mod Loading and Ordering' (AML).\n\nDevido ao AML, você não pode gerenciar a ordem dos mods com o Servo-Modquisitor, e a lista será destacada em azul.\n\nSe você quiser usar a classificação do Servo-Modquisitor, precisará remover o AML reinstalando o 'Darktide Mod Loader' (DML)."
 	},
 	"aml_save_warning_tooltip": {
 		"en": "You can Save the list, but AML will overwrite the order of mods in the game.",
@@ -1371,6 +1371,20 @@
 		"es": "Desactivar/Activar mods en el juego.\n\n[CTRL]+[O]",
 	 "pt-BR": "Desativar/Ativar mods no jogo.\n\n[CTRL]+[O]"
 	},
+	"btn_skip_version": {
+		"en": "Skip this version",
+		"ru": "Пропустить версию",
+   "zh-hans": "跳过此版本",
+   "zh-hant": "略過此版本",
+		"de": "Diese Version überspringen",
+		"fr": "Ignorer cette version",
+		"ja": "このバージョンをスキップ",
+		"ko": "이 버전 건너뛰기",
+		"it": "Salta questa versione",
+		"pl": "Pomiń tę wersję",
+		"es": "Omitir esta versión",
+	 "pt-BR": "Pular esta versão"
+	},
 	"btn_up_tooltip": {
 		"en": "Moves the selected mods up one line.",
 		"ru": "Поднимает выбранные моды выше на одну строку.",
@@ -1384,20 +1398,6 @@
 		"pl": "Przesuwa zaznaczone mody o jeden wiersz w górę.",
 		"es": "Mueve los mods seleccionados una línea hacia arriba.",
 	 "pt-BR": "Move os mods selecionados uma linha para cima."
-	},
-	"btn_update_mod_premium_only": {
-		"de": "Aktualisiert den Mod schnell. Nexus Premium ist erforderlich, um aus dem Programm heraus zu aktualisieren (Website-Einschränkung)!\n\nDu kannst aber dem Nexus-Link folgen und dort auf \"Mod manager download\" klicken, um den Mod schnell zu aktualisieren.",
-		"en": "Updates mod quickly. Nexus Premium is required to update from within the program (site limitation)!\n\nBut you can follow the Nexus link and click \"Mod manager download\" there to quickly update the mod.",
-		"es": "Actualiza el mod rápidamente. ¡Se requiere Nexus Premium para actualizar desde el programa (limitación del sitio)!\n\nPero puedes seguir el enlace de Nexus y hacer clic en \"Mod manager download\" allí para actualizar el mod rápidamente.",
-		"fr": "Met à jour le mod rapidement. Un compte Nexus Premium est requis pour mettre à jour depuis le programme (limitation du site) !\n\nMais vous pouvez suivre le lien Nexus et cliquer sur \"Mod manager download\" pour mettre à jour le mod rapidement.",
-		"it": "Aggiorna la mod rapidamente. È richiesto Nexus Premium per aggiornare dall'interno del programma (limitazione del sito)!\n\nMa puoi seguire il link di Nexus e cliccare su \"Mod manager download\" per aggiornare rapidamente il mod.",
-		"ja": "MODを素早く更新します。プログラムから更新するにはNexus Premiumが必要です（サイト側の制限）！\n\nただし、Nexusのリンクを開き、そこでMod manager downloadをクリックすれば、MODを素早く更新できます。",
-		"ko": "모드를 빠르게 업데이트합니다. 프로그램 내에서 업데이트하려면 Nexus 프리미엄이 필요합니다(사이트 제한)!\n\n하지만 Nexus 링크를 열고 거기서 Mod manager download를 클릭하면 모드를 빠르게 업데이트할 수 있습니다.",
-		"pl": "Szybko aktualizuje moda. Do aktualizacji z poziomu programu wymagane jest Nexus Premium (ograniczenie strony)!\n\nMożesz jednak otworzyć link do Nexusa i kliknąć tam \"Mod manager download\", aby szybko zaktualizować mod.",
-	 "pt-BR": "Atualiza o mod rapidamente. É necessário Nexus Premium para atualizar de dentro do programa (limitação do site)!\n\nMas você pode seguir o link do Nexus e clicar em \"Mod manager download\" lá para atualizar o mod rapidamente.",
-		"ru": "Быстро обновляет мод. Требуется премиум Нексус для обновления из программы (ограничение сайта)!\n\nНо вы можете перейти по ссылке на Нексус и нажать там \"Mod manager download\", чтобы быстро обновить мод.",
-   "zh-hans": "快速更新模组。需要 Nexus 高级会员才能从程序内更新（网站限制）！\n\n但你可以打开 Nexus 链接并在那里点击 Mod manager download，以快速更新模组。",
-   "zh-hant": "快速更新模組。需要 Nexus 高級會員才能從程式內更新（網站限制）！\n\n但你可以開啟 Nexus 連結並在那裡點擊 Mod manager download，以快速更新模組。"
 	},
 	"btn_update_mod_tooltip": {
 		"en": "Updates one mod currently selected in the list.",
@@ -12246,6 +12246,20 @@
    "zh-hans": "仅在模组名称中搜索",
    "zh-hant": "僅在模組名稱中搜尋"
 	},
+	"update_available_title": {
+		"en": "Update Available",
+		"ru": "Доступно обновление",
+   "zh-hans": "有可用更新",
+   "zh-hant": "有可用更新",
+		"de": "Update verfügbar",
+		"fr": "Mise à jour disponible",
+		"ja": "アップデートが利用可能です",
+		"ko": "업데이트 사용 가능",
+		"it": "Aggiornamento disponibile",
+		"pl": "Aktualizacja dostępna",
+		"es": "Actualización disponible",
+	 "pt-BR": "Atualização disponível"
+	},
 	"status_required_mods": {
 		"de": "Erforderlich: ",
 		"en": "Required: ",
@@ -12259,5 +12273,34 @@
 		"ru": "Требуется: ",
    "zh-hans": "需要：",
    "zh-hant": "需要："
+	},
+
+	"sorting_update_title": {
+		"en": "⬆ Sorting Files Update Available",
+		"ru": "⬆ Доступно обновление файлов сортировки",
+   "zh-hans": "⬆ 有排序文件更新可用",
+   "zh-hant": "⬆ 有排序檔案更新可用",
+		"de": "⬆ Sortierdateien-Update verfügbar",
+		"fr": "⬆ Mise à jour des fichiers de tri disponible",
+		"ja": "⬆ ソートファイルのアップデートが利用可能です",
+		"ko": "⬆ 정렬 파일 업데이트 사용 가능",
+		"it": "⬆ Aggiornamento file di ordinamento disponibile",
+		"pl": "⬆ Dostępna aktualizacja plików sortowania",
+		"es": "⬆ Actualización de archivos de ordenamiento disponible",
+	 "pt-BR": "⬆ Atualização de arquivos de classificação disponível"
+	},
+	"sorting_update_message": {
+		"en": "A new version of sorting files (%s) is available on Nexus.\nDownload and install now?",
+		"ru": "Доступна новая версия файлов сортировки (%s) на Nexus.\nХотите скачать и установить?",
+   "zh-hans": "Nexus 上有新版本的排序文件 (%s) 可用。\n立即下载并安装吗？",
+   "zh-hant": "Nexus 上有新版本的排序檔案 (%s) 可用。\n立即下載並安裝嗎？",
+		"de": "Eine neue Version der Sortierdateien (%s) ist auf Nexus verfügbar.\nJetzt herunterladen und installieren?",
+		"fr": "Une nouvelle version des fichiers de tri (%s) est disponible sur Nexus.\nTélécharger et installer maintenant ?",
+		"ja": "Nexusで新しいバージョンのソートファイル (%s) が利用可能です。\nダウンロードして今すぐインストールしますか？",
+		"ko": "Nexus에서 새 버전의 정렬 파일(%s)을(를) 사용할 수 있습니다.\n지금 다운로드하여 설치하시겠습니까?",
+		"it": "È disponibile una nuova versione dei file di ordinamento (%s) su Nexus.\nScaricare e installare ora?",
+		"pl": "Dostępna jest nowa wersja plików sortowania (%s) na Nexus.\nPobrać i zainstalować teraz?",
+		"es": "Una nueva versión de los archivos de ordenamiento (%s) está disponible en Nexus.\n¿Descargar e instalar ahora?",
+	 "pt-BR": "Uma nova versão dos arquivos de classificação (%s) está disponível no Nexus.\nBaixar e instalar agora?"
 	}
 }

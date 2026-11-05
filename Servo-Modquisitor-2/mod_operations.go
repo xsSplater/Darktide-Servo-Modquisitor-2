@@ -278,8 +278,60 @@ func (app *App) refreshModList() {
 	}
 
 	// AML
-	app.amlDetected.Store(checks.IsAMLInstalled(modsPath))
+	isAML := checks.IsAMLInstalled(modsPath)
+	app.amlDetected.Store(isAML)
 	app.applyAMLWarningState()
+
+	// Читаем реальный порядок из AML, если он включен
+	var amlOrder map[string]int
+	if isAML {
+		amlOrder = app.parseAMLLoadOrder(modsPath)
+	}
+
+	// Присваиваем порядковые номера
+	orderNum := 1
+	for i := range sysMods {
+		if isAML {
+			if val, ok := amlOrder[sysMods[i].Name]; ok {
+				sysMods[i].Order = val
+			} else {
+				// Если системного мода нет в логе AML (например, DML или Autopatcher),
+				// ставим -1, чтобы они были выше остальных
+				sysMods[i].Order = -1
+			}
+		} else {
+			sysMods[i].Order = orderNum
+			orderNum++
+		}
+	}
+	for i := range regMods {
+		if isAML {
+			// Если мода нет в логе (он выключен), Order останется 0
+			regMods[i].Order = amlOrder[regMods[i].Name]
+		} else {
+			regMods[i].Order = orderNum
+			orderNum++
+		}
+	}
+
+	// Если AML активен, сортируем списки по реальному порядку из лога
+	if isAML {
+		// Системные моды (DML должен быть первым)
+		sort.SliceStable(sysMods, func(i, j int) bool {
+			return sysMods[i].Order < sysMods[j].Order
+		})
+		// Обычные моды
+		sort.SliceStable(regMods, func(i, j int) bool {
+			// Моды с Order == 0 (отключенные в AML) отправляем в конец списка
+			if regMods[i].Order == 0 {
+				return false
+			}
+			if regMods[j].Order == 0 {
+				return true
+			}
+			return regMods[i].Order < regMods[j].Order
+		})
+	}
 
 	// Собираем все моды вместе
 	app.modsMutex.Lock()
@@ -2598,4 +2650,41 @@ func (app *App) removeCleanMarker() {
 		_ = os.Remove(markerPath)
 		app.appendLogToFile("Profile is no longer 'clean': removed .clean_profile marker")
 	}
+}
+
+// parseAMLLoadOrder читает auto_mod_loader_log.txt и возвращает
+// карту "имя папки мода -> порядковый номер в AML".
+func (app *App) parseAMLLoadOrder(modsPath string) map[string]int {
+	orderMap := make(map[string]int)
+	filePath := filepath.Join(modsPath, "auto_mod_loader_log.txt")
+	data, err := os.ReadFile(filePath)
+	if err != nil {
+		return orderMap // Если файла нет (AML ещё не запускался), возвращаем пустую карту
+	}
+
+	lines := strings.Split(string(data), "\n")
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
+		if line == "" || !strings.Contains(line, ":\"") {
+			continue
+		}
+
+		// Разделяем строку по первому вхождению :"
+		parts := strings.SplitN(line, ":\"", 2)
+		if len(parts) == 2 {
+			num, err := strconv.Atoi(strings.TrimSpace(parts[0]))
+			if err != nil {
+				continue // Пропускаем, если слева не число
+			}
+
+			name := parts[1]
+			// Отрезаем версию в скобках, если она есть: `OverflowMeter ("1.5.0)` -> `OverflowMeter`
+			if idx := strings.Index(name, " (\""); idx != -1 {
+				name = name[:idx]
+			}
+
+			orderMap[name] = num
+		}
+	}
+	return orderMap
 }

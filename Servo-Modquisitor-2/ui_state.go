@@ -25,4 +25,7 @@ type UIState struct {
 	pathsInitialized        bool
 	amlDetected             atomic.Bool
 	enrichDebounce          *time.Timer
+	sortColumn              int // 2 = порядок, 3 = имя, 4 = дата, 5 = статус
+	sortAscending           bool
+	searchDebounce          *time.Timer
 }

@@ -28,7 +28,7 @@ require (
 	github.com/dsnet/compress v0.0.2-0.20230904184137-39efe44ab707 // indirect
 	github.com/fredbi/uri v1.1.1 // indirect
 	github.com/fsnotify/fsnotify v1.10.1 // indirect
-	github.com/fyne-io/oksvg v0.2.0 // indirect
+	github.com/fyne-io/oksvg v0.2.1-0.20260918172519-a9af55fa95d9 // indirect
 	github.com/go-gl/gl v0.0.0-20260331235117-4566fea9a276 // indirect
 	github.com/go-gl/glfw/v3.4/glfw v0.1.0-pre.2 // indirect
 	github.com/go-text/render v0.2.1 // indirect
@@ -61,11 +61,12 @@ require (
 	golang.org/x/text v0.43.0 // indirect
 )
 
+replace fyne.io/fyne/v2 => github.com/xsSplater/xssyne/v2 v2.1.1
+
 // replace fyne.io/fyne/v2 => /home/xssplater/Проекты/GitHub/xssyne // локальная папка
 
-replace fyne.io/fyne/v2 => github.com/xsSplater/xssyne/v2 v2.0.9
+replace github.com/lusingander/colorpicker => github.com/xsSplater/xsscolorpicker v0.5.1
 
 // replace github.com/lusingander/colorpicker => /home/xssplater/Проекты/GitHub/xsscolorpicker // локальная папка
-replace github.com/lusingander/colorpicker => github.com/xsSplater/xsscolorpicker v0.5.1
 
 replace github.com/gobwas/glob => github.com/gobwas/glob v0.2.3

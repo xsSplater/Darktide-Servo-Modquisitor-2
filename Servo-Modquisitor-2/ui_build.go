@@ -11,6 +11,7 @@ import (
 	"image/color"
 	"net/url"
 	"path/filepath"
+	"sort"
 	"strings"
 	"sync/atomic"
 	"time"
@@ -35,8 +36,9 @@ import (
 func createTableRow(height float32) fyne.CanvasObject {
 	spacer := canvas.NewRectangle(color.Transparent)
 	spacer.SetMinSize(fyne.NewSize(1, height))
-	lbl := widget.NewLabel("")
-	return container.NewStack(spacer, lbl)
+	bg := canvas.NewRectangle(color.Transparent)
+	inner := container.NewStack()
+	return container.NewStack(spacer, bg, inner)
 }
 
 // VBoxWithSpacing - вертикальный layout с заданным отступом между элементами.
@@ -341,7 +343,7 @@ func (app *App) statusIcon(filename string) *canvas.Image {
 	}
 	img := canvas.NewImageFromResource(res)
 	img.FillMode = canvas.ImageFillContain
-	img.SetMinSize(fyne.NewSize(20, 20))
+	img.SetMinSize(fyne.NewSize(20, 20)) // Размер иконок в колонке статусов
 	return img
 }
 
@@ -1018,10 +1020,9 @@ func (app *App) buildConsole() {
 	th := app.myApp.Settings().Theme()
 	variant := app.myApp.Settings().ThemeVariant()
 
-	app.screenBgRect = canvas.NewRectangle(th.Color(themes.ColorCRTScreenFill, variant))
-	app.screenBgRect.CornerRadius = 22
-	app.screenBgRect.StrokeWidth = 2
-	app.screenBgRect.StrokeColor = th.Color(themes.ColorCRTScreenStroke, variant)
+	app.screenBgRect = widget.NewThemedRectangle(themes.ColorCRTScreenFill)
+	app.screenBgRect.Rect.CornerRadius = 22
+	app.screenBgRect.SetStroke(themes.ColorCRTScreenStroke, 2)
 
 	app.logHeaderText = canvas.NewText("", th.Color(themes.ColorConsoleText, variant))
 	app.logHeaderText.TextStyle = fyne.TextStyle{Bold: true}
@@ -1036,7 +1037,7 @@ func (app *App) buildConsole() {
 	logStack.Add(app.screenBgRect)
 	logStack.Add(container.NewPadded(app.logWindow))
 
-	app.headerBoxBgRect = canvas.NewRectangle(th.Color(themes.ColorCRTHeaderBg, variant))
+	app.headerBoxBgRect = widget.NewThemedRectangle(themes.ColorCRTHeaderBg)
 	headerBox := container.NewStack(
 		app.headerBoxBgRect,
 		container.NewCenter(app.logHeaderText),
@@ -1061,12 +1062,15 @@ func (app *App) buildConsole() {
 func (app *App) buildSearchAndFilter() (filterSelectWithSize fyne.CanvasObject, searchBar fyne.CanvasObject) {
 	app.searchEntry = widget.NewEntry()
 	app.searchEntry.SetEscapeHandler(func() {
-		if app.modTable != nil {
-			app.mainWindow.Canvas().Focus(app.modTable)
+		if app.searchEntry.Text != "" {
+			app.searchEntry.SetText("")
 		} else {
-			app.mainWindow.Canvas().Unfocus()
+			if app.modTable != nil {
+				app.mainWindow.Canvas().Focus(app.modTable)
+			} else {
+				app.mainWindow.Canvas().Unfocus()
+			}
 		}
-		app.appendLogToFile("Поиск закрыт по Esc (стандартный Entry)")
 	})
 	app.searchEntry.SetPlaceHolder(app.msg("search_placeholder"))
 
@@ -1086,10 +1090,17 @@ func (app *App) buildSearchAndFilter() (filterSelectWithSize fyne.CanvasObject, 
 		} else {
 			app.searchClearBtn.Hide()
 		}
-		app.filterModList()
-		// После смены поиска — скролл наверх: пользователь ожидает
-		// увидеть новую выборку с начала.
-		app.modTable.ScrollToTop()
+
+		// Таймер задержки (Debounce)
+		if app.searchDebounce != nil {
+			app.searchDebounce.Stop()
+		}
+		app.searchDebounce = time.AfterFunc(300*time.Millisecond, func() {
+			fyne.Do(func() {
+				app.filterModList()
+				app.modTable.ScrollToTop()
+			})
+		})
 	}
 
 	searchBar = container.NewBorder(nil, nil, nil, app.searchClearBtn, searchEntryBox)
@@ -1142,9 +1153,6 @@ func (app *App) buildManagePanel() {
 		app.btnRemoveAll,
 	)
 
-	th := app.myApp.Settings().Theme()
-	variant := app.myApp.Settings().ThemeVariant()
-
 	yellowData, _ := embeddedFiles.ReadFile(HeaderBackgroundImage)
 	var yellowBg *canvas.Image
 	if yellowData != nil {
@@ -1153,7 +1161,7 @@ func (app *App) buildManagePanel() {
 		yellowBg.Translucency = 0.9
 	}
 
-	app.managePanelBgRect = canvas.NewRectangle(th.Color(themes.ColorManagePanelBg, variant))
+	app.managePanelBgRect = widget.NewThemedRectangle(themes.ColorManagePanelBg)
 	panelContent := container.NewVBox(singleRow)
 	if yellowBg != nil {
 		app.managePanel = container.NewStack(app.managePanelBgRect, yellowBg, panelContent)
@@ -1171,10 +1179,7 @@ func (app *App) buildManagePanel() {
 // и поиском. Устанавливает app.topPanelBgRect и возвращает готовый
 // контейнер с фоном.
 func (app *App) buildTopPanel(filterSelectWithSize, searchBar fyne.CanvasObject) fyne.CanvasObject {
-	th := app.myApp.Settings().Theme()
-	variant := app.myApp.Settings().ThemeVariant()
-
-	app.topPanelBgRect = canvas.NewRectangle(th.Color(themes.ColorTopPanelBg, variant))
+	app.topPanelBgRect = widget.NewThemedRectangle(themes.ColorTopPanelBg)
 	content := container.NewHBox(
 		app.btnBrowser,
 		app.btnInstall,
@@ -1202,44 +1207,99 @@ func (app *App) buildTopPanel(filterSelectWithSize, searchBar fyne.CanvasObject)
 // Таблицы
 // ─────────────────────────────────────────────────────────────────
 
-// buildHeaderTable создаёт таблицу-заголовок над основной таблицей модов.
+// tappableText — кастомный виджет, который оборачивает canvas.Text
+// и позволяет перехватывать клики мышью.
+type tappableText struct {
+	widget.BaseWidget
+	Text     *canvas.Text
+	Arrow    *canvas.Text
+	onTapped func()
+}
+
+func newTappableText() *tappableText {
+	t := &tappableText{
+		Text:  canvas.NewText("", color.White),
+		Arrow: canvas.NewText("", color.White),
+	}
+	t.Text.TextStyle = fyne.TextStyle{Bold: true}
+	t.Arrow.TextStyle = fyne.TextStyle{Bold: true}
+	t.ExtendBaseWidget(t)
+	return t
+}
+
+func (t *tappableText) CreateRenderer() fyne.WidgetRenderer {
+	// Центрируем текст и стрелку вместе
+	return widget.NewSimpleRenderer(container.NewCenter(container.NewHBox(t.Text, t.Arrow)))
+}
+
+func (t *tappableText) Tapped(*fyne.PointEvent) {
+	if t.onTapped != nil {
+		t.onTapped()
+	}
+}
+
+func (t *tappableText) Cursor() desktop.Cursor { return desktop.PointerCursor }
+
 func (app *App) buildHeaderTable() {
 	createCell := func() fyne.CanvasObject {
 		return container.NewStack(
 			canvas.NewRectangle(color.Transparent),
-			widget.NewLabel(""),
+			newTappableText(), // Используем наш новый виджет
 		)
 	}
 	updateCell := func(id widget.TableCellID, cell fyne.CanvasObject) {
 		th := fyne.CurrentApp().Settings().Theme()
 		variant := fyne.CurrentApp().Settings().ThemeVariant()
 		cont := cell.(*fyne.Container)
-		cont.Objects = nil
-		bg := canvas.NewRectangle(th.Color(themes.ColorTableHeaderBg, variant))
-		cont.Add(bg)
-		label := widget.NewLabel("")
-		label.TextStyle = fyne.TextStyle{Bold: true}
-		label.Alignment = fyne.TextAlignCenter
+		bg := cont.Objects[0].(*canvas.Rectangle)
+		lbl := cont.Objects[1].(*tappableText)
+
+		bg.FillColor = th.Color(themes.ColorTableHeaderBg, variant)
+
+		// Салатовый цвет для основного текста
+		lbl.Text.Color = th.Color(theme.ColorNameForegroundOnWarning, variant)
+		// Белый цвет для стрелок
+		lbl.Arrow.Color = color.White
+
+		var text string
 		switch id.Col {
-		case 0:
-			if app.showSelectColumn {
-				label.SetText("⚙")
-			}
 		case 1:
-			label.SetText(app.msg("col_checkbox"))
+			text = app.msg("col_checkbox")
 		case 2:
-			label.SetText(app.msg("col_number"))
+			text = app.msg("col_number")
 		case 3:
-			label.SetText(app.msg("col_name"))
+			text = app.msg("col_name")
 		case 4:
-			label.SetText(app.msg("col_date"))
+			text = app.msg("col_date")
 		case 5:
-			label.SetText(app.msg("col_status"))
+			text = app.msg("col_status")
 		case 6:
-			label.SetText(app.msg("col_note"))
+			text = app.msg("col_note")
 		}
-		cont.Add(label)
+
+		lbl.Text.Text = text
+		if app.sortColumn == id.Col {
+			if app.sortAscending {
+				lbl.Arrow.Text = " ▲"
+			} else {
+				lbl.Arrow.Text = " ▼"
+			}
+		} else {
+			lbl.Arrow.Text = ""
+		}
+
+		lbl.Text.Refresh()
+		lbl.Arrow.Refresh()
+
+		if id.Col >= 1 {
+			lbl.onTapped = func() { app.toggleSort(id.Col) }
+			lbl.Show()
+		} else {
+			lbl.onTapped = nil
+			lbl.Hide()
+		}
 	}
+
 	app.headerTable = widget.NewTable(
 		func() (int, int) { return 1, TableColumnCount },
 		createCell,
@@ -1261,31 +1321,32 @@ func (app *App) buildModsTable() {
 		variant := fyne.CurrentApp().Settings().ThemeVariant()
 		mod := &app.displayedMods[id.Row]
 		cont := cell.(*fyne.Container)
-		cont.Objects = nil
 
-		bgColor := app.modRowBackgroundColor(id.Row, mod, th, variant)
-		cont.Add(canvas.NewRectangle(bgColor))
+		bg := cont.Objects[1].(*canvas.Rectangle)
+		inner := cont.Objects[2].(*fyne.Container)
+
+		bg.FillColor = app.modRowBackgroundColor(id.Row, mod, th, variant)
+		inner.Objects = nil
 
 		switch id.Col {
 		case 0:
-			cont.Objects = nil
 			if !mod.IsSystem && app.showSelectColumn {
-				cont.Add(app.buildSelectCheckboxColumn(id.Row, mod))
+				inner.Add(app.buildSelectCheckboxColumn(id.Row, mod))
 			} else {
-				cont.Add(widget.NewLabel(""))
+				inner.Add(widget.NewLabel(""))
 			}
 		case 1:
-			cont.Add(app.buildActiveCheckboxColumn(id.Row, mod))
+			inner.Add(app.buildActiveCheckboxColumn(id.Row, mod))
 		case 2:
-			cont.Add(app.buildNumberColumn(id.Row, th, variant))
+			inner.Add(app.buildNumberColumn(id.Row, mod, th, variant))
 		case 3:
-			cont.Add(app.buildNameColumn(id.Row, mod))
+			inner.Add(app.buildNameColumn(id.Row, mod, inner))
 		case 4:
-			cont.Add(app.buildDateColumn(mod, th, variant))
+			inner.Add(app.buildDateColumn(mod, th, variant))
 		case 5:
-			cont.Add(app.buildStatusIconsColumn(mod))
+			inner.Add(app.buildStatusIconsColumn(mod))
 		case 6:
-			cont.Add(app.buildNoteColumn(mod))
+			inner.Add(app.buildNoteColumn(mod))
 		}
 	}
 
@@ -1315,25 +1376,14 @@ func (app *App) buildModsTable() {
 		app.onModRowSelected(id)
 	}
 
-	th := fyne.CurrentApp().Settings().Theme()
-	variant := fyne.CurrentApp().Settings().ThemeVariant()
-
-	app.tableBorder = canvas.NewRectangle(color.Transparent)
-	app.tableBorder.StrokeWidth = 2
-	app.tableBorder.StrokeColor = th.Color(themes.ColorTableBorderDirty, variant)
-	app.tableBorder.FillColor = color.Transparent
+	app.tableBorder = widget.NewThemedRectangle("")
+	app.tableBorder.SetStroke(themes.ColorTableBorderDirty, 2)
+	app.tableBorder.SetFillColor(color.Transparent)
 	app.tableBorder.Hide()
 
-	// AML-рамка: 3px, чтобы при одновременном показе с dirty-рамкой
-	// (2px, сверху) жёлтая торчала тонкой полоской снаружи. Порядок
-	// в стеке ниже: amlTableBorder снизу, tableBorder сверху.
-	// Так при AML+dirty видны обе — жёлтый контур снаружи, оранжевая
-	// обводка внутри. При только AML — жёлтая 3px. При только dirty —
-	// оранжевая 2px.
-	app.amlTableBorder = canvas.NewRectangle(color.Transparent)
-	app.amlTableBorder.StrokeWidth = 1
-	app.amlTableBorder.StrokeColor = th.Color(themes.ColorAMLWarning, variant)
-	app.amlTableBorder.FillColor = color.Transparent
+	app.amlTableBorder = widget.NewThemedRectangle("")
+	app.amlTableBorder.SetStroke(themes.ColorAMLWarning, 1)
+	app.amlTableBorder.SetFillColor(color.Transparent)
 	app.amlTableBorder.Hide()
 
 	mechData, _ := embeddedFiles.ReadFile(TableBackgroundImage)
@@ -1462,9 +1512,6 @@ func (app *App) buildStatusIconsColumn(mod *checks.ModInfo) fyne.CanvasObject {
 // buildSelectCheckboxColumn - ячейка колонки 0: чекбокс выделения поверх
 // опционального фонового изображения.
 func (app *App) buildSelectCheckboxColumn(row int, mod *checks.ModInfo) fyne.CanvasObject {
-	th := app.myApp.Settings().Theme()
-	variant := app.myApp.Settings().ThemeVariant()
-
 	bgStack := []fyne.CanvasObject{}
 	if app.selectColumnBgRes != nil {
 		img := canvas.NewImageFromResource(app.selectColumnBgRes)
@@ -1472,7 +1519,7 @@ func (app *App) buildSelectCheckboxColumn(row int, mod *checks.ModInfo) fyne.Can
 		img.Translucency = 0.8
 		bgStack = append(bgStack, img)
 	} else {
-		bgStack = append(bgStack, canvas.NewRectangle(th.Color(themes.ColorButtonShadow, variant)))
+		bgStack = append(bgStack, widget.NewThemedRectangle(themes.ColorButtonShadow))
 	}
 
 	name := mod.Name
@@ -1565,20 +1612,37 @@ func (app *App) buildActiveCheckboxColumn(_ int, mod *checks.ModInfo) fyne.Canva
 	btn := NewIconButton(icon, func() {
 		app.toggleModActive(name, !isActive)
 	})
-	btn.SetIconSize(24)
+	btn.SetIconSize(20) // Размер иконки в 1 столбце on/off
 	btn.Importance = widget.LowImportance
 	return container.NewCenter(btn)
 }
 
 // buildNumberColumn - колонка 2: порядковый номер строки.
-func (app *App) buildNumberColumn(row int, th fyne.Theme, variant fyne.ThemeVariant) fyne.CanvasObject {
-	t := canvas.NewText(fmt.Sprintf("%2d", row+1), th.Color(theme.ColorNameForeground, variant))
+func (app *App) buildNumberColumn(row int, mod *checks.ModInfo, th fyne.Theme, variant fyne.ThemeVariant) fyne.CanvasObject {
+	// Если обнаружен AML, показываем реальный номер из его лога
+	if app.amlDetected.Load() {
+		if mod.Order > 0 {
+			// Если мод загружается AML, показываем голубой номер
+			t := canvas.NewText(fmt.Sprintf("%d", mod.Order), th.Color(themes.ColorAMLWarning, variant))
+			t.Alignment = fyne.TextAlignCenter
+			t.TextStyle = fyne.TextStyle{Bold: true}
+			return t
+		}
+		// Если мода нет в списке AML (например, он выключен), показываем прочерк
+		t := canvas.NewText("-", th.Color(themes.ColorAMLWarning, variant))
+		t.Alignment = fyne.TextAlignCenter
+		t.TextStyle = fyne.TextStyle{Bold: true}
+		return t
+	}
+
+	// В обычном режиме (без AML) показываем стандартный номер
+	t := canvas.NewText(fmt.Sprintf("%2d", mod.Order), th.Color(theme.ColorNameForeground, variant))
 	t.Alignment = fyne.TextAlignCenter
 	return t
 }
 
 // buildNameColumn - колонка 3: имя мода.
-func (app *App) buildNameColumn(row int, mod *checks.ModInfo) fyne.CanvasObject {
+func (app *App) buildNameColumn(row int, mod *checks.ModInfo, cont *fyne.Container) fyne.CanvasObject {
 	display := mod.DisplayName
 	if display == "" {
 		display = mod.Name
@@ -1599,11 +1663,20 @@ func (app *App) buildNameColumn(row int, mod *checks.ModInfo) fyne.CanvasObject 
 			baseStyle.TextStyle = fyne.TextStyle{Bold: true}
 		}
 
-		// createHighlightedSegments находится в ui_mod_browser.go (пакет main)
 		segs := createHighlightedSegments(display, query, baseStyle)
-		rt := widget.NewRichText(segs...)
-		rt.Wrapping = fyne.TextWrapOff
-		rt.Truncation = fyne.TextTruncateEllipsis
+
+		var rt *widget.RichText
+		if len(cont.Objects) > 0 {
+			if r, ok := cont.Objects[0].(*widget.RichText); ok {
+				rt = r
+			}
+		}
+		if rt == nil {
+			rt = widget.NewRichText()
+			rt.Wrapping = fyne.TextWrapOff
+			rt.Truncation = fyne.TextTruncateEllipsis
+		}
+		rt.Segments = segs
 		return rt
 	}
 
@@ -1623,12 +1696,32 @@ func (app *App) buildDateColumn(mod *checks.ModInfo, th fyne.Theme, variant fyne
 }
 
 // buildNoteColumn - колонка 6: примечание в горизонтальном скролле.
+type tooltipLabel struct {
+	widget.Label
+	text string
+}
+
+func (t *tooltipLabel) Tapped(*fyne.PointEvent) {}
+func (t *tooltipLabel) Cursor() desktop.Cursor  { return desktop.DefaultCursor }
+
+// Эти три метода нужны, чтобы Fyne понял, что объект поддерживает наведение мыши
+func (t *tooltipLabel) MouseIn(ev *desktop.MouseEvent)    {}
+func (t *tooltipLabel) MouseMoved(ev *desktop.MouseEvent) {}
+func (t *tooltipLabel) MouseOut()                         {}
+
+// А этот метод драйвер вызовет автоматически, когда увидит наведение
+func (t *tooltipLabel) ToolTip() string {
+	return t.text
+}
+
 func (app *App) buildNoteColumn(mod *checks.ModInfo) fyne.CanvasObject {
-	label := widget.NewLabel(mod.Note)
-	label.Wrapping = fyne.TextWrapOff
-	scroll := container.NewScroll(label)
-	scroll.SetMinSize(fyne.NewSize(0, 35))
-	return scroll
+	lbl := &tooltipLabel{text: mod.Note}
+	lbl.ExtendBaseWidget(lbl)
+
+	lbl.Label.SetText(mod.Note)
+	lbl.Label.Wrapping = fyne.TextWrapOff
+	lbl.Label.Truncation = fyne.TextTruncateEllipsis
+	return lbl
 }
 
 // onModRowSelected - логика OnSelected основной таблицы.
@@ -1773,19 +1866,10 @@ func (app *App) buildDescriptionCard() fyne.CanvasObject {
 		}
 	}
 
-	// Thumbnail в правом верхнем углу карточки. Контейнер фиксированного
-	// размера; внутри — фон-заглушка и картинка. Пока URL
-	// картинки нет или пока она грузится, видна только заглушка.
-	//
-	// SetMinSize на обоих элементах задаёт MinSize контейнера. Border
-	// в metaRow ниже даст этому боксу именно его min-size, а остальное
-	// уйдёт метаданным слева.
-	// Фон-подложка. Полупрозрачный чёрный, скруглённый — виден
-	// только когда картинка ещё грузится или не вписалась в бокс
-	// целиком (Contain оставляет поля по краям у неквадратных
-	// картинок).
-	app.descThumbnailBg = canvas.NewRectangle(color.NRGBA{R: 0, G: 0, B: 0, A: 15})
-	app.descThumbnailBg.CornerRadius = CornerRadius15
+	// Thumbnail в правом верхнем углу карточки.
+	app.descThumbnailBg = widget.NewThemedRectangle("")
+	app.descThumbnailBg.SetFillColor(color.NRGBA{R: 0, G: 0, B: 0, A: 15})
+	app.descThumbnailBg.SetCornerRadius(CornerRadius15)
 	app.descThumbnailBg.SetMinSize(fyne.NewSize(sizeThumbnailX, sizeThumbnailY))
 
 	app.descThumbnail = canvas.NewImageFromResource(nil)
@@ -1800,11 +1884,9 @@ func (app *App) buildDescriptionCard() fyne.CanvasObject {
 	// CRT-экран, и он уже присутствует в остальной карточке.
 	// Если захочется нейтральную рамку — ColorDescCardStroke;
 	// если ярче — ColorInputBorder.
-	app.descThumbnailBorder = canvas.NewRectangle(color.Transparent)
-	app.descThumbnailBorder.CornerRadius = CornerRadius15
-	app.descThumbnailBorder.StrokeWidth = 1
-	// ColorTableBorderDirty - рыжий
-	app.descThumbnailBorder.StrokeColor = th.Color(theme.ColorNameSeparator, variant)
+	app.descThumbnailBorder = widget.NewThemedRectangle("")
+	app.descThumbnailBorder.SetCornerRadius(CornerRadius15)
+	app.descThumbnailBorder.SetStroke(theme.ColorNameSeparator, 1)
 	app.descThumbnailBorder.SetMinSize(fyne.NewSize(sizeThumbnailX, sizeThumbnailY))
 
 	// Создаем прозрачный слой для кликов
@@ -1896,11 +1978,6 @@ func (app *App) buildDescriptionCard() fyne.CanvasObject {
 	app.descUserNote = widget.NewLabel("")
 	app.descUserNote.Wrapping = fyne.TextWrapWord
 
-	app.descCardBgRect = canvas.NewRectangle(th.Color(themes.ColorDescCardBg, variant))
-	app.descCardBgRect.CornerRadius = 12
-	app.descCardBgRect.StrokeWidth = 0.5
-	app.descCardBgRect.StrokeColor = th.Color(themes.ColorDescCardStroke, variant)
-
 	editNoteRes := app.loadIconResource("edit_note", "assets/buttons/edit_sv.png")
 	app.btnEditNote = NewIconButton(editNoteRes, func() {
 		if app.selectedModName == "" {
@@ -1934,7 +2011,7 @@ func (app *App) buildDescriptionCard() fyne.CanvasObject {
 		app.btnRemove,
 	)
 
-	titleSep := canvas.NewRectangle(th.Color(themes.ColorCRTScreenStroke, variant))
+	titleSep := widget.NewThemedRectangle(themes.ColorCRTScreenStroke)
 	titleSep.SetMinSize(fyne.NewSize(0, 3))
 
 	// titleSep — зелёная линия под заголовком карточки. Прячем
@@ -2137,8 +2214,12 @@ func (app *App) buildDescriptionCard() fyne.CanvasObject {
 	// 30/255 альфы — лёгкое притемнение. Достаточно, чтобы «пустая»
 	// карточка отличалась от «рабочей», но не настолько, чтобы
 	// потерялись цвета фона или рамки.
-	app.descCardOverlay = canvas.NewRectangle(color.NRGBA{R: 0, G: 0, B: 0, A: 30})
+	app.descCardOverlay = widget.NewThemedRectangle("")
+	app.descCardOverlay.SetFillColor(color.NRGBA{R: 0, G: 0, B: 0, A: 30})
 	app.descCardOverlay.Hide()
+
+	app.descCardBgRect = widget.NewThemedRectangle(themes.ColorDescCardBg)
+	app.descCardBgRect.Rect.CornerRadius = CornerRadius15
 
 	descCard := container.NewStack(
 		app.descCardBgRect,
@@ -2185,43 +2266,6 @@ func (app *App) refreshThemeColors() {
 	th := app.myApp.Settings().Theme()
 	variant := app.myApp.Settings().ThemeVariant()
 
-	if app.screenBgRect != nil {
-		app.screenBgRect.FillColor = th.Color(themes.ColorCRTScreenFill, variant)
-		app.screenBgRect.StrokeColor = th.Color(themes.ColorCRTScreenStroke, variant)
-		app.screenBgRect.Refresh()
-	}
-	if app.headerBoxBgRect != nil {
-		app.headerBoxBgRect.FillColor = th.Color(themes.ColorCRTHeaderBg, variant)
-		app.headerBoxBgRect.Refresh()
-	}
-	if app.logHeaderText != nil {
-		app.logHeaderText.Color = th.Color(themes.ColorConsoleText, variant)
-		app.logHeaderText.Refresh()
-	}
-	if app.tipBgRect != nil {
-		app.tipBgRect.FillColor = th.Color(themes.ColorTipBg, variant)
-		app.tipBgRect.Refresh()
-	}
-	if app.topPanelBgRect != nil {
-		app.topPanelBgRect.FillColor = th.Color(themes.ColorTopPanelBg, variant)
-		app.topPanelBgRect.Refresh()
-	}
-	if app.managePanelBgRect != nil {
-		app.managePanelBgRect.FillColor = th.Color(themes.ColorManagePanelBg, variant)
-		app.managePanelBgRect.Refresh()
-	}
-	if app.descThumbnailBorder != nil {
-		app.descThumbnailBorder.StrokeColor = th.Color(theme.ColorNameSeparator, variant)
-		app.descThumbnailBorder.Refresh()
-	}
-	if app.tableBorder != nil {
-		app.tableBorder.StrokeColor = th.Color(themes.ColorTableBorderDirty, variant)
-		app.tableBorder.Refresh()
-	}
-	if app.amlTableBorder != nil {
-		app.amlTableBorder.StrokeColor = th.Color(themes.ColorAMLWarning, variant)
-		app.amlTableBorder.Refresh()
-	}
 	if app.descTitle != nil {
 		app.descTitle.Color = th.Color(theme.ColorNameForeground, variant)
 		app.descTitle.Refresh()
@@ -3102,6 +3146,81 @@ func (app *App) filterModList() {
 	totalCount := len(app.allMods)
 	app.modsMutex.Unlock()
 
+	// Сортировка
+	if app.sortColumn == 2 { // Сортировка по номеру (порядку)
+		if !app.sortAscending {
+			// Переворачиваем список, если сортировка по убыванию
+			for i, j := 0, len(app.displayedMods)-1; i < j; i, j = i+1, j-1 {
+				app.displayedMods[i], app.displayedMods[j] = app.displayedMods[j], app.displayedMods[i]
+			}
+		}
+	} else {
+		sort.SliceStable(app.displayedMods, func(i, j int) bool {
+			m1, m2 := app.displayedMods[i], app.displayedMods[j]
+
+			switch app.sortColumn {
+			case 1: // Статус (Вкл/Выкл)
+				if app.sortAscending {
+					return !m1.Active && m2.Active // Сначала выключенные
+				}
+				return m1.Active && !m2.Active // Сначала включенные
+			case 2: // Номер
+				if app.sortAscending {
+					return m1.Order < m2.Order
+				}
+				return m1.Order > m2.Order
+			case 3: // Имя
+				if app.sortAscending {
+					return strings.ToLower(m1.DisplayName) < strings.ToLower(m2.DisplayName)
+				}
+				return strings.ToLower(m1.DisplayName) > strings.ToLower(m2.DisplayName)
+			case 4: // Дата
+				if app.sortAscending {
+					return m1.ModTime.Before(m2.ModTime)
+				}
+				return m1.ModTime.After(m2.ModTime)
+			case 5: // Статус (Проблемы/Обновления)
+				// Присваиваем вес проблемам: чем критичнее, тем выше
+				getWeight := func(m checks.ModInfo) int {
+					if m.Broken {
+						return 10
+					}
+					if m.MissingFolder {
+						return 9
+					}
+					if m.Incompatible {
+						return 8
+					}
+					if m.Obsolete {
+						return 7
+					}
+					if m.HasUpdate {
+						return 6
+					}
+					if m.Source == "nexus" {
+						return 1
+					} // Моды с Nexus чуть выше
+					return 0
+				}
+				w1, w2 := getWeight(m1), getWeight(m2)
+				if w1 != w2 {
+					if app.sortAscending {
+						return w1 < w2
+					}
+					return w1 > w2
+				}
+				// Если статусы равны, сортируем по алфавиту
+				return strings.ToLower(m1.DisplayName) < strings.ToLower(m2.DisplayName)
+			case 6: // Заметки
+				if app.sortAscending {
+					return m1.Note < m2.Note
+				}
+				return m1.Note > m2.Note
+			}
+			return false
+		})
+	}
+
 	// Пересчитываем selectedModIndex из selectedModName — после
 	// перестройки displayedMods индекс мог измениться (при смене
 	// фильтра/поиска/порядка). Иначе ScrollTo уедет на другой мод.
@@ -3424,20 +3543,6 @@ func (app *App) syncSelectionToCheckboxes() {
 	}
 	app.modsMutex.Unlock()
 
-	// Форсируем пересчёт размера скролла Fyne Table. Трюк:
-	// временно отдаём другое число, Refresh, потом возвращаем
-	// ЖИВУЮ функцию, читающую len(app.displayedMods) — не
-	// зафиксированное значение. Иначе Length навсегда останется
-	// числом на момент вызова, и таблица будет рисовать неверное
-	// количество строк после того, как displayedMods изменится
-	// (вплоть до того, что часть модов просто пропадёт из вида).
-	rows, cols := app.modTable.Length()
-	app.modTable.Length = func() (int, int) { return rows + 1, cols }
-	app.modTable.Refresh()
-
-	app.modTable.Length = func() (int, int) {
-		return len(app.displayedMods), TableColumnCount
-	}
 	app.modTable.Refresh()
 }
 
@@ -3475,10 +3580,16 @@ func (app *App) applySelectionFromMods() {
 		return
 	}
 
+	var ids []widget.TableCellID
 	for i := range names {
 		if selectedFlags[i] {
-			app.modTable.Select(widget.TableCellID{Row: i, Col: 0}, fyne.KeyModifierControl)
+			ids = append(ids, widget.TableCellID{Row: i, Col: 0})
 		}
+	}
+	if len(ids) > 0 {
+		app.modTable.BatchSelect(ids)
+	} else {
+		app.modTable.ClearSelection()
 	}
 
 	app.selectedModName = selectedNames[0]
@@ -3832,4 +3943,15 @@ func (app *App) refreshDescStaticLabels() {
 	if app.descCategoryLbl != nil {
 		app.descCategoryLbl.SetText(app.msg("category_label") + ":")
 	}
+}
+
+func (app *App) toggleSort(col int) {
+	if app.sortColumn == col {
+		app.sortAscending = !app.sortAscending
+	} else {
+		app.sortColumn = col
+		app.sortAscending = true
+	}
+	app.filterModList()
+	app.headerTable.Refresh()
 }

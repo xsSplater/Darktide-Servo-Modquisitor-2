@@ -293,39 +293,44 @@ type ModInfo struct {
 	IsSymlink      bool
 	MissingFolder  bool
 	HasUpdate      bool `json:"-"`
+
+	Order             int
+	NexusDownloads    int
+	NexusEndorsements int
+
 	// ConflictWith хранит display-имя второго мода в паре конфликта.
 	// Заполняется в refreshModList при обнаружении несовместимости.
 	// Пустая строка — конфликта нет или второй мод не установлен.
-	ConflictWith      string
-	NexusDownloads    int
-	NexusEndorsements int
-	Author            string
-	Description       string
-	DisplayName       string
-	Name              string
-	Note              string
-	URL               string
-	SourceCodeURL     string
-	Category          string
-	NexusVersion      string
-	NexusSummary      string
-	NexusPictureURL   string
-	Source            string
-	ModTime           time.Time
-	LastUpdated       time.Time `json:"-"`
-	OriginalUpload    time.Time `json:"-"`
+	ConflictWith    string
+	Author          string
+	Description     string
+	DisplayName     string
+	Name            string
+	Note            string
+	URL             string
+	SourceCodeURL   string
+	Category        string
+	NexusVersion    string
+	NexusSummary    string
+	NexusPictureURL string
+	Source          string
+
+	ModTime        time.Time
+	LastUpdated    time.Time `json:"-"`
+	OriginalUpload time.Time `json:"-"`
 }
 
 type ModDBEntry struct {
-	Folder           string            `json:"folder"`
-	NexusFilePattern string            `json:"nexus_file_pattern"`
-	Name             map[string]string `json:"name"`
-	Description      map[string]string `json:"description"`
-	Author           string            `json:"author"`
-	Category         string            `json:"category"`
-	URL              string            `json:"url"`
-	SourceCodeURL    string            `json:"source_code_url"`
-	Note             map[string]string `json:"note"`
+	Name        map[string]string `json:"name"`
+	Description map[string]string `json:"description"`
+	Note        map[string]string `json:"note"`
+
+	Folder           string `json:"folder"`
+	NexusFilePattern string `json:"nexus_file_pattern"`
+	Author           string `json:"author"`
+	Category         string `json:"category"`
+	URL              string `json:"url"`
+	SourceCodeURL    string `json:"source_code_url"`
 
 	// NexusPictureURL — прямая ссылка на thumbnail мода на CDN Nexus
 	// (staticdelivery.nexusmods.com/...). Храним в базе, чтобы не

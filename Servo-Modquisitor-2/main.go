@@ -9,6 +9,7 @@ import (
 	"net"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"sync/atomic"
 	"time"
@@ -197,7 +198,7 @@ func main() {
 						application.cfgMutex.Lock()
 						application.cfg.WindowWidth = int(size.Width)
 						application.cfg.WindowHeight = int(size.Height)
-						application.cfg.WindowMaximized = isWindowMaximized(application.mainWindow.Title())
+						application.cfg.WindowMaximized = application.mainWindow.IsMaximized()
 						application.cfgMutex.Unlock()
 						application.saveConfigSafe()
 					}
@@ -234,17 +235,27 @@ func main() {
 	application.mainWindow.Show()
 	application.updateTooltipStyle()
 
-	// Восстанавливаем размеры окна из конфига (если есть)
+	// Восстанавливаем сохранённый размер окна.
 	if cfg.WindowWidth > 0 && cfg.WindowHeight > 0 {
 		application.mainWindow.Resize(fyne.NewSize(float32(cfg.WindowWidth), float32(cfg.WindowHeight)))
 	} else {
 		application.mainWindow.Resize(fyne.NewSize(MainWindowWidth, MainWindowHeight))
 	}
-	if cfg.WindowMaximized {
+
+	// Linux: всегда максимизируем.
+	// Windows: только если так было при закрытии.
+	if runtime.GOOS == "linux" {
+		go func() {
+			time.Sleep(50 * time.Millisecond)
+			fyne.Do(func() {
+				application.mainWindow.Maximize()
+			})
+		}()
+	} else if cfg.WindowMaximized {
 		go func() {
 			time.Sleep(WindowMaximizeDelay)
 			fyne.Do(func() {
-				maximizeWindowByTitle(application.mainWindow.Title())
+				application.mainWindow.Maximize()
 			})
 		}()
 	}

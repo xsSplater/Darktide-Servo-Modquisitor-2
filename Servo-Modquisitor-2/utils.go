@@ -11,6 +11,7 @@ import (
 	"image/color"
 	"io"
 	"math"
+	"net/url"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -766,6 +767,10 @@ func (app *App) pruneVersionCache() {
 	existing["base"] = true
 	existing["dmf"] = true
 	existing["autopatch"] = true
+
+	existing["Program"] = true
+	existing["Sorting Rules"] = true
+
 	app.modsMutex.RUnlock()
 
 	// 1a. Guard от «пустого мира». Если existing пуст — это почти
@@ -773,7 +778,6 @@ func (app *App) pruneVersionCache() {
 	// checks.GetModsInfo вернул пусто, гонка на старте. Раньше
 	// Prune в этом случае сносил ВСЕ записи (нечего сохранять —
 	// значит, всё stale), и файл на диске перезаписывался пустым.
-	// Именно так был потерян кэш на 540 модов.
 	//
 	// Правильное поведение: пропустить prune и написать в лог.
 	// Если пользователь действительно удалил все моды, он сделает
@@ -1250,7 +1254,6 @@ func (app *App) openPathInFileManager(path string) {
 			"Could not open %q: no file manager backend found", path))
 
 	default:
-		// darwin и прочее — не целевая платформа, но пусть будет.
 		if err := exec.Command("open", path).Start(); err != nil {
 			app.appendLogToFile(fmt.Sprintf("open failed for %q: %v", path, err))
 		}
@@ -1271,18 +1274,38 @@ func (app *App) applyAMLWarningState() {
 	aml := app.amlDetected.Load()
 
 	// Логируем переход состояния, а не каждый вызов.
-	// Swap возвращает предыдущее значение, поэтому:
-	//   prev=false, aml=true   → переход «AML появился» → лог
-	//   prev=true,  aml=true   → уже логировали → тишина
-	//   prev=true,  aml=false  → переход «AML исчез» → лог
-	//   prev=false, aml=false  → тишина
-	//
-	// Раньше (в первом варианте правки) здесь стоял безусловный
-	// вызов appendLog: refreshModList вызывается десятки раз за
-	// сессию, и консоль заполнялась бы одинаковыми сообщениями.
+
 	prev := app.amlWarnedLastState.Swap(aml)
 	if aml && !prev {
 		app.appendLog(app.msg("log_aml_detected_warning"))
+
+		app.cfgMutex.RLock()
+		suppress := app.cfg.SuppressAMLWarning
+		app.cfgMutex.RUnlock()
+
+		if !suppress && app.mainWindow != nil {
+			app.showChoiceDialogAsync(
+				app.mainWindow,
+				app.msg("aml_detected_title"),
+				app.msg("aml_detected_warning"),
+				func(choice int) {
+					switch choice {
+					case 0: // Открыть страницу DML
+						if u, err := url.Parse(DarktideModDML); err == nil {
+							app.myApp.OpenURL(u)
+						}
+					case 2: // Больше не показывать
+						app.cfgMutex.Lock()
+						app.cfg.SuppressAMLWarning = true
+						app.cfgMutex.Unlock()
+						saveConfig(app.cfg)
+					}
+				},
+				app.msg("btn_open_dml_page"),
+				app.msg("btn_continue"),
+				app.msg("btn_dont_show_again"),
+			)
+		}
 	} else if !aml && prev {
 		app.appendLog(app.msg("log_aml_removed_info"))
 	}
