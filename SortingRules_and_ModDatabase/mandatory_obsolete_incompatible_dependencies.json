@@ -1,5 +1,5 @@
 {
-	"version": "3.0.4",
+	"version": "3.3.3",
 
 	"obsolete_mods": [
 		"ads_crosshair",
@@ -1137,9 +1137,17 @@
 			"dependent": "QIangIQsWarframeMovement",
 				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1416"},
 
+		{"required": "ParticlePicker",
+			"dependent": "ParticlePickerGroundFx",
+				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1186"},
+		{"required": "ParticlePicker",
+			"dependent": "ParticlePickerSmokeTimer",
+				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1186"},
+
 		{"required": "Power_DI",
 			"dependent": "Do I Know You",
 				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/281"},
+
 		{"required": "Perspectives",
 			"dependent": "PerspectivesExtras",
 				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/111"},
@@ -1375,6 +1383,9 @@
 				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/929"},
 		{"required": "SimpleAudio",
 			"dependent": "nanerpeel",
+				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/929"},
+		{"required": "SimpleAudio",
+			"dependent": "OgrynFartTaunt",
 				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/929"},
 		{"required": "SimpleAudio",
 			"dependent": "Rock",
