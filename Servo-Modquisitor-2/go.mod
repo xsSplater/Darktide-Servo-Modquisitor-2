@@ -1,6 +1,6 @@
 module Servo-Modquisitor
 
-go 1.27.1
+go 1.27.3
 
 require (
 	fyne.io/fyne/v2 v2.8.2
@@ -18,7 +18,7 @@ require (
 	fyne.io/systray v1.12.3-0.20260810170012-af4e8e793ec4 // indirect
 	github.com/BurntSushi/toml v1.6.0 // indirect
 	github.com/FyshOS/fancyfs v0.0.1 // indirect
-	github.com/andybalholm/brotli v1.2.7 // indirect
+	github.com/andybalholm/brotli v1.2.8 // indirect
 	github.com/anthonynsimon/bild v0.17.1 // indirect
 	github.com/bodgit/plumbing v1.3.0 // indirect
 	github.com/bodgit/sevenzip v1.6.5 // indirect
@@ -43,7 +43,7 @@ require (
 	github.com/minio/minlz v1.2.3 // indirect
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646 // indirect
 	github.com/nicksnyder/go-i18n/v2 v2.6.1 // indirect
-	github.com/nwaples/rardecode/v2 v2.4.5 // indirect
+	github.com/nwaples/rardecode/v2 v2.4.6 // indirect
 	github.com/pierrec/lz4/v4 v4.1.33 // indirect
 	github.com/rymdport/portal v0.4.2 // indirect
 	github.com/slackhq/deanimator v0.0.1 // indirect
@@ -54,15 +54,16 @@ require (
 	github.com/stangelandcl/ppmd v0.1.1 // indirect
 	github.com/stretchr/objx v0.8.0 // indirect
 	github.com/ulikunitz/xz v0.5.17 // indirect
-	github.com/yuin/goldmark v1.8.6 // indirect
-	go4.org v0.0.0-20261019143151-5b882263cdaf // indirect
+	github.com/yuin/goldmark v1.8.7 // indirect
+	go4.org v0.0.0-20261028031214-ed6929a230fe // indirect
 	golang.org/x/image v0.47.0 // indirect
 	golang.org/x/net v0.61.0 // indirect
 	golang.org/x/text v0.43.0 // indirect
 )
 
 // replace fyne.io/fyne/v2 => /home/xssplater/Проекты/GitHub/xssyne // локальная папка
-replace fyne.io/fyne/v2 => github.com/xsSplater/xssyne/v2 v2.0.4
+
+replace fyne.io/fyne/v2 => github.com/xsSplater/xssyne/v2 v2.0.9
 
 // replace github.com/lusingander/colorpicker => /home/xssplater/Проекты/GitHub/xsscolorpicker // локальная папка
 replace github.com/lusingander/colorpicker => github.com/xsSplater/xsscolorpicker v0.5.1

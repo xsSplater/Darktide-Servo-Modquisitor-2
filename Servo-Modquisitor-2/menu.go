@@ -779,4 +779,5 @@ func (app *App) changeLanguage(lang string) {
 	app.btnCheckUpdates.SetToolTip(app.msg("btn_check_updates_tooltip"))
 	app.btnEditVersion.SetToolTip(app.msg("btn_edit_version_tooltip"))
 	app.openFolderBtn.SetToolTip(app.msg("open_mod_folder_tooltip"))
+	app.btnBrowser.SetToolTip(app.msg("browser_description"))
 }

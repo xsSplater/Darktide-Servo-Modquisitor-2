@@ -263,7 +263,7 @@ func (app *App) buildControlButtons() {
 	// Кнопка открытия окна поиска модов (Find-O-Mod)
 	searchRes := app.loadIconResource("search", "assets/buttons/search.png")
 	app.btnBrowser = NewIconButton(searchRes, func() { app.showModBrowser() })
-	app.btnBrowser.SetToolTip(app.msg("browser_title"))
+	app.btnBrowser.SetToolTip(app.msg("browser_description"))
 
 	app.btnInstall = NewIconButton(addRes, func() { app.pickAndInstallArchive() })
 	app.btnInstall.SetToolTip(app.msg("btn_install_tooltip"))
@@ -1583,6 +1583,31 @@ func (app *App) buildNameColumn(row int, mod *checks.ModInfo) fyne.CanvasObject 
 	if display == "" {
 		display = mod.Name
 	}
+
+	// Получаем текущий поисковый запрос (если поле поиска уже создано)
+	query := ""
+	if app.searchEntry != nil {
+		query = app.searchEntry.Text
+	}
+
+	// Если есть запрос, используем RichText для подсветки
+	if query != "" {
+		baseStyle := widget.RichTextStyle{
+			Inline: true,
+		}
+		if row == int(app.selectedModIndex.Load()) {
+			baseStyle.TextStyle = fyne.TextStyle{Bold: true}
+		}
+
+		// createHighlightedSegments находится в ui_mod_browser.go (пакет main)
+		segs := createHighlightedSegments(display, query, baseStyle)
+		rt := widget.NewRichText(segs...)
+		rt.Wrapping = fyne.TextWrapOff
+		rt.Truncation = fyne.TextTruncateEllipsis
+		return rt
+	}
+
+	// Если поиска нет, используем обычный Label (быстрее)
 	label := widget.NewLabel(display)
 	if row == int(app.selectedModIndex.Load()) {
 		label.TextStyle = fyne.TextStyle{Bold: true}

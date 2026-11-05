@@ -16,6 +16,7 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/driver/desktop"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
@@ -64,6 +65,7 @@ func (app *App) showModBrowser() {
 	var selectedMod *ModBrowserItem
 	var searchTimer *time.Timer
 	var blinkSearchActive atomic.Bool
+	var currentSearchQuery string
 
 	// Хелпер для локализации категорий (как в ui_build.go)
 	getLocalizedCategory := func(cat string) string {
@@ -182,12 +184,18 @@ func (app *App) showModBrowser() {
 				pad.SetMinSize(fyne.NewSize(theme.Padding()/2, 1))
 				content = container.NewHBox(pad, row)
 
-			case 1:
-				lbl := widget.NewLabel(mod.Name)
-				lbl.TextStyle = fyne.TextStyle{Bold: true}
-				content = lbl
-			case 2:
-				content = widget.NewLabel(mod.Author)
+			case 1: // Название
+				segs := createHighlightedSegments(mod.Name, currentSearchQuery, widget.RichTextStyle{TextStyle: fyne.TextStyle{Bold: true}, Inline: true})
+				rt := widget.NewRichText(segs...)
+				rt.Wrapping = fyne.TextWrapOff
+				rt.Truncation = fyne.TextTruncateEllipsis
+				content = rt
+			case 2: // Автор
+				segs := createHighlightedSegments(mod.Author, currentSearchQuery, widget.RichTextStyle{Inline: true})
+				rt := widget.NewRichText(segs...)
+				rt.Wrapping = fyne.TextWrapOff
+				rt.Truncation = fyne.TextTruncateEllipsis
+				content = rt
 			case 3:
 				content = widget.NewLabel(getLocalizedCategory(mod.Category))
 			case 4:
@@ -218,9 +226,15 @@ func (app *App) showModBrowser() {
 	th := app.myApp.Settings().Theme()
 	variant := app.myApp.Settings().ThemeVariant()
 
-	titleLbl := widget.NewLabelWithStyle("", fyne.TextAlignLeading, fyne.TextStyle{Bold: true})
-	authorLbl := widget.NewLabel("")
-	summaryLbl := widget.NewLabel("")
+	titleLbl := widget.NewRichText()
+	titleLbl.Wrapping = fyne.TextWrapOff
+	titleLbl.Truncation = fyne.TextTruncateEllipsis
+
+	authorLbl := widget.NewRichText()
+	authorLbl.Wrapping = fyne.TextWrapOff
+	authorLbl.Truncation = fyne.TextTruncateEllipsis
+
+	summaryLbl := widget.NewRichText()
 	summaryLbl.Wrapping = fyne.TextWrapWord
 
 	descURL := widget.NewHyperlink("", nil)
@@ -444,8 +458,8 @@ func (app *App) showModBrowser() {
 			btnChangelog.Hide()
 		}
 
-		titleLbl.SetText(mod.Name)
-		authorLbl.SetText(fmt.Sprintf(app.msg("author_label"), mod.Author))
+		titleLbl.Segments = createHighlightedSegments(mod.Name, currentSearchQuery, widget.RichTextStyle{TextStyle: fyne.TextStyle{Bold: true}, Inline: true})
+		authorLbl.Segments = createHighlightedSegments(fmt.Sprintf(app.msg("author_label"), mod.Author), currentSearchQuery, widget.RichTextStyle{Inline: true})
 
 		if mod.ModID != 0 {
 			if u, err := url.Parse(fmt.Sprintf("https://www.nexusmods.com/warhammer40kdarktide/mods/%d", mod.ModID)); err == nil {
@@ -506,6 +520,11 @@ func (app *App) showModBrowser() {
 			}
 		}
 
+		// ДОБАВЛЕНО: Отображение статуса устаревшего мода
+		if mod.IsObsolete {
+			descStatusList.Add(app.statusRow("skull", app.msg("desc_obsolete")))
+		}
+
 		app.cfgMutex.RLock()
 		lang := app.cfg.Language
 		app.cfgMutex.RUnlock()
@@ -521,7 +540,7 @@ func (app *App) showModBrowser() {
 		}
 		descStatusList.Refresh()
 
-		summaryLbl.SetText(mod.Summary)
+		summaryLbl.Segments = createHighlightedSegments(mod.Summary, currentSearchQuery, widget.RichTextStyle{Inline: true})
 
 		thumbBox.Hide()
 		thumbnail.Resource = nil
@@ -544,6 +563,10 @@ func (app *App) showModBrowser() {
 
 		btnDownload.Enable()
 
+		// Принудительно обновляем контейнер и скролл, чтобы Fyne пересчитал высоту блоков после Show()/Hide() секции Required
+		detailsBox.Refresh()
+		detailsScroll.Refresh()
+
 		if mod.ModID != 0 && app.getAuthToken() != "" {
 			go func(m *ModBrowserItem, rowID int) {
 				fi, err := app.getLatestFileInfo(m.ModID)
@@ -551,6 +574,9 @@ func (app *App) showModBrowser() {
 					return
 				}
 				oldest, _ := app.getOldestFileInfo(m.ModID)
+
+				// Запрашиваем информацию о моде для получения количества скачиваний
+				info, _ := app.FetchNexusModInfo(m.ModID, app.getAuthToken())
 
 				fyne.Do(func() {
 					if selectedMod == m {
@@ -568,6 +594,12 @@ func (app *App) showModBrowser() {
 							descVersionValLatest.SetText(m.LatestVersion)
 						}
 
+						// Обновляем количество скачиваний
+						if info != nil && info.Downloads > 0 {
+							m.Downloads = info.Downloads
+						}
+
+						// Обновляем таблицу (чтобы отобразилось Total DLs)
 						table.Refresh()
 					}
 				})
@@ -577,6 +609,15 @@ func (app *App) showModBrowser() {
 
 	// --- 4. Поиск и Фильтры ---
 	searchEntry := widget.NewEntry()
+
+	// Обработка Esc: сброс поиска или снятие фокуса
+	searchEntry.SetEscapeHandler(func() {
+		if searchEntry.Text != "" {
+			searchEntry.SetText("")
+		} else {
+			win.Canvas().Focus(table)
+		}
+	})
 
 	// Определяем цвета для режимов
 	colorPink := color.NRGBA{R: 255, G: 105, B: 180, A: 255}
@@ -655,6 +696,7 @@ func (app *App) showModBrowser() {
 		stopSearchBlink()
 
 		q := searchEntry.Text
+		currentSearchQuery = q
 		if q == "" {
 			return
 		}
@@ -694,8 +736,16 @@ func (app *App) showModBrowser() {
 		}()
 	})
 
+	// Обработка Enter в поле поиска (запускает поиск по Nexus)
+	searchEntry.OnSubmitted = func(s string) {
+		if !btnSearchNexus.Disabled() {
+			btnSearchNexus.OnTapped()
+		}
+	}
+
 	// Выносим логику поиска в отдельную функцию, чтобы вызывать её из двух мест
 	doSearch := func(s string) {
+		currentSearchQuery = s
 		if s == "" {
 			if searchTimer != nil {
 				searchTimer.Stop()
@@ -798,7 +848,7 @@ func (app *App) showModBrowser() {
 
 	// Оранжевая рамка для результатов Nexus API
 	nexusTableBorder = canvas.NewRectangle(color.Transparent)
-	nexusTableBorder.StrokeWidth = 3
+	nexusTableBorder.StrokeWidth = 2
 	nexusTableBorder.StrokeColor = color.NRGBA{R: 255, G: 140, B: 0, A: 255}
 	nexusTableBorder.Hide()
 
@@ -834,5 +884,74 @@ func (app *App) showModBrowser() {
 		}
 	}
 
+	// Горячие клавиши: Ctrl+F для фокуса на поиске
+	win.Canvas().AddShortcut(&desktop.CustomShortcut{
+		KeyName:  fyne.KeyF,
+		Modifier: fyne.KeyModifierControl,
+	}, func(shortcut fyne.Shortcut) {
+		win.Canvas().Focus(searchEntry)
+	})
+
 	win.Show()
+}
+
+// createHighlightedSegments разбивает текст на сегменты, подсвечивая
+// найденный запрос жирным шрифтом и цветом.
+func createHighlightedSegments(text, query string, baseStyle widget.RichTextStyle) []widget.RichTextSegment {
+	if query == "" {
+		return []widget.RichTextSegment{
+			&widget.TextSegment{Text: text, Style: baseStyle},
+		}
+	}
+
+	lowerText := strings.ToLower(text)
+	lowerQuery := strings.ToLower(query)
+
+	var segments []widget.RichTextSegment
+	start := 0
+
+	for {
+		idx := strings.Index(lowerText[start:], lowerQuery)
+		if idx == -1 {
+			// Добавляем оставшийся хвост текста
+			if start < len(text) {
+				segments = append(segments, &widget.TextSegment{
+					Text:  text[start:],
+					Style: baseStyle,
+				})
+			}
+			break
+		}
+
+		actualIdx := start + idx
+
+		// Текст ДО совпадения
+		if actualIdx > start {
+			segments = append(segments, &widget.TextSegment{
+				Text:  text[start:actualIdx],
+				Style: baseStyle,
+			})
+		}
+
+		// Сам НАЙДЕННЫЙ текст (подсвечиваем фоном)
+		highlightStyle := baseStyle
+		highlightStyle.TextStyle.Bold = true
+
+		// Белый текст на цветной подложке.
+		// В стандартной теме белый даёт, например, ColorNameForegroundOnError
+		// (или ForegroundOnPrimary). Подставьте тот, что в вашей теме — белый.
+		highlightStyle.ColorName = theme.ColorNameForegroundOnError
+
+		// Подложка цвета, как вы просили — #c0ff1a в вашей теме
+		highlightStyle.BackgroundColorName = theme.ColorNameForegroundOnWarning
+
+		segments = append(segments, &widget.TextSegment{
+			Text:  text[actualIdx : actualIdx+len(query)],
+			Style: highlightStyle,
+		})
+
+		start = actualIdx + len(query)
+	}
+
+	return segments
 }

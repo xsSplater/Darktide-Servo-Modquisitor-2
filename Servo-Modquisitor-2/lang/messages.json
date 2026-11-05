@@ -12064,6 +12064,20 @@
    "zh-hans": "找模组",
    "zh-hant": "找模組"
 	},
+	"browser_description": {
+		"de": "Find-O-Mod - Ermöglicht die Suche nach Mods in einer lokalen Mod-Datenbank oder sogar auf Nexus, ohne das Programm zu verlassen.",
+		"en": "Find-O-Mod - Allows you to search for mods in a local mod database or even on Nexus, without leaving the program.",
+		"es": "Encuentra-Tu-Mod - Te permite buscar mods en una base de datos local o incluso en Nexus, sin salir del programa.",
+		"fr": "Trouve-Ton-Mod - Vous permet de rechercher des mods dans une base de données locale ou même sur Nexus, sans quitter le programme.",
+		"it": "Trova-Il-Mod - Ti permette di cercare mod in un database locale o addirittura su Nexus, senza uscire dal programma.",
+		"ja": "Find-O-Mod（MOD検索） - プログラムを終了せずに、ローカルのMODデータベースやNexusでMODを検索できます。",
+		"ko": "파인드-오-모드 - 프로그램을 종료하지 않고 로컬 모드 데이터베이스나 Nexus에서 모드를 검색할 수 있습니다.",
+		"pl": "Znajdź-Mod - Pozwala wyszukiwać mody w lokalnej bazie danych lub nawet na Nexusie, bez wychodzenia z programu.",
+	 "pt-BR": "Encontre-Um-Mod - Permite pesquisar mods em um banco de dados local ou até mesmo no Nexus, sem sair do programa.",
+		"ru": "Найди-Мод - позволяет искать моды в локальной базе модов или даже на Нексусе, не выходя из программы.",
+   "zh-hans": "找模组 - 允许您在不离开程序的情况下，在本地模组数据库甚至 Nexus 上搜索模组。",
+   "zh-hant": "找模組 - 允許您在不離開程式的情況下，在本機模組資料庫甚至 Nexus 上搜尋模組。"
+	},
 	"browser_search_ph_names": {
 		"de": "Geben Sie den NAMEN des Mods ein, um ihn in der Datenbank zu finden...",
 		"en": "Enter mod NAME to find it in the database...",
