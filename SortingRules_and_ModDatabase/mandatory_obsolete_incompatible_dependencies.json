@@ -1,5 +1,5 @@
 {
-	"version": "3.3.3",
+	"version": "3.3.4",
 
 	"obsolete_mods": [
 		"ads_crosshair",
@@ -1073,6 +1073,9 @@
 				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1263"},
 		{"required": "hud_studio",
 			"dependent": "hud_studio_psyker_hud",
+				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1263"},
+		{"required": "hud_studio",
+			"dependent": "IndicaHUD",
 				"url": "https://www.nexusmods.com/warhammer40kdarktide/mods/1263"},
 		{"required": "hud_studio",
 			"dependent": "mankind_divided",
