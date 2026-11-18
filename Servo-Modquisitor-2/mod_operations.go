@@ -79,6 +79,28 @@ func (app *App) refreshModList() {
 
 	mods := checks.GetModsInfo(lang, forceEnglish)
 
+	// Multi-select flags — чистое UI-состояние, живёт только в app.allMods.
+	// GetModsInfo всегда возвращает Selected=false, поэтому любой refresh
+	// (сохранение заметки, смена языка/темы, установка мода) молча стирал
+	// галки пользователя. Снимок до rebuild'а + восстановление после —
+	// безопасно: Selected нигде не персистится и ни на что не влияет,
+	// кроме визуального чекбокса и панели массовых операций.
+	app.modsMutex.RLock()
+	selectedSnapshot := make(map[string]bool, len(app.allMods))
+	for _, m := range app.allMods {
+		if m.Selected {
+			selectedSnapshot[m.Name] = true
+		}
+	}
+	app.modsMutex.RUnlock()
+	if len(selectedSnapshot) > 0 {
+		for i := range mods {
+			if selectedSnapshot[mods[i].Name] {
+				mods[i].Selected = true
+			}
+		}
+	}
+
 	var sysMods, regMods []checks.ModInfo
 	for _, m := range mods {
 		if m.IsSystem {
@@ -145,7 +167,6 @@ func (app *App) refreshModList() {
 	// полную копию слайса при каждом вызове, а IsMandatoryMod берёт
 	// RLock. На 267 модах это давало сотни аллокаций и lock/unlock
 	// на пустом месте — существенная часть задержки refreshModList.
-	incompatiblePairs := checks.GetIncompatiblePairs()
 	obsoleteSnapshot := checks.GetObsoleteMods()
 	mandatorySnapshot := checks.GetMandatoryOrder()
 
@@ -156,29 +177,24 @@ func (app *App) refreshModList() {
 
 		// Описание несовместимости в таблице в Примечании
 		if regMods[i].Incompatible {
-			for _, pair := range incompatiblePairs {
-				if pair.Mod1 == regMods[i].Name || pair.Mod2 == regMods[i].Name {
-					other := pair.Mod1
-					if other == regMods[i].Name {
-						other = pair.Mod2
-					}
-					if checks.FolderExists(other) {
-						conflictLang := lang
-						if forceEnglish {
-							conflictLang = "en"
-						}
-						displayName := other
-						if entry := checks.GetModDBEntry(other); entry != nil {
-							if name := checks.PickLocalized(entry.Name, conflictLang); name != "" {
-								displayName = name
-							}
-						}
-						conflictText := app.msg("conflict_with") + displayName
-						regMods[i].Note = checks.JoinNotes(regMods[i].Note, conflictText)
-						regMods[i].ConflictWith = displayName
-						break
+			// GetConflictPartner использует ТОТ ЖЕ критерий, что
+			// IsIncompatibleMod (папки существуют + не disabled_by_naming),
+			// поэтому ConflictWith никогда не укажет на несуществующий
+			// или намеренно выключенный мод.
+			if other, _ := checks.GetConflictPartner(regMods[i].Name); other != "" {
+				conflictLang := lang
+				if forceEnglish {
+					conflictLang = "en"
+				}
+				displayName := other
+				if entry := checks.GetModDBEntry(other); entry != nil {
+					if n := checks.PickLocalized(entry.Name, conflictLang); n != "" {
+						displayName = n
 					}
 				}
+				conflictText := app.msg("conflict_with") + displayName
+				regMods[i].Note = checks.JoinNotes(regMods[i].Note, conflictText)
+				regMods[i].ConflictWith = displayName
 			}
 		}
 
@@ -191,31 +207,35 @@ func (app *App) refreshModList() {
 			regMods[i].IsSymlink = false
 		}
 
-		// Определяем Source для обычных модов
-		var cacheKey string
-		switch regMods[i].Name {
-		case "dmf":
-			cacheKey = "8:dmf"
-		case "base":
-			cacheKey = "19:base"
-		case "autopatch":
-			cacheKey = "709:autopatch"
-		default:
-			if regMods[i].URL != "" {
-				modID := helpers.ExtractModIDFromURL(regMods[i].URL)
-				if modID != 0 {
-					cacheKey = fmt.Sprintf("%d:%s", modID, regMods[i].Name)
+		// Определяем Source для обычных модов.
+		if regMods[i].IsSymlink {
+			regMods[i].Source = ""
+		} else {
+			var cacheKey string
+			switch regMods[i].Name {
+			case "dmf":
+				cacheKey = "8:dmf"
+			case "base":
+				cacheKey = "19:base"
+			case "autopatch":
+				cacheKey = "709:autopatch"
+			default:
+				if regMods[i].URL != "" {
+					modID := helpers.ExtractModIDFromURL(regMods[i].URL)
+					if modID != 0 {
+						cacheKey = fmt.Sprintf("%d:%s", modID, regMods[i].Name)
+					}
 				}
 			}
-		}
-		if cacheKey != "" {
-			if info, ok := app.getCachedVersion(cacheKey); ok {
-				regMods[i].Source = info.Source
+			if cacheKey != "" {
+				if info, ok := app.getCachedVersion(cacheKey); ok {
+					regMods[i].Source = info.Source
+				} else {
+					regMods[i].Source = "manual"
+				}
 			} else {
 				regMods[i].Source = "manual"
 			}
-		} else {
-			regMods[i].Source = "manual"
 		}
 	}
 
@@ -227,6 +247,11 @@ func (app *App) refreshModList() {
 			sysMods[i].IsSymlink = true
 		} else {
 			sysMods[i].IsSymlink = false
+		}
+
+		if sysMods[i].IsSymlink {
+			sysMods[i].Source = ""
+			continue
 		}
 
 		var cacheKey string
@@ -337,7 +362,6 @@ func (app *App) refreshModList() {
 	app.modsMutex.Lock()
 	app.allMods = append(sysMods, regMods...)
 	app.systemMods = sysMods
-	app.orderDirty.Store(false)
 	app.modsMutex.Unlock()
 
 	// Установка флага HasUpdate (теперь для всех модов)
@@ -416,8 +440,9 @@ func (app *App) toggleModActive(name string, active bool) {
 	}
 	app.modsMutex.Unlock()
 	app.updateTableBorder()
+
+	// filterModList сам восстановит фокус на этот мод (если он не отфильтровался)
 	app.filterModList()
-	// app.forceRefreshTable()
 }
 
 // findModByName возвращает КОПИЮ ModInfo. Указатель наружу отдавать
@@ -426,6 +451,7 @@ func (app *App) toggleModActive(name string, active bool) {
 func (app *App) findModByName(name string) (checks.ModInfo, bool) {
 	app.modsMutex.RLock()
 	defer app.modsMutex.RUnlock()
+	// Сначала точное совпадение (быстрый путь).
 	for i := range app.allMods {
 		if app.allMods[i].Name == name {
 			return app.allMods[i], true
@@ -433,6 +459,19 @@ func (app *App) findModByName(name string) (checks.ModInfo, bool) {
 	}
 	for i := range app.systemMods {
 		if app.systemMods[i].Name == name {
+			return app.systemMods[i], true
+		}
+	}
+	// Fallback: регистронезависимо. На Windows это не даст
+	// преимущества (NTFS регистронезависим), но на Linux/macOS
+	// спасёт, если JSON содержит "AutoMark", а папка "automark".
+	for i := range app.allMods {
+		if strings.EqualFold(app.allMods[i].Name, name) {
+			return app.allMods[i], true
+		}
+	}
+	for i := range app.systemMods {
+		if strings.EqualFold(app.systemMods[i].Name, name) {
 			return app.systemMods[i], true
 		}
 	}
@@ -1249,6 +1288,23 @@ func (app *App) InstallModFromArchive(archivePath string, activate bool, knownVe
 		if gameRoot != "" {
 			if info, statErr := os.Stat(filepath.Join(tmpDir, "binaries")); statErr == nil && info.IsDir() {
 				app.appendLogToFile("Binaries-only archive installed to game root (no mod folder)")
+
+				// Если мы знаем имя мода (например, autopatch из batch-обновления),
+				// кешируем версию и обновляем UI, чтобы статус сменился на Nexus.
+				if modNameToUpdate != "" {
+					manual := false
+					modID, version := app.resolveModIDAndVersion(archivePath, modNameToUpdate, knownVersion, manual)
+
+					// Кешируем ДО обновления UI
+					source := "nexus"
+					app.cacheInstalledVersion(modID, modNameToUpdate, version, source)
+
+					app.finalizeModInstallUI(modNameToUpdate, modID, activate, archivePath)
+					return modNameToUpdate, version, nil
+				}
+
+				// Если имя неизвестно (ручная установка бинарников), просто обновляем список
+				fyne.Do(func() { app.refreshModList() })
 				return "", "", nil
 			}
 		}
@@ -1260,15 +1316,15 @@ func (app *App) InstallModFromArchive(archivePath string, activate bool, knownVe
 	manual := modNameToUpdate == ""
 	modID, version := app.resolveModIDAndVersion(archivePath, installedName, knownVersion, manual)
 
-	// 5. Обновляем UI и активируем мод, если нужно.
-	app.finalizeModInstallUI(installedName, modID, activate, archivePath)
-
-	// 6. Кешируем версию.
+	// 5. Кешируем версию (ДО обновления UI, чтобы refreshModList увидел её).
 	source := "nexus"
 	if manual {
 		source = "manual"
 	}
 	app.cacheInstalledVersion(modID, installedName, version, source)
+
+	// 6. Обновляем UI и активируем мод.
+	app.finalizeModInstallUI(installedName, modID, activate, archivePath)
 
 	return installedName, version, nil
 }
@@ -1338,7 +1394,13 @@ func (app *App) unwrapFolder(wrapper, tmpDir string) error {
 func (app *App) prepareInstallTempDir(archivePath, modNameToUpdate string) (string, error) {
 	// Удаляем старую папку мода, если это обновление.
 	if modNameToUpdate != "" {
-		checks.RemoveMod(modNameToUpdate)
+		if err := checks.RemoveMod(modNameToUpdate); err != nil {
+			app.appendLogToFile(fmt.Sprintf(
+				"prepareInstallTempDir: cannot remove old %q: %v (aborting)",
+				modNameToUpdate, err))
+			return "", fmt.Errorf(
+				"cannot remove old version of %q: %w", modNameToUpdate, err)
+		}
 		app.appendLog(fmt.Sprintf(app.msg("removed_old_folder"), modNameToUpdate))
 	}
 
@@ -1471,7 +1533,7 @@ func (app *App) installSortingArchive(tmpDir, modsPath string) error {
 	// Обновляем sorter. Геттеры возвращают снимки под checksDataMutex —
 	// без гонки с параллельным LoadExternalLists.
 	sorter.SetMandatoryOrder(checks.GetMandatoryOrder())
-	sorter.SetDependencies(convertDeps(checks.GetDependencies()))
+	sorter.SetDependencies(convertDeps(checks.GetDependenciesFlat()))
 	sorter.SetLoadOrderRules(checks.GetLoadOrderRules())
 
 	// Обновляем UI и кэш.
@@ -1700,6 +1762,10 @@ func (app *App) resolveModIDAndVersion(archivePath, installedName, knownVersion 
 			version = "unknown"
 		}
 	}
+	// Если modID всё ещё 0, но это autopatch — подставляем 709.
+	if modID == 0 && installedName == "autopatch" {
+		modID = 709
+	}
 	return modID, version
 }
 
@@ -1710,45 +1776,32 @@ func (app *App) resolveModIDAndVersion(archivePath, installedName, knownVersion 
 // Вся работа идёт в главном потоке Fyne.
 // finalizeModInstallUI получает modID, чтобы корректно сигналить батч.
 func (app *App) finalizeModInstallUI(installedName string, modID int, activate bool, archivePath string) {
-	// Читаем настройку ДО fyne.DoAndWait — по правилу
-	// «захватил → скопировал → отпустил → UI».
-	app.cfgMutex.RLock()
-	autoActivate := app.cfg.AutoActivateModsEnabled()
-	app.cfgMutex.RUnlock()
-
 	fyne.DoAndWait(func() {
 		app.appendLogToFile("InstallModFromArchive: entering fyne.DoAndWait")
 
-		// 1. СНАЧАЛА обновляем список, чтобы новый мод появился в app.allMods
+		// 1. Пересобираем список. В allMods мод появится с тем
+		// состоянием активности, которое уже записано в
+		// mod_load_order.txt (для обновления — прежнее состояние;
+		// для свежей установки — inactive, т.к. записи ещё нет).
 		app.refreshModList()
-		app.appendLogToFile("InstallModFromArchive: after refreshModList")
 
-		// 2. Активация — только если автовключение включено.
-		// Сохранение load order — всегда: новый мод должен попасть
-		// в mod_load_order.txt (активным или с -- префиксом), иначе
-		// refreshModList/syncActiveProfileFromGame при следующем
-		// проходе рассинхронизируются с allMods и «потеряют»
-		// только что установленные моды.
+		// 2. Сохраняем load order, чтобы новый мод (или обновлённый
+		// с сохранённым состоянием) попал в mod_load_order.txt и
+		// синхронизировался с игрой.
+		//
+		// НЕ включаем мод принудительно: единственная точка включения —
+		// установщик коллекций (batch_runner.go, BatchModeInstall).
 		if activate {
-			if autoActivate {
-				app.modsMutex.Lock()
-				for i := range app.allMods {
-					if app.allMods[i].Name == installedName {
-						app.allMods[i].Active = true
-						break
-					}
-				}
-				app.modsMutex.Unlock()
-			}
-
-			app.orderDirty.Store(true)
-			app.updateTableBorder()
-
-			// 3. Сохраняем порядок — всегда.
 			app.saveCurrentOrder()
 		}
 
-		app.syncModToProfile(installedName)
+		if installedName == "autopatch" {
+			// Autopatch состоит из системных файлов (DLL, bat, tools).
+			// Синхронизируем их напрямую в профиль.
+			app.copySystemFilesToProfile(app.activeProfilePath())
+		} else {
+			app.syncModToProfile(installedName)
+		}
 
 		app.filterModList()
 		app.forceRefreshTable()
@@ -1762,7 +1815,6 @@ func (app *App) finalizeModInstallUI(installedName string, modID int, activate b
 		app.selectAndScrollToMod(installedName)
 		app.appendLogToFile("InstallModFromArchive: after selectAndScrollToMod")
 
-		// Сигналим батчу, что мод установлен
 		select {
 		case app.batchInstallChan <- BatchSignal{Folder: installedName, NexusModID: modID}:
 		default:
@@ -1872,17 +1924,10 @@ func (app *App) removeSelectedMods() {
 			selectedNames = append(selectedNames, m.Name)
 		}
 	}
-	// Запоминаем ПОЗИЦИЮ первого выделенного мода в displayedMods.
-	// После удаления на эту позицию придёт мод, который был следующим
-	// за удалённым (или предыдущий, если удаляли с конца списка).
-	// Имя удалённого мода использовать нельзя — его в новом списке нет,
-	// из-за чего поиск не находил его и сбрасывал фокус на строку 0.
-	firstSelectedRow := -1
-	for i, m := range app.displayedMods {
-		if m.Selected {
-			firstSelectedRow = i
-			break
-		}
+	// Фокус ставим на тот мод, где пользователь работал в последний раз
+	focusRow := int(app.selectedModIndex.Load())
+	if focusRow < 0 {
+		focusRow = 0
 	}
 	app.modsMutex.RUnlock()
 
@@ -1901,8 +1946,10 @@ func (app *App) removeSelectedMods() {
 		defer closeDialog()
 
 		// Batch-удаление.
-		checks.RemoveMods(selectedNames)
-
+		if err := checks.RemoveMods(selectedNames); err != nil {
+			app.appendLogToFile(fmt.Sprintf(
+				"removeSelectedMods: batch delete failed: %v", err))
+		}
 		for _, name := range selectedNames {
 			app.removeModFromData(name)
 			app.removeModFromCache(name)
@@ -1922,34 +1969,16 @@ func (app *App) removeSelectedMods() {
 			app.filterModList()
 			app.forceRefreshTable()
 
-			app.modsMutex.RLock()
-			displayed := make([]checks.ModInfo, len(app.displayedMods))
-			copy(displayed, app.displayedMods)
-			app.modsMutex.RUnlock()
-
-			if len(displayed) > 0 {
-				targetRow := firstSelectedRow
-				if targetRow < 0 {
-					targetRow = 0
+			// Фокусируем позицию, где был последний клик
+			if len(app.displayedMods) > 0 {
+				if focusRow >= len(app.displayedMods) {
+					focusRow = len(app.displayedMods) - 1
 				}
-				if targetRow >= len(displayed) {
-					targetRow = len(displayed) - 1
-				}
-				time.AfterFunc(50*time.Millisecond, func() {
-					fyne.Do(func() {
-						app.modTable.Select(widget.TableCellID{Row: targetRow, Col: 0}, 0)
-						app.modTable.ScrollTo(widget.TableCellID{Row: targetRow, Col: 0})
-					})
-				})
+				app.focusModByIndex(focusRow, true)
 			} else {
-				app.selectedModName = ""
-				app.selectedModIndex.Store(-1)
-				app.updateDescriptionForMod("")
-				app.updateUpDownButtons()
+				app.clearFocus()
 			}
 
-			app.orderDirty.Store(false)
-			app.updateTableBorder()
 			app.appendLog(app.msg("log_selected_mods_removed"))
 		})
 	}()
@@ -2001,7 +2030,10 @@ func (app *App) removeAllMods() {
 		defer closeDialog()
 
 		// Batch-удаление: одна IFileOperation на все моды.
-		checks.RemoveMods(mods)
+		if err := checks.RemoveMods(mods); err != nil {
+			app.appendLogToFile(fmt.Sprintf(
+				"removeAllMods: batch delete failed: %v", err))
+		}
 		for _, name := range mods {
 			app.removeModFromCache(name)
 			app.appendLog(fmt.Sprintf(app.msg("log_deleted"), name))
@@ -2019,6 +2051,13 @@ func (app *App) removeAllMods() {
 			app.refreshModList()
 			app.filterModList()
 			app.forceRefreshTable()
+
+			// Если остались системные моды, фокусируем первый. Иначе — пусто.
+			if len(app.displayedMods) > 0 {
+				app.focusModByIndex(0, true)
+			} else {
+				app.clearFocus()
+			}
 		})
 	}()
 }
@@ -2687,4 +2726,51 @@ func (app *App) parseAMLLoadOrder(modsPath string) map[string]int {
 		}
 	}
 	return orderMap
+}
+
+// allKnownModFolders возвращает объединение всех модов, известных
+// приложению:
+//
+//   - mod_database.json (приоритет — покрывает ~1500 модов, включая
+//     ещё не установленные; сюда же попадают моды, которые автор
+//     снял с Nexus, но они продолжают работать у пользователей);
+//   - папка mods на диске (fallback — моды, которых нет в базе:
+//     приватные сборки, локальные разработки).
+//
+// Системные компоненты (base, dmf, autopatch) исключены. Они
+// управляются игрой автоматически, sorter их отбрасывает ещё в
+// CreateLoadOrderFromActive; правилам порядка / зависимостей /
+// несовместимостей они не подчиняются.
+//
+// Результат дедуплицирован и отсортирован по display-имени
+// (case-insensitive, tie-break — имя папки). Пользователь видит
+// алфавитный список в текущей локали независимо от того, установлен
+// мод или нет.
+func (app *App) allKnownModFolders() []string {
+	seen := make(map[string]bool)
+	for _, e := range checks.GetModDBList() {
+		if e.Folder != "" {
+			seen[e.Folder] = true
+		}
+	}
+	for _, f := range checks.ListModFolders() {
+		seen[f] = true
+	}
+	delete(seen, "base")
+	delete(seen, "dmf")
+	delete(seen, "autopatch")
+
+	out := make([]string, 0, len(seen))
+	for f := range seen {
+		out = append(out, f)
+	}
+	sort.Slice(out, func(i, j int) bool {
+		di := strings.ToLower(app.modDisplayName(out[i]))
+		dj := strings.ToLower(app.modDisplayName(out[j]))
+		if di != dj {
+			return di < dj
+		}
+		return out[i] < out[j]
+	})
+	return out
 }

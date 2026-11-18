@@ -36,11 +36,8 @@ func (app *App) buildMainMenu() *fyne.MainMenu {
 		return fyne.NewStaticResource(filename, data)
 	}
 
-	// !!!!! Иконка-заглушка для пунктов, у которых пока нет своей !!!!!
-	// wrenchIcon := loadMenuIcon("wrench.png")
-
 	// SETTINGS MENU - Submenu "Language selection"
-	languageCodes := []string{"de", "en", "es", "fr", "it", "ja", "ko", "pl", "pt-BR", "ru", "zh-hans", "zh-hant"}
+	languageCodes := []string{"de", "en", "es", "fr", "it", "ja", "ko", "pl", "pt-br", "ru", "zh-hans", "zh-hant"}
 	checkedIcon := loadMenuIcon("checked_box.png")
 	uncheckedIcon := loadMenuIcon("unchecked_box.png")
 
@@ -75,8 +72,9 @@ func (app *App) buildMainMenu() *fyne.MainMenu {
 			app.cfgMutex.Lock()
 			app.cfg.Theme = "dark"
 			app.cfgMutex.Unlock()
-			saveConfig(app.cfg)
+			app.saveConfigSafe()
 			app.myApp.Settings().SetTheme(&themes.ForcedDarkTheme{})
+			app.refreshThemeColors()
 			app.mainWindow.SetMainMenu(app.buildMainMenu())
 		})
 	themeDark.Checked = currentTheme == "dark"
@@ -90,8 +88,9 @@ func (app *App) buildMainMenu() *fyne.MainMenu {
 			app.cfgMutex.Lock()
 			app.cfg.Theme = "light"
 			app.cfgMutex.Unlock()
-			saveConfig(app.cfg)
+			app.saveConfigSafe()
 			app.myApp.Settings().SetTheme(&themes.ForcedLightTheme{})
+			app.refreshThemeColors()
 			app.mainWindow.SetMainMenu(app.buildMainMenu())
 		})
 	themeLight.Checked = currentTheme == "light"
@@ -105,8 +104,9 @@ func (app *App) buildMainMenu() *fyne.MainMenu {
 			app.cfgMutex.Lock()
 			app.cfg.Theme = "highcontrast"
 			app.cfgMutex.Unlock()
-			saveConfig(app.cfg)
+			app.saveConfigSafe()
 			app.myApp.Settings().SetTheme(&themes.HighContrastTheme{})
+			app.refreshThemeColors()
 			app.mainWindow.SetMainMenu(app.buildMainMenu())
 		})
 	themeHighContrast.Checked = currentTheme == "highcontrast"
@@ -138,7 +138,7 @@ func (app *App) buildMainMenu() *fyne.MainMenu {
 			app.cfgMutex.Lock()
 			app.cfg.DateFormat = "yyyy-mm-dd"
 			app.cfgMutex.Unlock()
-			saveConfig(app.cfg)
+			app.saveConfigSafe()
 			app.refreshModList()
 			app.mainWindow.SetMainMenu(app.buildMainMenu())
 		})
@@ -153,7 +153,7 @@ func (app *App) buildMainMenu() *fyne.MainMenu {
 			app.cfgMutex.Lock()
 			app.cfg.DateFormat = "mm-dd-yyyy"
 			app.cfgMutex.Unlock()
-			saveConfig(app.cfg)
+			app.saveConfigSafe()
 			app.refreshModList()
 			app.mainWindow.SetMainMenu(app.buildMainMenu())
 		})
@@ -168,7 +168,7 @@ func (app *App) buildMainMenu() *fyne.MainMenu {
 			app.cfgMutex.Lock()
 			app.cfg.DateFormat = "dd-mm-yyyy"
 			app.cfgMutex.Unlock()
-			saveConfig(app.cfg)
+			app.saveConfigSafe()
 			app.refreshModList()
 			app.mainWindow.SetMainMenu(app.buildMainMenu())
 		})
@@ -202,7 +202,7 @@ func (app *App) buildMainMenu() *fyne.MainMenu {
 			app.cfgMutex.Lock()
 			app.cfg.UpdateCheckFrequency = freqCopy
 			app.cfgMutex.Unlock()
-			saveConfig(app.cfg)
+			app.saveConfigSafe()
 			app.appendLog(fmt.Sprintf(app.msg("log_update_check_frequency_set"), name))
 			app.mainWindow.SetMainMenu(app.buildMainMenu())
 		})
@@ -222,7 +222,7 @@ func (app *App) buildMainMenu() *fyne.MainMenu {
 		app.cfgMutex.Lock()
 		app.cfg.ForceEnglishModNames = !app.cfg.ForceEnglishModNames
 		app.cfgMutex.Unlock()
-		saveConfig(app.cfg)
+		app.saveConfigSafe()
 		app.refreshModList()
 		app.mainWindow.SetMainMenu(app.buildMainMenu())
 	})
@@ -235,7 +235,7 @@ func (app *App) buildMainMenu() *fyne.MainMenu {
 		app.cfgMutex.Lock()
 		app.cfg.ShowModListAfterSort = !app.cfg.ShowModListAfterSort
 		app.cfgMutex.Unlock()
-		saveConfig(app.cfg)
+		app.saveConfigSafe()
 		app.mainWindow.SetMainMenu(app.buildMainMenu())
 	})
 	showListAfterSortItem.Checked = showListAfterSort
@@ -328,6 +328,14 @@ func (app *App) buildMainMenu() *fyne.MainMenu {
 			app.msg("btn_aml_config"),
 			loadMenuIcon("tasks.png"),
 			func() { app.showAMLConfigWindow() }),
+		fyne.NewMenuItemSeparator(),
+
+		// Редактор правил сортировки
+		fyne.NewMenuItemWithIcon(
+			app.msg("rules_editor_title"),
+			loadMenuIcon("edit_sv.png"),
+			func() { app.showSortingRulesEditor() },
+		),
 		fyne.NewMenuItemSeparator(),
 
 		fyne.NewMenuItemWithIcon(
@@ -605,22 +613,6 @@ func (app *App) buildMainMenu() *fyne.MainMenu {
 	autoSortLaunchItem.CheckedIcon = checkedIcon
 	autoSortLaunchItem.UncheckedIcon = uncheckedIcon
 
-	// Auto activate mods after install/update.
-	app.cfgMutex.RLock()
-	autoActivate := app.cfg.AutoActivateModsEnabled()
-	app.cfgMutex.RUnlock()
-	autoActivateItem := fyne.NewMenuItem(app.msg("setting_auto_activate_mods"), func() {
-		app.cfgMutex.Lock()
-		v := !app.cfg.AutoActivateModsEnabled()
-		app.cfg.AutoActivateMods = &v
-		app.cfgMutex.Unlock()
-		app.saveConfigSafe()
-		app.mainWindow.SetMainMenu(app.buildMainMenu())
-	})
-	autoActivateItem.Checked = autoActivate
-	autoActivateItem.CheckedIcon = checkedIcon
-	autoActivateItem.UncheckedIcon = uncheckedIcon
-
 	// SETTINGS MENU
 	settingsMenu := fyne.NewMenuWithIcon(app.msg("menu_settings"), loadMenuIcon("cog.png"),
 		langMenu,
@@ -635,7 +627,6 @@ func (app *App) buildMainMenu() *fyne.MainMenu {
 		autoFocusItem,
 		autoConfirmItem,
 		autoSortLaunchItem,
-		autoActivateItem,
 		fyne.NewMenuItemSeparator(),
 		changePathItem,
 		createShortcutItem,
@@ -681,7 +672,7 @@ func (app *App) changeLanguage(lang string) {
 	app.cfg.Language = lang
 	app.cfgMutex.Unlock()
 	checks.SetLanguage(lang)
-	saveConfig(app.cfg)
+	app.saveConfigSafe()
 	app.mainWindow.SetTitle(app.msg("app_title_long"))
 	app.mainWindow.SetMainMenu(app.buildMainMenu())
 	sorter.SetSortMessages(app.msg("sort_ru_warning"), app.msg("sort_en_warning"))
@@ -691,10 +682,16 @@ func (app *App) changeLanguage(lang string) {
 	if app.searchEntry != nil {
 		app.searchEntry.SetPlaceHolder(app.msg("search_placeholder"))
 	}
-	if app.filterSelect != nil {
-		app.filterSelect.Options = app.filterOptions()
-		app.filterSelect.SetSelected(app.msg("filter_all"))
-		app.filterSelect.Refresh()
+	if app.filterPicker != nil {
+		app.filterPicker.SetLabels([]string{
+			app.msg("filter_all"),
+			app.msg("filter_active"),
+			app.msg("filter_inactive"),
+			app.msg("filter_obsolete"),
+			app.msg("filter_conflict"),
+			app.msg("filter_missing"),
+			app.msg("filter_has_update"),
+		})
 	}
 	app.refreshModList() // filterModList внутри имеет проверку counterLabel != nil
 

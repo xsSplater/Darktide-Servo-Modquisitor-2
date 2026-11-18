@@ -1,14 +1,14 @@
 {
 	"FixedFileInfo": {
 		"FileVersion": {
-			"Major": 5,
-			"Minor": 8,
+			"Major": 6,
+			"Minor": 0,
 			"Patch": 0,
 			"Build": 0
 		},
 		"ProductVersion": {
-			"Major": 5,
-			"Minor": 8,
+			"Major": 6,
+			"Minor": 0,
 			"Patch": 0,
 			"Build": 0
 		},
@@ -16,7 +16,7 @@
 	},
 	"StringFileInfo": {
 		"Comments": "Mod manager for Warhammer 40,000: Darktide",
-		"CompanyName": "xsSplater",
+		"CompanyName": "Roga & Co",
 		"FileDescription": "Servo-Modquisitor-2 - Darktide Mod Manager",
 		"InternalName": "Servo-Modquisitor-2.exe",
 		"LegalCopyright": "© xsSplater 2026",

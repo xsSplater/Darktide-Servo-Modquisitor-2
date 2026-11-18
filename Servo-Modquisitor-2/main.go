@@ -147,8 +147,7 @@ func main() {
 	iconData, _ := embeddedFiles.ReadFile(AppIcon)
 	if iconData != nil {
 		icon := fyne.NewStaticResource("icon", iconData)
-		// SetIcon на app — для Windows и macOS (иконка в панели
-		// задач/Dock). На Linux это no-op, но ничего не ломает.
+		// SetIcon на app — для Windows. На Linux это no-op, но ничего не ломает.
 		myApp.SetIcon(icon)
 		// SetIcon на window — для X11 Linux (_NET_WM_ICON).
 		// На Wayland — no-op, там работает .desktop (см. register).
@@ -157,6 +156,7 @@ func main() {
 
 	// Строим UI, устанавливаем заголовок и меню
 	application.buildUI()
+	application.refreshThemeColors() // гарантирует, что все canvas.Text/ThemedRectangle получили цвет из актуальной темы (а не из дефолтной, если SetTheme отработал позже, чем создавались виджеты)
 	application.mainWindow.SetTitle(application.getTitle() + " v" + AppVersion)
 	application.mainWindow.SetMainMenu(application.buildMainMenu())
 

@@ -11,7 +11,7 @@ import (
 // ───────────── Программа ─────────────────────────────────────────
 const (
 	AppName         = "Servo-Modquisitor-2"
-	AppVersion      = "5.8.0"
+	AppVersion      = "6.0.0"
 	AppID           = "com.xssplater.servo-modquisitor"
 	AppIcon         = "assets/icon.png"
 	ConfigFolderSMQ = "Servo-Modquisitor"
@@ -49,8 +49,10 @@ const (
 	clientID     = "servomodquisitor2"
 	NexusMainURL = "https://www.nexusmods.com/"
 	nexusAPIBase = "https://api.nexusmods.com/v1"
-	// nexusV3APIBase    = "https://api.nexusmods.com/v3"
-	// gameDomain        = "warhammer40kdarktide"
+	apiURL       = "https://api.nexusmods.com/v2/graphql"
+	gameDom      = "warhammer40kdarktide"
+	pageSize     = 30
+
 	oauthAuthorizeURL = "https://users.nexusmods.com/oauth/authorize"
 	oauthTokenURL     = "https://users.nexusmods.com/oauth/token"
 	redirectURI       = "http://localhost:31337/callback" // НЕ менять!
@@ -59,8 +61,8 @@ const (
 	NexusV1DownLink   = "https://api.nexusmods.com/v1/games/warhammer40kdarktide/mods/%s/files/%s/download_link.json"
 	NexusModIDLink    = "https://www.nexusmods.com/warhammer40kdarktide/mods/%d"
 
-	MaxModsID      = 2000 // Примерный максимум модов на Нексус
-	MaxModsID_less = 2001 // но меньше этого числа
+	MaxModsID      = 2500 // Примерный максимум модов на Нексус
+	MaxModsID_less = 2501 // но меньше этого числа
 )
 
 // ───────────── Файлы ─────────────────────────────────────────────
@@ -141,9 +143,12 @@ const (
 const (
 	MainWindowWidth  float32 = 1666
 	MainWindowHeight float32 = 777
-
-	AMLWindowWidth  float32 = 1666
-	AMLWindowHeight float32 = 777
+	WindowWidth550   float32 = 550
+	WindowWidth400   float32 = 400
+	WindowHeight200  float32 = 200
+	WindowHeight170  float32 = 170
+	WindowHeight160  float32 = 160
+	WindowHeight120  float32 = 120
 )
 
 // ───────────── Панели ────────────────────────────────────────────

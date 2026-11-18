@@ -27,5 +27,9 @@ type UIState struct {
 	enrichDebounce          *time.Timer
 	sortColumn              int // 2 = порядок, 3 = имя, 4 = дата, 5 = статус
 	sortAscending           bool
-	searchDebounce          *time.Timer
+	// blinkRulesEditorActive — свой флаг для мигания Save в редакторе
+	// правил. Раньше редактор использовал общий blinkSaveOrderActive,
+	// из-за чего сохранение правил останавливало мигание главного окна,
+	// хотя orderDirty там оставался true.
+	blinkRulesEditorActive atomic.Bool
 }

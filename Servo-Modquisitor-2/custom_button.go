@@ -4,6 +4,7 @@ package main
 import (
 	"Servo-Modquisitor/themes"
 	"image/color"
+	"time"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
@@ -31,38 +32,73 @@ func (r *_CustomButtonRenderer) Layout(size fyne.Size) {
 		r.bgImage.Resize(size)
 	}
 
-	// Размещаем иконку
-	if r.icon != nil {
-		iconSize := r.btn.iconSize // обычный размер
-		if r.btn.hovered && !r.btn.disabled {
-			iconSize = iconSize * 1.35 // увеличиваем на 35% при наведении
-		}
-		x := (size.Width - iconSize) / 2
-		y := (size.Height - iconSize) / 2
-		r.icon.Resize(fyne.NewSize(iconSize, iconSize))
-		r.icon.Move(fyne.NewPos(x, y))
-		r.icon.Refresh()
+	textMin := r.text.MinSize()
+	if r.btn.text == "" {
+		textMin = fyne.NewSize(0, 0)
 	}
 
-	r.text.Resize(size)
-	r.text.Alignment = fyne.TextAlignCenter
+	iconSize := r.btn.iconSize
+	if r.icon != nil && r.btn.hovered && !r.btn.disabled {
+		iconSize = iconSize * 1.35 // Увеличение при наведении
+	}
+
+	if r.icon != nil && r.btn.text != "" {
+		// Есть И иконка, И текст: центрируем их вместе как единый блок
+		totalWidth := iconSize + theme.Padding() + textMin.Width
+		startX := (size.Width - totalWidth) / 2
+
+		// Иконка (слева)
+		r.icon.Resize(fyne.NewSize(iconSize, iconSize))
+		r.icon.Move(fyne.NewPos(startX, (size.Height-iconSize)/2))
+		r.icon.Refresh()
+
+		// Текст (справа от иконки)
+		r.text.Resize(fyne.NewSize(textMin.Width, textMin.Height))
+		r.text.Move(fyne.NewPos(startX+iconSize+theme.Padding(), (size.Height-textMin.Height)/2))
+		r.text.Alignment = fyne.TextAlignLeading
+	} else if r.icon != nil {
+		// Только иконка: центрируем
+		r.icon.Resize(fyne.NewSize(iconSize, iconSize))
+		r.icon.Move(fyne.NewPos((size.Width-iconSize)/2, (size.Height-iconSize)/2))
+		r.icon.Refresh()
+	} else {
+		// Только текст: центрируем
+		r.text.Resize(size)
+		r.text.Alignment = fyne.TextAlignCenter
+	}
+
 	r.updateColors()
 }
 
 func (r *_CustomButtonRenderer) MinSize() fyne.Size {
-	min := r.text.MinSize()
-	if r.icon != nil {
-		iconMin := r.icon.MinSize()
-		if iconMin.Width > min.Width {
-			min.Width = iconMin.Width
-		}
-		if iconMin.Height > min.Height {
-			min.Height = iconMin.Height
-		}
+	textMin := r.text.MinSize()
+	if r.btn.text == "" {
+		textMin = fyne.NewSize(0, 0)
 	}
-	min.Width += 2*theme.Padding() + 8
-	min.Height += 2*theme.Padding() + 8
-	return min
+	iconMin := fyne.NewSize(0, 0)
+	if r.icon != nil {
+		iconMin = fyne.NewSize(r.btn.iconSize, r.btn.iconSize)
+	}
+
+	var w, h float32
+	if r.icon != nil && r.btn.text != "" {
+		// Иконка + текст: складываем их ширину + отступ
+		w = iconMin.Width + theme.Padding() + textMin.Width
+		h = fyne.Max(iconMin.Height, textMin.Height)
+	} else if r.icon != nil {
+		// Только иконка
+		w = iconMin.Width
+		h = iconMin.Height
+	} else {
+		// Только текст
+		w = textMin.Width
+		h = textMin.Height
+	}
+
+	// Добавляем стандартные отступы по краям.
+	// +8 было слишком много — раздувало высоту кнопок до ~46-50px.
+	// +4 даёт комфортные ~36-40px.
+	return fyne.NewSize(w+2*theme.Padding()+4, h+2*theme.Padding()+4)
 }
 
 func (r *_CustomButtonRenderer) updateIcon() {
@@ -181,10 +217,6 @@ type CustomButton struct {
 	focused  bool
 	disabled bool
 
-	// warningFrame — постоянная жёлтая обводка вокруг кнопки.
-	// Используется, например, для кнопок Save и Autosort, когда
-	// в системе обнаружен AML (Auto Mod Loader), и наши операции
-	// с load order'ом могут конфликтовать с ним.
 	warningFrame bool
 
 	OnMouseIn    func()
@@ -194,6 +226,17 @@ type CustomButton struct {
 	bgImage *canvas.Image
 
 	iconSize float32 // размер иконки
+
+	// iconImage — ссылка на canvas.Image внутри рендерера.
+	// Создаётся в CreateRenderer при первом показе кнопки.
+	// Нужна для анимации поворота иконки (SetIconRotation).
+	//
+	// До первого CreateRenderer — nil. SetIconRotation в этом
+	// состоянии запоминает значение в pendingRotation и
+	// применяет его, когда рендерер будет создан.
+	iconImage        *canvas.Image
+	pendingRotation  float32
+	hasPendingRotate bool
 }
 
 // SetWarningFrame включает/выключает постоянную жёлтую обводку.
@@ -221,7 +264,7 @@ func NewIconButton(icon fyne.Resource, tapped func()) *CustomButton {
 		icon:     icon,
 		OnTapped: tapped,
 
-		iconSize: 30, // по умолчанию
+		iconSize: 24, // по умолчанию
 	}
 	b.ExtendBaseWidget(b)
 	return b
@@ -240,6 +283,23 @@ func (b *CustomButton) SetBackgroundImage(img *canvas.Image) {
 
 func (b *CustomButton) SetText(text string) {
 	b.text = text
+	b.Refresh()
+}
+
+// SetIcon меняет иконку кнопки. Если иконка не менялась — no-op.
+//
+// Специально НЕ вызывает Refresh, если значение идентично: внутри
+// Refresh пересчитывается Layout (изменение размера иконки при hover,
+// центрирование иконки и текста), и лишний пересчёт на каждое
+// «обновить состояние» (а updateDescriptionForMod / FilterPicker.updateButton
+// вызываются часто) даёт заметный оверхед на ровном месте.
+//
+// nil допустим — иконка просто исчезнет.
+func (b *CustomButton) SetIcon(icon fyne.Resource) {
+	if b.icon == icon {
+		return
+	}
+	b.icon = icon
 	b.Refresh()
 }
 
@@ -311,6 +371,14 @@ func (b *CustomButton) CreateRenderer() fyne.WidgetRenderer {
 		iconImg = canvas.NewImageFromResource(b.icon)
 		iconImg.FillMode = canvas.ImageFillContain
 		iconImg.SetMinSize(fyne.NewSize(24, 24))
+		// Применяем «отложенный» поворот, если SetIconRotation
+		// вызывали до первого рендера (например, при восстановлении
+		// состояния спойлера из кэша).
+		if b.hasPendingRotate {
+			iconImg.Rotation = b.pendingRotation
+			b.hasPendingRotate = false
+		}
+		b.iconImage = iconImg
 	}
 
 	renderer := &_CustomButtonRenderer{
@@ -330,3 +398,73 @@ var _ fyne.Tappable = (*CustomButton)(nil)
 var _ desktop.Hoverable = (*CustomButton)(nil)
 var _ fyne.Focusable = (*CustomButton)(nil)
 var _ fyne.Disableable = (*CustomButton)(nil)
+
+func NewCustomIconButton(label string, icon fyne.Resource, tapped func()) *CustomButton {
+	b := &CustomButton{
+		text:     label,
+		icon:     icon,
+		OnTapped: tapped,
+		iconSize: 24, // стандартный размер иконки в текстовой кнопке
+	}
+	b.ExtendBaseWidget(b)
+	return b
+}
+
+// SetIconRotation задаёт угол поворота иконки в градусах по часовой
+// стрелке. Не перерисовывает, если значение совпадает.
+//
+// Если рендерер ещё не создан (кнопка ни разу не показывалась) —
+// значение запоминается и применяется, когда рендерер будет создан.
+// Это позволяет восстанавливать состояние (например, «спойлер
+// раскрыт») из кэша до первого показа кнопки на экране.
+func (b *CustomButton) SetIconRotation(degrees float32) {
+	if b.iconImage != nil {
+		b.iconImage.SetRotation(degrees)
+		return
+	}
+	if b.hasPendingRotate && b.pendingRotation == degrees {
+		return
+	}
+	b.pendingRotation = degrees
+	b.hasPendingRotate = true
+}
+
+// IconRotation возвращает текущий угол поворота иконки.
+// 0 — если иконка не была повёрнута или рендерер ещё не создан.
+func (b *CustomButton) IconRotation() float32 {
+	if b.iconImage == nil {
+		if b.hasPendingRotate {
+			return b.pendingRotation
+		}
+		return 0
+	}
+	return b.iconImage.Rotation
+}
+
+// AnimateIconRotation плавно поворачивает иконку кнопки от from до to
+// градусов за duration.
+//
+// Если btn == nil или iconImage == nil — no-op. В последнем случае
+// (кнопка ещё не показана) можно передать желаемое конечное значение
+// через btn.SetIconRotation(to) — оно запомнится в pendingRotation
+// и применится при первом рендере.
+//
+// Пример: раскрытие спойлера — from=0, to=90; закрытие — from=90, to=0.
+func AnimateIconRotation(btn *CustomButton, from, to float32, duration time.Duration) {
+	if btn == nil {
+		return
+	}
+	if btn.iconImage == nil {
+		// Рендерер не готов — запоминаем конечное значение.
+		btn.SetIconRotation(to)
+		return
+	}
+	if from == to {
+		btn.SetIconRotation(to)
+		return
+	}
+	anim := fyne.NewAnimation(duration, func(v float32) {
+		btn.SetIconRotation(from + (to-from)*v)
+	})
+	anim.Start()
+}

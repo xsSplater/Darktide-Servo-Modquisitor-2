@@ -254,11 +254,17 @@ func (app *App) enrichModBrowserItems(items []ModBrowserItem) []ModBrowserItem {
 
 // SearchNexusMods — поиск модов на Nexus через GraphQL v2.
 func (app *App) SearchNexusMods(query string, sortBy string, offset int, onlyNames bool) ([]ModBrowserItem, int, error) {
-	const (
-		apiURL   = "https://api.nexusmods.com/v2/graphql"
-		gameDom  = "warhammer40kdarktide"
-		pageSize = 30
-	)
+	// onlyNames намеренно игнорируется.
+	//
+	// GraphQL v2 (mods.filter.name) умеет искать только по имени мода —
+	// у него нет поля для поиска по описанию или автору. То есть API
+	// работает ровно в режиме onlyNames==true, и переключатель в UI
+	// на серверный поиск не влияет (он влияет только на локальную
+	// базу mod_database.json).
+	//
+	// Параметр оставлен в сигнатуре, чтобы не менять call-site и
+	// сохранить возможность расширения, если Nexus добавит другие
+	// фильтры (например, filter.summary WILDCARD).
 	_ = onlyNames
 
 	var sortField string

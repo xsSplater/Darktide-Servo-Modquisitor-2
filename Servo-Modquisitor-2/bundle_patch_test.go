@@ -142,7 +142,8 @@ func TestPatchBundle_Roundtrip(t *testing.T) {
 	writeDB(t, root, original)
 
 	// ── 1. Патч ────────────────────────────────────────────────
-	if err := PatchBundle(root); err != nil {
+	err := PatchBundle(root)
+	if err != nil {
 		t.Fatalf("PatchBundle: %v", err)
 	}
 
@@ -239,8 +240,8 @@ func TestPatchBundle_ForeignPatch(t *testing.T) {
 	writeDB(t, root, original)
 
 	err := PatchBundle(root)
-	if !errors.Is(err, ErrBundleUnsupported) {
-		t.Fatalf("PatchBundle err = %v, want ErrBundleUnsupported", err)
+	if !errors.Is(err, ErrBundleAlreadyPatched) {
+		t.Fatalf("PatchBundle err = %v, want ErrBundleAlreadyPatched", err)
 	}
 
 	// Файл не изменён.
@@ -313,4 +314,17 @@ func TestToggleBundle_States(t *testing.T) {
 	if state {
 		t.Fatalf("after second toggle state = true, want false")
 	}
+}
+
+// TestMain грузит assets/patch.bin до запуска тестов.
+//
+// В проде это делает main(), но go test main() не вызывает —
+// только TestMain. Без этой загрузки bundlePatchBin остаётся
+// пустым, и все тесты, зависящие от содержимого patch.bin,
+// падают с невнятными «patch offset not found».
+func TestMain(m *testing.M) {
+	if data, err := embeddedFiles.ReadFile("assets/patch.bin"); err == nil {
+		bundlePatchBin = data
+	}
+	os.Exit(m.Run())
 }

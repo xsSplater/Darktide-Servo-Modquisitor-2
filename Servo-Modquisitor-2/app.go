@@ -81,11 +81,6 @@ type Config struct {
 	// Программа продолжает работать в ручном режиме.
 	SuppressOAuthPrompt bool `json:"suppress_oauth_prompt"`
 
-	// AutoActivateMods — автоматически включать мод в load order сразу
-	// после скачивания/установки. Дефолт: включено (nil трактуется как
-	// «да»), чтобы старый config.json без этого ключа не менял поведение.
-	AutoActivateMods *bool `json:"auto_activate_mods,omitempty"`
-
 	// Пропущенные версии
 	SkippedProgramVersion string `json:"skipped_program_version,omitempty"`
 	SkippedSortingVersion string `json:"skipped_sorting_version,omitempty"`
@@ -112,7 +107,7 @@ type ModVersionInfo struct {
 // refreshModList, любой другой вызов Fyne API. Для лога из-под
 // loadOrderMutex используйте только appendLogToFile.
 //
-// gameRootMutex, pathsMutex, logFileMu — независимы (берутся по одному).
+// gameRootMutex, logFileMu — независимы (берутся по одному).
 // Мьютексы кэшей (VersionCache.mu, ChangelogCache.mu, OAuthState.mu,
 // NXMListener.mu) — локальные для своих сервисов, с чужими мьютексами
 // не пересекаются.
@@ -338,7 +333,7 @@ type App struct {
 	descURL        *widget.Hyperlink
 	sourceCodeLink *widget.Hyperlink
 	logWindow      *widget.RichText
-	filterSelect   *widget.Select
+	filterPicker   *FilterPicker
 	profileSelect  *widget.Select
 
 	// ─── OAuth ─────────────────────────────────────────────────────
@@ -399,6 +394,11 @@ type App struct {
 	// runAllChecks (через sorter), syncLoadOrderToGame. Порядок:
 	// берётся последним, ничего внутри не вкладывается.
 	loadOrderMutex sync.Mutex
+	// openWindowsMu защищает openWindows. Порядок: независимый,
+	// с другими мьютексами App не пересекается — берётся только
+	// на короткий lock/unlock в acquireWindow/registerWindow.
+	openWindowsMu sync.Mutex
+	openWindows   map[string]fyne.Window
 	// Остальные мьютексы живут внутри сервисов:
 	//   versionCache → app.versionCache (version_cache.go)
 	//   changelog*   → app.changelog    (changelog_cache.go)
@@ -438,6 +438,8 @@ func NewApp(cfg *Config, myApp fyne.App) *App {
 	app.cleanupLegacyTokenFile()
 
 	app.batchInstallChan = make(chan BatchSignal, 4) // 4 — чтобы случайные stale-сигналы не блокировали
+
+	app.openWindows = make(map[string]fyne.Window)
 
 	app.selectedModIndex.Store(-1)
 	// Однократное обращение к keyring на старте — до того, как
@@ -783,11 +785,10 @@ func (app *App) loadModDatabase(filename string) error {
 	app.cfg.LastModDatabaseVersion = container.Version
 	app.cfgMutex.Unlock()
 	app.saveConfigSafe()
-	// saveConfig(app.cfg)
 	return nil
 }
 
-func convertDeps(deps []checks.Dependency) []sorter.ModDependency {
+func convertDeps(deps []checks.FlatDependency) []sorter.ModDependency {
 	out := make([]sorter.ModDependency, len(deps))
 	for i, d := range deps {
 		out[i] = sorter.ModDependency{Dependent: d.Dependent, Required: d.Required}
@@ -825,7 +826,7 @@ func (app *App) initializePaths() {
 				app.cfgMutex.Lock()
 				app.cfg.GameRoot = filepath.Dir(modsPath)
 				app.cfgMutex.Unlock()
-				saveConfig(app.cfg)
+				app.saveConfigSafe()
 			}
 			return
 		}
@@ -833,7 +834,7 @@ func (app *App) initializePaths() {
 		app.cfg.ModsPath = ""
 		app.cfg.GameRoot = ""
 		app.cfgMutex.Unlock()
-		saveConfig(app.cfg)
+		app.saveConfigSafe()
 	}
 
 	autoRoot := autoFindGameRoot()
@@ -937,12 +938,15 @@ func (app *App) changeGamePath() {
 
 				root, _ := app.getGameState()
 				if root == "" {
-					// Пользователь отменил выбор — оставляем как есть.
 					app.appendLogToFile("changeGamePath: cancelled by user")
 					return
 				}
 
 				app.setGlobalDataDir()
+
+				// gameRoot сменился: bundle-состояние нового корня может
+				// отличаться от того, что записано в cfg.ModsGloballyEnabled.
+				app.syncModsEnabledState()
 
 				fyne.Do(func() {
 					app.reloadAfterPathChange()
@@ -1064,7 +1068,9 @@ func (app *App) setGamePaths(gameRoot string) {
 	app.cfgMutex.Lock()
 	app.cfg.ModsPath = modsPath
 	app.cfgMutex.Unlock()
-	saveConfig(app.cfg)
+
+	app.saveConfigSafe()
+	checks.SetModsDir(modsPath) // теперь checks видит новый путь
 	app.setGameState(gameRoot, detectPatcherTypeWithRoot(gameRoot))
 }
 
@@ -1112,6 +1118,28 @@ func (app *App) loadDataAfterInit() {
 
 	checks.SetTrashFunc(moveManyToTrash)
 
+	checks.SetConfirmPermanentDeleteFunc(func(paths []string) bool {
+		names := make([]string, len(paths))
+		for i, p := range paths {
+			names[i] = filepath.Base(p)
+		}
+		var listing string
+		if len(names) <= 10 {
+			listing = strings.Join(names, "\n")
+		} else {
+			listing = strings.Join(names[:10], "\n") +
+				fmt.Sprintf("\n… и ещё %d", len(names)-10)
+		}
+		choice := app.showChoiceDialogSync(
+			app.mainWindow,
+			app.msg("trash_failed_title"),
+			fmt.Sprintf(app.msg("trash_failed_confirm_permanent"), listing),
+			app.msg("btn_delete_forever"),
+			app.msg("btn_cancel"),
+		)
+		return choice == 0
+	})
+
 	checks.SetLanguage(lang)
 
 	checks.InitGlobals(
@@ -1127,7 +1155,8 @@ func (app *App) loadDataAfterInit() {
 		func(modName string) bool {
 			return app.isModActive(modName)
 		},
-		func() { fyne.Do(app.refreshModList) },
+		// func() { fyne.Do(app.refreshModList) },
+		func() { fyne.DoAndWait(app.refreshModList) }, // Дэдлок?
 		func(key string) int64 {
 			if info, ok := app.getCachedVersion(key); ok {
 				return info.InstalledAt
@@ -1187,11 +1216,11 @@ func (app *App) loadDataAfterInit() {
 		app.cfgMutex.Lock()
 		app.cfg.LastMandatoryRulesVersion = checks.GetExternalVersion()
 		app.cfgMutex.Unlock()
-		saveConfig(app.cfg)
+		app.saveConfigSafe()
 		app.appendLog(app.msg("log_succ_moid_found"))
 	}
 	sorter.SetMandatoryOrder(checks.GetMandatoryOrder())
-	sorter.SetDependencies(convertDeps(checks.GetDependencies()))
+	sorter.SetDependencies(convertDeps(checks.GetDependenciesFlat()))
 	sorter.SetLoadOrderRules(checks.GetLoadOrderRules())
 
 	if err := app.loadModDatabase(FileNameModDatabase); err != nil {
@@ -1263,7 +1292,7 @@ func (app *App) loadDataAfterInit() {
 	// registerNXMProtocol уже вызывается из main.go в шаге 6 фоновой
 	// инициализации — здесь второй раз не нужно.
 
-	app.nxm.Start() // ошибку логируем, если нужно
+	// app.nxm.Start() // Есть уже в main.go: 306
 }
 
 // isLoggedIn возвращает кэшированное состояние авторизации.
@@ -1352,7 +1381,7 @@ func (app *App) initProfiles() {
 		app.cfgMutex.Lock()
 		app.cfg.ActiveProfile = "Default"
 		app.cfgMutex.Unlock()
-		saveConfig(app.cfg)
+		app.saveConfigSafe()
 	}
 
 	app.cfgMutex.RLock()
@@ -1362,7 +1391,7 @@ func (app *App) initProfiles() {
 		app.cfgMutex.Lock()
 		app.cfg.ActiveProfile = profileNames[0]
 		app.cfgMutex.Unlock()
-		saveConfig(app.cfg)
+		app.saveConfigSafe()
 	}
 
 	app.cfgMutex.RLock()
@@ -1536,10 +1565,10 @@ func (app *App) migrateGlobalFilesFromMods() {
 			app.cfgMutex.Lock()
 			app.cfg.LastMandatoryRulesVersion = checks.GetExternalVersion()
 			app.cfgMutex.Unlock()
-			saveConfig(app.cfg)
+			app.saveConfigSafe()
 		}
 		sorter.SetMandatoryOrder(checks.GetMandatoryOrder())
-		sorter.SetDependencies(convertDeps(checks.GetDependencies()))
+		sorter.SetDependencies(convertDeps(checks.GetDependenciesFlat()))
 		sorter.SetLoadOrderRules(checks.GetLoadOrderRules())
 		app.appendLogToFile("Global files migration completed successfully.")
 		return
@@ -1892,7 +1921,7 @@ func (app *App) renameProfile(oldName, newName string) error {
 		app.cfgMutex.Lock()
 		app.cfg.ActiveProfile = newName
 		app.cfgMutex.Unlock()
-		saveConfig(app.cfg)
+		app.saveConfigSafe()
 	}
 	app.appendLogToFile(fmt.Sprintf("Renamed profile: %s -> %s", oldName, newName))
 	app.refreshProfileList()
@@ -2012,136 +2041,6 @@ func (app *App) performFirstRunSetup() {
 	go app.runWizard(false)
 }
 
-// showLanguagePickerIfFirstRun показывает выбор языка при самом первом
-// запуске. Вызывается ПЕРЕД initializePaths/loadDataAfterInit, чтобы
-// все последующие диалоги (пути, wizard, AML-предупреждение) были уже
-// на выбранном языке.
-//
-// Если InitialSetupDone == true — no-op: язык уже выбран ранее.
-//
-// Блокирует вызывающую горутину до выбора пользователя. Вызывать
-// ТОЛЬКО из фоновой горутины (внутри fyne.DoAndWait + ожидание канала).
-func (app *App) showLanguagePickerIfFirstRun() {
-	app.cfgMutex.RLock()
-	done := app.cfg.InitialSetupDone
-	current := app.cfg.Language
-	app.cfgMutex.RUnlock()
-
-	// Показываем пикер, если:
-	//   - setup ещё не проходили (свежий install), ИЛИ
-	//   - cfg.Language пустой — это означает, что язык так и не выбрали
-	//     (например, старый config.json без поля language, или запись
-	//     повреждена). Тогда fallback на английский даёт неверный UI,
-	//     хотя пользователь мог быть русскоязычным.
-	if done && current != "" {
-		return
-	}
-
-	// Названия языков — эндонимы (на самом языке), не переводятся.
-	// Первый — English, чтобы англоязычный пользователь мог сразу ОК.
-	languages := []struct {
-		code  string
-		label string
-	}{
-		{"en", app.msg("menu_lang_en")},
-		{"ru", app.msg("menu_lang_ru")},
-		{"de", app.msg("menu_lang_de")},
-		{"es", app.msg("menu_lang_es")},
-		{"fr", app.msg("menu_lang_fr")},
-		{"it", app.msg("menu_lang_it")},
-		{"ja", app.msg("menu_lang_ja")},
-		{"ko", app.msg("menu_lang_ko")},
-		{"pl", app.msg("menu_lang_pl")},
-		{"pt-BR", app.msg("menu_lang_pt-BR")},
-		{"zh-hans", app.msg("menu_lang_zh-hans")},
-		{"zh-hant", app.msg("menu_lang_zh-hant")},
-	}
-
-	// Индекс текущего языка в списке. На первом запуске cfg.Language
-	// ещё "en" (defaultConfig), реального выбора пользователя не было.
-	// Поэтому пытаемся предвыбрать системную локаль: русский пользователь сразу увидит «Русский» и нажмёт только OK.
-	//
-	// Если система не поддерживается (fi-FI, tr-TR, …) — оставляем
-	// текущий (en) или ранее сохранённый выбор.
-	curIdx := 0
-	for i, l := range languages {
-		if l.code == current {
-			curIdx = i
-			break
-		}
-	}
-	if sysCode := mapSystemLocaleToSupported(systemLocale()); sysCode != "" {
-		for i, l := range languages {
-			if l.code == sysCode {
-				curIdx = i
-				break
-			}
-		}
-	}
-
-	labels := make([]string, len(languages))
-	for i, l := range languages {
-		labels[i] = l.label
-	}
-
-	chosen := make(chan string, 1)
-
-	fyne.DoAndWait(func() {
-		app.bringToFront()
-
-		sel := widget.NewSelect(labels, nil)
-		sel.SetSelectedIndex(curIdx)
-
-		var popUp *widget.PopUp
-		okBtn := widget.NewButton(app.msg("btn_ok"), func() {
-			idx := sel.SelectedIndex()
-			if idx < 0 || idx >= len(languages) {
-				idx = curIdx
-			}
-			if popUp != nil {
-				popUp.Hide()
-			}
-			chosen <- languages[idx].code
-		})
-
-		content := container.NewVBox(
-			widget.NewLabelWithStyle(
-				app.msg("menu_language"),
-				fyne.TextAlignCenter,
-				fyne.TextStyle{Bold: true},
-			),
-			widget.NewSeparator(),
-			widget.NewLabel(app.msg("choose_lang")),
-			sel,
-			widget.NewSeparator(),
-			container.NewCenter(okBtn),
-		)
-
-		popUp = widget.NewModalPopUp(content, app.mainWindow.Canvas())
-		popUp.Resize(fyne.NewSize(420, 240))
-		popUp.Show()
-	})
-
-	code := <-chosen
-
-	if err := app.loadLanguage(code); err != nil {
-		app.appendLogToFile(fmt.Sprintf("Failed to load language %q: %v", code, err))
-	}
-	app.cfgMutex.Lock()
-	app.cfg.Language = code
-	app.cfgMutex.Unlock()
-	app.saveConfigSafe()
-
-	// Обновляем заголовок окна и меню на новый язык. Само окно уже
-	// построено — просто перекрашиваем тексты.
-	fyne.Do(func() {
-		app.mainWindow.SetTitle(app.getTitle() + " v" + AppVersion)
-		app.mainWindow.SetMainMenu(app.buildMainMenu())
-	})
-
-	app.appendLogToFile(fmt.Sprintf("First-run language selected: %s", code))
-}
-
 func (app *App) shouldCheckUpdates() bool {
 	app.cfgMutex.RLock()
 	freq := app.cfg.UpdateCheckFrequency
@@ -2233,12 +2132,6 @@ func (c Config) AutoFocusEnabled() bool {
 // согласиться.
 func (c Config) AutoConfirmDownloadEnabled() bool {
 	return c.AutoConfirmDownload != nil && *c.AutoConfirmDownload
-}
-
-// AutoActivateModsEnabled — включать ли мод в load order
-// автоматически после установки. Дефолт: включено.
-func (c Config) AutoActivateModsEnabled() bool {
-	return c.AutoActivateMods == nil || *c.AutoActivateMods
 }
 
 // RemoveDirWithTrashFallback перемещает директорию в системную корзину.

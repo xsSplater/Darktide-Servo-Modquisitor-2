@@ -132,36 +132,17 @@ func (app *App) startCallbackServer() {
 		expiry := time.Now().Add(time.Duration(token.ExpiresIn) * time.Second)
 		saveErr := app.saveOAuthTokens(token.AccessToken, token.RefreshToken, expiry)
 
-		fyne.Do(func() {
-			app.mainWindow.SetMainMenu(app.buildMainMenu())
-
-			if saveErr != nil {
-				app.appendLogToFile(fmt.Sprintf("Failed to save OAuth tokens: %v", saveErr))
-				app.showInfoDialog(
-					app.msg("oauth_success_title"),
-					fmt.Sprintf("%s\n\nWarning: tokens could not be stored: %v",
-						app.msg("oauth_success_message"), saveErr),
-				)
-				return
-			}
-
-			app.appendLog(app.msg("oauth_login_success"))
-			app.bringToFront()
-			app.showInfoDialog(
-				app.msg("oauth_success_title"),
-				app.msg("oauth_success_message"),
-			)
-			time.AfterFunc(500*time.Millisecond, func() {
-				fyne.Do(func() { app.bringToFront() })
-			})
-		})
-
+		// ─── Подготовка данных для HTML ─────────────────────────────
 		imgBase64 := base64.StdEncoding.EncodeToString(mechanicusPNG)
 		imgSrc := "data:image/png;base64," + imgBase64
 
-		// Локализованные строки для HTML-страницы. Если ключа нет в
-		// messages.json — используем безопасный английский fallback,
-		// чтобы страница не оставалась пустой.
+		app.cfgMutex.RLock()
+		langTag := app.cfg.Language
+		app.cfgMutex.RUnlock()
+		if langTag == "" {
+			langTag = "en"
+		}
+
 		title := app.msg("oauth_success_title")
 		if title == "" {
 			title = "Authorisation successful!"
@@ -169,6 +150,14 @@ func (app *App) startCallbackServer() {
 		msg := app.msg("oauth_success_message")
 		if msg == "" {
 			msg = "You have successfully authenticated with your Nexus Mods account."
+		}
+		msg_token_not_saved1 := app.msg("oauth_failed_message1")
+		if msg == "" {
+			msg = "However, SMQ could not securely save your login credentials to your computer's storage system."
+		}
+		msg_token_not_saved2 := app.msg("oauth_failed_message2")
+		if msg == "" {
+			msg = "This means that after closing Servo-Modquisitor, you will need to log in to your account again."
 		}
 		nexusClose := app.msg("oauth_success_nexus_close")
 		if nexusClose == "" {
@@ -179,13 +168,8 @@ func (app *App) startCallbackServer() {
 			closeText = "You may close this window now."
 		}
 
-		app.cfgMutex.RLock()
-		langTag := app.cfg.Language
-		app.cfgMutex.RUnlock()
-		if langTag == "" {
-			langTag = "en"
-		}
-
+		// ─── Генерация HTML ─────────────────────────────────────────
+		// Сначала генерируем успешный HTML (он используется в ветке else)
 		successHTML := `<!DOCTYPE html>
 <html lang="` + langTag + `">
 <head>
@@ -239,15 +223,109 @@ func (app *App) startCallbackServer() {
 		<img class="logo" src="` + imgSrc + `" alt="Servo-Modquisitor Logo">
 		<h1>` + title + `</h1>
 		<p>` + msg + `</p>
-		<p>` + nexusClose + `</p>
 		<p> </p>
 		<p> </p>
 		<h2>` + closeText + `</h2>
 	</div>
 </body>
 </html>`
-		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		w.Write([]byte(successHTML))
+
+		// ─── Отправка ответа в браузер ──────────────────────────────
+		if saveErr != nil {
+			// Пишем техническую ошибку ТОЛЬКО в лог программы
+			app.appendLogToFile(fmt.Sprintf("OAuth Warning: Could not persist token: %v", saveErr))
+
+			// Пользователю показываем понятный текст
+			errorHTML := `<!DOCTYPE html>
+<html lang="` + langTag + `">
+<head>
+	<meta charset="UTF-8">
+	<title>` + title + ` - Servo-Modquisitor</title>
+	<style>
+		body {
+			background-color: #000000;
+			color: #c0ff1a;
+			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			height: 100vh;
+			margin: 0;
+		}
+		.card {
+			background: #111111;
+			border: 1px solid #c0ff1a;
+			border-radius: 16px;
+			padding: 40px;
+			text-align: center;
+			max-width: 666px;
+		}
+		img.logo {
+			width: 100%;
+			max-width: 444px;
+			height: auto;
+			margin-bottom: 24px;
+			display: inline-block;
+			animation: gentlePulse 5s ease-in-out infinite;
+			will-change: transform, filter;
+			border-radius: 16px;
+		}
+		@keyframes gentlePulse {
+			0% { transform: scale(1); filter: drop-shadow(0 0 2px #c0ff1a) drop-shadow(0 0 4px #c0ff1a); }
+			50% { transform: scale(1.01); filter: drop-shadow(0 0 3px #c0ff1a) drop-shadow(0 0 6px #c0ff1a); }
+			100% { transform: scale(1); filter: drop-shadow(0 0 2px #c0ff1a) drop-shadow(0 0 4px #c0ff1a); }
+		}
+		h1 { font-size: 3.3rem; margin: 0 0 10px 0; }
+		h2 { margin: 20px 0 0 0; font-size: 2.4rem; font-weight: 400; color: #ff8866; animation: gentleClosePulse 1s ease-in-out infinite; }
+		@keyframes gentleClosePulse {
+			0%, 100% { text-shadow: 0 0 2px #ff5533, 0 0 3px #ff2222; opacity: 0.85; }
+			50% { text-shadow: 0 0 5px #ff5533, 0 0 10px #ff2222; opacity: 1; }
+		}
+		p { margin: 0 0 20px 0; font-size: 16px; color: #dddddd; }
+	</style>
+</head>
+<body>
+	<div class="card">
+		<img class="logo" src="` + imgSrc + `" alt="Servo-Modquisitor Logo">
+		<h1>` + title + `</h1>
+		<p>` + msg_token_not_saved1 + `</p>
+		<p>` + msg_token_not_saved2 + `</p>
+		<p> </p>
+		<p> </p>
+		<h2>` + closeText + `</h2>
+	</div>
+</body>
+</html>`
+
+			w.Header().Set("Content-Type", "text/html; charset=utf-8")
+			w.Write([]byte(errorHTML))
+		} else {
+			w.Header().Set("Content-Type", "text/html; charset=utf-8")
+			w.Write([]byte(successHTML))
+		}
+
+		// ─── Обновление UI внутри программы ─────────────────────────
+		fyne.Do(func() {
+			app.mainWindow.SetMainMenu(app.buildMainMenu())
+
+			if saveErr != nil {
+				app.showInfoDialog(
+					app.msg("oauth_success_title"),
+					"You are logged in for this session!\n\nHowever, the program could not save your token to the disk. You will need to log in again after restarting the app.",
+				)
+				return
+			}
+
+			app.appendLog(app.msg("oauth_login_success"))
+			app.bringToFront()
+			app.showInfoDialog(
+				app.msg("oauth_success_title"),
+				app.msg("oauth_success_message"),
+			)
+			time.AfterFunc(500*time.Millisecond, func() {
+				fyne.Do(func() { app.bringToFront() })
+			})
+		})
 
 		go func() {
 			time.Sleep(3 * time.Second)
@@ -337,15 +415,13 @@ func (app *App) refreshAccessToken() error {
 	return nil
 }
 
+// getAuthToken — молчаливая проверка. Не показывает UI.
+// Диалог «сессия истекла» показывает только handleAuthExpired,
+// который вызывается ТОЛЬКО из реального 401 от API.
 func (app *App) getAuthToken() string {
 	accessToken, err := getStoredToken(keyAccessToken)
 	if err != nil || accessToken == "" {
-		// Токена нет вообще: пользователь либо никогда не логинился,
-		// либо предыдущий refresh уже всё стёр. В любом случае —
-		// сообщаем об этом через handleAuthExpired: он покажет окно
-		// и переключит меню на красный значок.
 		app.appendLogToFile("OAuth: no access token stored")
-		app.handleAuthExpired()
 		return ""
 	}
 

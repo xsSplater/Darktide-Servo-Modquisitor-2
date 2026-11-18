@@ -177,14 +177,17 @@ func CreateLoadOrderFromActive(activeMods []string, lang string) []DanglingDepen
 
 	allDeps := make([]ModDependency, len(deps))
 	copy(allDeps, deps)
+
 	for _, rule := range rules {
 		if rule.Before == "*" {
 			continue
 		}
-		allDeps = append(allDeps, ModDependency{
-			Required:  rule.Before,
-			Dependent: rule.After,
-		})
+		for _, after := range rule.After {
+			allDeps = append(allDeps, ModDependency{
+				Required:  rule.Before,
+				Dependent: after,
+			})
+		}
 	}
 	for i := 0; i < len(mandatory)-1; i++ {
 		allDeps = append(allDeps, ModDependency{

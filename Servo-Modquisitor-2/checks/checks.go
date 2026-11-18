@@ -24,6 +24,9 @@ const (
 	steamGuideRuURL   = "https://steamcommunity.com/sharedfiles/filedetails/?id=2950374474"
 )
 
+// userNotePrefix отделяет пользовательскую заметку от базы.
+const userNotePrefix = "📝 "
+
 var modListDividers = []string{
 	"___System",
 	"___Scoreboard",
@@ -74,9 +77,15 @@ var (
 // заметку по имени папки мода, либо "".
 var getUserNote func(string) string
 
-func SetUserNotesGetter(fn func(string) string) {
-	getUserNote = fn
-}
+var (
+	checksDataMutex   sync.RWMutex // Решение гонки 79
+	ObsoleteMods      []string
+	IncompatiblePairs []IncompatiblePair
+	Dependencies      []Dependency
+	MandatoryOrder    []string
+)
+
+var LoadOrderRules []LoadOrderRule
 
 // setModActiveFunc — устанавливается из App. Меняет состояние
 // активности мода по имени папки: active==true включает, active==false
@@ -90,30 +99,233 @@ func SetUserNotesGetter(fn func(string) string) {
 // что и «включить», и «выключить» — одна операция toggleModActive.
 var setModActiveFunc func(string, bool) bool
 
-// SetModActiveFunc устанавливает функцию переключения активности мода.
-func SetModActiveFunc(fn func(string, bool) bool) { setModActiveFunc = fn }
-
-// userNotePrefix отделяет пользовательскую заметку от базы.
-const userNotePrefix = "📝 "
-
 // trashFunc — устанавливается из main при старте. Если nil,
 // RemoveMod откатывается на os.RemoveAll.
 var trashFunc func([]string) error
 
-func SetTrashFunc(fn func([]string) error) { trashFunc = fn }
+// confirmPermanentDeleteFunc — вызывается, когда корзина недоступна.
+// Должен вернуть true, если пользователь согласен удалить
+// перечисленные пути БЕЗВОЗВРАТНО. Если функция не установлена
+// или вернула false — удаление не выполняется, RemoveMods
+// возвращает ошибку. Это гарантирует, что при отказе корзины
+// данные не пропадут молча.
+var confirmPermanentDeleteFunc func(paths []string) bool
 
-func RemoveMod(name string) {
-	RemoveMods([]string{name})
+var refreshModListFunc func()
+
+// currentLang хранит текущий код языка. Атомарный указатель, потому что
+// значение пишется из UI-потока (changeLanguage) и из фоновой инициализации
+// (loadDataAfterInit), а читается в GetIncompatibleDesc, WriteLoadOrderHeader
+// и askMissing.
+var currentLang atomic.Pointer[string]
+
+// LoadOrderRule — одна группа правил порядка загрузки: «Before грузится
+// раньше всех After». After — слайс, потому что один before обычно
+// требует несколько after (например, ChatBlock before guarantee_*).
+type LoadOrderRule struct {
+	Before string   `json:"before"`
+	After  []string `json:"after"`
 }
 
-// RemoveMods — batch-удаление. На Windows все пути уходят
-// в одну операцию IFileOperation, что радикально быстрее цикла
-// из N отдельных вызовов.
+// Dependency — одна группа зависимостей: «Required нужен всем Dependents».
+// URL принадлежит Required (все dependents используют одну страницу мода).
+type Dependency struct {
+	Required    string   `json:"required"`
+	RequiredURL string   `json:"url,omitempty"`
+	Dependents  []string `json:"dependents"`
+}
+
+type IncompatiblePair struct {
+	Mod1 string            `json:"mod1"`
+	Mod2 string            `json:"mod2"`
+	Desc map[string]string `json:"desc,omitempty"`
+	Type string            `json:"type,omitempty"`
+}
+
+// ─── Толерантный разбор After и Dependents ─────────────────────
 //
-// Симлинки удаляются сразу через os.Remove: перемещение
-// симлинка в Корзину на Windows не имеет смысла (в Корзину
-// уйдёт только ссылка, а не цель).
-func RemoveMods(names []string) {
+// Исторически поля After (в LoadOrderRule) и Dependents (в Dependency)
+// были строкой. В 4.0.0 они массивы. Чтобы старые файлы, где осталась
+// строка, не валили разбор с "cannot unmarshal string into []string",
+// принимаем оба варианта: "x" → ["x"], ["x","y"] → ["x","y"].
+//
+// parseStringOrArray — общий хелпер. Возвращает nil на "null" и на
+// пустое значение, что эквивалентно отсутствию поля.
+func parseStringOrArray(raw json.RawMessage) []string {
+	if len(raw) == 0 || string(raw) == "null" {
+		return nil
+	}
+	var arr []string
+	if err := json.Unmarshal(raw, &arr); err == nil {
+		return arr
+	}
+	var s string
+	if err := json.Unmarshal(raw, &s); err == nil {
+		return []string{s}
+	}
+	return nil
+}
+
+// UnmarshalJSON для LoadOrderRule.
+func (r *LoadOrderRule) UnmarshalJSON(data []byte) error {
+	type alias struct {
+		Before string          `json:"before"`
+		After  json.RawMessage `json:"after"`
+	}
+	var a alias
+	if err := json.Unmarshal(data, &a); err != nil {
+		return err
+	}
+	r.Before = a.Before
+	r.After = parseStringOrArray(a.After)
+	return nil
+}
+
+// UnmarshalJSON для Dependency.
+func (d *Dependency) UnmarshalJSON(data []byte) error {
+	type alias struct {
+		Required    string          `json:"required"`
+		RequiredURL string          `json:"url,omitempty"`
+		Dependents  json.RawMessage `json:"dependents"`
+	}
+	var a alias
+	if err := json.Unmarshal(data, &a); err != nil {
+		return err
+	}
+	d.Required = a.Required
+	d.RequiredURL = a.RequiredURL
+	d.Dependents = parseStringOrArray(a.Dependents)
+	return nil
+}
+
+type ExternalData struct {
+	Version           string             `json:"version"`
+	ObsoleteMods      []string           `json:"obsolete_mods"`
+	MandatoryOrder    []string           `json:"mandatory_order"`
+	LoadOrder         []LoadOrderRule    `json:"load_order"`
+	IncompatiblePairs []IncompatiblePair `json:"incompatible_pairs"`
+	Dependencies      []Dependency       `json:"dependencies"`
+}
+
+type ModInfo struct {
+	Active         bool
+	Broken         bool
+	Incompatible   bool
+	Mandatory      bool
+	Obsolete       bool
+	Selected       bool
+	IsSystem       bool
+	VortexDeployed bool
+	IsSymlink      bool
+	MissingFolder  bool
+	HasUpdate      bool `json:"-"`
+
+	Order             int
+	NexusDownloads    int
+	NexusEndorsements int
+
+	// ConflictWith хранит display-имя второго мода в паре конфликта.
+	// Заполняется в refreshModList при обнаружении несовместимости.
+	// Пустая строка — конфликта нет или второй мод не установлен.
+	ConflictWith    string
+	Author          string
+	Description     string
+	DisplayName     string
+	Name            string
+	Note            string
+	URL             string
+	SourceCodeURL   string
+	Category        string
+	NexusVersion    string
+	NexusSummary    string
+	NexusPictureURL string
+	Source          string
+
+	ModTime        time.Time
+	LastUpdated    time.Time `json:"-"`
+	OriginalUpload time.Time `json:"-"`
+}
+
+type ModDBEntry struct {
+	Folder           string            `json:"folder"`
+	NexusFilePattern string            `json:"nexus_file_pattern"`
+	Name             map[string]string `json:"name"`
+	Description      map[string]string `json:"description"`
+	Author           string            `json:"author"`
+	Category         string            `json:"category"`
+	URL              string            `json:"url"`
+	SourceCodeURL    string            `json:"source_code_url"`
+	NexusPictureURL  string            `json:"nexus_picture_url,omitempty"`
+	Note             map[string]string `json:"note"`
+}
+
+type LoadOrderEntry struct {
+	Name   string
+	Active bool
+}
+
+// FlatLoadOrderRule — «before грузится раньше after».
+type FlatLoadOrderRule struct {
+	Before string
+	After  string
+}
+
+// FlatDependency — «dependent требует required». Развёрнутая форма
+// группы Dependency. Используется в логике, которая думает парами,
+// а не группами.
+type FlatDependency struct {
+	Required    string
+	RequiredURL string
+	Dependent   string
+}
+
+// Expand разворачивает группу в плоский список пар.
+func (d Dependency) Expand() []FlatDependency {
+	out := make([]FlatDependency, len(d.Dependents))
+	for i, dep := range d.Dependents {
+		out[i] = FlatDependency{
+			Required:    d.Required,
+			RequiredURL: d.RequiredURL,
+			Dependent:   dep,
+		}
+	}
+	return out
+}
+
+// Expand разворачивает группу в плоский список пар.
+func (r LoadOrderRule) Expand() []FlatLoadOrderRule {
+	out := make([]FlatLoadOrderRule, len(r.After))
+	for i, after := range r.After {
+		out[i] = FlatLoadOrderRule{Before: r.Before, After: after}
+	}
+	return out
+}
+
+func SetUserNotesGetter(fn func(string) string) {
+	getUserNote = fn
+}
+
+// SetModActiveFunc устанавливает функцию переключения активности мода.
+func SetModActiveFunc(fn func(string, bool) bool) { setModActiveFunc = fn }
+
+func SetTrashFunc(fn func([]string) error) { trashFunc = fn }
+
+func SetConfirmPermanentDeleteFunc(fn func([]string) bool) {
+	confirmPermanentDeleteFunc = fn
+}
+
+// RemoveMod — обёртка над RemoveMods для одного мода.
+// Возвращает ошибку, если удаление не удалось.
+func RemoveMod(name string) error {
+	return RemoveMods([]string{name})
+}
+
+// RemoveMods — batch-удаление. Симлинки удаляются сразу через
+// os.Remove (в корзину ссылка не имеет смысла). Обычные папки
+// уходят в корзину; если корзина упала — спрашиваем подтверждение
+// через confirmPermanentDeleteFunc. Без подтверждения возвращаем
+// ошибку и ничего не трогаем.
+func RemoveMods(names []string) error {
 	paths := make([]string, 0, len(names))
 	for _, name := range names {
 		path := filepath.Join(getModsDir(), name)
@@ -122,24 +334,45 @@ func RemoveMods(names []string) {
 			continue
 		}
 		if info.Mode()&os.ModeSymlink != 0 {
-			_ = os.Remove(path)
+			if err := os.Remove(path); err != nil {
+				return fmt.Errorf("remove symlink %q: %w", path, err)
+			}
 			continue
 		}
 		paths = append(paths, path)
 	}
 	if len(paths) == 0 {
-		return
+		return nil
 	}
+
+	// 1. Пытаемся в корзину.
 	if trashFunc != nil {
 		if err := trashFunc(paths); err == nil {
-			return
+			return nil
+		} else {
+			appendLogToFileSafe(fmt.Sprintf("trash failed: %v", err))
+		}
+	} else {
+		appendLogToFileSafe("trash function is not set")
+	}
+
+	// 2. Корзина недоступна — спрашиваем разрешение на безвозвратное.
+	if confirmPermanentDeleteFunc == nil {
+		return fmt.Errorf(
+			"trash unavailable and no confirmation callback; refusing to delete %d path(s)", len(paths))
+	}
+	if !confirmPermanentDeleteFunc(paths) {
+		return fmt.Errorf("user declined permanent delete")
+	}
+
+	// 3. Пользователь согласился — удаляем, собирая первую ошибку.
+	var firstErr error
+	for _, p := range paths {
+		if err := os.RemoveAll(p); err != nil && firstErr == nil {
+			firstErr = err
 		}
 	}
-	// Fallback: насовсем. Пользователь увидит предупреждение
-	// (в bulk-операциях — через showInfiniteProgressDialog).
-	for _, p := range paths {
-		_ = os.RemoveAll(p)
-	}
+	return firstErr
 }
 
 // getModsDir возвращает путь к папке модов.
@@ -208,13 +441,11 @@ func SetGlobalDataDir(path string) {
 	pathsMutex.Unlock()
 }
 
-var refreshModListFunc func()
-
-// currentLang хранит текущий код языка. Атомарный указатель, потому что
-// значение пишется из UI-потока (changeLanguage) и из фоновой инициализации
-// (loadDataAfterInit), а читается в GetIncompatibleDesc, WriteLoadOrderHeader
-// и askMissing.
-var currentLang atomic.Pointer[string]
+func SetModsDir(path string) {
+	pathsMutex.Lock()
+	modsDir = path
+	pathsMutex.Unlock()
+}
 
 // SetLanguage сохраняет код языка потокобезопасно.
 func SetLanguage(lang string) {
@@ -238,13 +469,6 @@ func SetModDatabase(entries []ModDBEntry) {
 		modDBMap[strings.ToLower(entries[i].Folder)] = &entries[i]
 	}
 }
-
-type LoadOrderRule struct {
-	Before string `json:"before"`
-	After  string `json:"after"`
-}
-
-var LoadOrderRules []LoadOrderRule
 
 func ModsDir() string { return getModsDir() }
 
@@ -279,71 +503,6 @@ func ListModFolders() []string {
 		}
 	}
 	return folders
-}
-
-type ModInfo struct {
-	Active         bool
-	Broken         bool
-	Incompatible   bool
-	Mandatory      bool
-	Obsolete       bool
-	Selected       bool
-	IsSystem       bool
-	VortexDeployed bool
-	IsSymlink      bool
-	MissingFolder  bool
-	HasUpdate      bool `json:"-"`
-
-	Order             int
-	NexusDownloads    int
-	NexusEndorsements int
-
-	// ConflictWith хранит display-имя второго мода в паре конфликта.
-	// Заполняется в refreshModList при обнаружении несовместимости.
-	// Пустая строка — конфликта нет или второй мод не установлен.
-	ConflictWith    string
-	Author          string
-	Description     string
-	DisplayName     string
-	Name            string
-	Note            string
-	URL             string
-	SourceCodeURL   string
-	Category        string
-	NexusVersion    string
-	NexusSummary    string
-	NexusPictureURL string
-	Source          string
-
-	ModTime        time.Time
-	LastUpdated    time.Time `json:"-"`
-	OriginalUpload time.Time `json:"-"`
-}
-
-type ModDBEntry struct {
-	Name        map[string]string `json:"name"`
-	Description map[string]string `json:"description"`
-	Note        map[string]string `json:"note"`
-
-	Folder           string `json:"folder"`
-	NexusFilePattern string `json:"nexus_file_pattern"`
-	Author           string `json:"author"`
-	Category         string `json:"category"`
-	URL              string `json:"url"`
-	SourceCodeURL    string `json:"source_code_url"`
-
-	// NexusPictureURL — прямая ссылка на thumbnail мода на CDN Nexus
-	// (staticdelivery.nexusmods.com/...). Храним в базе, чтобы не
-	// дёргать Nexus API каждый раз при выделении мода в таблице.
-	//
-	// Заполняется:
-	//   - при первичной установке/обновлении мода (autoAddModToDatabase);
-	//   - ленивым дозаполнением, когда пользователь выделяет мод в таблице
-	//     и у записи ещё нет URL (enrichModFromNexus → FetchNexusModInfo).
-	//
-	// omitempty, чтобы не засорять mod_database.json пустыми полями для
-	// тех модов, у которых Nexus картинку не отдал.
-	NexusPictureURL string `json:"nexus_picture_url,omitempty"`
 }
 
 // JoinNotes склеивает непустые заметки через разделитель " · ".
@@ -664,11 +823,6 @@ func tryReadLocalization(modName string) string {
 	return ""
 }
 
-type LoadOrderEntry struct {
-	Name   string
-	Active bool
-}
-
 func ReadLoadOrder() []LoadOrderEntry {
 	dir := getProfileDataDir()
 	if dir == "" {
@@ -750,37 +904,6 @@ func UpdateModActive(entries []LoadOrderEntry, modName string, active bool) []Lo
 		}
 	}
 	return append(entries, LoadOrderEntry{Name: modName, Active: active})
-}
-
-var (
-	checksDataMutex   sync.RWMutex // Решение гонки 79
-	ObsoleteMods      []string
-	IncompatiblePairs []IncompatiblePair
-	Dependencies      []Dependency
-	MandatoryOrder    []string
-)
-
-type ExternalData struct {
-	Version           string             `json:"version"`
-	MandatoryOrder    []string           `json:"mandatory_order"`
-	ObsoleteMods      []string           `json:"obsolete_mods"`
-	IncompatiblePairs []IncompatiblePair `json:"incompatible_pairs"`
-	Dependencies      []Dependency       `json:"dependencies"`
-	LoadOrder         []LoadOrderRule    `json:"load_order"`
-}
-
-type IncompatiblePair struct {
-	Mod1 string            `json:"mod1"`
-	Mod2 string            `json:"mod2"`
-	Desc map[string]string `json:"desc"`
-	Type string            `json:"type,omitempty"`
-}
-
-// Dependency — одна запись из массива "dependencies" в mandatory_obsolete_incompatible_dependencies.json.
-type Dependency struct {
-	Dependent   string `json:"dependent"`
-	Required    string `json:"required"`
-	RequiredURL string `json:"url"`
 }
 
 func LoadExternalLists(filename string) error {
@@ -904,25 +1027,50 @@ func askMissing(folder, modAbbr, modName, nexusURL string, window fyne.Window) b
 }
 
 func EnsureModLoadOrder(window fyne.Window) {
-	path := filepath.Join(getModsDir(), FileNameLoadOrder)
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		appendLog(msgGetter("window_error_dsc_mlo_mis"))
-		choice := showChoiceDialog(window, msgGetter("window_error_title"),
-			msgGetter("window_error_dsc_mlo_mis"),
-			msgGetter("btn_create_new"),
-			msgGetter("btn_quit"),
-		)
-		if choice == 0 {
-			os.WriteFile(path, []byte{}, 0644)
-			appendLog(msgGetter("mod_load_order_created"))
-		} else {
-			os.Exit(0)
+	profileDir := getProfileDataDir()
+	if profileDir == "" {
+		appendLogToFileSafe("EnsureModLoadOrder: profileDataDir is not set")
+		return
+	}
+	profilePath := filepath.Join(profileDir, "mods", FileNameLoadOrder)
+	if _, err := os.Stat(profilePath); err == nil {
+		return
+	}
+
+	// Миграция: если файл есть в игровой папке, но нет в профиле —
+	// копируем. Это случай, когда пользователь обновился со старой
+	// версии (или профиль был создан вручную без load order).
+	gamePath := filepath.Join(getModsDir(), FileNameLoadOrder)
+	if _, err := os.Stat(gamePath); err == nil {
+		if err := os.MkdirAll(filepath.Dir(profilePath), 0755); err == nil {
+			if data, rerr := os.ReadFile(gamePath); rerr == nil {
+				if werr := os.WriteFile(profilePath, data, 0644); werr == nil {
+					appendLogToFileSafe(
+						"EnsureModLoadOrder: migrated game mod_load_order.txt → profile")
+					return
+				}
+			}
 		}
+	}
+
+	appendLog(msgGetter("window_error_dsc_mlo_mis"))
+	choice := showChoiceDialog(window, msgGetter("window_error_title"),
+		msgGetter("window_error_dsc_mlo_mis"),
+		msgGetter("btn_create_new"), msgGetter("btn_quit"))
+	if choice == 0 {
+		_ = os.MkdirAll(filepath.Dir(profilePath), 0755)
+		_ = os.WriteFile(profilePath, []byte{}, 0644)
+		appendLog(msgGetter("mod_load_order_created"))
+	} else {
+		os.Exit(0)
 	}
 }
 
 func isDisabledByNaming(name string) bool {
-	if strings.HasPrefix(name, "_") || strings.HasPrefix(name, "--") {
+	if len(name) > 1 && strings.HasPrefix(name, "_") {
+		return true
+	}
+	if len(name) > 2 && strings.HasPrefix(name, "--") {
 		return true
 	}
 	if strings.Contains(name, " - Copy") || strings.Contains(name, " — копия") {
@@ -957,7 +1105,10 @@ func CheckObsoleteMods(window fyne.Window) bool {
 	)
 	if choice == 1 {
 		for _, mod := range found {
-			RemoveMod(mod)
+			if err := RemoveMod(mod); err != nil {
+				appendLog(fmt.Sprintf(msgGetter("log_delete_failed"), mod, err))
+				continue
+			}
 			appendLog(fmt.Sprintf(msgGetter("deleted_mod"), mod))
 		}
 	}
@@ -1081,7 +1232,10 @@ func CheckBrokenMods(window fyne.Window) bool {
 	)
 	if choice == 1 {
 		for _, mod := range broken {
-			RemoveMod(mod)
+			if err := RemoveMod(mod); err != nil {
+				appendLog(fmt.Sprintf(msgGetter("log_delete_failed"), mod, err))
+				continue
+			}
 			appendLog(fmt.Sprintf(msgGetter("deleted_mod"), mod))
 		}
 	}
@@ -1145,8 +1299,13 @@ func CheckIncompatible(window fyne.Window) bool {
 	for {
 		var found *IncompatiblePair
 		for _, pair := range pairsCopy {
+			// Проверяем только наличие папок и отсутствие явного
+			// disabled-префикса (_mod / --mod / " - Copy"). Активность
+			// из mod_load_order.txt не проверяем: пользователь должен
+			// видеть проблему, даже если один из пары сейчас выключен —
+			// он мог выключить вручную и забыть про второй.
 			if FolderExists(pair.Mod1) && FolderExists(pair.Mod2) &&
-				isModActiveFunc != nil && isModActiveFunc(pair.Mod1) && isModActiveFunc(pair.Mod2) {
+				!isDisabledByNaming(pair.Mod1) && !isDisabledByNaming(pair.Mod2) {
 				key := pairKey(pair)
 				if !skipped[key] {
 					p := pair
@@ -1172,19 +1331,29 @@ func CheckIncompatible(window fyne.Window) bool {
 		case 0:
 			skipped[pairKey(*found)] = true
 		case 1:
-			RemoveMod(found.Mod1)
-			appendLog(fmt.Sprintf(msgGetter("deleted_mod"), found.Mod1))
-			if refreshModListFunc != nil {
-				refreshModListFunc()
+			if err := RemoveMod(found.Mod1); err != nil {
+				appendLog(fmt.Sprintf(msgGetter("log_delete_failed"), found.Mod1, err))
+				// Не зацикливаемся на этой паре — иначе пользователь
+				// увидит тот же диалог снова и снова.
+				skipped[pairKey(*found)] = true
+			} else {
+				appendLog(fmt.Sprintf(msgGetter("deleted_mod"), found.Mod1))
+				if refreshModListFunc != nil {
+					// DoAndWait на стороне App — refreshModListFunc уже
+					// обёрнут в fyne.DoAndWait (см. InitGlobals).
+					refreshModListFunc()
+				}
 			}
-			time.Sleep(100 * time.Millisecond)
 		case 2:
-			RemoveMod(found.Mod2)
-			appendLog(fmt.Sprintf(msgGetter("deleted_mod"), found.Mod2))
-			if refreshModListFunc != nil {
-				refreshModListFunc()
+			if err := RemoveMod(found.Mod2); err != nil {
+				appendLog(fmt.Sprintf(msgGetter("log_delete_failed"), found.Mod2, err))
+				skipped[pairKey(*found)] = true
+			} else {
+				appendLog(fmt.Sprintf(msgGetter("deleted_mod"), found.Mod2))
+				if refreshModListFunc != nil {
+					refreshModListFunc()
+				}
 			}
-			time.Sleep(100 * time.Millisecond)
 		case 3:
 			return true
 		}
@@ -1233,10 +1402,7 @@ func appendLogToFileSafe(msg string) {
 //	false — пользователь открыл страницу required-мода и ушёл его
 //	        ставить.
 func CheckDependencies(window fyne.Window) bool {
-	checksDataMutex.RLock()
-	depsCopy := make([]Dependency, len(Dependencies))
-	copy(depsCopy, Dependencies)
-	checksDataMutex.RUnlock()
+	depsCopy := GetDependenciesFlat() // уже копия под checksDataMutex
 
 	if isModActiveFunc == nil || len(depsCopy) == 0 {
 		appendLog(msgGetter("no_dependency_issues"))
@@ -1246,13 +1412,14 @@ func CheckDependencies(window fyne.Window) bool {
 	lang := getCurrentLang()
 
 	type missingItem struct {
-		dep           Dependency
+		dep           FlatDependency
 		dependentName string // display name зависимого мода
 		requiredName  string // display name требуемого мода
 		installed     bool   // папка required-мода существует
 	}
 
 	var missing []missingItem
+
 	for _, dep := range depsCopy {
 		if !isModActiveFunc(dep.Dependent) {
 			continue
@@ -1261,7 +1428,7 @@ func CheckDependencies(window fyne.Window) bool {
 			continue
 		}
 		missing = append(missing, missingItem{
-			dep:           dep,
+			dep:           dep, // теперь FlatDependency
 			dependentName: getDisplayName(dep.Dependent, lang),
 			requiredName:  getDisplayName(dep.Required, lang),
 			installed:     FolderExists(dep.Required),
@@ -1499,14 +1666,24 @@ func CheckDependencies(window fyne.Window) bool {
 		actions = append(actions, depAction{
 			label: label,
 			run: func() bool {
+				var failed []string
 				for _, dependent := range deleteList {
-					RemoveMod(dependent)
+					if err := RemoveMod(dependent); err != nil {
+						appendLog(fmt.Sprintf(
+							msgGetter("log_delete_failed"), dependent, err))
+						failed = append(failed, dependent)
+						continue
+					}
 					appendLog(fmt.Sprintf(msgGetter("deleted_mod"), dependent))
+				}
+				if len(failed) > 0 {
+					appendLogToFileSafe(fmt.Sprintf(
+						"CheckDependencies: %d of %d dependents were not deleted",
+						len(failed), len(deleteList)))
 				}
 				if refreshModListFunc != nil {
 					refreshModListFunc()
 				}
-				time.Sleep(100 * time.Millisecond)
 				return true
 			},
 		})
@@ -1544,6 +1721,15 @@ func PickLocalized(tr map[string]string, lang string) string {
 	}
 	if val, ok := tr[lang]; ok && val != "" {
 		return val
+	}
+	// Case-insensitive fallback: "pt-BR" ↔ "pt-br", "zh-Hans" ↔ "zh-hans".
+	// Нужен для совместимости с базами, скачанными до переименования
+	// ключей. Стоимость — проход по map только при miss.
+	lowerLang := strings.ToLower(lang)
+	for k, v := range tr {
+		if strings.ToLower(k) == lowerLang && v != "" {
+			return v
+		}
 	}
 	if val, ok := tr["en"]; ok && val != "" {
 		return val
@@ -1769,11 +1955,45 @@ func GetIncompatiblePairs() []IncompatiblePair {
 func IsIncompatibleMod(name string) bool {
 	pairs := GetIncompatiblePairs()
 	for _, pair := range pairs {
-		if (pair.Mod1 == name || pair.Mod2 == name) && FolderExists(pair.Mod1) && FolderExists(pair.Mod2) {
-			return true
+		if pair.Mod1 != name && pair.Mod2 != name {
+			continue
 		}
+		if !FolderExists(pair.Mod1) || !FolderExists(pair.Mod2) {
+			continue
+		}
+		if isDisabledByNaming(pair.Mod1) || isDisabledByNaming(pair.Mod2) {
+			continue
+		}
+		return true
 	}
 	return false
+}
+
+// GetConflictPartner возвращает display-имя второго мода в паре,
+// по которой name конфликтует, либо "". Используется refreshModList
+// для заполнения Note и ConflictWith. Критерий "живой проблемы" —
+// ровно тот же, что в IsIncompatibleMod и CheckIncompatible.
+func GetConflictPartner(name string) (folder string, displayPartner string) {
+	pairs := GetIncompatiblePairs()
+	for _, pair := range pairs {
+		var other string
+		switch name {
+		case pair.Mod1:
+			other = pair.Mod2
+		case pair.Mod2:
+			other = pair.Mod1
+		default:
+			continue
+		}
+		if !FolderExists(pair.Mod1) || !FolderExists(pair.Mod2) {
+			continue
+		}
+		if isDisabledByNaming(pair.Mod1) || isDisabledByNaming(pair.Mod2) {
+			continue
+		}
+		return other, ""
+	}
+	return "", ""
 }
 
 // GetObsoleteMods возвращает копию списка устаревших модов.
@@ -1803,4 +2023,31 @@ func GetLoadOrderRules() []LoadOrderRule {
 	checksDataMutex.RLock()
 	defer checksDataMutex.RUnlock()
 	return append([]LoadOrderRule(nil), LoadOrderRules...)
+}
+
+// GetDependenciesFlat возвращает плоский список всех зависимостей.
+// Каждая группа развёрнута в N пар «(required, dependent)».
+//
+// Используется в логике, которая раньше получала плоский список
+// из GetDependencies — теперь ей не нужно разворачивать группы
+// самостоятельно.
+func GetDependenciesFlat() []FlatDependency {
+	checksDataMutex.RLock()
+	defer checksDataMutex.RUnlock()
+	var out []FlatDependency
+	for _, d := range Dependencies {
+		out = append(out, d.Expand()...)
+	}
+	return out
+}
+
+// GetLoadOrderRulesFlat возвращает плоский список всех правил порядка.
+func GetLoadOrderRulesFlat() []FlatLoadOrderRule {
+	checksDataMutex.RLock()
+	defer checksDataMutex.RUnlock()
+	var out []FlatLoadOrderRule
+	for _, r := range LoadOrderRules {
+		out = append(out, r.Expand()...)
+	}
+	return out
 }

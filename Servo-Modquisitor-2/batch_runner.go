@@ -2,6 +2,7 @@
 package main
 
 import (
+	"Servo-Modquisitor/checks"
 	"context"
 	"errors"
 	"fmt"
@@ -25,47 +26,48 @@ const (
 
 // runBatchRunner — фоновая горутина, обрабатывающая элементы по одному.
 func (app *App) runBatchRunner(d *BatchDialog, cancelChan <-chan struct{}) {
+	var success, total int
+
+	// Регистрируется ПЕРВЫМ → выполнится ПОСЛЕ cleanup (defer LIFO),
+	// чтобы вызывающий увидел уже обновлённый список модов.
+	defer func() { d.Finish(success, total) }()
+
 	// Отложенная функция, которая сработает даже при отмене или ошибке
 	defer func() {
-		if d.mode == BatchModeInstall || d.mode == BatchModeUpdate {
-			// Читаем настройку до UI-вызовов — по правилу
-			// «захватил → скопировал → отпустил → UI».
-			app.cfgMutex.RLock()
-			autoActivate := app.cfg.AutoActivateModsEnabled()
-			app.cfgMutex.RUnlock()
-
-			// Активируем все моды — только если автовключение включено.
-			// Save для случая «autoActivate off» уже сделан внутри
-			// finalizeModInstallUI при установке каждого мода (load order
-			// содержит новый мод как -- name). Поэтому повторный save
-			// здесь не нужен: syncActiveProfileFromGame получит
-			// консистентное состояние.
-			if autoActivate {
-				app.modsMutex.Lock()
-				for i := range app.allMods {
-					if !app.allMods[i].IsSystem {
-						app.allMods[i].Active = true
-					}
+		// Коллекция — включаем всё, что установилось.
+		// Батч-обновление — НЕ трогаем состояние активности:
+		// отключённые моды должны остаться отключёнными.
+		if d.mode == BatchModeInstall {
+			app.modsMutex.Lock()
+			for i := range app.allMods {
+				if !app.allMods[i].IsSystem {
+					app.allMods[i].Active = true
 				}
-				app.modsMutex.Unlock()
-
-				app.saveCurrentOrder()
 			}
-			if err := app.syncActiveProfileFromGame(); err != nil {
-				app.appendLogToFile(fmt.Sprintf("Batch: sync failed: %v", err))
-			}
-			fyne.Do(func() {
-				app.refreshModList()
-				app.orderDirty.Store(false)
-				app.updateTableBorder()
-			})
+			app.modsMutex.Unlock()
+			app.saveCurrentOrder()
 		}
+		if err := app.syncActiveProfileFromGame(); err != nil {
+			app.appendLogToFile(fmt.Sprintf("Batch: sync failed: %v", err))
+		}
+		// DoAndWait, а не Do: runAllChecksInternal читает app.allMods
+		// сразу после выхода из showBatchDialogSync.
+		fyne.DoAndWait(func() {
+			app.refreshModList()
+			app.orderDirty.Store(false)
+			app.updateTableBorder()
+		})
 	}()
 
 	select {
 	case <-cancelChan:
 		return
 	case <-d.startChan:
+	}
+
+	if d.mode == BatchModeDelete {
+		success, total = app.runBatchDelete(d, cancelChan)
+		return
 	}
 
 	var itemsToProcess []*BatchItem
@@ -77,13 +79,12 @@ func (app *App) runBatchRunner(d *BatchDialog, cancelChan <-chan struct{}) {
 		}
 	}
 
-	total := len(itemsToProcess)
+	total = len(itemsToProcess)
 	if total == 0 {
-		d.Finish(0, 0)
 		return
 	}
+	success = 0
 
-	success := 0
 	loggedIn := app.isLoggedIn()
 
 	// Создаем контекст для отмены скачивания
@@ -151,8 +152,58 @@ func (app *App) runBatchRunner(d *BatchDialog, cancelChan <-chan struct{}) {
 			return // defer сработает
 		}
 	}
+}
 
-	d.Finish(success, total)
+// runBatchDelete — цикл удаления выбранных проблемных модов.
+// Каждый мод удаляется через checks.RemoveMod — с корзиной и
+// confirmPermanentDeleteFunc из App, единообразно с одиночным
+// удалением.
+func (app *App) runBatchDelete(d *BatchDialog, cancelChan <-chan struct{}) (success, total int) {
+	var itemsToProcess []*BatchItem
+	for _, item := range d.items {
+		if item.Selected {
+			itemsToProcess = append(itemsToProcess, item)
+		} else {
+			d.SetStatus(item, BatchSkipped)
+		}
+	}
+	total = len(itemsToProcess)
+	if total == 0 {
+		return 0, 0
+	}
+
+	for i, item := range itemsToProcess {
+		select {
+		case <-cancelChan:
+			d.UpdateProgress(app.msg("batch_cancelled"))
+			app.saveCurrentOrder()
+			return success, total // sync+refresh делает defer в runBatchRunner
+		default:
+		}
+
+		d.UpdateProgress(fmt.Sprintf(
+			app.msg("batch_deleting"), i+1, total, item.Name))
+		d.SetStatus(item, BatchWaiting)
+
+		if err := checks.RemoveMod(item.ID); err != nil {
+			d.SetStatus(item, BatchFailed, err.Error())
+			app.appendLogToFile(fmt.Sprintf(
+				"batch delete %q: %v", item.ID, err))
+			continue
+		}
+
+		// Убираем из памяти и кэша. Эти операции дёшевы и не
+		// требуют пересборки списка между модами — сделаем один
+		// refreshModList в конце.
+		app.removeModFromData(item.ID)
+		app.removeModFromCache(item.ID)
+		d.SetStatus(item, BatchInstalled) // используем Installed как «успех»
+		success++
+		app.appendLog(fmt.Sprintf(app.msg("log_deleted"), item.ID))
+	}
+
+	app.saveCurrentOrder()
+	return success, total
 }
 
 // downloadAndInstallBatchItem — скачивает и устанавливает один мод.
@@ -202,6 +253,9 @@ func (d *BatchDialog) waitForItem(item *BatchItem, cancelChan <-chan struct{}) w
 			}
 
 		case sig := <-d.app.batchInstallChan:
+			if sig.Folder == "" && sig.NexusModID == 0 {
+				continue
+			}
 			if batchSignalMatches(sig, item) {
 				d.SetStatus(item, BatchInstalled)
 				return outcomeInstalled

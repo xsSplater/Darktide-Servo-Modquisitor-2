@@ -12,6 +12,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"runtime/debug"
+	"sort"
 	"strconv"
 	"strings"
 	"sync"
@@ -63,13 +64,13 @@ func (app *App) showChoiceDialog(parent fyne.Window, title, message string, call
 		// кнопки создаются заново — это диалог, лишняя работа
 		// незаметна.
 		// Добавляем переменную для хранения первой кнопки
-		var firstBtn *widget.Button
+		var firstBtn fyne.Focusable
 
 		makeButtons := func() []fyne.CanvasObject {
 			btns := make([]fyne.CanvasObject, len(options))
 			for i, opt := range options {
 				idx := i
-				btn := widget.NewButton(opt, func() {
+				btn := NewCustomIconButton(opt, app.getIconForButton(opt), func() {
 					if popUp != nil {
 						popUp.Hide()
 					}
@@ -85,7 +86,7 @@ func (app *App) showChoiceDialog(parent fyne.Window, title, message string, call
 			return btns
 		}
 
-		titleLabel := widget.NewLabelWithStyle(title, fyne.TextAlignCenter, fyne.TextStyle{Bold: true})
+		titleLabel := helpers.BoldCenterLabel(title)
 		msgLabel := widget.NewLabel(message)
 		msgLabel.Wrapping = fyne.TextWrapWord
 
@@ -94,11 +95,11 @@ func (app *App) showChoiceDialog(parent fyne.Window, title, message string, call
 
 		// Функция сборки контента с заданной раскладкой кнопок.
 		// Возвращает контейнер и ссылку на свою первую кнопку.
-		buildContent := func(oneRow bool) (*fyne.Container, *widget.Button) {
+		buildContent := func(oneRow bool) (*fyne.Container, fyne.Focusable) {
 			btns := makeButtons()
-			var firstBtn *widget.Button
+			var firstBtn fyne.Focusable
 			if len(btns) > 0 {
-				if btn, ok := btns[0].(*widget.Button); ok {
+				if btn, ok := btns[0].(fyne.Focusable); ok {
 					firstBtn = btn
 				}
 			}
@@ -175,14 +176,18 @@ func (app *App) showChoiceDialog(parent fyne.Window, title, message string, call
 
 // showConfirmDialog показывает диалог подтверждения с двумя кнопками (Да/Нет).
 func (app *App) showConfirmDialog(title, message string, onConfirm func()) {
-	fyne.Do(func() {
-		app.bringToFront()
-		dialog.ShowConfirm(title, message, func(ok bool) {
-			if ok && onConfirm != nil {
+	app.showChoiceDialog(
+		app.mainWindow,
+		title,
+		message,
+		func(choice int) {
+			if choice == 0 && onConfirm != nil {
 				onConfirm()
 			}
-		}, app.mainWindow)
-	})
+		},
+		app.msg("btn_yes"),
+		app.msg("btn_no"),
+	)
 }
 
 // showChoiceDialogSync - синхронная версия для фоновых горутин.
@@ -236,7 +241,7 @@ func (app *App) showChoiceDialogRows(parent fyne.Window, title, message string, 
 			for _, opt := range rowOpts {
 				idx := flatIdx
 				flatIdx++
-				btn := widget.NewButton(opt, func() {
+				btn := NewCustomIconButton(opt, app.getIconForButton(opt), func() {
 					if popUp != nil {
 						popUp.Hide()
 					}
@@ -250,7 +255,7 @@ func (app *App) showChoiceDialogRows(parent fyne.Window, title, message string, 
 				container.NewCenter(container.NewHBox(rowObjs...)))
 		}
 
-		titleLabel := widget.NewLabelWithStyle(title, fyne.TextAlignCenter, fyne.TextStyle{Bold: true})
+		titleLabel := helpers.BoldCenterLabel(title)
 		msgLabel := widget.NewLabel(message)
 		msgLabel.Wrapping = fyne.TextWrapWord
 
@@ -395,27 +400,11 @@ func (app *App) startDownload(downloadURL, filename, modName string, fileInfo *F
 		fallbackFileName = fileInfo.FileName
 	}
 
-	ctx, cancel := context.WithCancel(context.Background())
-
-	var bar *widget.ProgressBar
-	var dlg *dialog.CustomDialog
-	ready := make(chan struct{})
-
-	fyne.Do(func() {
-		bar = widget.NewProgressBar()
-		bar.SetValue(0)
-		lbl := widget.NewLabel(fmt.Sprintf(app.msg("downloading"), filename))
-		content := container.NewVBox(lbl, bar)
-		dlg = dialog.NewCustom(app.msg("download_title"), app.msg("btn_cancel"), content, app.mainWindow)
-		dlg.SetOnClosed(func() {
-			cancel()
-		})
-		dlg.Show()
-		close(ready)
-	})
+	bar, ctx, hideDialog, ready := app.downloadProgressDialog(
+		app.msg("download_title"), filename,
+	)
 	<-ready
 
-	// Забираем ModsPath заранее, чтобы не трогать cfg из горутины
 	app.cfgMutex.RLock()
 	modsPath := app.cfg.ModsPath
 	app.cfgMutex.RUnlock()
@@ -427,12 +416,11 @@ func (app *App) startDownload(downloadURL, filename, modName string, fileInfo *F
 	safeFilename, err := sanitizeFilename(saveFilename)
 	if err != nil {
 		app.appendLogToFile(fmt.Sprintf("Invalid filename: %v", err))
-		fyne.Do(func() { dlg.Hide() })
+		hideDialog()
 		return
 	}
 	dest := filepath.Join(modsPath, safeFilename)
 
-	// Вся тяжёлая работа — в фоне. UI-поток свободен.
 	go func() {
 		defer func() {
 			if r := recover(); r != nil {
@@ -442,9 +430,8 @@ func (app *App) startDownload(downloadURL, filename, modName string, fileInfo *F
 		}()
 
 		app.appendLogToFile(fmt.Sprintf("DownloadFileWithProgress: starting download to %s", dest))
-
 		err := app.DownloadFileWithProgress(ctx, downloadURL, dest, bar)
-		fyne.Do(func() { dlg.Hide() })
+		hideDialog()
 
 		if err != nil {
 			if err == context.Canceled {
@@ -626,26 +613,11 @@ func (app *App) showAutopatcherDownloadDialog(downloadURL, filename string, file
 func (app *App) startSystemDownload(downloadURL, filename, displayName string, fileInfo *FileInfo, cacheKey string, installFunc func(string) error, logInstalling, logSuccess string) {
 	app.appendLog(fmt.Sprintf(app.msg("log_downloading_mod"), displayName))
 
-	ctx, cancel := context.WithCancel(context.Background())
-
-	var bar *widget.ProgressBar
-	var dlg *dialog.CustomDialog
-	ready := make(chan struct{})
-
-	fyne.Do(func() {
-		bar = widget.NewProgressBar()
-		lbl := widget.NewLabel(fmt.Sprintf(app.msg("downloading"), filename))
-		content := container.NewVBox(lbl, bar)
-		dlg = dialog.NewCustom(app.msg("download_title"), app.msg("btn_cancel"), content, app.mainWindow)
-		dlg.SetOnClosed(func() {
-			cancel()
-		})
-		dlg.Show()
-		close(ready)
-	})
+	bar, ctx, hideDialog, ready := app.downloadProgressDialog(
+		app.msg("download_title"), filename,
+	)
 	<-ready
 
-	// Копируем ModsPath под мьютексом перед запуском горутины
 	app.cfgMutex.RLock()
 	modsPath := app.cfg.ModsPath
 	app.cfgMutex.RUnlock()
@@ -654,57 +626,53 @@ func (app *App) startSystemDownload(downloadURL, filename, displayName string, f
 		safeFilename, err := sanitizeFilename(filename)
 		if err != nil {
 			app.appendLogToFile(fmt.Sprintf("Invalid filename: %v", err))
+			hideDialog()
 			return
 		}
 		dest := filepath.Join(modsPath, safeFilename)
 
 		err = app.DownloadFileWithProgress(ctx, downloadURL, dest, bar)
-		fyne.Do(func() {
-			dlg.Hide()
-			if err != nil {
-				if err == context.Canceled {
-					app.appendLog(app.msg("download_cancelled"))
-				} else {
-					app.appendLog(fmt.Sprintf(app.msg("download_failed"), err))
-				}
-				return
-			}
-			info, e := os.Stat(dest)
-			if e == nil && info.Size() < 100 {
-				app.appendLog(fmt.Sprintf(app.msg("log_error_file_too_small"), info.Size()))
-				os.Remove(dest)
-				return
-			}
-			app.appendLog(logInstalling)
-			if err := installFunc(dest); err != nil {
-				app.appendLog(fmt.Sprintf(app.msg("log_install_failed"), err))
+		hideDialog()
+		if err != nil {
+			if err == context.Canceled {
+				app.appendLog(app.msg("download_cancelled"))
 			} else {
-				if fileInfo != nil {
-					// Извлекаем реальное имя папки из ключа (например, "19:base" -> "base")
-					folderName := displayName
-					parts := strings.Split(cacheKey, ":")
-					if len(parts) == 2 {
-						folderName = parts[1]
-					}
-					modID, _ := strconv.Atoi(parts[0])
-
-					app.setCachedVersion(cacheKey, ModVersionInfo{
-						Timestamp:   fileInfo.UploadedTimestamp,
-						Version:     fileInfo.Version,
-						Folder:      folderName, // Теперь Prune не удалит запись
-						Source:      "nexus",
-						InstalledAt: time.Now().Unix(),
-					})
-
-					select {
-					case app.batchInstallChan <- BatchSignal{Folder: folderName, NexusModID: modID}:
-					default:
-					}
-				}
-				app.appendLog(logSuccess)
+				app.appendLog(fmt.Sprintf(app.msg("download_failed"), err))
 			}
+			return
+		}
+		info, e := os.Stat(dest)
+		if e == nil && info.Size() < 100 {
+			app.appendLog(fmt.Sprintf(app.msg("log_error_file_too_small"), safeFilename, info.Size()))
 			os.Remove(dest)
-		})
+			return
+		}
+		app.appendLog(logInstalling)
+		if err := installFunc(dest); err != nil {
+			app.appendLog(fmt.Sprintf(app.msg("log_install_failed"), err))
+		} else {
+			if fileInfo != nil {
+				folderName := displayName
+				parts := strings.Split(cacheKey, ":")
+				if len(parts) == 2 {
+					folderName = parts[1]
+				}
+				modID, _ := strconv.Atoi(parts[0])
+				app.setCachedVersion(cacheKey, ModVersionInfo{
+					Timestamp:   fileInfo.UploadedTimestamp,
+					Version:     fileInfo.Version,
+					Folder:      folderName,
+					Source:      "nexus",
+					InstalledAt: time.Now().Unix(),
+				})
+				select {
+				case app.batchInstallChan <- BatchSignal{Folder: folderName, NexusModID: modID}:
+				default:
+				}
+			}
+			app.appendLog(logSuccess)
+		}
+		os.Remove(dest)
 	}()
 }
 
@@ -970,7 +938,7 @@ func (app *App) showEditVersionDialog(mod *checks.ModInfo) {
 		widget.NewLabel(fmt.Sprintf(app.msg("edit_version_current"), mod.DisplayName, currentVersion)),
 		entry,
 		container.NewHBox(
-			widget.NewButton(app.msg("btn_save"), func() {
+			NewCustomIconButton(app.msg("btn_save"), app.loadIconResource("save", "assets/buttons/save.png"), func() {
 				newVersion := strings.TrimSpace(entry.Text)
 				if newVersion == "" {
 					app.appendLog(app.msg("log_cannot_version_empty"))
@@ -987,14 +955,14 @@ func (app *App) showEditVersionDialog(mod *checks.ModInfo) {
 				popUp.Hide()
 				app.updateDescriptionForMod(mod.Name)
 			}),
-			widget.NewButton(app.msg("btn_cancel"), func() {
+			NewCustomIconButton(app.msg("btn_cancel"), app.loadIconResource("cancel", "assets/buttons/x_.png"), func() {
 				popUp.Hide()
 			}),
 		),
 	)
 
 	popUp = widget.NewModalPopUp(content, app.mainWindow.Canvas())
-	popUp.Resize(fyne.NewSize(400, 200))
+	popUp.Resize(fyne.NewSize(WindowWidth400, WindowHeight120))
 	popUp.Show()
 }
 
@@ -1080,7 +1048,7 @@ func (app *App) showCreateProfileDialog() {
 	var popUp *widget.PopUp
 
 	// Кнопки с центрированием
-	btnCreate := widget.NewButton(app.msg("btn_create"), func() {
+	btnCreate := NewCustomIconButton(app.msg("btn_create"), app.loadIconResource("add", "assets/buttons/add.png"), func() {
 		name := strings.TrimSpace(entry.Text)
 		if name == "" {
 			app.showInfoDialog(app.msg("error_title"), app.msg("profile_name_empty"))
@@ -1115,16 +1083,15 @@ func (app *App) showCreateProfileDialog() {
 		}()
 	})
 
-	btnCancel := widget.NewButton(app.msg("btn_cancel"), func() {
+	btnCancel := NewCustomIconButton(app.msg("btn_cancel"), app.loadIconResource("cancel", "assets/buttons/x_.png"), func() {
 		popUp.Hide()
 	})
-
 	btnContainer := container.NewCenter(
 		container.NewHBox(btnCreate, btnCancel),
 	)
 
 	content := container.NewVBox(
-		widget.NewLabelWithStyle(app.msg("profile_create_title"), fyne.TextAlignCenter, fyne.TextStyle{Bold: true}),
+		helpers.BoldCenterLabel(app.msg("profile_create_title")),
 		widget.NewLabel(app.msg("profile_create_message")),
 		entry,
 		copyCheck,
@@ -1134,7 +1101,7 @@ func (app *App) showCreateProfileDialog() {
 	)
 
 	popUp = widget.NewModalPopUp(content, app.mainWindow.Canvas())
-	popUp.Resize(fyne.NewSize(400, 250))
+	popUp.Resize(fyne.NewSize(WindowWidth400, WindowHeight200))
 	popUp.Show()
 	app.mainWindow.Canvas().Focus(entry)
 }
@@ -1155,7 +1122,7 @@ func (app *App) showRenameProfileDialog() {
 
 	var popUp *widget.PopUp
 
-	btnRename := widget.NewButton(app.msg("btn_rename"), func() {
+	btnRename := NewCustomIconButton(app.msg("btn_rename"), app.loadIconResource("edit_version", "assets/buttons/edit_version.png"), func() {
 		newName := strings.TrimSpace(entry.Text)
 		if newName == "" {
 			app.showInfoDialog(app.msg("error_title"), app.msg("profile_name_empty"))
@@ -1170,14 +1137,14 @@ func (app *App) showRenameProfileDialog() {
 		popUp.Hide()
 	})
 
-	btnCancel := widget.NewButton(app.msg("btn_cancel"), func() {
+	btnCancel := NewCustomIconButton(app.msg("btn_cancel"), app.loadIconResource("cancel", "assets/buttons/x_.png"), func() {
 		popUp.Hide()
 	})
 
 	btnContainer := container.NewCenter(container.NewHBox(btnRename, btnCancel))
 
 	content := container.NewVBox(
-		widget.NewLabelWithStyle(app.msg("profile_rename_title"), fyne.TextAlignCenter, fyne.TextStyle{Bold: true}),
+		helpers.BoldCenterLabel(app.msg("profile_rename_title")),
 		widget.NewLabel(fmt.Sprintf(app.msg("profile_rename_message"), currentProfile)),
 		entry,
 		widget.NewSeparator(),
@@ -1185,7 +1152,7 @@ func (app *App) showRenameProfileDialog() {
 	)
 
 	popUp = widget.NewModalPopUp(content, app.mainWindow.Canvas())
-	popUp.Resize(fyne.NewSize(400, 200))
+	popUp.Resize(fyne.NewSize(WindowWidth400, WindowHeight160))
 	popUp.Show()
 	app.mainWindow.Canvas().Focus(entry)
 }
@@ -1379,17 +1346,6 @@ func (app *App) showExportProfileDialog() {
 	fd.Resize(fyne.NewSize(FileDialogWidth, FileDialogHeight))
 }
 
-// fileInfoSnapshot безопасно извлекает поля из возможно-nil *FileInfo.
-// Возвращает (version, uploadedTimestamp, fileName). Для nil-аргумента
-// все три значения — zero-value, что позволяет вызывающей стороне
-// не думать про nil-проверки на каждом шаге.
-func fileInfoSnapshot(fi *FileInfo) (version string, timestamp int64, fileName string) {
-	if fi == nil {
-		return "", 0, ""
-	}
-	return fi.Version, fi.UploadedTimestamp, fi.FileName
-}
-
 // showInfiniteProgressDialog — модальный диалог с инфинитным прогрессом.
 //
 // cancellable == true  — показывает кнопку «Отмена», закрытие крестиком
@@ -1554,7 +1510,10 @@ func (app *App) showEditUserNoteDialog(modName, displayName string) {
 
 	var popUp *widget.PopUp
 
-	saveBtn := widget.NewButton(app.msg("btn_save"), func() {
+	// Иконка
+	saveIcon := app.loadIconResource("save", "assets/buttons/save.png")
+	// Создаём кнопку через кастомную функцию
+	saveBtn := NewCustomIconButton(app.msg("btn_save"), saveIcon, func() {
 		app.userNotes.Set(modName, entry.Text)
 		if err := app.userNotes.Save(); err != nil {
 			app.appendLogToFile(fmt.Sprintf("Failed to save user_notes.json: %v", err))
@@ -1563,25 +1522,37 @@ func (app *App) showEditUserNoteDialog(modName, displayName string) {
 			app.appendLogToFile(fmt.Sprintf("User note saved for %s", modName))
 		}
 		popUp.Hide()
+
+		// refreshModList() ниже перечитывает mod_load_order.txt с диска
+		// и заменяет app.allMods целиком. Если у пользователя были
+		// несохранённые переключения Active — они живут только в памяти
+		// и пропали бы молча. Сохраняем порядок первым, чтобы пересборка
+		// читала уже актуальное состояние.
+		if app.orderDirty.Load() {
+			app.saveCurrentOrder()
+			app.orderDirty.Store(false)
+			app.stopBlinkSaveButton()
+			app.updateTableBorder()
+		}
+
 		app.refreshModList()
 		app.updateDescriptionForMod(modName)
 	})
 
-	clearBtn := widget.NewButton(app.msg("btn_clear"), func() {
+	clearBtn := NewCustomIconButton(app.msg("btn_clear"), app.loadIconResource("clear", "assets/buttons/backsp.png"), func() {
 		entry.SetText("")
 	})
 
-	cancelBtn := widget.NewButton(app.msg("btn_cancel"), func() {
+	cancelBtn := NewCustomIconButton(app.msg("btn_cancel"), app.loadIconResource("cancel", "assets/buttons/x_.png"), func() {
 		popUp.Hide()
 	})
-
 	title := fmt.Sprintf(app.msg("user_note_title"), displayName)
 	if displayName == "" {
 		title = fmt.Sprintf(app.msg("user_note_title"), modName)
 	}
 
 	content := container.NewVBox(
-		widget.NewLabelWithStyle(title, fyne.TextAlignCenter, fyne.TextStyle{Bold: true}),
+		helpers.BoldCenterLabel(title),
 		widget.NewSeparator(),
 		entry,
 		widget.NewSeparator(),
@@ -1589,7 +1560,7 @@ func (app *App) showEditUserNoteDialog(modName, displayName string) {
 	)
 
 	popUp = widget.NewModalPopUp(content, app.mainWindow.Canvas())
-	popUp.Resize(fyne.NewSize(600, 400))
+	popUp.Resize(fyne.NewSize(WindowWidth550, WindowHeight170))
 	popUp.Show()
 	app.mainWindow.Canvas().Focus(entry)
 }
@@ -1665,7 +1636,7 @@ func (app *App) showEnlargedImage(imgRes fyne.Resource) {
 		var popUp *widget.PopUp
 
 		// Кнопка закрытия
-		closeBtn := widget.NewButton(app.msg("theme_editor_btn_close"), func() {
+		closeBtn := NewCustomIconButton(app.msg("theme_editor_btn_close"), app.loadIconResource("cancel", "assets/buttons/x_.png"), func() {
 			popUp.Hide()
 		})
 		closeBtn.Importance = widget.HighImportance
@@ -1832,7 +1803,7 @@ func (app *App) installNexusCollection(slug string, rev int) {
 		choice := app.showChoiceDialogSync(
 			app.mainWindow,
 			app.msg("aml_detected_title"),
-			"Коллекция содержит мод 'Auto Mod Loading and Ordering' (AML). Servo-Modquisitor обеспечивает лучшую сортировку. Вы хотите отключить AML в этой коллекции?",
+			app.msg("aml_detected_collections"),
 			app.msg("btn_yes"), app.msg("btn_no"),
 		)
 		if choice == 0 {
@@ -1908,4 +1879,283 @@ func sanitizeProfileName(name string) string {
 		name = "Collection"
 	}
 	return name
+}
+
+// confirmSteamLoggedIn показывает модальный диалог и блокирует
+// вызывающую горутину до тех пор, пока пользователь не подтвердит,
+// что залогинился в Steam (или не отменит запуск).
+//
+// Нужен потому, что определить программно момент «Steam готов
+// принимать игру» невозможно: steamwebhelper поднимается ещё на
+// экране выбора аккаунта, а до логина SteamAPI не работает.
+// Вызывать ТОЛЬКО из фоновой горутины.
+func (app *App) confirmSteamLoggedIn() bool {
+	resultChan := make(chan bool, 1)
+
+	fyne.Do(func() {
+		app.bringToFront()
+
+		var popUp *widget.PopUp
+
+		okBtn := NewCustomIconButton(app.msg("btn_continue"), app.loadIconResource("ok", "assets/buttons/checked_box.png"), func() {
+			if popUp != nil {
+				popUp.Hide()
+			}
+			resultChan <- true
+		})
+		cancelBtn := NewCustomIconButton(app.msg("btn_cancel"), app.loadIconResource("cancel", "assets/buttons/x_.png"), func() {
+			if popUp != nil {
+				popUp.Hide()
+			}
+			resultChan <- false
+		})
+
+		msg := widget.NewLabel(app.msg("steam_login_prompt"))
+		msg.Wrapping = fyne.TextWrapWord
+
+		content := container.NewVBox(
+			helpers.BoldCenterLabel(app.msg("steam_not_running_title")),
+			widget.NewSeparator(),
+			msg,
+			widget.NewSeparator(),
+			container.NewCenter(container.NewHBox(okBtn, cancelBtn)),
+		)
+
+		popUp = widget.NewModalPopUp(content, app.mainWindow.Canvas())
+		popUp.Resize(fyne.NewSize(450, 220))
+		popUp.Show()
+	})
+
+	return <-resultChan
+}
+
+// showLanguagePickerIfFirstRun показывает выбор языка при самом первом
+// запуске. Вызывается ПЕРЕД initializePaths/loadDataAfterInit, чтобы
+// все последующие диалоги (пути, wizard, AML-предупреждение) были уже
+// на выбранном языке.
+//
+// Если InitialSetupDone == true — no-op: язык уже выбран ранее.
+//
+// Блокирует вызывающую горутину до выбора пользователя. Вызывать
+// ТОЛЬКО из фоновой горутины (внутри fyne.DoAndWait + ожидание канала).
+func (app *App) showLanguagePickerIfFirstRun() {
+	app.cfgMutex.RLock()
+	done := app.cfg.InitialSetupDone
+	current := app.cfg.Language
+	app.cfgMutex.RUnlock()
+
+	// Показываем пикер, если:
+	//   - setup ещё не проходили (свежий install), ИЛИ
+	//   - cfg.Language пустой — это означает, что язык так и не выбрали
+	//     (например, старый config.json без поля language, или запись
+	//     повреждена). Тогда fallback на английский даёт неверный UI,
+	//     хотя пользователь мог быть русскоязычным.
+	if done && current != "" {
+		return
+	}
+
+	// Названия языков — эндонимы (на самом языке), не переводятся.
+	// Первый — English, чтобы англоязычный пользователь мог сразу ОК.
+	languages := []struct {
+		code  string
+		label string
+	}{
+		{"en", app.msg("menu_lang_en")},
+		{"ru", app.msg("menu_lang_ru")},
+		{"de", app.msg("menu_lang_de")},
+		{"es", app.msg("menu_lang_es")},
+		{"fr", app.msg("menu_lang_fr")},
+		{"it", app.msg("menu_lang_it")},
+		{"ja", app.msg("menu_lang_ja")},
+		{"ko", app.msg("menu_lang_ko")},
+		{"pl", app.msg("menu_lang_pl")},
+		{"pt-br", app.msg("menu_lang_pt-BR")},
+		{"zh-hans", app.msg("menu_lang_zh-hans")},
+		{"zh-hant", app.msg("menu_lang_zh-hant")},
+	}
+
+	// Индекс текущего языка в списке. На первом запуске cfg.Language
+	// ещё "en" (defaultConfig), реального выбора пользователя не было.
+	// Поэтому пытаемся предвыбрать системную локаль: русский пользователь сразу увидит «Русский» и нажмёт только OK.
+	//
+	// Если система не поддерживается (fi-FI, tr-TR, …) — оставляем
+	// текущий (en) или ранее сохранённый выбор.
+	curIdx := 0
+	for i, l := range languages {
+		if l.code == current {
+			curIdx = i
+			break
+		}
+	}
+	if sysCode := mapSystemLocaleToSupported(systemLocale()); sysCode != "" {
+		for i, l := range languages {
+			if l.code == sysCode {
+				curIdx = i
+				break
+			}
+		}
+	}
+
+	labels := make([]string, len(languages))
+	for i, l := range languages {
+		labels[i] = l.label
+	}
+
+	chosen := make(chan string, 1)
+
+	fyne.DoAndWait(func() {
+		app.bringToFront()
+
+		sel := widget.NewSelect(labels, nil)
+		sel.SetSelectedIndex(curIdx)
+
+		var popUp *widget.PopUp
+		okBtn := widget.NewButton(app.msg("btn_ok"), func() {
+			idx := sel.SelectedIndex()
+			if idx < 0 || idx >= len(languages) {
+				idx = curIdx
+			}
+			if popUp != nil {
+				popUp.Hide()
+			}
+			chosen <- languages[idx].code
+		})
+
+		content := container.NewVBox(
+			helpers.BoldCenterLabel(app.msg("menu_language")),
+			widget.NewSeparator(),
+			widget.NewLabel(app.msg("choose_lang")),
+			sel,
+			widget.NewSeparator(),
+			container.NewCenter(okBtn),
+		)
+
+		popUp = widget.NewModalPopUp(content, app.mainWindow.Canvas())
+		popUp.Resize(fyne.NewSize(420, 240))
+		popUp.Show()
+	})
+
+	code := <-chosen
+
+	if err := app.loadLanguage(code); err != nil {
+		app.appendLogToFile(fmt.Sprintf("Failed to load language %q: %v", code, err))
+	}
+	app.cfgMutex.Lock()
+	app.cfg.Language = code
+	app.cfgMutex.Unlock()
+	app.saveConfigSafe()
+
+	// Обновляем заголовок окна и меню на новый язык. Само окно уже
+	// построено — просто перекрашиваем тексты.
+	fyne.Do(func() {
+		app.mainWindow.SetTitle(app.getTitle() + " v" + AppVersion)
+		app.mainWindow.SetMainMenu(app.buildMainMenu())
+	})
+
+	app.appendLogToFile(fmt.Sprintf("First-run language selected: %s", code))
+}
+
+// showProblemsDialog открывает батч-диалог для проблемных модов.
+// Вызывается из runAllChecksInternal.
+func (app *App) showProblemsDialog(items []*BatchItem) {
+	if len(items) == 0 {
+		return
+	}
+	fyne.Do(func() {
+		app.showBatchDialog(
+			app.msg("problems_title"), // «Найдены проблемы»
+			items,
+			BatchModeDelete,
+		)
+	})
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// Восстановление из бэкапа
+// ─────────────────────────────────────────────────────────────────────
+
+func (app *App) showRestoreSettingsDialog() {
+	settingsPath := app.getUserSettingsPath()
+	configDir := filepath.Dir(configFilePath())
+	backupDir := filepath.Join(configDir, "backups", "user_settings")
+
+	if _, err := os.Stat(backupDir); os.IsNotExist(err) {
+		app.showInfoDialog(app.msg("usettings_info_title"), app.msg("usettings_no_backups"))
+		return
+	}
+	entries, err := os.ReadDir(backupDir)
+	if err != nil {
+		app.showInfoDialog(app.msg("usettings_error_title"), fmt.Sprintf(app.msg("usettings_read_backup_dir_failed"), err))
+		return
+	}
+	var backupFiles []string
+	for _, e := range entries {
+		if !e.IsDir() && strings.HasSuffix(e.Name(), ".config") {
+			backupFiles = append(backupFiles, e.Name())
+		}
+	}
+	if len(backupFiles) == 0 {
+		app.showInfoDialog(app.msg("usettings_info_title"), app.msg("usettings_no_backup_files"))
+		return
+	}
+	sort.Slice(backupFiles, func(i, j int) bool {
+		return backupFiles[i] > backupFiles[j]
+	})
+
+	selected := ""
+	list := widget.NewList(
+		func() int { return len(backupFiles) },
+		func() fyne.CanvasObject { return widget.NewLabel("") },
+		func(id widget.ListItemID, obj fyne.CanvasObject) {
+			obj.(*widget.Label).SetText(backupFiles[id])
+		},
+	)
+	list.OnSelected = func(id widget.ListItemID) {
+		selected = backupFiles[id]
+	}
+
+	// widget.List в VBox схлопывается до одной строки — VBox выдаёт
+	// каждому ребёнку ровно его MinSize(). Спайсер поднимает MinSize
+	// Stack-контейнера до нужной высоты, а сам List внутри Stack
+	// растягивается на всю эту высоту.
+	// Одна строка ~37-40px, 6 строк ≈ 240px.
+	listSpacer := canvas.NewRectangle(color.Transparent)
+	listSpacer.SetMinSize(fyne.NewSize(0, 240))
+	listBox := container.NewStack(listSpacer, list)
+
+	var popUp *widget.PopUp
+	content := container.NewVBox(
+		widget.NewLabel(app.msg("usettings_select_backup")),
+		listBox,
+		container.NewHBox(
+			widget.NewButton(app.msg("usettings_restore_btn"), func() {
+				if selected == "" {
+					app.showInfoDialog(app.msg("usettings_info_title"), app.msg("usettings_select_file"))
+					return
+				}
+				popUp.Hide()
+				dialog.ShowConfirm(app.msg("usettings_confirm_title"), fmt.Sprintf(app.msg("usettings_confirm_restore"), selected), func(ok bool) {
+					if !ok {
+						return
+					}
+					app.createSettingsBackup()
+					src := filepath.Join(backupDir, selected)
+					data, err := os.ReadFile(src)
+					if err != nil {
+						app.showInfoDialog(app.msg("usettings_error_title"), fmt.Sprintf(app.msg("usettings_read_backup_failed"), err))
+						return
+					}
+					if err := os.WriteFile(settingsPath, data, 0644); err != nil {
+						app.showInfoDialog(app.msg("usettings_error_title"), fmt.Sprintf(app.msg("usettings_restore_failed"), err))
+						return
+					}
+					app.appendLog(fmt.Sprintf(app.msg("usettings_restored"), selected))
+				}, app.mainWindow)
+			}),
+			widget.NewButton(app.msg("btn_cancel"), func() { popUp.Hide() }),
+		),
+	)
+	popUp = widget.NewModalPopUp(content, app.mainWindow.Canvas())
+	popUp.Resize(fyne.NewSize(WindowWidth400, 300))
+	popUp.Show()
 }

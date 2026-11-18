@@ -27,8 +27,6 @@ func launchGame(version GameVersion, gameRoot string, skipLauncher bool) error {
 		args = []string{
 			"--bundle-dir", "../bundle",
 			"--ini", "settings",
-			"--backend-auth-service-url", "https://bsp-auth-prod.atoma.cloud",
-			"--backend-title-service-url", "https://bsp-td-prod.atoma.cloud",
 			"--lua-heap-mb-size", "2048",
 		}
 
@@ -44,8 +42,6 @@ func launchGame(version GameVersion, gameRoot string, skipLauncher bool) error {
 		args = []string{
 			"--bundle-dir", "../bundle",
 			"--ini", "settings",
-			"--backend-auth-service-url", "https://bsp-auth-prod.atoma.cloud",
-			"--backend-title-service-url", "https://bsp-td-prod.atoma.cloud",
 			"--lua-heap-mb-size", "2048",
 		}
 

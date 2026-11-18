@@ -64,7 +64,7 @@ func (app *App) ensureSortFiles() {
 				app.cfgMutex.Lock()
 				app.cfg.SkipSortFilesPrompt = true
 				app.cfgMutex.Unlock()
-				saveConfig(app.cfg)
+				app.saveConfigSafe()
 				fallthrough
 			case 1:
 				app.appendLog(app.msg("download_skipped"))

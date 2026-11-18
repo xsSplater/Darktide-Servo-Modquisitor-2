@@ -229,6 +229,10 @@ func toNRGBA(c color.Color) color.NRGBA {
 
 // showThemeEditor opens the theme editor window.
 func (app *App) showThemeEditor() {
+	if !app.acquireWindow("theme_editor") {
+		return
+	}
+
 	// Снимок конфига.
 	app.cfgMutex.RLock()
 	cfgCustomColors := make(map[string]color.NRGBA, len(app.cfg.CustomColors))
@@ -286,7 +290,8 @@ func (app *App) showThemeEditor() {
 	originalBase := baseThemeName
 
 	win := app.myApp.NewWindow(app.msg("theme_editor_title"))
-	win.Resize(fyne.NewSize(1200, 800))
+	app.registerWindow("theme_editor", win)
+	win.Resize(fyne.NewSize(MainWindowWidth, MainWindowHeight))
 
 	searchText := ""
 	filterGroup := ""

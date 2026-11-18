@@ -8,15 +8,18 @@
     "#1": {
       "0000": {
         "fixed": {
-          "file_version": "5.8.0.0",
-          "product_version": "5.8.0.0"
+          "file_version": "6.0.0.0",
+          "product_version": "6.0.0.0"
         },
         "info": {
           "0409": {
-            "FileDescription": "Servo-Modquisitor-2",
-            "ProductName": "Servo-Modquisitor-2",
-            "LegalCopyright": "© 2026 xsSplater",
-            "OriginalFilename": "Servo-Modquisitor-2.exe"
+            "Comments": "Mod manager for Warhammer 40,000: Darktide",
+            "CompanyName": "Roga & Co",
+            "FileDescription": "Servo-Modquisitor-2 - Darktide Mod Manager",
+            "InternalName": "Servo-Modquisitor-2.exe",
+            "LegalCopyright": "© xsSplater 2026",
+            "OriginalFilename": "Servo-Modquisitor-2.exe",
+            "ProductName": "Servo-Modquisitor-2"
           }
         }
       }

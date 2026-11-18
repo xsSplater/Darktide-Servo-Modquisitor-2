@@ -112,8 +112,8 @@ github.com/xsSplater/xsscolorpicker v0.5.1 h1:98ISbgBgGr9JIAuFCRhy/nFM7pbuRPm1b/
 github.com/xsSplater/xsscolorpicker v0.5.1/go.mod h1:rWR32UgxgsSH72H0IWA53afknjn9dWPGAyqe9DqinTQ=
 github.com/xsSplater/xsstrashy v0.5.8 h1:n964L85+nQdXVrLYMRr8CAuQVjRoICPO0rVQiX8/vl4=
 github.com/xsSplater/xsstrashy v0.5.8/go.mod h1:bYSCw6+kMhLmbjt2jP2h4Znb6aIKz8dFuaXAMX03KD4=
-github.com/xsSplater/xssyne/v2 v2.1.1 h1:x147l2Bd1xJ+qI3W03z2tkdSi6uNmPD00SJjHgBzRgc=
-github.com/xsSplater/xssyne/v2 v2.1.1/go.mod h1:qqdnqo6Ve9n+neHq6QdA+FQAzR+hnu3Y9gYrw2wNArg=
+github.com/xsSplater/xssyne/v2 v2.1.5 h1:oscDXBT6BQ31ypyrrssnoqZGfJs25UzthstNRLpZJYs=
+github.com/xsSplater/xssyne/v2 v2.1.5/go.mod h1:qqdnqo6Ve9n+neHq6QdA+FQAzR+hnu3Y9gYrw2wNArg=
 github.com/xyproto/randomstring v1.0.5 h1:YtlWPoRdgMu3NZtP45drfy1GKoojuR7hmRcnhZqKjWU=
 github.com/xyproto/randomstring v1.0.5/go.mod h1:rgmS5DeNXLivK7YprL0pY+lTuhNQW3iGxZ18UQApw/E=
 github.com/yuin/goldmark v1.8.7 h1:XT/tNqCIbabh0ln675w4x3dv04kQBKi8NwYqi9IJaxI=

@@ -57,8 +57,13 @@ func (m *modBrowserTheme) Color(name fyne.ThemeColorName, variant fyne.ThemeVari
 }
 
 func (app *App) showModBrowser() {
+	if !app.acquireWindow("mod_browser") {
+		return
+	}
+
 	win := app.myApp.NewWindow(app.msg("browser_title"))
-	win.Resize(fyne.NewSize(1300, 800))
+	app.registerWindow("mod_browser", win)
+	win.Resize(fyne.NewSize(MainWindowWidth, MainWindowHeight))
 	win.CenterOnScreen()
 
 	var results []ModBrowserItem
@@ -67,7 +72,6 @@ func (app *App) showModBrowser() {
 	var blinkSearchActive atomic.Bool
 	var currentSearchQuery string
 
-	// Хелпер для локализации категорий (как в ui_build.go)
 	getLocalizedCategory := func(cat string) string {
 		if cat == "" {
 			return "-"
@@ -79,14 +83,13 @@ func (app *App) showModBrowser() {
 		return cat
 	}
 
-	// Состояние спойлера и кнопок (локально для этого окна)
 	var (
 		changelogExpanded bool
 		changelogFetched  bool
 		changelogModID    int
-		btnChangelog      *widget.Button
+		btnChangelog      *CustomButton
 		detailsBox        *fyne.Container
-		btnDownload       *widget.Button
+		btnDownload       *CustomButton
 	)
 
 	// --- 1. Таблица и Заголовки ---
@@ -175,7 +178,7 @@ func (app *App) showModBrowser() {
 				}
 
 				hasReqs := false
-				for _, dep := range checks.GetDependencies() {
+				for _, dep := range checks.GetDependenciesFlat() {
 					if dep.Dependent == mod.Folder || dep.Dependent == mod.Name {
 						hasReqs = true
 						break
@@ -312,7 +315,7 @@ func (app *App) showModBrowser() {
 	thumbBox.Hide()
 
 	// Кнопка установки
-	btnDownload = widget.NewButton(app.msg("browser_btn_install"), func() {
+	btnDownload = NewCustomIconButton(app.msg("browser_btn_install"), app.loadIconResource("update", "assets/buttons/upd_download_blue.png"), func() {
 		if selectedMod == nil {
 			return
 		}
@@ -362,7 +365,7 @@ func (app *App) showModBrowser() {
 	changelogContainer := container.NewVBox(changelogLabel)
 	changelogContainer.Hide()
 
-	btnChangelog = widget.NewButton(app.msg("btn_show_changelog"), func() {
+	btnChangelog = NewCustomIconButton(app.msg("btn_show_changelog"), app.loadIconResource("info", "assets/buttons/info.png"), func() {
 		if selectedMod == nil {
 			return
 		}
@@ -567,7 +570,6 @@ func (app *App) showModBrowser() {
 
 		btnDownload.Enable()
 
-		// Принудительно обновляем контейнер и скролл, чтобы Fyne пересчитал высоту блоков после Show()/Hide() секции Required
 		detailsBox.Refresh()
 		detailsScroll.Refresh()
 
@@ -612,37 +614,37 @@ func (app *App) showModBrowser() {
 	}
 
 	// --- 4. Поиск и Фильтры ---
-	searchEntry := widget.NewEntry()
-
-	// Обработка Esc: сброс поиска или снятие фокуса
-	searchEntry.SetEscapeHandler(func() {
-		if searchEntry.Text != "" {
-			searchEntry.SetText("")
-		} else {
-			win.Canvas().Focus(table)
-		}
-	})
-
 	// Определяем цвета для режимов
 	colorPink := color.NRGBA{R: 255, G: 105, B: 180, A: 255}
 	colorBlue := color.NRGBA{R: 0, G: 205, B: 255, A: 255}
 
-	// Используем кастомную тему для Entry, чтобы избежать двойных рамок
-	searchTheme := &modBrowserTheme{Theme: fyne.CurrentApp().Settings().Theme(), primaryColor: colorPink}
-	searchEntryWithTheme := container.NewThemeOverride(searchEntry, searchTheme)
+	searchTheme := &modBrowserTheme{
+		Theme:        fyne.CurrentApp().Settings().Theme(),
+		primaryColor: colorPink,
+	}
 
-	// Кнопка очистки
-	searchClearBtn := NewCustomButton("✕", func() {
-		searchEntry.SetText("")
+	var searchField *SearchField
+	var doSearch func(string)
+
+	searchField = app.NewSearchField(SearchFieldOptions{
+		Width:         SearchMinWidth,
+		DebounceDelay: 300 * time.Millisecond,
+		ShowClear:     true,
+		Theme:         searchTheme,
+		OnFilter: func(s string) {
+			currentSearchQuery = s
+			doSearch(s)
+		},
+		OnEscape: func() {
+			if searchField.Entry.Text != "" {
+				searchField.Entry.SetText("")
+			} else if win.Canvas() != nil {
+				win.Canvas().Focus(table)
+			}
+		},
 	})
-	searchClearBtn.Importance = widget.DangerImportance
-	searchClearBtn.Hide()
-
-	searchSpacer := canvas.NewRectangle(color.Transparent)
-	searchSpacer.SetMinSize(fyne.NewSize(100, 1))
-	searchEntryBox := container.NewStack(searchSpacer, searchEntryWithTheme)
-
-	searchBar := container.NewBorder(nil, nil, nil, searchClearBtn, searchEntryBox)
+	searchEntry := searchField.Entry
+	searchBar := searchField.Container
 
 	statusLabel := widget.NewLabel("")
 	statusLabel.Alignment = fyne.TextAlignCenter
@@ -662,14 +664,12 @@ func (app *App) showModBrowser() {
 	updateSearchModeUI := func(onlyNames bool) {
 		phNames := app.msg("browser_search_ph_names")
 		if phNames == "" {
-			phNames = "Начните вводить название мода..."
+			phNames = "Start typing a mod name..."
 		}
-
 		phAll := app.msg("browser_search_ph_all")
 		if phAll == "" {
-			phAll = "Начните вводить название, описание или имя автора..."
+			phAll = "Start typing a name, description, or author..."
 		}
-
 		if onlyNames {
 			searchEntry.SetPlaceHolder(phNames)
 			searchTheme.primaryColor = colorPink
@@ -677,7 +677,7 @@ func (app *App) showModBrowser() {
 			searchEntry.SetPlaceHolder(phAll)
 			searchTheme.primaryColor = colorBlue
 		}
-		searchEntryWithTheme.Refresh()
+		searchBar.Refresh()
 	}
 
 	// Вызываем при старте (false = искать везде)
@@ -696,7 +696,7 @@ func (app *App) showModBrowser() {
 		}
 	}
 
-	btnSearchNexus = NewCustomButton(app.msg("btn_browser_search_nexus"), func() {
+	btnSearchNexus = NewCustomIconButton(app.msg("btn_browser_search_nexus"), app.loadIconResource("nexus", "assets/buttons/nexus_orange.png"), func() {
 		stopSearchBlink()
 
 		q := searchEntry.Text
@@ -740,7 +740,6 @@ func (app *App) showModBrowser() {
 		}()
 	})
 
-	// Обработка Enter в поле поиска (запускает поиск по Nexus)
 	searchEntry.OnSubmitted = func(s string) {
 		if !btnSearchNexus.Disabled() {
 			btnSearchNexus.OnTapped()
@@ -748,7 +747,7 @@ func (app *App) showModBrowser() {
 	}
 
 	// Выносим логику поиска в отдельную функцию, чтобы вызывать её из двух мест
-	doSearch := func(s string) {
+	doSearch = func(s string) {
 		currentSearchQuery = s
 		if s == "" {
 			if searchTimer != nil {
@@ -824,16 +823,6 @@ func (app *App) showModBrowser() {
 		})
 	}
 
-	searchEntry.OnChanged = func(s string) {
-		if s != "" {
-			searchClearBtn.Show()
-		} else {
-			searchClearBtn.Hide()
-		}
-		searchBar.Refresh()
-		doSearch(s)
-	}
-
 	// При переключении галочки перезапускаем поиск и обновляем цвета/плейсхолдер
 	checkBox.OnChanged = func(b bool) {
 		updateSearchModeUI(b)
@@ -856,7 +845,6 @@ func (app *App) showModBrowser() {
 	nexusTableBorder.StrokeColor = color.NRGBA{R: 255, G: 140, B: 0, A: 255}
 	nexusTableBorder.Hide()
 
-	// Строка поиска остается наверху, а сплиттер разделяет Таблицу+Заголовки и Карточку
 	topPanelBg := canvas.NewRectangle(th.Color(themes.ColorTopPanelBg, variant))
 	topBarContent := container.NewVBox(
 		container.NewPadded(container.NewBorder(nil, nil, btnSearchNexus, checkBox, searchBar)),
@@ -865,7 +853,6 @@ func (app *App) showModBrowser() {
 	)
 	topBar := container.NewStack(topPanelBg, topBarContent)
 
-	// Оборачиваем левую панель в Stack, чтобы рамка рисовалась ПОВЕРХ таблицы и заголовков
 	leftPanelInner := container.NewBorder(headerTable, nil, nil, nil, tableContent)
 	leftPanel = container.NewStack(leftPanelInner, nexusTableBorder)
 
@@ -888,7 +875,7 @@ func (app *App) showModBrowser() {
 		}
 	}
 
-	// Горячие клавиши: Ctrl+F для фокуса на поиске
+	// Ctrl+F для фокуса на поиске
 	win.Canvas().AddShortcut(&desktop.CustomShortcut{
 		KeyName:  fyne.KeyF,
 		Modifier: fyne.KeyModifierControl,
@@ -937,16 +924,11 @@ func createHighlightedSegments(text, query string, baseStyle widget.RichTextStyl
 			})
 		}
 
-		// Сам НАЙДЕННЫЙ текст (подсвечиваем фоном)
 		highlightStyle := baseStyle
 		highlightStyle.TextStyle.Bold = true
 
-		// Белый текст на цветной подложке.
-		// В стандартной теме белый даёт, например, ColorNameForegroundOnError
-		// (или ForegroundOnPrimary). Подставьте тот, что в вашей теме — белый.
 		highlightStyle.ColorName = theme.ColorNameForegroundOnError
 
-		// Подложка цвета, как вы просили — #c0ff1a в вашей теме
 		highlightStyle.BackgroundColorName = theme.ColorNameForegroundOnWarning
 
 		segments = append(segments, &widget.TextSegment{

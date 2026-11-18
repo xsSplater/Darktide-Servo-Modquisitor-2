@@ -52,7 +52,7 @@ func ComputeModsSignature(modsPath string) (string, error) {
 		entries = append(entries, entry{
 			rel:   filepath.ToSlash(rel),
 			size:  info.Size(),
-			mtime: info.ModTime().Unix(),
+			mtime: info.ModTime().UnixNano(),
 		})
 		return nil
 	})

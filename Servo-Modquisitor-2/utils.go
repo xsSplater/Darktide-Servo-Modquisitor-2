@@ -21,7 +21,6 @@ import (
 	"time"
 
 	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/widget"
 	golocale "github.com/jeandeaual/go-locale"
 )
 
@@ -124,25 +123,30 @@ func (app *App) runAllChecksInternal(openFileAtEnd bool) bool {
 		app.appendLogToFile("runAllChecks: mainWindow not ready, aborting")
 		return false
 	}
-	checks.CheckInstallation(app.mainWindow)
-	checks.EnsureModLoadOrder(app.mainWindow)
-
-	if !checks.CheckObsoleteMods(app.mainWindow) {
+	if !checks.CheckInstallation(app.mainWindow) {
 		return false
 	}
+	checks.EnsureModLoadOrder(app.mainWindow)
+
 	if !checks.CheckMalformed(app.mainWindow) {
 		return false
 	}
 	if !checks.CheckEmptyFolders(app.mainWindow) {
 		return false
 	}
-	if !checks.CheckIncompatible(app.mainWindow) {
-		return false
+
+	// Один батч-диалог на все «удаляемые» проблемы:
+	// obsolete + conflict + broken + missing.
+	problems := app.collectAllProblems()
+	if len(problems) > 0 {
+		app.showBatchDialogSync(app.msg("problems_title"), problems, BatchModeDelete)
+	} else {
+		app.appendLog(app.msg("no_problems_found"))
 	}
+
+	// Зависимости — отдельно, там конструктивные действия
+	// (enable required / open pages), не удаление.
 	if !checks.CheckDependencies(app.mainWindow) {
-		return false
-	}
-	if !checks.CheckBrokenMods(app.mainWindow) {
 		return false
 	}
 
@@ -331,47 +335,23 @@ func (app *App) runAllChecksInternal(openFileAtEnd bool) bool {
 
 func (app *App) forceRefreshTable() {
 	if app.modTable == nil {
-		app.appendLogToFile("forceRefreshTable: modTable is nil, skipping")
-		return
-	}
-	if app.mainWindow == nil || app.mainWindow.Canvas() == nil {
-		app.appendLogToFile("forceRefreshTable: mainWindow or Canvas is nil, skipping")
 		return
 	}
 
-	// Шаг 1. Гарантируем, что Length — живой closure.
+	// Убеждаемся, что таблица получает актуальную длину.
 	app.modTable.Length = func() (int, int) {
 		return len(app.displayedMods), TableColumnCount
 	}
 
-	// Шаг 2. Трюк «bump Length». Fyne Table кэширует состояние
-	// прокрутки/видимых строк и на обычном Refresh() не всегда
-	// перечитывает Length, если внутренний кэш считает, что «число
-	// строк не изменилось». В итоге displayedMods уже 114, счётчик
-	// показывает 114, а рендер всё ещё рисует 0 строк — что и
-	// проявляется как «таблица схлопнулась после автосортировки».
-	//
-	// Подменяем Length на значение +1, Refresh (Fyne видит «стало
-	// больше строк» и делает полный re-layout), затем возвращаем
-	// живой closure и Refresh ещё раз — окончательная раскладка
-	// происходит уже по правильному числу строк.
-	rows, _ := app.modTable.Length()
-	app.modTable.Length = func() (int, int) { return rows + 1, TableColumnCount }
 	app.modTable.Refresh()
 
-	app.modTable.Length = func() (int, int) {
-		return len(app.displayedMods), TableColumnCount
-	}
-	app.modTable.Refresh()
-
-	// Шаг 3. Обновляем соседние виджеты.
+	// Обновляем соседние виджеты.
 	if app.tableBorderContainer != nil {
 		app.tableBorderContainer.Refresh()
 	}
 	if app.headerTable != nil {
 		app.headerTable.Refresh()
 	}
-	app.mainWindow.Canvas().Refresh(app.modTable)
 }
 
 // restoreSelectedMod после обновления списка пытается выделить и прокрутить к ранее выбранному моду
@@ -382,19 +362,9 @@ func (app *App) restoreSelectedMod(savedModName string) {
 	// Даём время таблице перестроиться после refreshModList()
 	time.AfterFunc(50*time.Millisecond, func() {
 		fyne.Do(func() {
-			for i, m := range app.displayedMods {
-				if m.Name == savedModName {
-					app.modTable.Select(widget.TableCellID{Row: i, Col: 0}, 0)
-					app.modTable.ScrollTo(widget.TableCellID{Row: i, Col: 0})
-					// updateDescriptionForMod вызовется автоматически через OnSelected
-					return
-				}
+			if !app.focusModByName(savedModName, true) {
+				app.clearFocus()
 			}
-			// Если мод не найден (например, был удалён), очищаем выделение
-			app.selectedModName = ""
-			app.selectedModIndex.Store(-1)
-			app.updateDescriptionForMod("")
-			app.updateUpDownButtons()
 		})
 	})
 }
@@ -1151,9 +1121,7 @@ func mapSystemLocaleToSupported(locale string) string {
 	// Особые случаи: регион/скрипт значим.
 	switch base {
 	case "pt":
-		// У нас только pt-BR. pt-PT тоже мапим на pt-BR — лучше, чем
-		// ничего, раз всё равно перевод близкий.
-		return "pt-BR"
+		return "pt-br"
 	case "zh":
 		if len(parts) > 1 {
 			switch parts[1] {
@@ -1166,7 +1134,6 @@ func mapSystemLocaleToSupported(locale string) string {
 		return "zh-hans" // fallback
 	}
 
-	// Простые двухбуквенные коды — совпадают с нашими 1:1.
 	switch base {
 	case "en", "ru", "de", "es", "fr", "it", "ja", "ko", "pl":
 		return base
@@ -1298,7 +1265,7 @@ func (app *App) applyAMLWarningState() {
 						app.cfgMutex.Lock()
 						app.cfg.SuppressAMLWarning = true
 						app.cfgMutex.Unlock()
-						saveConfig(app.cfg)
+						app.saveConfigSafe()
 					}
 				},
 				app.msg("btn_open_dml_page"),
@@ -1340,4 +1307,32 @@ func (app *App) applyAMLWarningState() {
 	if app.btnSortChecks != nil {
 		app.btnSortChecks.SetWarningFrame(aml)
 	}
+}
+
+// getIconForButton пытается подобрать кастомную иконку для стандартных
+// кнопок диалогов по их локализованному тексту.
+func (app *App) getIconForButton(text string) fyne.Resource {
+	switch text {
+	case app.msg("btn_yes"), app.msg("btn_ok"), app.msg("btn_confirm"), app.msg("btn_continue"):
+		return app.loadIconResource("ok", "assets/buttons/checked_box.png")
+	case app.msg("btn_no"), app.msg("btn_cancel"), app.msg("btn_close"), app.msg("theme_editor_btn_close"):
+		return app.loadIconResource("cancel", "assets/buttons/x_.png")
+	case app.msg("btn_save"), app.msg("btn_save_and_refresh"):
+		return app.loadIconResource("save", "assets/buttons/save.png")
+	case app.msg("btn_delete"), app.msg("btn_remove"), app.msg("delete_broken"), app.msg("delete_obsolete"), app.msg("delete_empty"), app.msg("delete_first"), app.msg("delete_second"), app.msg("delete_dependent"):
+		return app.loadIconResource("trash", "assets/buttons/trashcan_red.png")
+	case app.msg("btn_install"), app.msg("install_collection_current_profile"):
+		return app.loadIconResource("add", "assets/buttons/add.png")
+	case app.msg("btn_update_mod"), app.msg("btn_update_mods"), app.msg("btn_update_selected"), app.msg("btn_update"):
+		return app.loadIconResource("update", "assets/buttons/upd_download_blue.png")
+	case app.msg("btn_refresh"), app.msg("btn_refresh_anyway"):
+		return app.loadIconResource("refresh", "assets/buttons/refresh.png")
+	case app.msg("btn_open_steam_guide"), app.msg("btn_open_nexus_for_mod"), app.msg("btn_open_dml_page"), app.msg("btn_open_nexus"):
+		return app.loadIconResource("nexus", "assets/buttons/nexus_orange.png")
+	case app.msg("open_mods_folder"), app.msg("open_mod_folder"):
+		return app.loadIconResource("folder", "assets/buttons/folder_open.png")
+	case app.msg("skip"), app.msg("btn_skip"):
+		return app.loadIconResource("skip", "assets/buttons/skip.png")
+	}
+	return nil
 }

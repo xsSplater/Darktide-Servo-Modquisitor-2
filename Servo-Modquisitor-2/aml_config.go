@@ -1,13 +1,4 @@
 // Servo-Modquisitor-2/aml_config.go
-//
-// The "AML Configuration" window. AML (Auto Mod Loading and Ordering) reads the
-// top-level load_after / load_before / require tables from each mod's ".mod"
-// file to decide load order. This window scans every installed mod, shows which
-// ones have that metadata, and lets the user edit it — fully button-driven,
-// matching the main UI.
-//
-// The left mod list is now a table with columns: Folder Name | Load After | Load Before | Required
-// The right panel has three sections that stretch evenly, with row striping similar to the main table.
 package main
 
 import (
@@ -30,10 +21,6 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-// amlOverrideTheme delegates to the app's active theme but makes selection
-// highlights use the main UI's table-selection color (ColorTableRowSelected),
-// so the AML window's hover/select match the rest of the program. (Hover
-// already uses the shared ColorNameHover, so only selection needs remapping.)
 type amlOverrideTheme struct {
 	fyne.Theme
 }
@@ -59,14 +46,19 @@ type amlEdit struct {
 // sectionHeaderKeys maps each editable list (in lists[] order) to its message key.
 var sectionHeaderKeys = [3]string{"aml_editor_load_after", "aml_editor_load_before", "aml_editor_require"}
 
-// getAMLDisplayName возвращает локализованное отображаемое имя мода по имени папки.
-func (app *App) getAMLDisplayName(folder string) string {
+// modDisplayName возвращает отображаемое имя мода по имени папки.
+func (app *App) modDisplayName(folder string) string {
 	entry := checks.GetModDBEntry(folder)
 	if entry == nil {
 		return folder
 	}
+
+	app.cfgMutex.RLock()
 	lang := app.cfg.Language
-	if app.cfg.ForceEnglishModNames {
+	forceEn := app.cfg.ForceEnglishModNames
+	app.cfgMutex.RUnlock()
+
+	if forceEn {
 		lang = "en"
 	}
 	name := checks.PickLocalized(entry.Name, lang)
@@ -77,11 +69,24 @@ func (app *App) getAMLDisplayName(folder string) string {
 }
 
 func (app *App) showAMLConfigWindow() {
+	if !app.acquireWindow("aml_config") {
+		return
+	}
+
 	win := app.myApp.NewWindow(app.msg("aml_config_title"))
+	app.registerWindow("aml_config", win)
 	selTheme := amlOverrideTheme{Theme: app.myApp.Settings().Theme()}
 
-	configs := checks.ListAMLConfigs() // all mods (source of truth)
+	configs := checks.ListAMLConfigs()
 	allFolders := checks.ListModFolders()
+
+	// sortedConfigs — кэш результата sortAMLOrder. Пересчитывается:
+	//   - при первом обращении (initial applyModFilter ниже);
+	//   - после Reload (пользователь мог обновить auto_mod_loader_log.txt).
+	// После Save НЕ пересчитываем: сохраняются только списки/версия/автор,
+	// имена папок не меняются, порядок из лог-файла остаётся тем же.
+	var sortedConfigs []checks.AMLModConfig
+	var sortedConfigsValid bool
 
 	var displayed []checks.AMLModConfig // filtered + sorted view of configs
 	edit := &amlEdit{}
@@ -110,7 +115,6 @@ func (app *App) showAMLConfigWindow() {
 	markerWidth := float32(30)
 
 	// Иконки-маркеры для колонки «есть ли AML-настройки у мода».
-	// checked_box.png — есть конфиг, unchecked_box_red.png — нет.
 	amlCheckedIcon := app.loadIconResource("checked_box", "assets/buttons/checked_box.png")
 	amlUncheckedIcon := app.loadIconResource("unchecked_box_red", "assets/buttons/unchecked_box_red.png")
 
@@ -118,13 +122,7 @@ func (app *App) showAMLConfigWindow() {
 		func() (int, int) { return len(displayed), 5 },
 		func() fyne.CanvasObject {
 			bg := canvas.NewRectangle(color.Transparent)
-			// Явная минимальная высота строки: Fyne берёт MinSize шаблона
-			// как высоту. Пустой прозрачный прямоугольник даёт (0,0) и
-			// строки схлопываются.
 			bg.SetMinSize(fyne.NewSize(1, 28))
-			// Универсальный контейнер: что положить внутрь — решает
-			// updateCell по id.Col. Так одна ячейка может держать либо
-			// Label, либо Image.
 			content := container.NewStack()
 			return container.NewStack(bg, content)
 		},
@@ -137,13 +135,10 @@ func (app *App) showAMLConfigWindow() {
 			bg := outer.Objects[0].(*canvas.Rectangle)
 			content := outer.Objects[1].(*fyne.Container)
 
-			// Сбрасываем содержимое — templateSize переиспользует ячейки,
-			// поэтому нельзя «докидывать» в существующий контейнер.
 			content.Objects = nil
 
 			switch id.Col {
 			case 0:
-				// Иконка-маркер, выровнена по центру.
 				var icon fyne.Resource
 				if c.HasConfig {
 					icon = amlCheckedIcon
@@ -158,7 +153,7 @@ func (app *App) showAMLConfigWindow() {
 				}
 
 			case 1:
-				lbl := widget.NewLabel(app.getAMLDisplayName(c.Folder))
+				lbl := widget.NewLabel(app.modDisplayName(c.Folder))
 				lbl.Alignment = fyne.TextAlignLeading
 				content.Add(lbl)
 
@@ -203,27 +198,26 @@ func (app *App) showAMLConfigWindow() {
 
 	modList.OnSelected = func(id widget.TableCellID) {
 		if int(id.Row) >= 0 && int(id.Row) < len(displayed) {
-			loadMod(displayed[id.Row])
-			// Перерисовать — иначе выделение не появится.
+			c := displayed[id.Row]
+			if c.Folder == selectedFolder {
+				modList.Refresh()
+				return
+			}
+			loadMod(c)
 			modList.Refresh()
 		}
 	}
 
 	// ── filter apply ──────────────────────────────────────────────────
 	applyModFilter = func() {
-		q := strings.ToLower(strings.TrimSpace(searchText))
-		sortedAll := sortAMLOrder(configs)
-
-		// --- Логирование для дебага (построчно с номерами) ---
-		app.appendLogToFile("=== AML Sorted Order ===")
-		for i, c := range sortedAll {
-			app.appendLogToFile(fmt.Sprintf("%3d: %s", i+1, c.Folder))
+		if !sortedConfigsValid {
+			sortedConfigs = sortAMLOrder(configs)
+			sortedConfigsValid = true
 		}
-		app.appendLogToFile("=== End of AML Order ===")
-		// --- Конец лога ---
+		q := strings.ToLower(strings.TrimSpace(searchText))
 
 		displayed = displayed[:0]
-		for _, c := range sortedAll {
+		for _, c := range sortedConfigs {
 			if filterMode == 1 && !c.HasConfig {
 				continue
 			}
@@ -249,12 +243,9 @@ func (app *App) showAMLConfigWindow() {
 		}
 	}
 
-	// ── Создаём saveBtn с пустым обработчиком, потом определим функцию и назначим обработчик ──
-	saveBtn = NewCustomButton(app.msg("aml_btn_save"), nil)
+	saveBtn = NewCustomIconButton(app.msg(""), app.loadIconResource("save", "assets/buttons/save.png"), nil)
 
 	// ── Определяем функцию обновления внешнего вида кнопки Save (мигание) ──
-	// ── Определяем функцию обновления внешнего вида кнопки Save (мигание) ──
-	//
 	// dirty и blinkActive — atomic.Bool, потому что цикл мигания живёт
 	// в отдельной горутине и читает оба флага, пока UI-поток их пишет.
 	updateSaveButtonAppearance := func() {
@@ -307,6 +298,11 @@ func (app *App) showAMLConfigWindow() {
 		if selectedFolder == "" {
 			return
 		}
+		if !dirty.Load() {
+			app.appendLogToFile("AML: save skipped, no changes")
+			return
+		}
+
 		cfg := checks.AMLModConfig{
 			Folder:      edit.folder,
 			ModFilePath: edit.path,
@@ -351,7 +347,7 @@ func (app *App) showAMLConfigWindow() {
 	saveBtn.SetToolTip(app.msg("btn_aml_config_tooltip"))
 
 	// ── reloadBtn ──
-	reloadBtn = NewCustomButton(app.msg("aml_btn_reload"), func() {
+	reloadBtn = NewCustomIconButton(app.msg(""), app.loadIconResource("refresh", "assets/buttons/refresh.png"), func() {
 		go func() {
 			// Функция для выполнения перезагрузки (вынесена для избежания дублирования)
 			doReload := func() {
@@ -362,6 +358,7 @@ func (app *App) showAMLConfigWindow() {
 				fyne.Do(func() {
 					configs = newConfigs
 					allFolders = newAllFolders
+					sortedConfigsValid = false
 					applyModFilter()
 					for _, c := range configs {
 						if c.Folder == selectedFolder {
@@ -386,55 +383,68 @@ func (app *App) showAMLConfigWindow() {
 				)
 				switch choice {
 				case 0: // Save and Reload
-					// Сохраняем изменения
-					if selectedFolder != "" {
+					// Снимок состояния — на UI-потоке, чтобы не гонять
+					// edit.* и allFolders между горутиной и UI.
+					var (
+						snapFolder     string
+						snapPath       string
+						snapVersion    string
+						snapAuthor     string
+						snapLists      [3][]string
+						snapAllFolders []string
+					)
+					fyne.DoAndWait(func() {
+						snapFolder = edit.folder
+						snapPath = edit.path
+						snapVersion = edit.version
+						snapAuthor = edit.author
+						for k := 0; k < 3; k++ {
+							snapLists[k] = append([]string{}, edit.lists[k]...)
+						}
+						snapAllFolders = append([]string{}, allFolders...)
+					})
+
+					if snapFolder != "" {
 						cfg := checks.AMLModConfig{
-							Folder:      edit.folder,
-							ModFilePath: edit.path,
-							LoadAfter:   edit.lists[0],
-							LoadBefore:  edit.lists[1],
-							Require:     edit.lists[2],
+							Folder:      snapFolder,
+							ModFilePath: snapPath,
+							LoadAfter:   snapLists[0],
+							LoadBefore:  snapLists[1],
+							Require:     snapLists[2],
+							Version:     snapVersion,
+							Author:      snapAuthor,
 						}
 						if err := checks.WriteAMLConfig(cfg); err != nil {
 							fyne.Do(func() {
-								app.appendLogToFile(fmt.Sprintf(app.msg("aml_log_save_failed"), edit.folder, err))
+								app.appendLogToFile(fmt.Sprintf(app.msg("aml_log_save_failed"), snapFolder, err))
 							})
 							return
 						}
 						fyne.Do(func() {
-							app.appendLogToFile(fmt.Sprintf(app.msg("aml_log_saved"), edit.folder))
+							app.appendLogToFile(fmt.Sprintf(app.msg("aml_log_saved"), snapFolder))
 						})
-						// Проверка зависимостей
-						installed := make(map[string]bool, len(allFolders))
-						for _, f := range allFolders {
+
+						installed := make(map[string]bool, len(snapAllFolders))
+						for _, f := range snapAllFolders {
 							installed[f] = true
 						}
-						for _, lst := range edit.lists {
+						for _, lst := range snapLists {
 							for _, e := range lst {
 								if !installed[e] {
 									fyne.Do(func() {
-										app.appendLogToFile(fmt.Sprintf(app.msg("aml_log_unknown_ref"), edit.folder, e))
+										app.appendLogToFile(fmt.Sprintf(app.msg("aml_log_unknown_ref"), snapFolder, e))
 									})
 								}
 							}
 						}
-						// Обновляем configs для выбранного мода (в фоне)
-						for i := range configs {
-							if configs[i].Folder == selectedFolder {
-								configs[i] = checks.ReadAMLConfig(selectedFolder)
-								break
-							}
-						}
 					}
-					// После сохранения выполняем перезагрузку
 					doReload()
 				case 2: // Reload anyway
 					doReload()
-				case 1: // Cancel - ничего не делаем
+				case 1: // Cancel
 					return
 				}
 			} else {
-				// обычная перезагрузка
 				doReload()
 			}
 		}()
@@ -442,29 +452,37 @@ func (app *App) showAMLConfigWindow() {
 	reloadBtn.SetToolTip(app.msg("btn_refresh_tooltip")) // используем существующий тултип
 
 	// ── right: editor widgets ────────────────────────────────────────
-	editorTitle := widget.NewLabelWithStyle(app.msg("aml_select_mod_hint"), fyne.TextAlignLeading, fyne.TextStyle{Bold: true})
+	editorTitle := helpers.BoldLabel(app.msg("aml_select_mod_hint"))
 	editorTitle.Wrapping = fyne.TextWrapWord
+
+	var suppressChange atomic.Bool
 
 	versionEntry := widget.NewEntry()
 	versionEntry.SetPlaceHolder(app.msg("placeholder_mod_version"))
+
 	versionEntry.OnChanged = func(s string) {
+		if suppressChange.Load() {
+			return
+		}
 		edit.version = s
 		dirty.Store(true)
 		updateSaveButtonAppearance()
 	}
-	versionSpacer := canvas.NewRectangle(color.Transparent)
-	versionSpacer.SetMinSize(fyne.NewSize(150, 1))
+	versionSpacer := helpers.NewFixedSpacer(150, 1)
 	versionEntryBox := container.NewStack(versionSpacer, versionEntry)
 
 	authorEntry := widget.NewEntry()
 	authorEntry.SetPlaceHolder(app.msg("author_unknown"))
+
 	authorEntry.OnChanged = func(s string) {
+		if suppressChange.Load() {
+			return
+		}
 		edit.author = s
 		dirty.Store(true)
 		updateSaveButtonAppearance()
 	}
-	authorSpacer := canvas.NewRectangle(color.Transparent)
-	authorSpacer.SetMinSize(fyne.NewSize(300, 1))
+	authorSpacer := helpers.NewFixedSpacer(300, 1)
 	authorEntryBox := container.NewStack(authorSpacer, authorEntry)
 
 	var addBtns [3]*CustomButton
@@ -499,63 +517,15 @@ func (app *App) showAMLConfigWindow() {
 		updateSaveButtonAppearance()
 	}
 
-	// showSearchPopup displays a searchable modal list and calls onPick with the
-	// chosen value. Both Add and Remove use it, so they behave the same way —
-	// Add's candidates are the installed mods, Remove's are the array's current
-	// entries.
+	// showSearchPopup теперь вызывает универсальный app.ShowSearchPopup.
 	showSearchPopup := func(title string, source []string, onPick func(string)) {
-		var filtered []string
-		apply := func(q string) {
-			q = strings.ToLower(strings.TrimSpace(q))
-			filtered = filtered[:0]
-			for _, f := range source {
-				if q == "" || strings.Contains(strings.ToLower(f), q) {
-					filtered = append(filtered, f)
-				}
-			}
-		}
-		apply("")
-
-		var pop *widget.PopUp
-		list := widget.NewList(
-			func() int { return len(filtered) },
-			func() fyne.CanvasObject { return widget.NewLabel("") },
-			func(id widget.ListItemID, o fyne.CanvasObject) {
-				if id >= 0 && id < len(filtered) {
-					o.(*widget.Label).SetText(filtered[id])
-				}
-			},
-		)
-		list.OnSelected = func(id widget.ListItemID) {
-			if int(id) >= 0 && int(id) < len(filtered) {
-				onPick(filtered[id])
-				pop.Hide()
-			}
-		}
-
-		search := widget.NewEntry()
-		search.SetPlaceHolder(app.msg("search_placeholder"))
-		search.OnChanged = func(q string) {
-			apply(q)
-			list.UnselectAll()
-			list.Refresh()
-		}
-
-		titleLbl := widget.NewLabelWithStyle(title, fyne.TextAlignCenter, fyne.TextStyle{Bold: true})
-		listScroll := container.NewVScroll(list)
-		listScroll.SetMinSize(fyne.NewSize(330, 320))
-		cancel := NewCustomButton(app.msg("btn_cancel"), func() { pop.Hide() })
-
-		content := container.NewBorder(
-			container.NewVBox(titleLbl, search),
-			container.NewCenter(cancel),
-			nil, nil,
-			listScroll,
-		)
-		pop = widget.NewModalPopUp(container.NewThemeOverride(content, selTheme), win.Canvas())
-		pop.Resize(fyne.NewSize(390, 440))
-		pop.Show()
-		win.Canvas().Focus(search)
+		app.ShowSearchPopup(SearchPopupOptions{
+			Title:  title,
+			Source: source,
+			Parent: win,
+			OnPick: onPick,
+			// FormatRow: по умолчанию app.modDisplayName(folder)
+		})
 	}
 
 	// openPicker (Add): pick an installed mod (minus the current mod and any
@@ -667,8 +637,8 @@ func (app *App) showAMLConfigWindow() {
 				label.Refresh()
 			},
 		)
-		secTable.SetColumnWidth(0, 30)
-		secTable.SetColumnWidth(1, 220)
+		secTable.SetColumnWidth(0, ColSelectWidth)
+		secTable.SetColumnWidth(1, ColAuthorWidth)
 		secTable.SetRowHeight(-1, 26)
 		sectionTables[idx] = secTable
 
@@ -693,9 +663,12 @@ func (app *App) showAMLConfigWindow() {
 		edit.lists[1] = append([]string{}, c.LoadBefore...)
 		edit.lists[2] = append([]string{}, c.Require...)
 
-		editorTitle.SetText(app.getAMLDisplayName(c.Folder))
+		editorTitle.SetText(app.modDisplayName(c.Folder))
+
+		suppressChange.Store(true)
 		versionEntry.SetText(c.Version)
 		authorEntry.SetText(c.Author)
+		suppressChange.Store(false)
 
 		// Обновляем таблицы разделов.
 		for k := 0; k < 3; k++ {
@@ -710,31 +683,18 @@ func (app *App) showAMLConfigWindow() {
 		updateSaveButtonAppearance()
 	}
 
-	// left-list filter controls
-	searchEntry := widget.NewEntry()
-	searchEntry.SetPlaceHolder(app.msg("search_placeholder"))
-
-	searchClearBtn := NewCustomButton("✕", func() {
-		searchEntry.SetText("")
+	searchField := app.NewSearchField(SearchFieldOptions{
+		Width:         AMLSearchMinWidth,
+		DebounceDelay: 300 * time.Millisecond,
+		ShowClear:     true,
+		// Backsp-иконка теперь единая. Раньше тут стояла
+		// select_all_de.png — семантически неверная.
+		OnFilter: func(s string) {
+			searchText = s
+			applyModFilter()
+		},
 	})
-	searchClearBtn.Importance = widget.DangerImportance
-	searchClearBtn.Hide()
-
-	searchEntry.OnChanged = func(s string) {
-		searchText = s
-		if s != "" {
-			searchClearBtn.Show()
-		} else {
-			searchClearBtn.Hide()
-		}
-		applyModFilter()
-	}
-
-	searchSpacer := canvas.NewRectangle(color.Transparent)
-	searchSpacer.SetMinSize(fyne.NewSize(AMLSearchMinWidth, 1))
-	searchEntryBox := container.NewStack(searchSpacer, searchEntry)
-
-	searchBox := container.NewBorder(nil, nil, nil, searchClearBtn, searchEntryBox)
+	searchBox := searchField.Container
 
 	filterLabel := widget.NewLabel(app.msg("filter_label"))
 
@@ -758,8 +718,7 @@ func (app *App) showAMLConfigWindow() {
 	)
 	filterSelect.Selected = app.msg("filter_all")
 
-	filterSpacer := canvas.NewRectangle(color.Transparent)
-	filterSpacer.SetMinSize(fyne.NewSize(AMLFilterMinWidth, 1))
+	filterSpacer := helpers.NewFixedSpacer(AMLFilterMinWidth, 1)
 	filterSelectWithSize := container.NewStack(filterSpacer, filterSelect)
 
 	leftTop := container.NewHBox(
@@ -793,9 +752,9 @@ func (app *App) showAMLConfigWindow() {
 			case 1:
 				lbl.SetText(app.msg("col_name"))
 			case 2:
-				lbl.SetText(app.msg("aml_col_load_after"))
+				lbl.SetText(app.msg("after"))
 			case 3:
-				lbl.SetText(app.msg("aml_col_load_before"))
+				lbl.SetText(app.msg("before"))
 			case 4:
 				lbl.SetText(app.msg("aml_col_required"))
 			}
@@ -811,21 +770,15 @@ func (app *App) showAMLConfigWindow() {
 
 	// Фон для левой панели (как в основной таблице, ImageFillContain)
 	leftContent := container.NewBorder(headerTable, nil, nil, nil, modList)
-	mechData, _ := embeddedFiles.ReadFile(TableBackgroundImage)
-	if mechData != nil {
-		mechBg := canvas.NewImageFromResource(fyne.NewStaticResource(TableBackgroundImage, mechData))
-		mechBg.FillMode = canvas.ImageFillContain
-		mechBg.Translucency = TableBackgroundOpacity
-		leftContent = container.NewStack(mechBg, leftContent)
-	}
+	leftContent = app.newTableBackground(TableBackgroundOpacity, leftContent)
 	leftPanel := container.NewBorder(leftTop, nil, nil, nil, leftContent)
 
 	// ── assemble right editor with buttons on top ──────────────────
 	// Создаём кнопки Add/Remove для каждой секции
 	for i := 0; i < 3; i++ {
 		idx := i
-		addBtns[idx] = NewCustomButton(app.msg("aml_btn_add"), func() { openPicker(idx) })
-		remBtns[idx] = NewCustomButton(app.msg("aml_btn_remove"), func() { openRemovePicker(idx) })
+		addBtns[idx] = NewCustomIconButton(app.msg(""), app.loadIconResource("add", "assets/buttons/add.png"), func() { openPicker(idx) })
+		remBtns[idx] = NewCustomIconButton(app.msg(""), app.loadIconResource("trash", "assets/buttons/trashcan_red.png"), func() { openRemovePicker(idx) })
 	}
 
 	section0 := buildSection(0)
@@ -860,7 +813,7 @@ func (app *App) showAMLConfigWindow() {
 	split := container.NewHSplit(leftPanel, editorScroll)
 	split.Offset = 0.6
 	win.SetContent(container.NewThemeOverride(split, selTheme))
-	win.Resize(fyne.NewSize(AMLWindowWidth, AMLWindowHeight))
+	win.Resize(fyne.NewSize(MainWindowWidth, MainWindowHeight))
 	win.Show()
 }
 

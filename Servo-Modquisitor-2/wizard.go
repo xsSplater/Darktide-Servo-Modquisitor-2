@@ -80,7 +80,7 @@ func (app *App) runWizard(force bool) {
 		{
 			ID:          "base",
 			Name:        "Darktide Mod Loader",
-			Description: "Основной загрузчик модов. Без него игра не загрузит ни один мод.",
+			Description: app.msg("wizard_desc_dml"),
 			NexusModID:  19,
 			Selected:    !app.checkDMLInstalled(),
 			Status:      BatchPending,
@@ -91,7 +91,7 @@ func (app *App) runWizard(force bool) {
 		{
 			ID:          "dmf",
 			Name:        "Darktide Mod Framework",
-			Description: "Библиотека, необходимая большинству модов.",
+			Description: app.msg("wizard_desc_dmf"),
 			NexusModID:  8,
 			Selected:    !app.checkDMFInstalled(),
 			Status:      BatchPending,
@@ -102,7 +102,7 @@ func (app *App) runWizard(force bool) {
 		{
 			ID:          "autopatch",
 			Name:        "Darktide Mod Autopatcher",
-			Description: "Автоматически патчит bundle_database.data при запуске игры.",
+			Description: app.msg("wizard_desc_autopatch"),
 			NexusModID:  709,
 			Selected:    !app.checkAutopatcherInstalled(),
 			Status:      BatchPending,

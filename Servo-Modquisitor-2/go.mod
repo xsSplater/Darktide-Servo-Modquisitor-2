@@ -61,7 +61,7 @@ require (
 	golang.org/x/text v0.43.0 // indirect
 )
 
-replace fyne.io/fyne/v2 => github.com/xsSplater/xssyne/v2 v2.1.1
+replace fyne.io/fyne/v2 => github.com/xsSplater/xssyne/v2 v2.1.5
 
 // replace fyne.io/fyne/v2 => /home/xssplater/Проекты/GitHub/xssyne // локальная папка
 

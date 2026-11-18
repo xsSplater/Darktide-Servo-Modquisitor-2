@@ -8,7 +8,6 @@ import (
 	"image/color"
 	"io"
 	"os"
-	"path/filepath"
 	"sort"
 	"strconv"
 	"strings"
@@ -642,6 +641,10 @@ func parseSettingsData(data string) (*SettingsNode, error) {
 // ─────────────────────────────────────────────────────────────────────
 
 func (app *App) showGameSettingsEditor() {
+	if !app.acquireWindow("settings_editor") {
+		return
+	}
+
 	settingsPath := app.getUserSettingsPath()
 	if _, err := os.Stat(settingsPath); os.IsNotExist(err) {
 		app.showInfoDialog(app.msg("error_title"), app.msg("settings_file_not_found"))
@@ -649,7 +652,8 @@ func (app *App) showGameSettingsEditor() {
 	}
 
 	win := app.myApp.NewWindow(app.msg("settings_editor_title"))
-	win.Resize(fyne.NewSize(1320, 820))
+	app.registerWindow("settings_editor", win)
+	win.Resize(fyne.NewSize(MainWindowWidth, MainWindowHeight))
 
 	root, err := parseSettingsFile(settingsPath)
 	if err != nil {
@@ -1007,7 +1011,7 @@ func (app *App) showGameSettingsEditor() {
 	headerVal.Objects[1].(*widget.Label).Alignment = fyne.TextAlignCenter
 
 	headerDesc := createFixedWidthLabel(400)
-	headerDesc.Objects[1].(*widget.Label).SetText(app.msg("usettingsconf_description"))
+	headerDesc.Objects[1].(*widget.Label).SetText(app.msg("description"))
 	headerDesc.Objects[1].(*widget.Label).TextStyle = fyne.TextStyle{Bold: true}
 	headerDesc.Objects[1].(*widget.Label).Alignment = fyne.TextAlignCenter
 
@@ -1171,7 +1175,7 @@ func (app *App) showGameSettingsEditor() {
 		searchText = s
 		rebuildRows()
 	}
-	clearSearchBtn := widget.NewButton("✕", func() {
+	clearSearchBtn := NewIconButton(app.loadIconResource("clear", "assets/buttons/backsp.png"), func() {
 		searchEntry.SetText("")
 	})
 	searchBox := container.NewBorder(
@@ -1194,28 +1198,13 @@ func (app *App) showGameSettingsEditor() {
 	)
 
 	// ─── Фон mechanicus под списком ──────────────────────────────
-	var listStack *fyne.Container
-	if mechData, err := embeddedFiles.ReadFile(TableBackgroundImage); err == nil && len(mechData) > 0 {
-		mechImg := canvas.NewImageFromResource(fyne.NewStaticResource(TableBackgroundImage, mechData))
-		mechImg.FillMode = canvas.ImageFillContain
-		mechImg.Translucency = settingsEditorBgOpacity
+	listBorder = canvas.NewRectangle(color.Transparent)
+	listBorder.StrokeWidth = 2
+	listBorder.StrokeColor = th.Color(themes.ColorTableBorderDirty, variant)
+	listBorder.FillColor = color.Transparent
+	listBorder.Hide()
 
-		listBorder = canvas.NewRectangle(color.Transparent)
-		listBorder.StrokeWidth = 2
-		listBorder.StrokeColor = th.Color(themes.ColorTableBorderDirty, variant)
-		listBorder.FillColor = color.Transparent
-		listBorder.Hide()
-
-		listStack = container.NewStack(mechImg, settingsList, listBorder)
-	} else {
-		listBorder = canvas.NewRectangle(color.Transparent)
-		listBorder.StrokeWidth = 2
-		listBorder.StrokeColor = th.Color(themes.ColorTableBorderDirty, variant)
-		listBorder.FillColor = color.Transparent
-		listBorder.Hide()
-
-		listStack = container.NewStack(settingsList, listBorder)
-	}
+	var listStack fyne.CanvasObject = app.newTableBackground(settingsEditorBgOpacity, settingsList, listBorder)
 
 	tableContainer := container.NewBorder(headerContainer, nil, nil, nil, listStack)
 
@@ -1395,84 +1384,4 @@ func (app *App) showGameSettingsEditor() {
 	tree.OpenBranch("sys")
 	tree.OpenBranch("mods")
 	rebuildRows()
-}
-
-// ─────────────────────────────────────────────────────────────────────
-// Восстановление из бэкапа
-// ─────────────────────────────────────────────────────────────────────
-
-func (app *App) showRestoreSettingsDialog() {
-	settingsPath := app.getUserSettingsPath()
-	configDir := filepath.Dir(configFilePath())
-	backupDir := filepath.Join(configDir, "backups", "user_settings")
-
-	if _, err := os.Stat(backupDir); os.IsNotExist(err) {
-		app.showInfoDialog(app.msg("usettings_info_title"), app.msg("usettings_no_backups"))
-		return
-	}
-	entries, err := os.ReadDir(backupDir)
-	if err != nil {
-		app.showInfoDialog(app.msg("usettings_error_title"), fmt.Sprintf(app.msg("usettings_read_backup_dir_failed"), err))
-		return
-	}
-	var backupFiles []string
-	for _, e := range entries {
-		if !e.IsDir() && strings.HasSuffix(e.Name(), ".config") {
-			backupFiles = append(backupFiles, e.Name())
-		}
-	}
-	if len(backupFiles) == 0 {
-		app.showInfoDialog(app.msg("usettings_info_title"), app.msg("usettings_no_backup_files"))
-		return
-	}
-	sort.Slice(backupFiles, func(i, j int) bool {
-		return backupFiles[i] > backupFiles[j]
-	})
-
-	selected := ""
-	list := widget.NewList(
-		func() int { return len(backupFiles) },
-		func() fyne.CanvasObject { return widget.NewLabel("") },
-		func(id widget.ListItemID, obj fyne.CanvasObject) {
-			obj.(*widget.Label).SetText(backupFiles[id])
-		},
-	)
-	list.OnSelected = func(id widget.ListItemID) {
-		selected = backupFiles[id]
-	}
-	var popUp *widget.PopUp
-	content := container.NewVBox(
-		widget.NewLabel(app.msg("usettings_select_backup")),
-		list,
-		container.NewHBox(
-			widget.NewButton(app.msg("usettings_restore_btn"), func() {
-				if selected == "" {
-					app.showInfoDialog(app.msg("usettings_info_title"), app.msg("usettings_select_file"))
-					return
-				}
-				popUp.Hide()
-				dialog.ShowConfirm(app.msg("usettings_confirm_title"), fmt.Sprintf(app.msg("usettings_confirm_restore"), selected), func(ok bool) {
-					if !ok {
-						return
-					}
-					app.createSettingsBackup()
-					src := filepath.Join(backupDir, selected)
-					data, err := os.ReadFile(src)
-					if err != nil {
-						app.showInfoDialog(app.msg("usettings_error_title"), fmt.Sprintf(app.msg("usettings_read_backup_failed"), err))
-						return
-					}
-					if err := os.WriteFile(settingsPath, data, 0644); err != nil {
-						app.showInfoDialog(app.msg("usettings_error_title"), fmt.Sprintf(app.msg("usettings_restore_failed"), err))
-						return
-					}
-					app.appendLog(fmt.Sprintf(app.msg("usettings_restored"), selected))
-				}, app.mainWindow)
-			}),
-			widget.NewButton(app.msg("btn_cancel"), func() { popUp.Hide() }),
-		),
-	)
-	popUp = widget.NewModalPopUp(content, app.mainWindow.Canvas())
-	popUp.Resize(fyne.NewSize(400, 300))
-	popUp.Show()
 }
